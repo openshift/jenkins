@@ -5,4 +5,4 @@ This is a Jenkins Docker image intended for use with [OpenShift v3](https://gith
 
 For an example of how to use it, [see this sample.](https://github.com/openshift/origin/blob/master/examples/jenkins/README.md)
 
-The image is pushed to DockerHub as openshift/jenkins.
+The image is pushed to DockerHub as openshift/jenkins-1-centos.
