@@ -33,3 +33,4 @@ EXPOSE 50000
 USER jenkins
 
 ENTRYPOINT ["/usr/local/bin/jenkins.sh"]
+
