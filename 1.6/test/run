@@ -1,0 +1,94 @@
+#!/bin/bash
+#
+# Test the Jenkins image.
+#
+# IMAGE_NAME specifies the name of the candidate image used for testing.
+# The image has to be available before this script is executed.
+#
+
+set -exo nounset
+shopt -s nullglob
+
+IMAGE_NAME=${IMAGE_NAME-openshift/jenkins-16-centos7-candidate}
+
+CIDFILE_DIR=$(mktemp --suffix=mysql_test_cidfiles -d)
+
+function cleanup() {
+  for cidfile in $CIDFILE_DIR/* ; do
+    CONTAINER=$(cat $cidfile)
+
+    echo "Stopping and removing container $CONTAINER..."
+    docker stop $CONTAINER
+    exit_status=$(docker inspect -f '{{.State.ExitCode}}' $CONTAINER)
+    if [ "$exit_status" != "0" ]; then
+      echo "Dumping logs for $CONTAINER"
+      docker logs $CONTAINER
+    fi
+    docker rm $CONTAINER
+    rm $cidfile
+    echo "Done."
+  done
+  rmdir $CIDFILE_DIR
+}
+trap cleanup EXIT SIGINT
+
+function get_cid() {
+  local id="$1" ; shift || return 1
+  echo $(cat "$CIDFILE_DIR/$id")
+}
+
+function get_container_ip() {
+  local id="$1" ; shift
+  docker inspect --format='{{.NetworkSettings.IPAddress}}' $(get_cid "$id")
+}
+
+function mysql_cmd() {
+  docker run --rm $IMAGE_NAME mysql --host $CONTAINER_IP -u$USER -p"$PASS" "$@" db
+}
+
+test_connection() {
+  set +e
+  echo "Testing HTTP connection..."
+  local max_attempts=10
+  local sleep_time=6
+  local attempt=1
+  local result=1
+  while [ $attempt -le $max_attempts ]; do
+    echo "Sending GET request to http://${CONTAINER_IP}:8080/"
+    response_code=$(curl -s -w %{http_code} -o /dev/null "http://${CONTAINER_IP}:8080/login?from=%2F")
+    status=$?
+    if [ $status -eq 0 ]; then
+      if [ $response_code -eq 200 ]; then
+        result=0
+        break
+      fi
+    fi
+    attempt=$(( $attempt + 1 ))
+    sleep $sleep_time
+  done
+  set -e
+  return $result
+}
+
+function create_container() {
+  local name=$1 ; shift
+  local cargs=${CONTAINER_ARGS:-}
+  cidfile="$CIDFILE_DIR/$name"
+  # create container with a cidfile in a directory for cleanup
+  docker run $cargs --cidfile $cidfile -d -p 8080:8080 "$@" $IMAGE_NAME
+  echo "Created container $(cat $cidfile)"
+}
+
+
+function run_tests() {
+  local name=$1 ; shift
+  create_container $name
+  CONTAINER_IP=$(get_container_ip $name)  
+  test_connection $name
+  echo "  Success!"
+}
+
+# Tests.
+
+# Normal tests
+run_tests jenkins_test
