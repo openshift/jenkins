@@ -9,7 +9,8 @@ function obfuscate_password {
 }
 
 if [ ! -e /var/lib/jenkins/configured ]; then
-  mv /opt/openshift/configuration/* /var/lib/jenkins
+  cp -r /opt/openshift/configuration/* /var/lib/jenkins
+  rm -rf /opt/openshift/configuration/*
   
   mkdir /tmp/war
   unzip -q /usr/lib/jenkins/jenkins.war -d /tmp/war
