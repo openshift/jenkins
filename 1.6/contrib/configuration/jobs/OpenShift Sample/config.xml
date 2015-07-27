@@ -83,7 +83,10 @@ TEST_ENDPOINT=`oc get service ${SERVICE} -t &apos;{{.spec.clusterIP}}{{&quot;:&q
 oc get rc -t &apos;{{ range .items }}{{.spec.selector.deploymentconfig}}{{&quot; &quot;}}{{.metadata.name}}{{&quot;\n&quot;}}{{end}}&apos; | grep -e &quot;^$DEPLOYMENT_CONFIG &quot; | awk &apos;{print $2}&apos; | while read -r test_rc_id; do
   echo &quot;Scaling down old deployment $test_rc_id&quot;
   oc scale --replicas=0 rc $test_rc_id
+  echo $test_rc_id &gt; old_rc_id
 done
+old_rc_id=`cat old_rc_id`
+
 
 # wait for old pods to be torn down
 # TODO should poll instead.
@@ -93,8 +96,16 @@ echo &quot;Triggering new application build and deployment&quot;
 BUILD_ID=`oc start-build ${BUILD_CONFIG}`
 
 # stream the logs for the build that just started
-oc build-logs $BUILD_ID
-
+rc=1
+count=0
+attempts=3
+set +e
+while [ $rc -ne 0 -a $count -lt $attempts ]; do
+  oc build-logs $BUILD_ID
+  rc=$?
+  count=$(($count+1))
+done
+set -e
 
 echo &quot;Checking build result status&quot;
 rc=1
@@ -122,7 +133,26 @@ if [ $rc -ne 0 ]; then
     exit 1
 fi
 
+
 # scale up the test deployment
+# if this gets scaled up before the new deployment occurs from the build,
+# bad things happen...need to make sure a new deployment has occurred first.
+count=0
+attempts=20
+new_rc_id="x"
+while [ $new_rc_id == $old_rc_id -a $count -lt $attempts ]; do
+  oc get rc -t &apos;{{ range .items }}{{.spec.selector.deploymentconfig}}{{&quot; &quot;}}{{.metadata.name}}{{&quot;\n&quot;}}{{end}}&apos; | grep -e &quot;^$DEPLOYMENT_CONFIG &quot; | awk &apos;{print $2}&apos; | while read -r test_rc_id; do
+    echo $test_rc_id &gt; new_rc_id
+  done
+  new_rc_id=`cat new_rc_id`  
+  count=$(($count+1))
+  sleep 1
+done
+if [ $count -eq $attempts ]; then
+  echo "Failure: Never found new deployment"
+  exit 1
+fi
+
 oc get rc -t &apos;{{ range .items }}{{.spec.selector.deploymentconfig}}{{&quot; &quot;}}{{.metadata.name}}{{&quot;\n&quot;}}{{end}}&apos; | grep -e &quot;^$DEPLOYMENT_CONFIG &quot; | awk &apos;{print $2}&apos; | while read -r test_rc_id; do
   # at the end of this loop, &apos;test_rc_id&apos; will contain the id of the last deployment in the list
   # should be the most recent.
