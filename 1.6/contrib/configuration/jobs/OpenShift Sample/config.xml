@@ -80,6 +80,7 @@ fi
 
 TEST_ENDPOINT=`oc get service ${SERVICE} -t &apos;{{.spec.clusterIP}}{{&quot;:&quot;}}{{ $a:= index .spec.ports 0 }}{{$a.port}}&apos;`
 
+echo "none" &gt; old_rc_id
 oc get rc -t &apos;{{ range .items }}{{.spec.selector.deploymentconfig}}{{&quot; &quot;}}{{.metadata.name}}{{&quot;\n&quot;}}{{end}}&apos; | grep -e &quot;^$DEPLOYMENT_CONFIG &quot; | awk &apos;{print $2}&apos; | while read -r test_rc_id; do
   echo &quot;Scaling down old deployment $test_rc_id&quot;
   oc scale --replicas=0 rc $test_rc_id
@@ -139,7 +140,8 @@ fi
 # bad things happen...need to make sure a new deployment has occurred first.
 count=0
 attempts=20
-new_rc_id="x"
+new_rc_id="none"
+echo "none" &gt; new_rc_id
 while [ $new_rc_id == $old_rc_id -a $count -lt $attempts ]; do
   oc get rc -t &apos;{{ range .items }}{{.spec.selector.deploymentconfig}}{{&quot; &quot;}}{{.metadata.name}}{{&quot;\n&quot;}}{{end}}&apos; | grep -e &quot;^$DEPLOYMENT_CONFIG &quot; | awk &apos;{print $2}&apos; | while read -r test_rc_id; do
     echo $test_rc_id &gt; new_rc_id
