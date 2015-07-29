@@ -1,4 +1,4 @@
-FROM centos:centos7
+FROM rhel7
 
 # Jenkins image for OpenShift
 #
@@ -21,12 +21,16 @@ LABEL k8s.io.description="Jenkins is a continuous integration server" \
       openshift.io.expose-services="8080:http" \
       openshift.io.tags="jenkins,jenkins16,ci"
 
+# Labels consumed by Red Hat build service
+LABEL Component="jenkins16" \
+      Name="openshift3/jenkins-16-rhel7" \
+      Version="1.6" \
+      Release="1"
+
 # 8080 for main web interface, 50000 for slave agents
 EXPOSE 8080 50000
 
-RUN curl http://pkg.jenkins-ci.org/redhat/jenkins.repo -o /etc/yum.repos.d/jenkins.repo && \
-  rpm --import http://pkg.jenkins-ci.org/redhat/jenkins-ci.org.key && \
-  yum install -y tar zip unzip java-1.7.0-openjdk jenkins && yum clean all 
+RUN yum install -y tar zip unzip java-1.7.0-openjdk jenkins && yum clean all 
 
 #RUN  curl -L -o /tmp/git.hpi http://updates.jenkins-ci.org/latest/git.hpi
 #RUN  curl -L -o /tmp/git-client.hpi http://updates.jenkins-ci.org/latest/git-client.hpi
