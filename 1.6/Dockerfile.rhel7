@@ -1,4 +1,4 @@
-FROM centos:centos7
+FROM rhel7
 
 # Jenkins image for OpenShift
 #
@@ -20,6 +20,12 @@ LABEL k8s.io.description="Jenkins is a continuous integration server" \
       k8s.io.display-name="Jenkins 1.6" \
       openshift.io.expose-services="8080:http" \
       openshift.io.tags="jenkins,jenkins16,ci"
+
+# Labels consumed by Red Hat build service
+LABEL Component="jenkins16" \
+      Name="openshift3/jenkins-16-rhel7" \
+      Version="1.6" \
+      Release="1"
 
 # 8080 for main web interface, 50000 for slave agents
 EXPOSE 8080 50000

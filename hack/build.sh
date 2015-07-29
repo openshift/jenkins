@@ -59,11 +59,11 @@ for dir in ${dirs}; do
   echo "-> Building ${IMAGE_NAME} ..."
 
   pushd ${dir} > /dev/null
-#  if [ "$OS" == "rhel7" -o "$OS" == "rhel7-candidate" ]; then
-#    docker_build_with_version Dockerfile.rhel7
-#  else
+  if [ "$OS" == "rhel7" -o "$OS" == "rhel7-candidate" ]; then
+    docker_build_with_version Dockerfile.rhel7
+  else
     docker_build_with_version Dockerfile
-#  fi
+  fi
 
   if [[ -v TEST_MODE ]]; then
     IMAGE_NAME=${IMAGE_NAME} test/run
