@@ -12,6 +12,8 @@ shopt -s nullglob
 IMAGE_NAME=${IMAGE_NAME-openshift/jenkins-16-centos7-candidate}
 
 CIDFILE_DIR=$(mktemp --suffix=mysql_test_cidfiles -d)
+VOLUME=`mktemp -d`
+chmod a+rwx $VOLUME
 
 function cleanup() {
   for cidfile in $CIDFILE_DIR/* ; do
@@ -20,7 +22,10 @@ function cleanup() {
     echo "Stopping and removing container $CONTAINER..."
     docker stop $CONTAINER
     exit_status=$(docker inspect -f '{{.State.ExitCode}}' $CONTAINER)
-    if [ "$exit_status" != "0" ]; then
+    # jenkins "normally" exits with code 143:
+    # http://jenkins-ci.361315.n4.nabble.com/Jenkins-exit-code-143-due-to-Unexpected-termination-of-the-channel-td4652347.html
+    # tl;dr: 128+signal=return code, and "15" equates to SIGTERM
+    if [ "$exit_status" != "143" ]; then
       echo "Dumping logs for $CONTAINER"
       docker logs $CONTAINER
     fi
@@ -29,6 +34,7 @@ function cleanup() {
     echo "Done."
   done
   rmdir $CIDFILE_DIR
+  rm -rf $VOLUME
 }
 trap cleanup EXIT SIGINT
 
@@ -40,10 +46,6 @@ function get_cid() {
 function get_container_ip() {
   local id="$1" ; shift
   docker inspect --format='{{.NetworkSettings.IPAddress}}' $(get_cid "$id")
-}
-
-function mysql_cmd() {
-  docker run --rm $IMAGE_NAME mysql --host $CONTAINER_IP -u$USER -p"$PASS" "$@" db
 }
 
 test_connection() {
@@ -72,19 +74,67 @@ test_connection() {
 
 function create_container() {
   local name=$1 ; shift
+  local volume=$1; shift
   local cargs=${CONTAINER_ARGS:-}
   cidfile="$CIDFILE_DIR/$name"
   # create container with a cidfile in a directory for cleanup
-  docker run $cargs --cidfile $cidfile -d -p 8080:8080 "$@" $IMAGE_NAME
+  docker run $cargs --cidfile $cidfile -d -v $volume:/var/lib/jenkins -p 8080:8080 "$@" $IMAGE_NAME
   echo "Created container $(cat $cidfile)"
 }
 
+function delete_container() {
+  CONTAINER=$(cat $cidfile)
+  docker stop $CONTAINER
+  docker rm $CONTAINER
+  rm $cidfile  
+}
+# $1 - username
+# $2 - password
+# $3 - job name
+function test_create_job() {
+  curl --fail --user $1:$2 -X POST -H "Content-Type: application/xml" -H "Expect: " --data-binary '@test/testjob.xml' http://${CONTAINER_IP}:8080/createItem\?name=$3
+}
+
+# $1 - username
+# $2 - password
+# $3 - job name
+function test_get_job() {
+  curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/job/$3
+}
 
 function run_tests() {
   local name=$1 ; shift
-  create_container $name
+  create_container $name $VOLUME
   CONTAINER_IP=$(get_container_ip $name)  
   test_connection $name
+  test_create_job admin password testJob
+  test_get_job admin password testJob
+  set +e
+  test_create_job admin badpassword failJob
+  if [ $? -eq 0 ]; then
+    echo "Fail: was able to create job with bad password"
+    return 1
+  fi
+  set -e
+
+  delete_container
+
+  # start a new container with the old volume so we can try to change the password
+  CONTAINER_ARGS="-e JENKINS_PASSWORD=newpassword" create_container $name $VOLUME
+  CONTAINER_IP=$(get_container_ip $name)  
+
+  # need this to wait for the container to start up
+  test_connection $name
+  # new password should work
+  test_get_job admin newpassword testJob
+  set +e
+  # old password should not
+  test_get_job admin password testJob
+  if [ $? -eq 0 ]; then
+    echo "Fail: was able to get job with bad password"
+    return 1
+  fi
+  set -e
   echo "  Success!"
 }
 
