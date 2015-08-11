@@ -12,12 +12,28 @@ Versions
 Jenkins versions currently provided are:
 * jenkins-1.6x
 
+RHEL versions currently supported are:
+* RHEL7
+
 CentOS versions currently supported are:
 * CentOS7
 
 
 Installation
 ---------------------------------
+Choose either the CentOS7 or RHEL7 based image:
+
+*  **RHEL7 based image**
+
+    To build a RHEL7 based image, you need to run Docker build on a properly
+    subscribed RHEL machine.
+
+    ```
+    $ git clone https://github.com/openshift/jenkins.git
+    $ cd jenkins
+    $ make build TARGET=rhel7 VERSION=1.6
+    ```
+
 *  **CentOS7 based image**
 
 	This image is available on DockerHub. To download it run:
@@ -87,6 +103,18 @@ Test
 
 This repository also provides a test framework which checks basic functionality
 of the Jenkins image.
+
+Users can choose between testing Jenkins based on a RHEL or CentOS image.
+
+*  **RHEL based image**
+
+    To test a RHEL7 based Jenkins image, you need to run the test on a properly
+    subscribed RHEL machine.
+
+    ```
+    $ cd jenkins
+    $ make test TARGET=rhel7 VERSION=5.5
+    ```
 
 *  **CentOS based image**
 
