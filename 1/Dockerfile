@@ -12,14 +12,14 @@ FROM centos:centos7
 
 MAINTAINER Ben Parees <bparees@redhat.com>
 
-ENV JENKINS_VERSION=1.6 \
+ENV JENKINS_VERSION=1.609 \
     HOME=/var/lib/jenkins \
     JENKINS_HOME=/var/lib/jenkins
 
 LABEL k8s.io.description="Jenkins is a continuous integration server" \
-      k8s.io.display-name="Jenkins 1.6" \
+      k8s.io.display-name="Jenkins 1.609" \
       openshift.io.expose-services="8080:http" \
-      openshift.io.tags="jenkins,jenkins16,ci"
+      openshift.io.tags="jenkins,jenkins1,ci"
 
 # 8080 for main web interface, 50000 for slave agents
 EXPOSE 8080 50000
