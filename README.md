@@ -5,7 +5,7 @@ This repository contains Dockerfiles for a Jenkins Docker image intended for use
 
 For an example of how to use it, [see this sample.](https://github.com/openshift/origin/blob/master/examples/jenkins/README.md)
 
-The image is pushed to DockerHub as openshift/jenkins-16-centos7.
+The image is pushed to DockerHub as openshift/jenkins-1-centos7.
 
 Versions
 ---------------------------------
@@ -31,7 +31,7 @@ Choose either the CentOS7 or RHEL7 based image:
     ```
     $ git clone https://github.com/openshift/jenkins.git
     $ cd jenkins
-    $ make build TARGET=rhel7 VERSION=1.6
+    $ make build TARGET=rhel7 VERSION=1
     ```
 
 *  **CentOS7 based image**
@@ -39,7 +39,7 @@ Choose either the CentOS7 or RHEL7 based image:
 	This image is available on DockerHub. To download it run:
 
 	```
-	$ docker pull openshift/jenkins-16-centos7
+	$ docker pull openshift/jenkins-1-centos7
 	```
 
 	To build a Jenkins image from scratch run:
@@ -47,11 +47,11 @@ Choose either the CentOS7 or RHEL7 based image:
 	```
 	$ git clone https://github.com/openshift/jenkins.git
 	$ cd jenkins
-	$ make build VERSION=1.6
+	$ make build VERSION=1
 	```
 
 **Notice: By omitting the `VERSION` parameter, the build/test action will be performed
-on all provided versions of Jenkins. Since we are currently providing only version `1.6`,
+on all provided versions of Jenkins. Since we are currently providing only version `1`,
 you can omit this parameter.**
 
 
@@ -81,12 +81,12 @@ matches the user UID or name which is running inside the container.**
 Usage
 ---------------------------------
 
-For this, we will assume that you are using the `openshift/jenkins-16-centos7` image.
+For this, we will assume that you are using the `openshift/jenkins-1-centos7` image.
 If you want to set only the mandatory environment variables and store the database
 in the `/tmp/jenkins` directory on the host filesystem, execute the following command:
 
 ```
-$ docker run -d -e JENKINS_PASSWORD=<password> -v /tmp/jenkins:/var/lib/jenkins openshift/jenkins-16-centos7
+$ docker run -d -e JENKINS_PASSWORD=<password> -v /tmp/jenkins:/var/lib/jenkins openshift/jenkins-1-centos7
 ```
 
 
@@ -120,9 +120,9 @@ Users can choose between testing Jenkins based on a RHEL or CentOS image.
 
     ```
     $ cd jenkins
-    $ make test VERSION=1.6
+    $ make test VERSION=1
     ```
 
 **Notice: By omitting the `VERSION` parameter, the build/test action will be performed
-on all provided versions of Jenkins. Since we are currently providing only version `1.6`,
+on all provided versions of Jenkins. Since we are currently providing only version `1`,
 you can omit this parameter.**

@@ -9,7 +9,7 @@
 set -exo nounset
 shopt -s nullglob
 
-IMAGE_NAME=${IMAGE_NAME-openshift/jenkins-16-centos7-candidate}
+IMAGE_NAME=${IMAGE_NAME-openshift/jenkins-1-centos7-candidate}
 
 CIDFILE_DIR=$(mktemp --suffix=mysql_test_cidfiles -d)
 VOLUME=`mktemp -d`
