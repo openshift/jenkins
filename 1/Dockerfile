@@ -30,9 +30,7 @@ EXPOSE 8080 50000
 #RUN  curl -L -o /tmp/ssh-credentials.hpi http://updates.jenkins-ci.org/latest/ssh-credentials.hpi
 #RUN  curl -L -o /tmp/credentials.hpi http://updates.jenkins-ci.org/latest/credentials.hpi
 
-
-COPY run.sh /usr/local/bin/run.sh
-COPY ./contrib/ /opt/openshift
+VOLUME ["/var/lib/jenkins"]
 
 RUN curl http://pkg.jenkins-ci.org/redhat/jenkins.repo -o /etc/yum.repos.d/jenkins.repo && \
     rpm --import http://pkg.jenkins-ci.org/redhat/jenkins-ci.org.key && \
@@ -42,11 +40,13 @@ RUN curl http://pkg.jenkins-ci.org/redhat/jenkins.repo -o /etc/yum.repos.d/jenki
     curl -L https://github.com/openshift/origin/releases/download/v1.0.2/openshift-origin-v1.0.2-325c7b7-linux-amd64.tar.gz | tar -zx && \
     mv oc /usr/local/bin && \
     rm oadm && \
-    rm openshift && \
-    chmod -R og+rw /opt/openshift
+    rm openshift
 
-VOLUME ["/var/lib/jenkins"]
+COPY ./contrib/openshift /opt/openshift
+COPY ./contrib/jenkins /usr/local/bin
+
+RUN chmod -R og+rw /opt/openshift
 
 USER 1001
 
-ENTRYPOINT ["/usr/local/bin/run.sh"]
+ENTRYPOINT ["/usr/local/bin/run-jenkins"]
