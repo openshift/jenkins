@@ -30,8 +30,6 @@ EXPOSE 8080 50000
 #RUN  curl -L -o /tmp/ssh-credentials.hpi http://updates.jenkins-ci.org/latest/ssh-credentials.hpi
 #RUN  curl -L -o /tmp/credentials.hpi http://updates.jenkins-ci.org/latest/credentials.hpi
 
-VOLUME ["/var/lib/jenkins"]
-
 RUN curl http://pkg.jenkins-ci.org/redhat/jenkins.repo -o /etc/yum.repos.d/jenkins.repo && \
     rpm --import http://pkg.jenkins-ci.org/redhat/jenkins-ci.org.key && \
     yum install -y tar zip unzip java-1.8.0-openjdk jenkins-1.609 && \
@@ -42,6 +40,7 @@ RUN curl http://pkg.jenkins-ci.org/redhat/jenkins.repo -o /etc/yum.repos.d/jenki
     rm oadm && \
     rm openshift
 
+VOLUME ["/var/lib/jenkins"]
 COPY ./contrib/openshift /opt/openshift
 COPY ./contrib/jenkins /usr/local/bin
 
