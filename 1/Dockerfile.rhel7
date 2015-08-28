@@ -39,7 +39,7 @@ EXPOSE 8080 50000
 COPY run.sh /usr/local/bin/run.sh
 COPY ./contrib/ /opt/openshift
 
-RUN yum install -y tar zip unzip java-1.7.0-openjdk jenkins-1.609.1 && \
+RUN yum install -y tar zip unzip java-1.8.0-openjdk jenkins-1.609.1 && \
     yum clean all  && \
     chmod og+rw /var/lib/jenkins && \
     curl -L https://github.com/openshift/origin/releases/download/v1.0.2/openshift-origin-v1.0.2-325c7b7-linux-amd64.tar.gz | tar -zx && \

@@ -36,7 +36,7 @@ COPY ./contrib/ /opt/openshift
 
 RUN curl http://pkg.jenkins-ci.org/redhat/jenkins.repo -o /etc/yum.repos.d/jenkins.repo && \
     rpm --import http://pkg.jenkins-ci.org/redhat/jenkins-ci.org.key && \
-    yum install -y tar zip unzip java-1.7.0-openjdk jenkins-1.609 && \
+    yum install -y tar zip unzip java-1.8.0-openjdk jenkins-1.609 && \
     yum clean all  && \
     chmod og+rw /var/lib/jenkins && \
     curl -L https://github.com/openshift/origin/releases/download/v1.0.2/openshift-origin-v1.0.2-325c7b7-linux-amd64.tar.gz | tar -zx && \
