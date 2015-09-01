@@ -12,26 +12,37 @@ mkdir /tmp/war
 unzip -q /usr/lib/jenkins/jenkins.war -d /tmp/war
 new_password_hash=`obfuscate_password ${JENKINS_PASSWORD:-password}`
 
-if [ ! -e /var/lib/jenkins/configured ]; then
-  cp -r /opt/openshift/configuration/* /var/lib/jenkins
+if [ ! -e ${JENKINS_HOME}/configured ]; then
+  echo "Copying Jenkins configuration to ${JENKINS_HOME} ..."
+  cp -r /opt/openshift/configuration/* ${JENKINS_HOME}
   rm -rf /opt/openshift/configuration/*
-  
-  sed -i "s,<passwordHash>.*</passwordHash>,<passwordHash>$new_password_hash</passwordHash>,g" "/var/lib/jenkins/users/admin/config.xml"
-  echo $new_password_hash > /var/lib/jenkins/password
-  touch /var/lib/jenkins/configured
+
+  if [ "$(ls -A /opt/openshift/plugins)" ]; then
+    mkdir -p ${JENKINS_HOME}/plugins
+    echo "Copying $(ls /opt/openshift/plugins | wc -l) Jenkins plugins to ${JENKINS_HOME} ..."
+    cp -r /opt/openshift/plugins/* ${JENKINS_HOME}/plugins/
+    rm -rf /opt/openshift/plugins
+  fi
+
+  echo "Creating initial Jenkins 'admin' user"
+  sed -i "s,<passwordHash>.*</passwordHash>,<passwordHash>$new_password_hash</passwordHash>,g" "${JENKINS_HOME}/users/admin/config.xml"
+  echo $new_password_hash > ${JENKINS_HOME}/password
+  touch ${JENKINS_HOME}/configured
 fi
 
-if [ -e /var/lib/jenkins/password ]; then
+if [ -e ${JENKINS_HOME}/password ]; then
+  echo "Detected password change, updating Jenkins configuration"
   # if the password environment variable has changed, update the jenkins config.
   # we don't want to just blindly do this on startup because the user might change their password via
   # the jenkins ui, so we only want to do this if the env variable has been explicitly modified from
   # the original value.
-  old_password=`cat /var/lib/jenkins/password`
+  old_password=`cat ${JENKINS_HOME}/password`
   if [ $old_password!=$new_password_hash ]; then
-    sed -i "s,<passwordHash>.*</passwordHash>,<passwordHash>$new_password_hash</passwordHash>,g" "/var/lib/jenkins/users/admin/config.xml"
-    echo $new_password_hash > /var/lib/jenkins/password
+    sed -i "s,<passwordHash>.*</passwordHash>,<passwordHash>$new_password_hash</passwordHash>,g" "${JENKINS_HOME}/users/admin/config.xml"
+    echo $new_password_hash > ${JENKINS_HOME}/password
   fi
 fi
+
 rm -rf /tmp/war
 
 # if `docker run` first argument start with `--` the user is passing jenkins launcher arguments
