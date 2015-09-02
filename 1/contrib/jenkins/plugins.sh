@@ -5,7 +5,7 @@
 #
 # Usage:
 #
-# FROM openshift/jenkins-16-centos7
+# FROM openshift/jenkins-1-centos7
 # COPY plugins.txt /plugins.txt
 # RUN /usr/local/bin/plugins.sh /plugins.txt
 #
