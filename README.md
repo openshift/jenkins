@@ -78,6 +78,35 @@ directory has the appropriate permissions and that the owner and group of the di
 matches the user UID or name which is running inside the container.**
 
 
+Plugins
+---------------------------------
+
+In order to install additional Jenkins plugins, the OpenShift Jenkins image provides a way
+how to add those by layering on top of this image. The derived image, will provide the same functionality
+as described in this documentation, in addition it will also include all plugins you list in the `plugins.txt` file.
+
+To create derived image, you have to write following `Dockerfile`:
+
+```
+FROM openshift/jenkins-1-centos7
+COPY plugins.txt /opt/openshift/configuration/plugins.txt
+RUN /usr/local/bin/plugins.sh /opt/openshift/configuration/plugins.txt
+```
+
+The format of `plugins.txt` file is:
+
+```
+pluginId:pluginVersion
+```
+
+For example, to install the github Jenkins plugin, you specify following to `plugins.txt`:
+
+```
+github:1.11.3
+```
+
+After this, just run `docker build -t my_jenkins_image -f Dockerfile`.
+
 Usage
 ---------------------------------
 
