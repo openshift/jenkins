@@ -11,7 +11,7 @@ shopt -s nullglob
 
 IMAGE_NAME=${IMAGE_NAME-openshift/jenkins-1-centos7-candidate}
 
-CIDFILE_DIR=$(mktemp --suffix=mysql_test_cidfiles -d)
+CIDFILE_DIR=$(mktemp --suffix=jenkins_test_cidfiles -d)
 VOLUME=`mktemp -d`
 chmod a+rwx $VOLUME
 
@@ -78,7 +78,7 @@ function create_container() {
   local cargs=${CONTAINER_ARGS:-}
   cidfile="$CIDFILE_DIR/$name"
   # create container with a cidfile in a directory for cleanup
-  docker run $cargs --cidfile $cidfile -d -v $volume:/var/lib/jenkins -p 8080:8080 "$@" $IMAGE_NAME
+  docker run $cargs --cidfile $cidfile -d -v $volume:/var/lib/jenkins:Z -p 8080:8080 "$@" $IMAGE_NAME
   echo "Created container $(cat $cidfile)"
 }
 
@@ -104,8 +104,9 @@ function test_get_job() {
 
 function run_tests() {
   local name=$1 ; shift
+  CONTAINER_ARGS="-u 10000:10000"
   create_container $name $VOLUME
-  CONTAINER_IP=$(get_container_ip $name)  
+  CONTAINER_IP=$(get_container_ip $name)
   test_connection $name
   test_create_job admin password testJob
   test_get_job admin password testJob
@@ -120,8 +121,8 @@ function run_tests() {
   delete_container
 
   # start a new container with the old volume so we can try to change the password
-  CONTAINER_ARGS="-e JENKINS_PASSWORD=newpassword" create_container $name $VOLUME
-  CONTAINER_IP=$(get_container_ip $name)  
+  CONTAINER_ARGS="-u 10000:10000 -e JENKINS_PASSWORD=newpassword" create_container $name $VOLUME
+  CONTAINER_IP=$(get_container_ip $name)
 
   # need this to wait for the container to start up
   test_connection $name
