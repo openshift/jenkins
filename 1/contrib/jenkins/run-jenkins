@@ -1,4 +1,21 @@
 #!/bin/bash
+#
+# This script runs the Jenkins server inside the Docker container.
+# It copies the configuration and plugins from /opt/openshift/configuration to
+# ${JENKINS_HOME}.
+#
+# It also sets the admin password to ${JENKINS_PASSWORD}.
+#
+
+# Generate passwd file based on current uid
+function generate_passwd_file() {
+  export USER_ID=$1
+  export GROUP_ID=$2
+  envsubst < /opt/openshift/passwd.template > /opt/openshift/passwd
+  export LD_PRELOAD=libnss_wrapper.so
+  export NSS_WRAPPER_PASSWD=/opt/openshift/passwd
+  export NSS_WRAPPER_GROUP=/etc/group
+}
 
 function obfuscate_password {
     local password="$1"
@@ -7,6 +24,13 @@ function obfuscate_password {
 
     java -classpath "${acegi_security_path}:${commons_codec_path}:/opt/openshift/password-encoder.jar" com.redhat.openshift.PasswordEncoder $password
 }
+
+# Since OpenShift runs this Docker image under random user ID, we have to assign
+# the 'jenkins' user name to this UID. For that we use nss_wrapper and
+# passwd.template.
+# If you adding more layers to this Docker image and the layer you adding add
+# more system users, make sure you update the passwd.template.
+generate_passwd_file `id -u` `id -g`
 
 mkdir /tmp/war
 unzip -q /usr/lib/jenkins/jenkins.war -d /tmp/war
