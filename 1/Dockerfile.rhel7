@@ -22,7 +22,7 @@ LABEL k8s.io.description="Jenkins is a continuous integration server" \
       openshift.io.tags="jenkins,jenkins1,ci"
 
 # Labels consumed by Red Hat build service
-LABEL BZComponent="jenkins1" \
+LABEL BZComponent="openshift-jenkins-docker" \
       Name="openshift3/jenkins-1-rhel7" \
       Version="1.609" \
       Release="7" \
