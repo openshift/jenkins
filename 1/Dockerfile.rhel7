@@ -22,10 +22,11 @@ LABEL k8s.io.description="Jenkins is a continuous integration server" \
       openshift.io.tags="jenkins,jenkins1,ci"
 
 # Labels consumed by Red Hat build service
-LABEL Component="jenkins1" \
+LABEL BZComponent="jenkins1" \
       Name="openshift3/jenkins-1-rhel7" \
       Version="1.609" \
-      Release="1"
+      Release="7" \
+      Architecture="x86_64"
 
 # 8080 for main web interface, 50000 for slave agents
 EXPOSE 8080 50000
