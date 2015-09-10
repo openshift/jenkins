@@ -41,7 +41,7 @@ if [ ! -e ${JENKINS_HOME}/configured ]; then
   cp -r /opt/openshift/configuration/* ${JENKINS_HOME}
   rm -rf /opt/openshift/configuration/*
 
-  if [ "$(ls -A /opt/openshift/plugins)" ]; then
+  if [ "$(ls -A /opt/openshift/plugins 2>/dev/null)" ]; then
     mkdir -p ${JENKINS_HOME}/plugins
     echo "Copying $(ls /opt/openshift/plugins | wc -l) Jenkins plugins to ${JENKINS_HOME} ..."
     cp -r /opt/openshift/plugins/* ${JENKINS_HOME}/plugins/
