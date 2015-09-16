@@ -25,20 +25,13 @@ LABEL k8s.io.description="Jenkins is a continuous integration server" \
 LABEL BZComponent="openshift-jenkins-docker" \
       Name="openshift3/jenkins-1-rhel7" \
       Version="1.609" \
-      Release="7" \
-      Architecture="x86_64"
+      Architecture="x86_64" \
+      Release="7"
 
 # 8080 for main web interface, 50000 for slave agents
 EXPOSE 8080 50000
 
-#RUN  curl -L -o /tmp/git.hpi http://updates.jenkins-ci.org/latest/git.hpi
-#RUN  curl -L -o /tmp/git-client.hpi http://updates.jenkins-ci.org/latest/git-client.hpi
-#RUN  curl -L -o /tmp/scm-api.hpi http://updates.jenkins-ci.org/latest/scm-api.hpi
-#RUN  curl -L -o /tmp/ssh-credentials.hpi http://updates.jenkins-ci.org/latest/ssh-credentials.hpi
-#RUN  curl -L -o /tmp/credentials.hpi http://updates.jenkins-ci.org/latest/credentials.hpi
-
-RUN yum-config-manager --enable rhel-7-server-optional-rpms && \
-    yum install -y git tar zip unzip java-1.7.0-openjdk jenkins-1.609.1 && \
+RUN yum install -y git tar zip unzip java-1.7.0-openjdk jenkins-1.609.1 && \
     yum install -y --disablerepo="epel" --setopt=tsflags=nodocs nss_wrapper && \
     yum clean all  && \
     localedef -f UTF-8 -i en_US en_US.UTF-8 && \
