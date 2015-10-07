@@ -1,0 +1,12 @@
+kubernetes:0.4
+credentials:1.23
+durable-task:1.6
+swarm:2.0
+git:2.4.0
+git-client:1.19.0
+envinject:1.92.1
+promoted-builds:2.23
+maven-plugin:2.0
+token-macro:1.10
+rebuild:1.22
+scm-api:0.2

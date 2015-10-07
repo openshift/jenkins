@@ -43,5 +43,14 @@ COPY ./contrib/jenkins /usr/local/bin
 RUN chmod -R og+rw {/opt/openshift,/var/lib/jenkins}
 VOLUME ["/var/lib/jenkins"]
 
+# Install the Jenkins plugin listed in 'plugins.txt'
+# Prevent credentials plugin to be overiden by bundled plugin.
+# The gettext is needed to provide envsubst command.
+RUN /usr/local/bin/plugins.sh /opt/openshift/configuration/plugins.txt && \
+    touch /opt/openshift/plugins/credentials.jpi.pinned && \
+    touch /opt/openshift/plugins/git.jpi.pinned && \
+    touch /opt/openshift/plugins/git-client.jpi.pinned && \
+    chown -R 1001:0 /opt/openshift && chmod -R g+w /opt/openshift/configuration
+
 USER 1001
 ENTRYPOINT ["/usr/local/bin/run-jenkins"]
