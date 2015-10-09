@@ -80,13 +80,14 @@ fi
 
 TEST_ENDPOINT=`oc get service ${SERVICE} -t &apos;{{.spec.clusterIP}}{{&quot;:&quot;}}{{ $a:= index .spec.ports 0 }}{{$a.port}}&apos;`
 
+rm old_rc_id || true
 echo "none" &gt; old_rc_id
 oc get rc -t &apos;{{ range .items }}{{.spec.selector.deploymentconfig}}{{&quot; &quot;}}{{.metadata.name}}{{&quot;\n&quot;}}{{end}}&apos; | grep -e &quot;^$DEPLOYMENT_CONFIG &quot; | awk &apos;{print $2}&apos; | while read -r test_rc_id; do
   echo &quot;Scaling down old deployment $test_rc_id&quot;
   oc scale --replicas=0 rc $test_rc_id
-  echo $test_rc_id &gt; old_rc_id
+  echo $test_rc_id &gt;&gt; old_rc_id
 done
-old_rc_id=`cat old_rc_id`
+old_rc_id=`cat old_rc_id | sort -n | tail -n 1`
 
 
 # wait for old pods to be torn down
@@ -140,13 +141,13 @@ fi
 # bad things happen...need to make sure a new deployment has occurred first.
 count=0
 attempts=20
-new_rc_id="none"
-echo "none" &gt; new_rc_id
+new_rc_id=$old_rc_id
+rm new_rc_id || true
 while [ $new_rc_id == $old_rc_id -a $count -lt $attempts ]; do
   oc get rc -t &apos;{{ range .items }}{{.spec.selector.deploymentconfig}}{{&quot; &quot;}}{{.metadata.name}}{{&quot;\n&quot;}}{{end}}&apos; | grep -e &quot;^$DEPLOYMENT_CONFIG &quot; | awk &apos;{print $2}&apos; | while read -r test_rc_id; do
-    echo $test_rc_id &gt; new_rc_id
+    echo $test_rc_id &gt;&gt; new_rc_id
   done
-  new_rc_id=`cat new_rc_id`  
+  new_rc_id=`cat new_rc_id | sort -n | tail -n 1`  
   count=$(($count+1))
   sleep 1
 done
@@ -155,13 +156,7 @@ if [ $count -eq $attempts ]; then
   exit 1
 fi
 
-oc get rc -t &apos;{{ range .items }}{{.spec.selector.deploymentconfig}}{{&quot; &quot;}}{{.metadata.name}}{{&quot;\n&quot;}}{{end}}&apos; | grep -e &quot;^$DEPLOYMENT_CONFIG &quot; | awk &apos;{print $2}&apos; | while read -r test_rc_id; do
-  # at the end of this loop, &apos;test_rc_id&apos; will contain the id of the last deployment in the list
-  # should be the most recent.
-  echo $test_rc_id &gt; test_rc_id
-done
-
-test_rc_id=`cat test_rc_id`
+test_rc_id=`cat new_rc_id | sort -n | tail -n 1`
 echo &quot;Scaling up new deployment $test_rc_id&quot;
 oc scale --replicas=1 rc $test_rc_id
 
