@@ -6,24 +6,17 @@
 #
 # It also sets the admin password to ${JENKINS_PASSWORD}.
 #
+source /usr/local/bin/jenkins-common.sh
 
-# Generate passwd file based on current uid
-function generate_passwd_file() {
-  export USER_ID=$1
-  export GROUP_ID=$2
-  envsubst < /opt/openshift/passwd.template > /opt/openshift/passwd
-  export LD_PRELOAD=libnss_wrapper.so
-  export NSS_WRAPPER_PASSWD=/opt/openshift/passwd
-  export NSS_WRAPPER_GROUP=/etc/group
-}
+for name in $(get_is_names); do
+  echo "Adding ${name} imagestream as Jenkins Slave ..."
+  K8S_PLUGIN_POD_TEMPLATES+=$(convert_is_to_slave ${name})
+done
 
-function obfuscate_password {
-    local password="$1"
-    local acegi_security_path=`find /tmp/war/WEB-INF/lib/ -name acegi-security-*.jar`
-    local commons_codec_path=`find /tmp/war/WEB-INF/lib/ -name commons-codec-*.jar`
+[ -z "${K8S_PLUGIN_POD_TEMPLATES}" ] && echo "No Kubernetes slave imagestreams found."
 
-    java -classpath "${acegi_security_path}:${commons_codec_path}:/opt/openshift/password-encoder.jar" com.redhat.openshift.PasswordEncoder $password
-}
+# Don't show these in the Jenkins UI
+unset oc_auth oc_cmd K8S_PLUGIN_POD_TEMPLATES
 
 # Since OpenShift runs this Docker image under random user ID, we have to assign
 # the 'jenkins' user name to this UID. For that we use nss_wrapper and
@@ -68,6 +61,9 @@ if [ -e ${JENKINS_HOME}/password ]; then
 fi
 
 rm -rf /tmp/war
+
+echo "Processing Jenkins Kubernetes configuration (${CONFIG_PATH}) ..."
+envsubst < "${CONFIG_PATH}.tpl" > "${CONFIG_PATH}" && rm -f "${CONFIG_PATH}.tpl"
 
 # if `docker run` first argument start with `--` the user is passing jenkins launcher arguments
 if [[ $# -lt 1 ]] || [[ "$1" == "--"* ]]; then
