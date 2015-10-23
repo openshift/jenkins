@@ -31,7 +31,7 @@ LABEL BZComponent="openshift-jenkins-docker" \
 # 8080 for main web interface, 50000 for slave agents
 EXPOSE 8080 50000
 
-RUN yum install -y git tar zip unzip java-1.7.0-openjdk jenkins-1.609.1 && \
+RUN yum install -y gettext git tar zip unzip java-1.7.0-openjdk jenkins-1.609.1 && \
     yum install -y --disablerepo="epel" --setopt=tsflags=nodocs nss_wrapper && \
     yum clean all  && \
     localedef -f UTF-8 -i en_US en_US.UTF-8 && \
