@@ -6,24 +6,7 @@
 #
 # It also sets the admin password to ${JENKINS_PASSWORD}.
 #
-
-# Generate passwd file based on current uid
-function generate_passwd_file() {
-  export USER_ID=$1
-  export GROUP_ID=$2
-  envsubst < /opt/openshift/passwd.template > /opt/openshift/passwd
-  export LD_PRELOAD=libnss_wrapper.so
-  export NSS_WRAPPER_PASSWD=/opt/openshift/passwd
-  export NSS_WRAPPER_GROUP=/etc/group
-}
-
-function obfuscate_password {
-    local password="$1"
-    local acegi_security_path=`find /tmp/war/WEB-INF/lib/ -name acegi-security-*.jar`
-    local commons_codec_path=`find /tmp/war/WEB-INF/lib/ -name commons-codec-*.jar`
-
-    java -classpath "${acegi_security_path}:${commons_codec_path}:/opt/openshift/password-encoder.jar" com.redhat.openshift.PasswordEncoder $password
-}
+source /usr/local/bin/jenkins-common.sh
 
 # Since OpenShift runs this Docker image under random user ID, we have to assign
 # the 'jenkins' user name to this UID. For that we use nss_wrapper and
@@ -48,14 +31,14 @@ if [ ! -e ${JENKINS_HOME}/configured ]; then
     rm -rf /opt/openshift/plugins
   fi
 
-  echo "Creating initial Jenkins 'admin' user"
+  echo "Creating initial Jenkins 'admin' user ..."
   sed -i "s,<passwordHash>.*</passwordHash>,<passwordHash>$new_password_hash</passwordHash>,g" "${JENKINS_HOME}/users/admin/config.xml"
   echo $new_password_hash > ${JENKINS_HOME}/password
   touch ${JENKINS_HOME}/configured
 fi
 
 if [ -e ${JENKINS_HOME}/password ]; then
-  echo "Detected password change, updating Jenkins configuration"
+  echo "Detected password change, updating Jenkins configuration ..."
   # if the password environment variable has changed, update the jenkins config.
   # we don't want to just blindly do this on startup because the user might change their password via
   # the jenkins ui, so we only want to do this if the env variable has been explicitly modified from
@@ -67,7 +50,24 @@ if [ -e ${JENKINS_HOME}/password ]; then
   fi
 fi
 
+if [ -f "${CONFIG_PATH}.tpl" ]; then
+  echo "Processing Jenkins Kubernetes configuration (${CONFIG_PATH}.tpl) ..."
+  export KUBERNETES_CONFIG=$(generate_kubernetes_config)
+  envsubst < "${CONFIG_PATH}.tpl" > "${CONFIG_PATH}"
+fi
+
+if [ -f "${JENKINS_HOME}/credentials.xml.tpl" ]; then
+  if [ ! -z "${KUBERNETES_CONFIG}" ]; then
+    echo "Processing Jenkins Kubernetes credentials (${JENKINS_HOME}/credentials.xml.tpl) ..."
+    export KUBERNETES_CREDENTIALS=$(generate_kubernetes_credentials)
+  fi
+  envsubst < "${JENKINS_HOME}/credentials.xml.tpl" > "${JENKINS_HOME}/credentials.xml"
+fi
+
 rm -rf /tmp/war
+
+# Don't show these in the Jenkins UI
+unset oc_auth oc_cmd KUBERNETES_CONFIG KUBERNETES_CREDENTIALS
 
 # if `docker run` first argument start with `--` the user is passing jenkins launcher arguments
 if [[ $# -lt 1 ]] || [[ "$1" == "--"* ]]; then

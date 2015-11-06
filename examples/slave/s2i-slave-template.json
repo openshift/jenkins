@@ -1,0 +1,118 @@
+{
+  "kind": "Template",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "s2i-to-jenkins-slave",
+    "creationTimestamp": null,
+    "annotations": {
+      "description": "Provides the conversion of S2I image to a Jenkins slave",
+      "iconClass": "icon-jenkins"
+    }
+  },
+  "labels": {
+    "template": "s2i-jenkins-slave"
+  },
+  "parameters": [
+    {
+      "name": "IMAGE_STREAM_NAME",
+      "description": "The name of the to build the slave from",
+      "value": "ruby-20-centos7",
+      "required": true
+    },
+    {
+      "name": "IMAGE_DOCKER_NAME",
+      "description": "Optionally, you can specify the Docker pull spec for the image stream",
+      "value": ""
+    },
+    {
+      "name": "SLAVE_S2I_REPO_URL",
+      "description": "Repository to use for the build",
+      "value": "git://github.com/openshift/jenkins.git"
+    },
+    {
+      "name": "SLAVE_S2I_REPO_CONTEXTDIR",
+      "description": "Specify sub-directory in the repository",
+      "value": "examples/slave"
+    },
+    {
+      "name": "SLAVE_S2I_REPO_REF",
+      "description": "Specify the GIT ref of the repository",
+      "value": "master"
+    }
+  ],
+  "objects": [
+    {
+      "kind": "ImageStream",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "${IMAGE_STREAM_NAME}"
+      },
+      "spec": {
+        "dockerImageRepository": "openshift/${IMAGE_STREAM_NAME}"
+      }
+    },
+    {
+      "kind": "ImageStream",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "${IMAGE_STREAM_NAME}-jenkins-slave",
+        "annotations": {
+          "slave-label": "${IMAGE_STREAM_NAME}",
+          "slave-directory": "/opt/app-root/jenkins"
+        },
+        "labels": {
+          "role": "jenkins-slave"
+        }
+      },
+      "spec": {}
+    },
+    {
+      "kind": "BuildConfig",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "${IMAGE_STREAM_NAME}-slave",
+        "annotations": {
+          "description": "Modifies the ${IMAGE_STREAM_NAME} to run as Jenkins slave"
+        },
+        "labels": {
+          "name": "${IMAGE_STREAM_NAME}-slave"
+        }
+      },
+      "spec": {
+        "triggers": [
+          {
+            "type": "imageChange",
+            "imageChange": {}
+          },
+          {
+            "type": "ConfigChange"
+          }
+        ],
+        "source": {
+          "type": "Git",
+          "contextDir": "${SLAVE_S2I_REPO_CONTEXTDIR}",
+          "git": {
+            "uri": "${SLAVE_S2I_REPO_URL}",
+            "ref": "${SLAVE_S2I_REPO_REF}"
+          }
+        },
+        "strategy": {
+          "type": "Docker",
+          "dockerStrategy": {
+            "from": {
+              "kind": "ImageStreamTag",
+              "name": "${IMAGE_STREAM_NAME}:latest"
+            }
+          }
+        },
+        "output": {
+          "to": {
+            "kind": "ImageStreamTag",
+            "name": "${IMAGE_STREAM_NAME}-jenkins-slave:latest"
+          }
+        },
+        "resources": {}
+      }
+    }
+  ]
+}

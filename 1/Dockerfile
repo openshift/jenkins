@@ -19,7 +19,8 @@ ENV JENKINS_VERSION=1.609 \
 LABEL k8s.io.description="Jenkins is a continuous integration server" \
       k8s.io.display-name="Jenkins 1.609" \
       openshift.io.expose-services="8080:http" \
-      openshift.io.tags="jenkins,jenkins1,ci"
+      openshift.io.tags="jenkins,jenkins1,ci" \
+      io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
 
 # 8080 for main web interface, 50000 for slave agents
 EXPOSE 8080 50000
@@ -39,9 +40,12 @@ RUN curl http://pkg.jenkins-ci.org/redhat/jenkins.repo -o /etc/yum.repos.d/jenki
 
 COPY ./contrib/openshift /opt/openshift
 COPY ./contrib/jenkins /usr/local/bin
+ADD ./contrib/s2i /usr/libexec/s2i
 
-RUN chmod -R og+rw {/opt/openshift,/var/lib/jenkins}
+RUN /usr/local/bin/fix-permissions /opt/openshift && \
+    /usr/local/bin/fix-permissions /var/lib/jenkins
+
 VOLUME ["/var/lib/jenkins"]
 
 USER 1001
-ENTRYPOINT ["/usr/local/bin/run-jenkins"]
+CMD ["/usr/libexec/s2i/run"]

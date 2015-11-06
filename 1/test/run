@@ -22,13 +22,10 @@ function cleanup() {
     echo "Stopping and removing container $CONTAINER..."
     docker stop $CONTAINER
     exit_status=$(docker inspect -f '{{.State.ExitCode}}' $CONTAINER)
-    # jenkins "normally" exits with code 143:
-    # http://jenkins-ci.361315.n4.nabble.com/Jenkins-exit-code-143-due-to-Unexpected-termination-of-the-channel-td4652347.html
-    # tl;dr: 128+signal=return code, and "15" equates to SIGTERM
-    if [ "$exit_status" != "143" ]; then
-      echo "Dumping logs for $CONTAINER"
-      docker logs $CONTAINER
-    fi
+    echo "Dumping logs for $CONTAINER"
+    # Dump the logs always (jenkins returns 143 when killed), so we can
+    # identify the failures in Jenkins
+    [[ "${exit_status}" != "0" ]] && docker logs $CONTAINER
     docker rm $CONTAINER
     rm $cidfile
     echo "Done."
@@ -88,6 +85,7 @@ function delete_container() {
   docker rm $CONTAINER
   rm $cidfile  
 }
+
 # $1 - username
 # $2 - password
 # $3 - job name

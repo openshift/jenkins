@@ -1,8 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <hudson>
+  <disabledAdministrativeMonitors/>
   <version>1.619</version>
   <numExecutors>5</numExecutors>
-  <mode>NORMAL</mode>
+  <mode>EXCLUSIVE</mode>
   <useSecurity>true</useSecurity>
   <authorizationStrategy class="hudson.security.GlobalMatrixAuthorizationStrategy">
     <permission>hudson.model.Computer.Configure:admin</permission>
@@ -28,11 +29,16 @@
   <securityRealm class="hudson.security.HudsonPrivateSecurityRealm">
     <disableSignup>true</disableSignup>
   </securityRealm>
+  <disableRememberMe>false</disableRememberMe>
+  <workspaceDir>${ITEM_ROOTDIR}/workspace</workspaceDir>
+  <buildsDir>${ITEM_ROOTDIR}/builds</buildsDir>
   <markupFormatter class="hudson.markup.RawHtmlMarkupFormatter"/>
   <jdks/>
   <viewsTabBar class="hudson.views.DefaultViewsTabBar"/>
   <myViewsTabBar class="hudson.views.DefaultMyViewsTabBar"/>
-  <slaves/>
+  <clouds>
+    ${KUBERNETES_CONFIG}
+  </clouds>
   <quietPeriod>1</quietPeriod>
   <scmCheckoutRetryCount>0</scmCheckoutRetryCount>
   <views>
@@ -45,10 +51,9 @@
     </hudson.model.AllView>
   </views>
   <primaryView>All</primaryView>
-  <slaveAgentPort>-1</slaveAgentPort>
-  <label></label>
+  <slaveAgentPort>49187</slaveAgentPort>
+  <label>master</label>
   <nodeProperties/>
   <globalNodeProperties/>
-  <disabledAdministrativeMonitors/>
   <noUsageStatistics>true</noUsageStatistics>
 </hudson>
