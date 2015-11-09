@@ -3,7 +3,7 @@
   <disabledAdministrativeMonitors/>
   <version>1.619</version>
   <numExecutors>5</numExecutors>
-  <mode>EXCLUSIVE</mode>
+  <mode>NORMAL</mode>
   <useSecurity>true</useSecurity>
   <authorizationStrategy class="hudson.security.GlobalMatrixAuthorizationStrategy">
     <permission>hudson.model.Computer.Configure:admin</permission>
