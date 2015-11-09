@@ -24,7 +24,7 @@ $ oc policy add-role-to-user edit system:serviceaccount:stage:default
 $ oc policy add-role-to-user edit system:serviceaccount:ci:default
 
 # Now create the templates
-$ oc create -n ci -f https://raw.githubusercontent.com/openshift/jenkins/master/examples/master/jenkins-master-with-k8s-plugin.json
+$ oc create -n ci -f https://raw.githubusercontent.com/openshift/jenkins/master/examples/master/jenkins-with-k8s-plugin.json
 $ oc create -n ci -f https://raw.githubusercontent.com/openshift/jenkins/master/examples/slave/s2i-slave-template.json
 ```
 
