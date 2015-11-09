@@ -33,7 +33,7 @@ RUN curl http://pkg.jenkins-ci.org/redhat/jenkins.repo -o /etc/yum.repos.d/jenki
     yum -y --setopt=tsflags=nodocs install gettext git tar zip unzip java-1.8.0-openjdk jenkins-1.609 nss_wrapper && \
     yum clean all  && \
     localedef -f UTF-8 -i en_US en_US.UTF-8 && \
-    curl -L https://github.com/openshift/origin/releases/download/v1.0.6/openshift-origin-v1.0.6-2695cdc-linux-amd64.tar.gz | tar -zx && \
+    curl -L https://github.com/openshift/origin/releases/download/v1.0.8/openshift-origin-v1.0.8-6a2b026-linux-amd64.tar.gz | tar -zx && \
     mv oc /usr/local/bin && \
     rm oadm && \
     rm openshift
