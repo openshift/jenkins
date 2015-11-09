@@ -61,6 +61,8 @@ if [ -f "${JENKINS_HOME}/credentials.xml.tpl" ]; then
     echo "Processing Jenkins Kubernetes credentials (${JENKINS_HOME}/credentials.xml.tpl) ..."
     export KUBERNETES_CREDENTIALS=$(generate_kubernetes_credentials)
   fi
+  # Fix the envsubst trying to substitute the $Hash inside credentials.xml
+  export Hash="\$Hash"
   envsubst < "${JENKINS_HOME}/credentials.xml.tpl" > "${JENKINS_HOME}/credentials.xml"
 fi
 
