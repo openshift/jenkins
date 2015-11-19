@@ -18,11 +18,11 @@
       <stageName>Deploy</stageName>
     </se.diabol.jenkins.pipeline.PipelineProperty>
   </properties>
-  <scm class="com.openshift.openshiftjenkinsbuildutils.OpenShiftImageStreams" plugin="openshift-jenkins-buildutils@1.0-SNAPSHOT">
+  <scm class="com.openshift.jenkins.plugins.pipeline.OpenShiftImageStreams" plugin="openshift-jenkins-buildutils@1.0-SNAPSHOT">
     <imageStreamName>sample-app</imageStreamName>
     <tag>latest</tag>
     <apiURL>https://openshift.default.svc.cluster.local</apiURL>
-    <nameSpace>ci</nameSpace>
+    <namespace>ci</namespace>
     <authToken></authToken>
   </scm>
   <assignedNode>master</assignedNode>
@@ -38,20 +38,20 @@
   </triggers>
   <concurrentBuild>false</concurrentBuild>
   <builders>
-    <com.openshift.openshiftjenkinsbuildutils.OpenShiftScaler plugin="openshift-jenkins-buildutils@1.0-SNAPSHOT">
+    <com.openshift.jenkins.plugins.pipeline.OpenShiftScaler plugin="openshift-pipeline@1.0">
       <apiURL>https://openshift.default.svc.cluster.local</apiURL>
       <depCfg>frontend</depCfg>
-      <nameSpace>stage</nameSpace>
+      <namespace>stage</namespace>
       <replicaCount>0</replicaCount>
       <authToken></authToken>
-    </com.openshift.openshiftjenkinsbuildutils.OpenShiftScaler>
-    <com.openshift.openshiftjenkinsbuildutils.OpenShiftScaler plugin="openshift-jenkins-buildutils@1.0-SNAPSHOT">
+    </com.openshift.jenkins.plugins.pipeline.OpenShiftScaler>
+    <com.openshift.jenkins.plugins.pipeline.OpenShiftScaler plugin="openshift-pipeline@1.0">
       <apiURL>https://openshift.default.svc.cluster.local</apiURL>
       <depCfg>frontend</depCfg>
-      <nameSpace>stage</nameSpace>
+      <namespace>stage</namespace>
       <replicaCount>1</replicaCount>
       <authToken></authToken>
-    </com.openshift.openshiftjenkinsbuildutils.OpenShiftScaler>
+    </com.openshift.jenkins.plugins.pipeline.OpenShiftScaler>
   </builders>
   <publishers>
     <hudson.tasks.Mailer plugin="mailer@1.11">

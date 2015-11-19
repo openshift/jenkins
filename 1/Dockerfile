@@ -42,7 +42,8 @@ COPY ./contrib/openshift /opt/openshift
 COPY ./contrib/jenkins /usr/local/bin
 ADD ./contrib/s2i /usr/libexec/s2i
 
-RUN /usr/local/bin/fix-permissions /opt/openshift && \
+RUN /usr/local/bin/plugins.sh /opt/openshift/base-plugins.txt && \
+    /usr/local/bin/fix-permissions /opt/openshift && \
     /usr/local/bin/fix-permissions /var/lib/jenkins
 
 VOLUME ["/var/lib/jenkins"]

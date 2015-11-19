@@ -27,20 +27,20 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
 
-    <com.openshift.openshiftjenkinsbuildutils.OpenShiftBuilder>
+    <com.openshift.jenkins.plugins.pipeline.OpenShiftBuilder>
       <apiURL>https://openshift.default.svc.cluster.local</apiURL>
       <bldCfg>sample-app</bldCfg>
-      <nameSpace>ci</nameSpace>
+      <namespace>ci</namespace>
       <authToken></authToken>
-    </com.openshift.openshiftjenkinsbuildutils.OpenShiftBuilder>
+    </com.openshift.jenkins.plugins.pipeline.OpenShiftBuilder>
 
-    <com.openshift.openshiftjenkinsbuildutils.OpenShiftDeploymentVerifier>
+    <com.openshift.jenkins.plugins.pipeline.OpenShiftDeploymentVerifier>
       <apiURL>https://openshift.default.svc.cluster.local</apiURL>
       <depCfg>sample-app</depCfg>
-      <nameSpace>ci</nameSpace>
+      <namespace>ci</namespace>
       <replicaCount>1</replicaCount>
       <authToken></authToken>
-    </com.openshift.openshiftjenkinsbuildutils.OpenShiftDeploymentVerifier>
+    </com.openshift.jenkins.plugins.pipeline.OpenShiftDeploymentVerifier>
 
   </builders>
   <publishers/>
