@@ -30,6 +30,7 @@ RUN curl http://pkg.jenkins-ci.org/redhat/jenkins.repo -o /etc/yum.repos.d/jenki
     rpmkeys --import file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 && \
     yum -y --setopt=tsflags=nodocs --enablerepo=centosplus install epel-release && \
     rpmkeys --import file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7 && \
+    yum -y update && \
     yum -y --setopt=tsflags=nodocs install gettext git tar zip unzip java-1.8.0-openjdk jenkins-1.609 nss_wrapper && \
     yum clean all  && \
     localedef -f UTF-8 -i en_US en_US.UTF-8 && \
