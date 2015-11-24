@@ -107,6 +107,19 @@ github:1.11.3
 
 After this, just run `docker build -t my_jenkins_image -f Dockerfile`.
 
+Furthermore,  there are now 2 plugins of note included in this Jenkins Docker image that specifically facilitate the creation
+of CI/CD jobs and workflows for [OpenShift v3](https://github.com/openshift/origin):
+
+* **OpenShift Pipeline plugin**
+
+  See [the following](https://github.com/openshift/jenkins-plugin), as well an example use of the plugin's capabilities with the [OpenShift Sample Job](https://github.com/openshift/jenkins/tree/master/1/contrib/openshift/configuration/jobs/OpenShift%20Sample)
+  included in this image.
+
+* **Kubernetes plugin**
+
+  See [the following](https://github.com/jenkinsci/kubernetes-plugin), as well as the examples for constructing Jenkins [masters](https://github.com/openshift/jenkins/tree/master/examples/master) and
+  [slaves](https://github.com/openshift/jenkins/tree/master/examples/slave) that interact with [OpenShift v3](https://github.com/openshift/origin)
+
 Usage
 ---------------------------------
 
