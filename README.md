@@ -73,7 +73,7 @@ You can also set the following mount points by passing the `-v /host:/container`
 | :-------------------------- | ------------------------ |
 |  `/var/lib/jenkins`         | Jenkins config directory |
 
-**Notice: When mouting a directory from the host into the container, ensure that the mounted
+**Notice: When mounting a directory from the host into the container, ensure that the mounted
 directory has the appropriate permissions and that the owner and group of the directory
 matches the user UID or name which is running inside the container.**
 
