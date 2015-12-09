@@ -18,7 +18,7 @@
       <stageName>Deploy</stageName>
     </se.diabol.jenkins.pipeline.PipelineProperty>
   </properties>
-  <scm class="com.openshift.jenkins.plugins.pipeline.OpenShiftImageStreams" plugin="openshift-jenkins-buildutils@1.0-SNAPSHOT">
+  <scm class="com.openshift.jenkins.plugins.pipeline.OpenShiftImageStreams" >
     <imageStreamName>sample-app</imageStreamName>
     <tag>latest</tag>
     <apiURL>https://openshift.default.svc.cluster.local</apiURL>
@@ -38,28 +38,25 @@
   </triggers>
   <concurrentBuild>false</concurrentBuild>
   <builders>
-    <com.openshift.jenkins.plugins.pipeline.OpenShiftScaler plugin="openshift-pipeline@1.0">
-      <apiURL>https://openshift.default.svc.cluster.local</apiURL>
-      <depCfg>frontend</depCfg>
-      <namespace>stage</namespace>
-      <replicaCount>0</replicaCount>
-      <authToken></authToken>
-    </com.openshift.jenkins.plugins.pipeline.OpenShiftScaler>
-    <com.openshift.jenkins.plugins.pipeline.OpenShiftScaler plugin="openshift-pipeline@1.0">
+    
+    <!--
+	The sample-app deployment config for the stage project as defined at https://github.com/openshift/origin/examples/jenkins/sample-app-masterslave-stage.json
+	has an image change trigger on the image stream tag defined and leveraged in the ci project as defined in https://github.com/openshift/origin/examples/jenkins/sample-app-masterslave-ci.json.
+	When the sample-app-build job in the `ci` project updates that image, it should trigger a deployment in the stage project.  Then this job's image stream polling will detect that change, and
+	start monitoring that the deployment is valid and a replica is up and ready for testing immediatly (since the deployment config in this project has a non-zero value for replicas).  Although
+	not part of this sample, typically an email notification Jenkins post-build action would be set up (assuming SMTP is set up in the Jenkins enviornment) to notify QE/QA a new image is ready
+	for testing.
+    -->
+    
+    <com.openshift.jenkins.plugins.pipeline.OpenShiftDeploymentVerifier>
       <apiURL>https://openshift.default.svc.cluster.local</apiURL>
       <depCfg>frontend</depCfg>
       <namespace>stage</namespace>
       <replicaCount>1</replicaCount>
       <authToken></authToken>
-    </com.openshift.jenkins.plugins.pipeline.OpenShiftScaler>
+    </com.openshift.jenkins.plugins.pipeline.OpenShiftDeploymentVerifier>
+
   </builders>
-  <publishers>
-    <hudson.tasks.Mailer plugin="mailer@1.11">
-      <recipients>mfojtik@redhat.com</recipients>
-      <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
-      <sendToIndividuals>false</sendToIndividuals>
-    </hudson.tasks.Mailer>
-  </publishers>
   <buildWrappers/>
 </project>
 

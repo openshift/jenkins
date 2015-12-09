@@ -68,18 +68,27 @@ plugins and configuration needed.
 
 ### Sample Application
 
-The last step is to instantiate the `sample-app` template. The [sample
-app](sample-app) is a simple Ruby application
-that runs Sinatra and has one unit test defined to exercise the CI flow.
+The last step is to instantiate the `sample-app` templates.  Look for the `sample-app-masterslave-ci.json` and
+`sample-app-masterslave-stage.json` files under the [jenkins example folder in OpenShift Origin](https://github.com/openshift/origin/tree/master/examples/jenkins).
+These two templates revolve around a [simple Ruby application that runs Sinatra](https://github.com/mfojtik/sample-app) and has one unit test defined to exercise the CI flow.
 
-You have to instantiate the template in both `ci` and `stage` projects.
+Instantiate each template in their corresponding projects (`sample-app-masterslave-ci.json` in `ci` and `sample-app-masterslave-stage.json` in `stage`).
+
+The `stage` project spins up deployments of the application for general testing when they are successfully built and unit tested
+in the `ci` project.  Deployments in the `ci` project are not spun up without human intervention, presumably following successful testing in
+the `stage` project.
+
+See the following workflow for precise details in how these projects are leveraged.
 
 ## Workflow
 
 You can [watch the youtube](https://www.youtube.com/watch?v=HsdmSaz1zhs)
-video that shows the full workflow. What happens in the video is:
+video that shows the full workflow. The video includes one addition which we could not
+preconfigure in this sample (valid email accounts you have).
 
-1. When the `sample-app-test` job is started it fetches the [sample-app](sample-app) sources,
+But that detail aside, The breakdown of this sample workflow that is illustrated in the the video is:
+
+1. When the `sample-app-test` job is started it fetches the [sample-app](https://github.com/mfojtik/sample-app) sources,
    installs all required rubygems using bundler and then executes the sample unit tests.
    In the job definition, we restricted this job to run only on slaves that have
    the *ruby-20-centos7* label. This will match the Kubernetes Pod Template you see
@@ -89,20 +98,32 @@ video that shows the full workflow. What happens in the video is:
    When this job finishes, the Pod is automatically destroyed by the Kubernetes
    plugin.
 
-2. If the unit tests passed, the `sample-app-build` is started automatically via
+2. If the unit tests in `sample-app-test` passed and the job completes successfully, the `sample-app-build` job is started automatically via
    the Jenkins [promoted builds](https://wiki.jenkins-ci.org/display/JENKINS/Promoted+Builds+Plugin)
-   plugin. This job will leverage the OpenShift Jenkins plugin and start
-   build of the Docker image which will contain 'sample-app'.
+   plugin. This job will leverage the [OpenShift Jenkins Pipeline plugin](https://github.com/openshift/jenkins-plugin) and start an OpenShift
+   build that creates a Docker image that contains 'sample-app'.  The build results will be validated, as well as whether a deployment
+   and replication controller based on the resulting image are available (with a replica count of 0).
 
 3. Once the new Docker image for the `sample-app` is built, the
-   `sample-app-stage` project will automatically deploy it into `stage` project
-   and notify the QA team about availability for testing.
+   `sample-app-stage` job will validate that the new Docker image is successfully deployed with a running replica into the `stage` project.  The
+   deployment validation is started automatically because the `sample-app-stage` job continually monitors the ImageStream where the image resides
+   in the `ci` project and will detect any change in the ImageStream produced by the `sample-app-build` job.
 
-3. If the `sample-app` image passes the `stage` testing, you have to **manually
-   promote** the `sample-app-build` build to be deployed to OpenShift. Since
-   re-deploying the application replaces the existing running application, human
-   intervention is needed to confirm this step.
+   A sample polling interval has been provided with the sample, but alter the interval to best suit your needs.  Also, no email notification is
+   preconfigured (a running SMTP server and a valid email are needed for the post build action, and by extendsion the entire job, to succeed), but you can set up SMTP in your Jenkins environment and
+   add a Jenkins email post build action to notify the QA team about your new image's availability for testing.
+   
+   Also note, with the `sample-app-stage` job's use of the OpenShift Pipeline Plugin's Jenkins SCM extension point (where it polls OpenShift ImageStream's instead
+   of your classic source control management systems), the Jenkins SCM extension point infrastructure will start polling the `ci` project as soon as the Jenkins master comes up.
+   Additionally, Jenkins' SCM extension point  infrastructure will trigger the job at least once because there are no existing job results, without even contacting the OpenShift Pipeline Plugin's
+   SCM extension point to see if a job invocation is needed.  So you'll see
+   an initial run of `sample-app-stage` attempted and failed because you have not run `sample-app-test` yet, which would result in a `sample-app-build` run
+   that produces the deployment the `sample-app-stage` job is trying to validate.
 
-4. Once the build is promoted, the `sample-app-deploy` job is started. This job
-   will scale down the existing application deployment and redeploy it using the
-   new Docker image.
+4. If the `sample-app` image passes whatever `stage` testing you deem appropriate, this sample workflow here introduces the human element of signing off
+   on the new Docker image.  You perform this sign off when you **manually promote** the `sample-app-build` build that served as input into the `stage` testing.
+   This provides to go ahead for the image to be spun up in the `ci` project and replace any existing, earlier versions of `sample-app` application.
+
+5. Once the build is promoted, the `sample-app-deploy` job is started. This job
+   will scale up the new application deployment (remember, the deployment in the `ci` project triggered by the new build is configured to 0 replicas to allow the testing
+   to occur first), and then verify the new deployment is available with a running replica.
