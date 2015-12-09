@@ -51,25 +51,11 @@ if [ -e ${JENKINS_HOME}/password ]; then
 fi
 
 if [ -f "${CONFIG_PATH}.tpl" ]; then
-  echo "Processing Jenkins Kubernetes configuration (${CONFIG_PATH}.tpl) ..."
-  export KUBERNETES_CONFIG=$(generate_kubernetes_config)
+  echo "Processing Jenkins configuration (${CONFIG_PATH}.tpl) ..."
   envsubst < "${CONFIG_PATH}.tpl" > "${CONFIG_PATH}"
 fi
 
-if [ -f "${JENKINS_HOME}/credentials.xml.tpl" ]; then
-  if [ ! -z "${KUBERNETES_CONFIG}" ]; then
-    echo "Processing Jenkins Kubernetes credentials (${JENKINS_HOME}/credentials.xml.tpl) ..."
-    export KUBERNETES_CREDENTIALS=$(generate_kubernetes_credentials)
-  fi
-  # Fix the envsubst trying to substitute the $Hash inside credentials.xml
-  export Hash="\$Hash"
-  envsubst < "${JENKINS_HOME}/credentials.xml.tpl" > "${JENKINS_HOME}/credentials.xml"
-fi
-
 rm -rf /tmp/war
-
-# Don't show these in the Jenkins UI
-unset oc_auth oc_cmd KUBERNETES_CONFIG KUBERNETES_CREDENTIALS
 
 # if `docker run` first argument start with `--` the user is passing jenkins launcher arguments
 if [[ $# -lt 1 ]] || [[ "$1" == "--"* ]]; then

@@ -36,9 +36,7 @@
   <jdks/>
   <viewsTabBar class="hudson.views.DefaultViewsTabBar"/>
   <myViewsTabBar class="hudson.views.DefaultMyViewsTabBar"/>
-  <clouds>
-    ${KUBERNETES_CONFIG}
-  </clouds>
+  <clouds></clouds>
   <quietPeriod>1</quietPeriod>
   <scmCheckoutRetryCount>0</scmCheckoutRetryCount>
   <views>
