@@ -75,7 +75,7 @@ function create_container() {
   local cargs=${CONTAINER_ARGS:-}
   cidfile="$CIDFILE_DIR/$name"
   # create container with a cidfile in a directory for cleanup
-  docker run $cargs --cidfile $cidfile -d -v $volume:/var/lib/jenkins:Z -p 8080:8080 "$@" $IMAGE_NAME
+  docker run $cargs --name=$name --cidfile $cidfile -d -v $volume:/var/lib/jenkins:Z -p 8080:8080 "$@" $IMAGE_NAME
   echo "Created container $(cat $cidfile)"
 }
 
@@ -102,7 +102,7 @@ function test_get_job() {
 
 function run_tests() {
   local name=$1 ; shift
-  CONTAINER_ARGS="-u 10000:10000"
+  CONTAINER_ARGS="-u 10000:0"
   create_container $name $VOLUME
   CONTAINER_IP=$(get_container_ip $name)
   test_connection $name
@@ -119,7 +119,7 @@ function run_tests() {
   delete_container
 
   # start a new container with the old volume so we can try to change the password
-  CONTAINER_ARGS="-u 10000:10000 -e JENKINS_PASSWORD=newpassword" create_container $name $VOLUME
+  CONTAINER_ARGS="-u 10000:0 -e JENKINS_PASSWORD=newpassword" create_container $name $VOLUME
   CONTAINER_IP=$(get_container_ip $name)
 
   # need this to wait for the container to start up
@@ -134,10 +134,53 @@ function run_tests() {
     return 1
   fi
   set -e
+  # Stop the container so next tests can run
+  docker stop $(get_cid $name)
   echo "  Success!"
+}
+
+function run_s2i_tests() {
+  if [ "$(which s2i)" == "" ]; then
+    echo "WARNING: Please install the s2i binary to run the s2i tests."
+    return
+  fi
+  output_image="openshift/s2i-test-jenkins"
+  s2i build --context-dir="1/test/s2i" --loglevel=3 --pull-policy=never \
+    file://$(pwd)/.. $IMAGE_NAME $output_image
+  s2i_volume=$(mktemp -d)
+  chmod a+rwx $s2i_volume
+  IMAGE_NAME="${output_image}" create_container s2i-jenkins-test $s2i_volume
+  cid=s2i-jenkins-test
+  CONTAINER_IP=$(get_container_ip ${cid})
+  test_connection ${cid}
+  set +e
+  if ! docker exec ${cid} ls /var/lib/jenkins/plugins/sample.jpi.pinned; then
+    echo "Fail: The sample.jpi.pinned plugin was not copied"
+    return 1
+  fi
+  if ! docker exec ${cid} ls /var/lib/jenkins/plugins/ansicolor.jpi; then
+    echo "Fail: The ansicolor plugin should be installed"
+    return 1
+  fi
+  if ! docker exec ${cid} ls /var/lib/jenkins/jobs/sample-app-test/config.xml; then
+    echo "Fail: The sample-app-test job was not copied"
+    return 1
+  fi
+  docker exec ${cid} cat /var/lib/jenkins/config.xml | grep -q "s2i-test-config"
+  if [ "$?" != "0" ]; then
+    echo "Fail: The config.xml was not copied"
+    return 1
+  fi
+  set -e
+  test_get_job admin password sample-app-test
+  test_create_job admin password testJob
+  test_get_job admin password testJob
 }
 
 # Tests.
 
 # Normal tests
 run_tests jenkins_test
+
+# S2I tests
+run_s2i_tests
