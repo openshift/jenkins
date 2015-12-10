@@ -81,6 +81,8 @@ matches the user UID or name which is running inside the container.**
 Plugins
 ---------------------------------
 
+#### Installing using layering
+
 In order to install additional Jenkins plugins, the OpenShift Jenkins image provides a way
 how to add those by layering on top of this image. The derived image, will provide the same functionality
 as described in this documentation, in addition it will also include all plugins you list in the `plugins.txt` file.
@@ -107,18 +109,39 @@ github:1.11.3
 
 After this, just run `docker build -t my_jenkins_image -f Dockerfile`.
 
-Furthermore,  there are now 2 plugins of note included in this Jenkins Docker image that specifically facilitate the creation
-of CI/CD jobs and workflows for [OpenShift v3](https://github.com/openshift/origin):
+#### Installing using S2I build
+
+The [s2i](https://github.com/openshift/source-to-image) tool allows you to do additional modifications of this Jenkins image.
+For example, you can use S2I to copy custom Jenkins Jobs definitions, additional
+plugins or replace the default `config.xml` file with your own configuration.
+
+To do that, you can either use the standalone `s2i` tool, that will produce the
+customized Docker image or you can use OpenShift Source build strategy.
+
+In order to include your modifications in Jenkins image, you need to have a Git
+repository with following directory structure:
+
+* `./plugins` folder that contains binary Jenkins plugins you want to copy into Jenkins 
+* `./plugins.txt` file that list the plugins you want to install (see the section above)
+* `./configuration/jobs` folder that contains the Jenkins job definitions
+* `./configuration/config.xml` file that contains your custom Jenkins configuration
+
+Note that the `./configuration` folder will be copied into `/var/lib/jenkins`
+folder, so you can also include additional files (like `credentials.xml`, etc.).
+
+To build your customized Jenkins image, you can then execute following command:
+
+```console
+$ s2i build https://github.com/your/repository openshift/jenkins-1-centos7 your_image_name
+```
+
+
+#### Included plugins
 
 * **OpenShift Pipeline plugin**
 
   See [the following](https://github.com/openshift/jenkins-plugin), as well an example use of the plugin's capabilities with the [OpenShift Sample Job](https://github.com/openshift/jenkins/tree/master/1/contrib/openshift/configuration/jobs/OpenShift%20Sample)
   included in this image.
-
-* **Kubernetes plugin**
-
-  See [the following](https://github.com/jenkinsci/kubernetes-plugin), as well as the examples for constructing Jenkins [masters](https://github.com/openshift/jenkins/tree/master/examples/master) and
-  [slaves](https://github.com/openshift/jenkins/tree/master/examples/slave) that interact with [OpenShift v3](https://github.com/openshift/origin)
 
 Usage
 ---------------------------------
