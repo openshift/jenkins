@@ -1,1 +1,1 @@
-openshift-pipeline:1.0.3
+openshift-pipeline:1.0.4
