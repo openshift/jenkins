@@ -8,6 +8,9 @@ For an example of how to use it, [see this sample.](https://github.com/openshift
 
 The image is pushed to DockerHub as openshift/jenkins-1-centos7.
 
+For more information about using these images with OpenShift, please see the
+official [OpenShift Documentation](https://docs.openshift.org/latest/using_images/other_images/jenkins.html).
+
 Versions
 ---------------------------------
 Jenkins versions currently provided are:
