@@ -12,12 +12,12 @@ FROM centos:centos7
 
 MAINTAINER Ben Parees <bparees@redhat.com>
 
-ENV JENKINS_VERSION=1.609 \
+ENV JENKINS_VERSION=1.625 \
     HOME=/var/lib/jenkins \
     JENKINS_HOME=/var/lib/jenkins
 
 LABEL k8s.io.description="Jenkins is a continuous integration server" \
-      k8s.io.display-name="Jenkins 1.609" \
+      k8s.io.display-name="Jenkins 1.625" \
       openshift.io.expose-services="8080:http" \
       openshift.io.tags="jenkins,jenkins1,ci" \
       io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
