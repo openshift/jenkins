@@ -28,7 +28,9 @@ EXPOSE 8080 50000
 RUN curl http://pkg.jenkins-ci.org/redhat/jenkins.repo -o /etc/yum.repos.d/jenkins.repo && \
     rpm --import http://pkg.jenkins-ci.org/redhat/jenkins-ci.org.key && \
     yum -y --setopt=tsflags=nodocs install epel-release && \
-    yum -y --setopt=tsflags=nodocs install gettext git tar zip unzip java-1.8.0-openjdk jenkins-1.625 nss_wrapper && \
+    INSTALL_PKGS="gettext git tar zip unzip java-1.8.0-openjdk jenkins-1.625 nss_wrapper" && \
+    yum -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
+    rpm -V $INSTALL_PKGS && \
     yum clean all  && \
     localedef -f UTF-8 -i en_US en_US.UTF-8 && \
     curl -L https://github.com/openshift/origin/releases/download/v1.0.8/openshift-origin-v1.0.8-6a2b026-linux-amd64.tar.gz | tar -zx && \
