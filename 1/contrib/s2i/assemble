@@ -11,6 +11,10 @@ cp -Rf /tmp/src/. ${JENKINS_INSTALL_DIR}
 if [ -f ${JENKINS_INSTALL_DIR}/plugins.txt ]; then
   echo "---> Installing Jenkins $(cat ${JENKINS_INSTALL_DIR}/plugins.txt|wc -l) plugins using ${JENKINS_DIR}/plugins.txt ..."
   /usr/local/bin/plugins.sh ${JENKINS_INSTALL_DIR}/plugins.txt
+  if [[ "$?" != "0" ]]; then
+    echo "Failed to install plugins."
+    exit 1
+  fi
   /usr/local/bin/fix-permissions ${JENKINS_DIR}/plugins
 fi
 
