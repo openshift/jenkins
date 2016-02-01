@@ -12,12 +12,12 @@ FROM centos:centos7
 
 MAINTAINER Ben Parees <bparees@redhat.com>
 
-ENV JENKINS_VERSION=1.625 \
+ENV JENKINS_VERSION=1.642 \
     HOME=/var/lib/jenkins \
     JENKINS_HOME=/var/lib/jenkins
 
 LABEL k8s.io.description="Jenkins is a continuous integration server" \
-      k8s.io.display-name="Jenkins 1.625" \
+      k8s.io.display-name="Jenkins 1.642" \
       openshift.io.expose-services="8080:http" \
       openshift.io.tags="jenkins,jenkins1,ci" \
       io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
@@ -28,7 +28,7 @@ EXPOSE 8080 50000
 RUN curl http://pkg.jenkins-ci.org/redhat/jenkins.repo -o /etc/yum.repos.d/jenkins.repo && \
     rpm --import http://pkg.jenkins-ci.org/redhat/jenkins-ci.org.key && \
     yum -y --setopt=tsflags=nodocs install epel-release && \
-    INSTALL_PKGS="gettext git tar zip unzip java-1.8.0-openjdk jenkins-1.625 nss_wrapper" && \
+    INSTALL_PKGS="gettext git tar zip unzip java-1.8.0-openjdk jenkins-1.642 nss_wrapper" && \
     yum -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     yum clean all  && \
