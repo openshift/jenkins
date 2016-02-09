@@ -34,9 +34,9 @@ LABEL BZComponent="openshift-jenkins-docker" \
 EXPOSE 8080 50000
 
 RUN yum-config-manager --disable epel >/dev/null || : && \
-    INSTALL_PKGS="gettext git tar zip unzip nss_wrapper java-1.8.0-openjdk jenkins-1.642.1 jenkins-plugin-openshift-pipeline" && \
+    INSTALL_PKGS="gettext git tar zip unzip nss_wrapper java-1.8.0-openjdk jenkins-1.642.1 jenkins-plugin-kubernetes jenkins-plugin-openshift-pipeline" && \
     yum install -y $INSTALL_PKGS && \
-    rpm -V $INSTALL_PKGS && \    
+    rpm -V $INSTALL_PKGS && \
     yum clean all  && \
     localedef -f UTF-8 -i en_US en_US.UTF-8 && \
     curl -L https://github.com/openshift/origin/releases/download/v1.0.8/openshift-origin-v1.0.8-6a2b026-linux-amd64.tar.gz | tar -zx && \

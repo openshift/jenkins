@@ -1,1 +1,2 @@
 openshift-pipeline:1.0.7
+kubernetes:0.4.1
