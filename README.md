@@ -142,10 +142,12 @@ $ s2i build https://github.com/your/repository openshift/jenkins-1-centos7 your_
 
 #### Included plugins
 
-* **OpenShift Pipeline plugin**
+* **OpenShift Pipeline Plugin**
 
-  See [the following](https://github.com/openshift/jenkins-plugin), as well an example use of the plugin's capabilities with the [OpenShift Sample Job](https://github.com/openshift/jenkins/tree/master/1/contrib/openshift/configuration/jobs/OpenShift%20Sample)
-  included in this image.
+See [the following](https://github.com/openshift/jenkins-plugin), as well an example use of the plugin's capabilities with the [OpenShift Sample Job](https://github.com/openshift/jenkins/tree/master/1/contrib/openshift/configuration/jobs/OpenShift%20Sample) included in this image. For more details visit the Jenkins [plugin](https://wiki.jenkins-ci.org/display/JENKINS/OpenShift+Pipeline+Plugin) website.
+
+* **Kubernetes Plugin**
+This plugin allows slaves to be dynamically provisioned on multiple Docker hosts using [Kubernetes](https://github.com/kubernetes/kubernetes). To learn how to use this plugin, see the [example](https://github.com/openshift/origin/tree/master/examples/jenkins-master) available in the OpenShift Origin repository. For more details about plugin, visit the [plugin](https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin) web site.
 
 Usage
 ---------------------------------
