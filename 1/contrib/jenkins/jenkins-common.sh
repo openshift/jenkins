@@ -8,11 +8,6 @@ export AUTH_TOKEN=/run/secrets/kubernetes.io/serviceaccount/token
 export JENKINS_PASSWORD KUBERNETES_SERVICE_HOST KUBERNETES_SERVICE_PORT
 export ITEM_ROOTDIR="\${ITEM_ROOTDIR}" # Preserve this variable Jenkins has in config.xml
 
-if [ -f "${AUTH_TOKEN}" ]; then
-  export oc_auth="--token=$(cat $AUTH_TOKEN) --certificate-authority=${KUBE_CA}"
-  export oc_cmd="oc --server=$OPENSHIFT_API_URL ${oc_auth}"
-fi
-
 # Generate passwd file based on current uid
 function generate_passwd_file() {
   export USER_ID=$1

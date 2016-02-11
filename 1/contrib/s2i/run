@@ -7,6 +7,33 @@
 # It also sets the admin password to ${JENKINS_PASSWORD}.
 #
 source /usr/local/bin/jenkins-common.sh
+source /usr/local/bin/kube-slave-common.sh
+
+jenkins_config_dir="/opt/openshift/configuration"
+jenkins_config_path="${jenkins_config_dir}/config.xml"
+
+if [ -f "${jenkins_config_path}" ]; then
+  echo "Skipping kubernetes plugin configuration as user provided custom 'config.xml'"
+else
+  if [ -f "${jenkins_config_path}.tpl" ]; then
+    export KUBERNETES_CONFIG=$(generate_kubernetes_config)
+    for name in $(get_is_names); do
+      echo "Adding image ${name}:latest as Kubernetes slave ..."
+    done
+    echo "Generating kubernetes-plugin configuration (${jenkins_config_path}.tpl) ..."
+    envsubst < "${jenkins_config_path}.tpl" > "${jenkins_config_path}"
+  fi
+
+  if [ -f "${jenkins_config_dir}/credentials.xml.tpl" ]; then
+    if [ ! -z "${KUBERNETES_CONFIG}" ]; then
+      echo "Generating kubernetes-plugin credentials (${JENKINS_HOME}/credentials.xml.tpl) ..."
+      export KUBERNETES_CREDENTIALS=$(generate_kubernetes_credentials)
+    fi
+    # Fix the envsubst trying to substitute the $Hash inside credentials.xml
+    export Hash="\$Hash"
+    envsubst < "${jenkins_config_dir}/credentials.xml.tpl" > "${jenkins_config_dir}/credentials.xml"
+  fi
+fi
 
 # Since OpenShift runs this Docker image under random user ID, we have to assign
 # the 'jenkins' user name to this UID. For that we use nss_wrapper and
