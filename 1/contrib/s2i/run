@@ -12,6 +12,21 @@ source /usr/local/bin/kube-slave-common.sh
 jenkins_config_dir="/opt/openshift/configuration"
 jenkins_config_path="${jenkins_config_dir}/config.xml"
 
+
+CONTAINER_MEMORY_IN_BYTES=`cat /sys/fs/cgroup/memory/memory.limit_in_bytes`
+DEFAULT_MEMORY_CEILING=$((2**40-1))
+if [ "${CONTAINER_MEMORY_IN_BYTES}" -lt "${DEFAULT_MEMORY_CEILING}" ]; then
+    if [ -z $CONTAINER_HEAP_PERCENT ]; then
+	CONTAINER_HEAP_PERCENT=0.80
+    fi
+    
+    CONTAINER_MEMORY_IN_MB=$((${CONTAINER_MEMORY_IN_BYTES}/1024**2))
+    CONTAINER_HEAP_MAX=$(echo "${CONTAINER_MEMORY_IN_MB} ${CONTAINER_HEAP_PERCENT}" | awk '{ printf "%d", $1 * $2 }')
+    
+    JAVA_MAX_HEAP_PARAM="-Xmx${CONTAINER_HEAP_MAX}m"
+fi 
+
+
 if [ -f "${jenkins_config_path}" ]; then
   echo "Skipping kubernetes plugin configuration as user provided custom 'config.xml'"
 else
@@ -86,7 +101,7 @@ rm -rf /tmp/war
 
 # if `docker run` first argument start with `--` the user is passing jenkins launcher arguments
 if [[ $# -lt 1 ]] || [[ "$1" == "--"* ]]; then
-   exec java $JAVA_OPTS -Dfile.encoding=UTF8 -jar /usr/lib/jenkins/jenkins.war $JENKINS_OPTS "$@"
+   exec java $JAVA_MAX_HEAP_PARAM $JAVA_OPTS -Dfile.encoding=UTF8 -jar /usr/lib/jenkins/jenkins.war $JENKINS_OPTS "$@"
 fi
 
 # As argument is not jenkins, assume user want to run his own process, for sample a `bash` shell to explore this image
