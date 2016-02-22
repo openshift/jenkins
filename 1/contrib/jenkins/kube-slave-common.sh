@@ -13,7 +13,20 @@
 
 export DEFAULT_SLAVE_DIRECTORY=/opt/app-root/jenkins
 export SLAVE_LABEL="jenkins-slave"
-export PROJECT_NAME=${PROJECT_NAME:-ci}
+
+# The project name equals to the namespace name where the container with jenkins
+# runs. You can override it by setting the PROJECT_NAME variable.
+# If there is no environment variable and this container does not run in
+# kubernetes, the default value "ci" is used.
+if [ -z "${PROJECT_NAME}" ]; then
+  if [ -f "${KUBE_SA_DIR}/namespace" ]; then
+    export PROJECT_NAME=$(cat "${KUBE_SA_DIR}/namespace")
+  else
+    export PROJECT_NAME="ci"
+  fi
+else
+  export PROJECT_NAME
+fi
 
 export JENKINS_PASSWORD KUBERNETES_SERVICE_HOST KUBERNETES_SERVICE_PORT
 export K8S_PLUGIN_POD_TEMPLATES=""

@@ -3,8 +3,9 @@
 export JENKINS_HOME=/var/lib/jenkins
 export CONFIG_PATH=${JENKINS_HOME}/config.xml
 export OPENSHIFT_API_URL=https://openshift.default.svc.cluster.local
-export KUBE_CA=/run/secrets/kubernetes.io/serviceaccount/ca.crt
-export AUTH_TOKEN=/run/secrets/kubernetes.io/serviceaccount/token
+export KUBE_SA_DIR=/run/secrets/kubernetes.io/serviceaccount
+export KUBE_CA=${KUBE_SA_DIR}/ca.crt
+export AUTH_TOKEN=${KUBE_SA_DIR}/token
 export JENKINS_PASSWORD KUBERNETES_SERVICE_HOST KUBERNETES_SERVICE_PORT
 export ITEM_ROOTDIR="\${ITEM_ROOTDIR}" # Preserve this variable Jenkins has in config.xml
 
