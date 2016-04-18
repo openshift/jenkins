@@ -33,10 +33,9 @@ RUN curl http://pkg.jenkins-ci.org/redhat/jenkins.repo -o /etc/yum.repos.d/jenki
     rpm -V $INSTALL_PKGS && \
     yum clean all  && \
     localedef -f UTF-8 -i en_US en_US.UTF-8 && \
-    curl -L https://github.com/openshift/origin/releases/download/v1.0.8/openshift-origin-v1.0.8-6a2b026-linux-amd64.tar.gz | tar -zx && \
-    mv oc /usr/local/bin && \
-    rm oadm && \
-    rm openshift
+    curl -L https://github.com/openshift/origin/releases/download/v1.1.6/openshift-origin-client-tools-v1.1.6-ef1caba-linux-64bit.tar.gz | tar -zx && \
+    mv openshift*/oc /usr/local/bin && \
+    rm -rf openshift-origin-client-tools-*
 
 COPY ./contrib/openshift /opt/openshift
 COPY ./contrib/jenkins /usr/local/bin
