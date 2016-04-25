@@ -17,6 +17,21 @@ function generate_passwd_file() {
   export LD_PRELOAD=libnss_wrapper.so
   export NSS_WRAPPER_PASSWD=/opt/openshift/passwd
   export NSS_WRAPPER_GROUP=/etc/group
+
+  USER_ID=$(id -u)
+  GROUP_ID=$(id -g)
+
+  if [ x"$USER_ID" != x"0" -a x"$USER_ID" != x"1001" ]; then
+
+    NSS_WRAPPER_PASSWD=/opt/openshift/passwd
+    NSS_WRAPPER_GROUP=/etc/group
+
+    echo "jenkins:x:${USER_ID}:${GROUP_ID}:Jenkins Continuous Integration Server:${JENKINS_HOME}:/bin/false" >> $NSS_WRAPPER_PASSWD
+
+    export NSS_WRAPPER_PASSWD
+    export NSS_WRAPPER_GROUP
+    export LD_PRELOAD=libnss_wrapper.so
+  fi
 }
 
 function obfuscate_password {
