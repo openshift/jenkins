@@ -11,22 +11,16 @@ export ITEM_ROOTDIR="\${ITEM_ROOTDIR}" # Preserve this variable Jenkins has in c
 
 # Generate passwd file based on current uid
 function generate_passwd_file() {
-  export USER_ID=$1
-  export GROUP_ID=$2
-  envsubst < /opt/openshift/passwd.template > /opt/openshift/passwd
-  export LD_PRELOAD=libnss_wrapper.so
-  export NSS_WRAPPER_PASSWD=/opt/openshift/passwd
-  export NSS_WRAPPER_GROUP=/etc/group
-
   USER_ID=$(id -u)
   GROUP_ID=$(id -g)
 
-  if [ x"$USER_ID" != x"0" -a x"$USER_ID" != x"1001" ]; then
+  if [ x"$USER_ID" != x"0" -a x"$USER_ID" != x"997" ]; then
 
     NSS_WRAPPER_PASSWD=/opt/openshift/passwd
     NSS_WRAPPER_GROUP=/etc/group
 
-    echo "jenkins:x:${USER_ID}:${GROUP_ID}:Jenkins Continuous Integration Server:${JENKINS_HOME}:/bin/false" >> $NSS_WRAPPER_PASSWD
+    cp /etc/passwd $NSS_WRAPPER_PASSWD
+    echo "default:x:${USER_ID}:${GROUP_ID}:Default Application User:${HOME}:/sbin/nologin" >> $NSS_WRAPPER_PASSWD
 
     export NSS_WRAPPER_PASSWD
     export NSS_WRAPPER_GROUP
