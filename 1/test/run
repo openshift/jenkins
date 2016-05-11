@@ -31,7 +31,8 @@ function cleanup() {
     echo "Done."
   done
   rmdir $CIDFILE_DIR
-  rm -rf $VOLUME
+  # This fails because the volume contains files owned by the container uid, so we can't clean it up.
+  #rm -rf $VOLUME
 }
 trap cleanup EXIT SIGINT
 
@@ -184,3 +185,5 @@ run_tests jenkins_test
 
 # S2I tests
 run_s2i_tests
+
+echo "SUCCESS!"
