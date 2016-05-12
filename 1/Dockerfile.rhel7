@@ -12,13 +12,13 @@ FROM rhel7.2
 
 MAINTAINER Ben Parees <bparees@redhat.com>
 
-ENV JENKINS_VERSION=1.642 \
+ENV JENKINS_VERSION=1.651.2 \
     HOME=/var/lib/jenkins \
     JENKINS_HOME=/var/lib/jenkins \
     STI_SCRIPTS_URL=image:///usr/libexec/s2i
 
 LABEL k8s.io.description="Jenkins is a continuous integration server" \
-      k8s.io.display-name="Jenkins 1.642" \
+      k8s.io.display-name="Jenkins 1.651.2" \
       openshift.io.expose-services="8080:http" \
       openshift.io.tags="jenkins,jenkins1,ci" \
       io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
@@ -26,7 +26,7 @@ LABEL k8s.io.description="Jenkins is a continuous integration server" \
 # Labels consumed by Red Hat build service
 LABEL BZComponent="openshift-jenkins-docker" \
       Name="openshift3/jenkins-1-rhel7" \
-      Version="1.642" \
+      Version="1.651.2" \
       Architecture="x86_64" \
       Release="7"
 
@@ -34,7 +34,7 @@ LABEL BZComponent="openshift-jenkins-docker" \
 EXPOSE 8080 50000
 
 RUN yum-config-manager --disable epel >/dev/null || : && \
-    INSTALL_PKGS="rsync gettext git tar zip unzip nss_wrapper java-1.8.0-openjdk atomic-openshift-clients jenkins-1.642.2 jenkins-plugin-kubernetes jenkins-plugin-openshift-pipeline jenkins-plugin-credentials" && \
+    INSTALL_PKGS="rsync gettext git tar zip unzip nss_wrapper java-1.8.0-openjdk atomic-openshift-clients jenkins-1.651.2 jenkins-plugin-kubernetes jenkins-plugin-openshift-pipeline jenkins-plugin-credentials" && \
     yum install -y $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     yum clean all  && \
