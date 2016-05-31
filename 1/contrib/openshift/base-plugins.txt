@@ -1,4 +1,4 @@
-openshift-pipeline:1.0.12
+openshift-pipeline:1.0.13
 durable-task:1.6
 kubernetes:0.5
 credentials:1.24
