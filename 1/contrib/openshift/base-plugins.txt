@@ -1,4 +1,4 @@
-openshift-pipeline:1.0.13
+openshift-pipeline:1.0.14
 
 # kubernetes plugin - https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin
 durable-task:1.6
