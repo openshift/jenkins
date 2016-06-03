@@ -13,7 +13,8 @@ workflow-cps-global-lib:2.0
 workflow-job:2.0
 pipeline-build-step:2.0
 workflow-multibranch:2.0
-workflow-cps:2.0
+# went to 2.2 here for https://github.com/fabric8io/openshift-jenkins-sync-plugin/issues/57
+workflow-cps:2.2
 workflow-scm-step:2.0
 pipeline-stage-step:2.0
 workflow-basic-steps:2.0
