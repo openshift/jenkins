@@ -2,7 +2,7 @@ openshift-pipeline:1.0.17
 
 # kubernetes plugin - https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin
 durable-task:1.6
-kubernetes:0.5
+kubernetes:0.6
 credentials:1.24
 
 # Pipeline plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Plugin
@@ -40,7 +40,7 @@ branch-api:1.1
 
 # Pipeline SCM Step Plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+SCM+Step+Plugin
 workflow-scm-step:2.0
-git:2.4.1
+git:2.4.2
 subversion:2.5
 
 # mercurial - https://wiki.jenkins-ci.org/display/JENKINS/Mercurial+Plugin
