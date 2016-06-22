@@ -5,18 +5,21 @@ durable-task:1.10
 kubernetes:0.6
 credentials:2.1.0
 
+# fabric8 openshift sync
+openshift-sync:0.0.9
+
 # Pipeline plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Plugin
 workflow-aggregator:2.1
-workflow-api:2.0
+workflow-api:2.1
 workflow-durable-task-step:2.1
 workflow-cps-global-lib:2.0
 workflow-job:2.2
 pipeline-build-step:2.1
-workflow-cps:2.5
+workflow-cps:2.6
 pipeline-stage-step:2.1
 workflow-basic-steps:2.0
 pipeline-input-step:2.0
-workflow-support:2.0
+workflow-support:2.1
 workflow-step-api:2.1
 
 # Pipeline Multibranch Plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Multibranch+Plugin
