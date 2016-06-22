@@ -45,6 +45,8 @@ RUN /usr/local/bin/plugins.sh /opt/openshift/base-plugins.txt && \
     # need to create <plugin>.pinned files when upgrading "core" plugins like credentials or subversion that are bundled with the jenkins server
     touch /opt/openshift/plugins/credentials.jpi.pinned && \
     touch /opt/openshift/plugins/subversion.jpi.pinned && \
+    touch /opt/openshift/plugins/ssh-credentials.jpi.pinned && \
+    touch /opt/openshift/plugins/script-security.jpi.pinned && \
     chown -R 1001:0 /opt/openshift && \
     /usr/local/bin/fix-permissions /opt/openshift && \
     /usr/local/bin/fix-permissions /var/lib/jenkins
