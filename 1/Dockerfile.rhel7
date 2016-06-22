@@ -51,6 +51,8 @@ RUN mkdir -p /opt/openshift/plugins && \
     for FILENAME in /usr/lib64/jenkins/*hpi ; do ln -s $FILENAME /opt/openshift/plugins/`basename $FILENAME .hpi`.jpi; done &&\
     touch /opt/openshift/plugins/credentials.jpi.pinned && \
     touch /opt/openshift/plugins/subversion.jpi.pinned && \
+    touch /opt/openshift/plugins/ssh-credentials.jpi.pinned && \
+    touch /opt/openshift/plugins/script-security.jpi.pinned && \
     /usr/local/bin/fix-permissions /opt/openshift && \
     chown -R 1001:0 /opt/openshift && \
     /usr/local/bin/fix-permissions /var/lib/jenkins
