@@ -11,7 +11,7 @@
 #
 # (where the 'ci' is the namespace where Jenkins runs)
 
-export DEFAULT_SLAVE_DIRECTORY=/opt/app-root/jenkins
+export DEFAULT_SLAVE_DIRECTORY=/tmp
 export SLAVE_LABEL="jenkins-slave"
 
 # The project name equals to the namespace name where the container with jenkins
@@ -63,6 +63,8 @@ function convert_is_to_slave() {
     <args></args>
     <instanceCap>5</instanceCap>
     <volumes/>
+    <envVars/>
+    <nodeSelector/>
     <remoteFs>{{if index .metadata.annotations \"slave-directory\"}}{{index .metadata.annotations \"slave-directory\"}}{{else}}${DEFAULT_SLAVE_DIRECTORY}{{end}}</remoteFs>
     <label>{{if index .metadata.annotations \"slave-label\"}}{{index .metadata.annotations \"slave-label\"}}{{else}}${name}{{end}}</label>
   </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
@@ -83,17 +85,43 @@ function generate_kubernetes_config() {
     else
       return
     fi
-    [ -z "${slave_templates}" ] && return
     echo "
-    <org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud plugin=\"kubernetes@0.5\">
+    <org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud>
       <name>openshift</name>
       <templates>
-        ${slave_templates}
+        <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+          <name>agent</name>
+          <image>jenkinsci/jnlp-slave</image>
+          <privileged>false</privileged>
+          <command></command>
+          <args></args>
+          <instanceCap>2147483647</instanceCap>
+          <label>agent</label>
+          <volumes/>
+          <envVars/>
+          <nodeSelector/>
+          <remoteFs>/tmp</remoteFs>
+        </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+        <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+          <name>redhatdistortion-maven</name>
+          <image>docker.io/redhatdistortion/maven-jenkins-slave</image>
+          <privileged>false</privileged>
+          <command></command>
+          <args></args>
+          <remoteFs>/opt/app-root/jenkins</remoteFs>
+          <instanceCap>2147483647</instanceCap>
+          <label>redhatdistortion-maven</label>
+          <volumes/>
+          <envVars/>
+          <nodeSelector/>
+        </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+      ${slave_templates}
       </templates>
       <serverUrl>https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}</serverUrl>
       <skipTlsVerify>true</skipTlsVerify>
       <namespace>${PROJECT_NAME}</namespace>
       <jenkinsUrl>http://${JENKINS_SERVICE_HOST}:${JENKINS_SERVICE_PORT}</jenkinsUrl>
+      <jenkinsTunnel>${JENKINS_JNLP_SERVICE_HOST}:${JENKINS_JNLP_SERVICE_PORT}</jenkinsTunnel>
       <credentialsId>1a12dfa4-7fc5-47a7-aa17-cc56572a41c7</credentialsId>
       <containerCap>10</containerCap>
       <retentionTimeout>5</retentionTimeout>

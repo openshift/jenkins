@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <hudson>
   <disabledAdministrativeMonitors/>
-  <version>1.619</version>
+  <version>1.651</version>
   <numExecutors>5</numExecutors>
   <mode>NORMAL</mode>
   <useSecurity>true</useSecurity>
@@ -52,7 +52,7 @@
     </hudson.model.AllView>
   </views>
   <primaryView>All</primaryView>
-  <slaveAgentPort>49187</slaveAgentPort>
+  <slaveAgentPort>${JENKINS_JNLP_SERVICE_PORT}</slaveAgentPort>
   <label>master</label>
   <nodeProperties/>
   <globalNodeProperties/>
