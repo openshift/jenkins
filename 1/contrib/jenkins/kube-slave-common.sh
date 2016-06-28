@@ -13,6 +13,7 @@
 
 export DEFAULT_SLAVE_DIRECTORY=/tmp
 export SLAVE_LABEL="jenkins-slave"
+export JENKINS_JNLP_SERVICE_PORT=${JENKINS_JNLP_SERVICE_PORT:-50000}
 
 # The project name equals to the namespace name where the container with jenkins
 # runs. You can override it by setting the PROJECT_NAME variable.
