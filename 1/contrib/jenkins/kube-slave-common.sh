@@ -15,6 +15,15 @@ export DEFAULT_SLAVE_DIRECTORY=/tmp
 export SLAVE_LABEL="jenkins-slave"
 export JENKINS_JNLP_SERVICE_PORT=${JENKINS_JNLP_SERVICE_PORT:-50000}
 
+NODEJS_SLAVE=registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7
+MAVEN_SLAVE=registry.access.redhat.com/openshift3/jenkins-slave-maven-rhel7
+# if the master is running the centos image, use the centos slave images.
+if [[ `grep CentOS /etc/redhat-release` ]]; then
+  NODEJS_SLAVE=openshift/jenkins-slave-nodejs-centos7
+  MAVEN_SLAVE=openshift/jenkins-slave-maven-centos7
+fi
+
+
 # The project name equals to the namespace name where the container with jenkins
 # runs. You can override it by setting the PROJECT_NAME variable.
 # If there is no environment variable and this container does not run in
@@ -91,27 +100,28 @@ function generate_kubernetes_config() {
       <name>openshift</name>
       <templates>
         <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
-          <name>agent</name>
-          <image>jenkinsci/jnlp-slave</image>
+          <name>maven</name>
+          <image>${MAVEN_SLAVE}</image>
           <privileged>false</privileged>
           <command></command>
           <args></args>
+          <remoteFs>/home/jenkins</remoteFs>
           <instanceCap>2147483647</instanceCap>
-          <label>agent</label>
+          <label>maven</label>
           <volumes/>
           <envVars/>
           <nodeSelector/>
           <remoteFs>/tmp</remoteFs>
         </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
         <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
-          <name>redhatdistortion-maven</name>
-          <image>docker.io/redhatdistortion/maven-jenkins-slave</image>
+          <name>nodejs</name>
+          <image>${NODEJS_SLAVE}</image>
           <privileged>false</privileged>
           <command></command>
           <args></args>
-          <remoteFs>/opt/app-root/jenkins</remoteFs>
+          <remoteFs>/home/jenkins</remoteFs>
           <instanceCap>2147483647</instanceCap>
-          <label>redhatdistortion-maven</label>
+          <label>nodejs</label>
           <volumes/>
           <envVars/>
           <nodeSelector/>
