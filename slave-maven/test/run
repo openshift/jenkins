@@ -1,0 +1,9 @@
+#!/bin/bash
+#
+# Test the Jenkins image.
+#
+# IMAGE_NAME specifies the name of the candidate image used for testing.
+# The image has to be available before this script is executed.
+#
+
+echo "SUCCESS (no tests)!"

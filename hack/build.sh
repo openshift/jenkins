@@ -13,7 +13,7 @@ VERSION=$2
 
 DOCKERFILE_PATH=""
 BASE_DIR_NAME=$(echo $(basename `pwd`) | sed -e 's/-[0-9]*$//g')
-BASE_IMAGE_NAME="openshift/${BASE_DIR_NAME#sti-}"
+BASE_IMAGE_NAME="openshift/${BASE_DIR_NAME#s2i-}"
 
 # Cleanup the temporary Dockerfile created by docker build with version
 trap "rm -f ${DOCKERFILE_PATH}.version" SIGINT SIGQUIT EXIT
@@ -34,18 +34,31 @@ function docker_build_with_version {
 }
 
 # Install the docker squashing tool[1] and squash the result image
-# [1] https://github.com/goldmann/docker-scripts
+# [1] https://github.com/goldmann/docker-squash
 function squash {
   # FIXME: We have to use the exact versions here to avoid Docker client
   #        compatibility issues
-  easy_install -q --user docker_py==1.6.0 docker-scripts==0.4.4
+  easy_install -q --user docker_py==1.6.0 docker-squash==1.0.0rc6
   base=$(awk '/^FROM/{print $2}' $1)
-  ${HOME}/.local/bin/docker-scripts squash -f $base ${IMAGE_NAME}
+  ${HOME}/.local/bin/docker-squash -f $base ${IMAGE_NAME}
 }
 
 # Versions are stored in subdirectories. You can specify VERSION variable
 # to build just one single version. By default we build all versions
 dirs=${VERSION:-$VERSIONS}
+
+# enforce building of the slave-base image if we're building any of
+# the slave images.  Note that we might build the slave-base
+# twice if it was explicitly requested.  That's ok, it's 
+# cheap to build it a second time.  The important thing
+# is we have to build it before building any other
+# slave image.
+for dir in ${dirs}; do
+  if [[ "$dir" =~ "slave" ]]; then
+    dirs=( "slave-base ${dirs[@]}")
+    break
+  fi
+done
 
 for dir in ${dirs}; do
   IMAGE_NAME="${BASE_IMAGE_NAME}-${dir//./}-${OS}"
@@ -65,7 +78,8 @@ for dir in ${dirs}; do
 
   if [[ ! -z "${TEST_MODE}" ]]; then
     IMAGE_NAME=${IMAGE_NAME} test/run
-    if [[ $? -eq 0 ]] && [[ "${TAG_ON_SUCCESS}" == "true" ]]; then
+    # always re-tag slave-base because we need it to build the other images even if we are just testing them.
+    if [[ $? -eq 0 ]] && [[ "${TAG_ON_SUCCESS}" == "true" || "${dir}" == "slave-base" ]]; then
       echo "-> Re-tagging ${IMAGE_NAME} image to ${IMAGE_NAME%"-candidate"}"
       docker tag -f $IMAGE_NAME ${IMAGE_NAME%"-candidate"}
     fi
