@@ -6,4 +6,7 @@
 # The image has to be available before this script is executed.
 #
 
+docker run ${IMAGE_NAME} oc
+docker run --entrypoint="mvn" ${IMAGE_NAME} --version
+
 echo "SUCCESS (no tests)!"

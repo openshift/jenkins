@@ -6,4 +6,6 @@
 # The image has to be available before this script is executed.
 #
 
-echo "SUCCESS (no tests)!"
+docker run ${IMAGE_NAME} oc
+
+echo "SUCCESS!"
