@@ -32,7 +32,11 @@ generate_passwd_file
 
 mkdir /tmp/war
 unzip -q /usr/lib/jenkins/jenkins.war -d /tmp/war
-new_password_hash=`obfuscate_password ${JENKINS_PASSWORD:-password}`
+if [ -e ${JENKINS_HOME}/password ]; then
+  old_salt=$(cat ${JENKINS_HOME}/password | sed 's/:.*//')
+fi
+new_password_hash=`obfuscate_password ${JENKINS_PASSWORD:-password} $old_salt`
+
 
 if [ ! -e ${JENKINS_HOME}/configured ]; then
   # This container hasn't been configured yet, so copy the default configuration from
@@ -86,9 +90,9 @@ if [ -e ${JENKINS_HOME}/password ]; then
   # we don't want to just blindly do this on startup because the user might change their password via
   # the jenkins ui, so we only want to do this if the env variable has been explicitly modified from
   # the original value.
-  old_password=`cat ${JENKINS_HOME}/password`
-  if [ $old_password!=$new_password_hash ]; then
-    echo "Detected password change, updating Jenkins configuration ..."
+  old_password_hash=`cat ${JENKINS_HOME}/password`
+  if [ $old_password_hash != $new_password_hash ]; then
+    echo "Detected password environment variable change, updating Jenkins configuration ..."
     sed -i "s,<passwordHash>.*</passwordHash>,<passwordHash>$new_password_hash</passwordHash>,g" "${JENKINS_HOME}/users/admin/config.xml"
     echo $new_password_hash > ${JENKINS_HOME}/password
   fi

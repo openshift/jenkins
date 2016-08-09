@@ -28,10 +28,14 @@ function generate_passwd_file() {
   fi
 }
 
+# Takes a password and an optional salt value, outputs the hashed password.
 function obfuscate_password {
     local password="$1"
+    local salt="$2"
     local acegi_security_path=`find /tmp/war/WEB-INF/lib/ -name acegi-security-*.jar`
     local commons_codec_path=`find /tmp/war/WEB-INF/lib/ -name commons-codec-*.jar`
 
-    java -classpath "${acegi_security_path}:${commons_codec_path}:/opt/openshift/password-encoder.jar" com.redhat.openshift.PasswordEncoder $password
+    # source for password-encoder.jar is inside the jar.
+    # acegi-security-1.0.7.jar is inside the jenkins war.
+    java -classpath "${acegi_security_path}:${commons_codec_path}:/opt/openshift/password-encoder.jar" com.redhat.openshift.PasswordEncoder $password $salt
 }
