@@ -1,7 +1,8 @@
 Jenkins Docker Image
 ====================
+[![Build Status](https://ci.openshift.redhat.com/jenkins/buildStatus/icon?job=jenkins)](https://ci.openshift.redhat.com/jenkins/job/jenkins/)
 
-This repository contains Dockerfiles for a Jenkins Docker image intended for 
+This repository contains Dockerfiles for a Jenkins Docker image intended for
 use with [OpenShift v3](https://github.com/openshift/origin)
 
 For an example of how to use it, [see this sample.](https://github.com/openshift/origin/blob/master/examples/jenkins/README.md)
@@ -125,7 +126,7 @@ customized Docker image or you can use OpenShift Source build strategy.
 In order to include your modifications in Jenkins image, you need to have a Git
 repository with following directory structure:
 
-* `./plugins` folder that contains binary Jenkins plugins you want to copy into Jenkins 
+* `./plugins` folder that contains binary Jenkins plugins you want to copy into Jenkins
 * `./plugins.txt` file that list the plugins you want to install (see the section above)
 * `./configuration/jobs` folder that contains the Jenkins job definitions
 * `./configuration/config.xml` file that contains your custom Jenkins configuration
