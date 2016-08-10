@@ -55,6 +55,8 @@ RUN mkdir -p /opt/openshift/plugins && \
     touch /opt/openshift/plugins/script-security.jpi.pinned && \
     /usr/local/bin/fix-permissions /opt/openshift && \
     chown -R 1001:0 /opt/openshift && \
+    # the prior chown doesn't traverse the /opt/openshift/plugins links .. this one will assist fix-permission/assemble for extension builds like master/slave
+    chown 1001:0 /usr/lib64/jenkins/*hpi && \ 
     /usr/local/bin/fix-permissions /var/lib/jenkins
 
 VOLUME ["/var/lib/jenkins"]
