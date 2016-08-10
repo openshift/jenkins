@@ -13,7 +13,15 @@
 
 export DEFAULT_SLAVE_DIRECTORY=/tmp
 export SLAVE_LABEL="jenkins-slave"
-export JENKINS_JNLP_SERVICE_PORT=${JENKINS_JNLP_SERVICE_PORT:-50000}
+JNLP_SERVICE_NAME=${JNLP_SERVICE_NAME:-JENKINS_JNLP}
+T_HOST=${JNLP_SERVICE_NAME}_SERVICE_HOST
+# the '!' handles env variable indirection so we can resolve the nested variable
+# see: http://stackoverflow.com/a/14204692
+JNLP_HOST=${!T_HOST}
+T_PORT=${JNLP_SERVICE_NAME}_SERVICE_PORT
+JNLP_PORT=${!T_PORT}
+
+export JNLP_PORT=${JNLP_PORT:-50000}
 
 NODEJS_SLAVE=registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7
 MAVEN_SLAVE=registry.access.redhat.com/openshift3/jenkins-slave-maven-rhel7
@@ -132,7 +140,7 @@ function generate_kubernetes_config() {
       <skipTlsVerify>true</skipTlsVerify>
       <namespace>${PROJECT_NAME}</namespace>
       <jenkinsUrl>http://${JENKINS_SERVICE_HOST}:${JENKINS_SERVICE_PORT}</jenkinsUrl>
-      <jenkinsTunnel>${JENKINS_JNLP_SERVICE_HOST}:${JENKINS_JNLP_SERVICE_PORT}</jenkinsTunnel>
+      <jenkinsTunnel>${JNLP_HOST}:${JNLP_PORT}</jenkinsTunnel>
       <credentialsId>1a12dfa4-7fc5-47a7-aa17-cc56572a41c7</credentialsId>
       <containerCap>10</containerCap>
       <retentionTimeout>5</retentionTimeout>

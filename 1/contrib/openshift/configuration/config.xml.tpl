@@ -54,7 +54,7 @@
     </hudson.model.AllView>
   </views>
   <primaryView>All</primaryView>
-  <slaveAgentPort>${JENKINS_JNLP_SERVICE_PORT}</slaveAgentPort>
+  <slaveAgentPort>${JNLP_PORT}</slaveAgentPort>
   <label>master</label>
   <nodeProperties/>
   <globalNodeProperties/>
