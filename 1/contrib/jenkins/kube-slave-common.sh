@@ -14,6 +14,7 @@
 export DEFAULT_SLAVE_DIRECTORY=/tmp
 export SLAVE_LABEL="jenkins-slave"
 JNLP_SERVICE_NAME=${JNLP_SERVICE_NAME:-JENKINS_JNLP}
+JNLP_SERVICE_NAME=`echo ${JNLP_SERVICE_NAME} | tr '[a-z]' '[A-Z]' | tr '-' '_'`
 T_HOST=${JNLP_SERVICE_NAME}_SERVICE_HOST
 # the '!' handles env variable indirection so we can resolve the nested variable
 # see: http://stackoverflow.com/a/14204692
