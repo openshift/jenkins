@@ -44,9 +44,12 @@ COPY ./contrib/openshift /opt/openshift
 COPY ./contrib/jenkins /usr/local/bin
 ADD ./contrib/s2i /usr/libexec/s2i
 
-# NOTE: When adding new Jenkins plugin, you have to create the symlink for the
-# HPI file created by rpm to /opt/openshift/plugins folder.
-RUN mkdir -p /opt/openshift/plugins && \
+# Remove the base-plugins.txt file because it's only used for Centos
+# and its presence in the rhel image is confusing.
+RUN rm /opt/openshift/base-plugins.txt && \ 
+    mkdir -p /opt/openshift/plugins && \
+    # NOTE: When adding new Jenkins plugin, you have to create the symlink for the
+    # HPI file created by rpm to /opt/openshift/plugins folder.
     # need to create <plugin>.pinned files when upgrading "core" plugins like credentials or subversion that are bundled with the jenkins server
     for FILENAME in /usr/lib64/jenkins/*hpi ; do ln -s $FILENAME /opt/openshift/plugins/`basename $FILENAME .hpi`.jpi; done &&\
     touch /opt/openshift/plugins/credentials.jpi.pinned && \
