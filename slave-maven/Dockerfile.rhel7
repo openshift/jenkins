@@ -2,7 +2,7 @@ FROM openshift/jenkins-slave-base-rhel7
 
 MAINTAINER Ben Parees <bparees@redhat.com>
 
-ENV MAVEN_VERSION=3.3.9
+ENV MAVEN_VERSION=3.0.5
 
 # Install Maven
 RUN yum-config-manager --disable epel >/dev/null || : && \

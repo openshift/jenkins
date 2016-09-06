@@ -1,0 +1,112 @@
+#!/bin/bash
+#
+# This script runs the Jenkins server inside the Docker container.
+# It copies the configuration and plugins from /opt/openshift/configuration to
+# ${JENKINS_HOME}.
+#
+# It also sets the admin password to ${JENKINS_PASSWORD}.
+#
+source /usr/local/bin/jenkins-common.sh
+source /usr/local/bin/kube-slave-common.sh
+
+image_config_dir="/opt/openshift/configuration"
+image_config_path="${image_config_dir}/config.xml"
+
+
+CONTAINER_MEMORY_IN_BYTES=`cat /sys/fs/cgroup/memory/memory.limit_in_bytes`
+DEFAULT_MEMORY_CEILING=$((2**40-1))
+if [ "${CONTAINER_MEMORY_IN_BYTES}" -lt "${DEFAULT_MEMORY_CEILING}" ]; then
+    if [ -z $CONTAINER_HEAP_PERCENT ]; then
+	CONTAINER_HEAP_PERCENT=0.80
+    fi
+    
+    CONTAINER_MEMORY_IN_MB=$((${CONTAINER_MEMORY_IN_BYTES}/1024**2))
+    CONTAINER_HEAP_MAX=$(echo "${CONTAINER_MEMORY_IN_MB} ${CONTAINER_HEAP_PERCENT}" | awk '{ printf "%d", $1 * $2 }')
+    
+    JAVA_MAX_HEAP_PARAM="-Xmx${CONTAINER_HEAP_MAX}m"
+fi 
+
+# Since OpenShift runs this Docker image under random user ID, we have to assign
+# the 'jenkins' user name to this UID. For that we use nss_wrapper
+generate_passwd_file
+
+mkdir /tmp/war
+unzip -q /usr/lib/jenkins/jenkins.war -d /tmp/war
+if [ -e ${JENKINS_HOME}/password ]; then
+  old_salt=$(cat ${JENKINS_HOME}/password | sed 's/:.*//')
+fi
+new_password_hash=`obfuscate_password ${JENKINS_PASSWORD:-password} $old_salt`
+
+
+if [ ! -e ${JENKINS_HOME}/configured ]; then
+  # This container hasn't been configured yet, so copy the default configuration from
+  # the image into the jenkins config path (which should be a volume for persistence).
+  if [ ! -f "${image_config_path}" ]; then
+    # If it contains a template (tpl) file, we can do additional manipulations to customize
+    # the configuration.
+    if [ -f "${image_config_path}.tpl" ]; then
+      export KUBERNETES_CONFIG=$(generate_kubernetes_config)
+      for name in $(get_is_names); do
+        echo "Adding image ${name}:latest as Kubernetes slave ..."
+      done
+      echo "Generating kubernetes-plugin configuration (${image_config_path}.tpl) ..."
+      envsubst < "${image_config_path}.tpl" > "${image_config_path}"
+    fi
+  fi
+
+  if [ ! -f "${image_config_dir}/credentials.xml" ]; then
+    if [ -f "${image_config_dir}/credentials.xml.tpl" ]; then
+      if [ ! -z "${KUBERNETES_CONFIG}" ]; then
+        echo "Generating kubernetes-plugin credentials (${JENKINS_HOME}/credentials.xml.tpl) ..."
+        export KUBERNETES_CREDENTIALS=$(generate_kubernetes_credentials)
+      fi
+      # Fix the envsubst trying to substitute the $Hash inside credentials.xml
+      export Hash="\$Hash"
+      envsubst < "${image_config_dir}/credentials.xml.tpl" > "${image_config_dir}/credentials.xml"
+    fi
+  fi
+
+  echo "Copying Jenkins configuration to ${JENKINS_HOME} ..."
+  cp -r /opt/openshift/configuration/* ${JENKINS_HOME}
+  rm -rf /opt/openshift/configuration/*
+
+  if [ "$(ls -A /opt/openshift/plugins 2>/dev/null)" ]; then
+    mkdir -p ${JENKINS_HOME}/plugins
+    echo "Copying $(ls /opt/openshift/plugins | wc -l) Jenkins plugins to ${JENKINS_HOME} ..."
+    cp -r /opt/openshift/plugins/* ${JENKINS_HOME}/plugins/
+    rm -rf /opt/openshift/plugins
+  fi
+
+  echo "Creating initial Jenkins 'admin' user ..."
+  sed -i "s,<passwordHash>.*</passwordHash>,<passwordHash>$new_password_hash</passwordHash>,g" "${JENKINS_HOME}/users/admin/config.xml"
+  echo $new_password_hash > ${JENKINS_HOME}/password
+  touch ${JENKINS_HOME}/configured
+fi
+
+if [ -e ${JENKINS_HOME}/password ]; then
+  # if the password environment variable has changed, update the jenkins config.
+  # we don't want to just blindly do this on startup because the user might change their password via
+  # the jenkins ui, so we only want to do this if the env variable has been explicitly modified from
+  # the original value.
+  old_password_hash=`cat ${JENKINS_HOME}/password`
+  if [ $old_password_hash != $new_password_hash ]; then
+    echo "Detected password environment variable change, updating Jenkins configuration ..."
+    sed -i "s,<passwordHash>.*</passwordHash>,<passwordHash>$new_password_hash</passwordHash>,g" "${JENKINS_HOME}/users/admin/config.xml"
+    echo $new_password_hash > ${JENKINS_HOME}/password
+  fi
+fi
+
+if [ -f "${CONFIG_PATH}.tpl" -a ! -f "${CONFIG_PATH}" ]; then
+  echo "Processing Jenkins configuration (${CONFIG_PATH}.tpl) ..."
+  envsubst < "${CONFIG_PATH}.tpl" > "${CONFIG_PATH}"
+fi
+
+rm -rf /tmp/war
+
+# if `docker run` first argument start with `--` the user is passing jenkins launcher arguments
+if [[ $# -lt 1 ]] || [[ "$1" == "--"* ]]; then
+   exec java $JAVA_MAX_HEAP_PARAM -Duser.home=${HOME} $JAVA_OPTS -Dfile.encoding=UTF8 -jar /usr/lib/jenkins/jenkins.war $JENKINS_OPTS "$@"
+fi
+
+# As argument is not jenkins, assume user want to run his own process, for sample a `bash` shell to explore this image
+exec "$@"

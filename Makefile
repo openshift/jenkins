@@ -9,18 +9,12 @@ SKIP_SQUASH?=0
 # version (at least that is the initial goal).  This naming system
 # can be revisited in the future if we decide we need either jenkins
 # or <platform> version numbers in the names.
-VERSIONS="1 slave-base slave-maven slave-nodejs"
+VERSIONS="1 2 slave-base slave-maven slave-nodejs"
 
 ifeq ($(TARGET),rhel7)
 	OS := rhel7
 else
 	OS := centos7
-endif
-
-ifeq ($(VERSION), 1)
-	VERSION := 1
-else
-	VERSION :=
 endif
 
 .PHONY: build

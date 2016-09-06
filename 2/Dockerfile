@@ -12,12 +12,13 @@ FROM centos:centos7
 
 MAINTAINER Ben Parees <bparees@redhat.com>
 
-ENV JENKINS_VERSION=1.651 \
+ENV JENKINS_VERSION=2.7 \
     HOME=/var/lib/jenkins \
-    JENKINS_HOME=/var/lib/jenkins
+    JENKINS_HOME=/var/lib/jenkins \
+    JENKINS_UC=https://updates.jenkins-ci.org
 
 LABEL k8s.io.description="Jenkins is a continuous integration server" \
-      k8s.io.display-name="Jenkins 1.651" \
+      k8s.io.display-name="Jenkins 2.7" \
       openshift.io.expose-services="8080:http" \
       openshift.io.tags="jenkins,jenkins1,ci" \
       io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
@@ -28,7 +29,7 @@ EXPOSE 8080 50000
 RUN curl http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo -o /etc/yum.repos.d/jenkins.repo && \
     rpm --import http://pkg.jenkins-ci.org/redhat-stable/jenkins-ci.org.key && \
     yum -y --setopt=tsflags=nodocs install epel-release && \
-    INSTALL_PKGS="rsync gettext git tar zip unzip java-1.8.0-openjdk java-1.8.0-openjdk-devel jenkins-1.651.3-1.1 nss_wrapper" && \
+    INSTALL_PKGS="rsync gettext git tar zip unzip java-1.8.0-openjdk java-1.8.0-openjdk-devel jenkins-2.7.3-1.1 nss_wrapper" && \
     yum -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     yum clean all  && \
@@ -41,12 +42,10 @@ COPY ./contrib/openshift /opt/openshift
 COPY ./contrib/jenkins /usr/local/bin
 ADD ./contrib/s2i /usr/libexec/s2i
 
-RUN /usr/local/bin/plugins.sh /opt/openshift/base-plugins.txt && \
+RUN /usr/local/bin/install-plugins.sh /opt/openshift/base-plugins.txt && \
     # need to create <plugin>.pinned files when upgrading "core" plugins like credentials or subversion that are bundled with the jenkins server
-    touch /opt/openshift/plugins/credentials.jpi.pinned && \
-    touch /opt/openshift/plugins/subversion.jpi.pinned && \
-    touch /opt/openshift/plugins/ssh-credentials.jpi.pinned && \
-    touch /opt/openshift/plugins/script-security.jpi.pinned && \
+    # Currently jenkins v2 does not embed any plugins, but for reference:
+    # touch /opt/openshift/plugins/credentials.jpi.pinned && \
     chown -R 1001:0 /opt/openshift && \
     /usr/local/bin/fix-permissions /opt/openshift && \
     /usr/local/bin/fix-permissions /var/lib/jenkins

@@ -154,7 +154,7 @@ function run_s2i_tests() {
   cid=s2i-jenkins-test
   CONTAINER_IP=$(get_container_ip ${cid})
   test_connection ${cid}
-
+  
   if ! docker exec ${cid} ls /var/lib/jenkins/plugins/sample.jpi.pinned; then
     echo "Fail: The sample.jpi.pinned plugin was not copied"
     return 1
@@ -172,7 +172,7 @@ function run_s2i_tests() {
     echo "Fail: The config.xml was not copied"
     return 1
   fi
-
+  
   test_get_job admin password sample-app-test
   test_create_job admin password testJob
   test_get_job admin password testJob
