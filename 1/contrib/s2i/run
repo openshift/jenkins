@@ -41,11 +41,7 @@ new_password_hash=`obfuscate_password ${JENKINS_PASSWORD:-password} $old_salt`
 if [ ! -e ${JENKINS_HOME}/configured ]; then
   # This container hasn't been configured yet, so copy the default configuration from
   # the image into the jenkins config path (which should be a volume for persistence).
-  if [ -f "${image_config_path}" ]; then
-    # If the image contains an explicit "config.xml" then don't do any further processing
-    # because it's user provided.
-    echo "Skipping kubernetes plugin configuration as user provided custom 'config.xml'"
-  else
+  if [ ! -f "${image_config_path}" ]; then
     # If it contains a template (tpl) file, we can do additional manipulations to customize
     # the configuration.
     if [ -f "${image_config_path}.tpl" ]; then
@@ -56,7 +52,9 @@ if [ ! -e ${JENKINS_HOME}/configured ]; then
       echo "Generating kubernetes-plugin configuration (${image_config_path}.tpl) ..."
       envsubst < "${image_config_path}.tpl" > "${image_config_path}"
     fi
+  fi
 
+  if [ ! -f "${image_config_dir}/credentials.xml" ]; then
     if [ -f "${image_config_dir}/credentials.xml.tpl" ]; then
       if [ ! -z "${KUBERNETES_CONFIG}" ]; then
         echo "Generating kubernetes-plugin credentials (${JENKINS_HOME}/credentials.xml.tpl) ..."
