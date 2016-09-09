@@ -58,6 +58,7 @@ function has_service_account() {
 if has_service_account; then
   export oc_auth="--token=$(cat $AUTH_TOKEN) --certificate-authority=${KUBE_CA}"
   export oc_cmd="oc --server=$OPENSHIFT_API_URL ${oc_auth}"
+  export oc_serviceaccount_name="$(expr "$(oc whoami)" : 'system:serviceaccount:\w\+:\(\w\+\)' || true)"
 fi
 
 # get_imagestream_names returns a list of image streams that match the
@@ -84,6 +85,7 @@ function convert_is_to_slave() {
     <volumes/>
     <envVars/>
     <nodeSelector/>
+    <serviceAccount>${oc_serviceaccount_name}</serviceAccount>
     <remoteFs>{{if index .metadata.annotations \"slave-directory\"}}{{index .metadata.annotations \"slave-directory\"}}{{else}}${DEFAULT_SLAVE_DIRECTORY}{{end}}</remoteFs>
     <label>{{if index .metadata.annotations \"slave-label\"}}{{index .metadata.annotations \"slave-label\"}}{{else}}${name}{{end}}</label>
   </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
@@ -121,6 +123,7 @@ function generate_kubernetes_config() {
           <envVars/>
           <nodeSelector/>
           <remoteFs>/tmp</remoteFs>
+          <serviceAccount>${oc_serviceaccount_name}</serviceAccount>
         </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
         <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
           <name>nodejs</name>
@@ -134,6 +137,7 @@ function generate_kubernetes_config() {
           <volumes/>
           <envVars/>
           <nodeSelector/>
+          <serviceAccount>${oc_serviceaccount_name}</serviceAccount>
         </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
       ${slave_templates}
       </templates>
