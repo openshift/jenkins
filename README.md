@@ -138,7 +138,8 @@ To build your customized Jenkins image, you can then execute following command:
 ```console
 $ s2i build https://github.com/your/repository openshift/jenkins-1-centos7 your_image_name
 ```
-
+NOTE:  if instead of adding a plugin you want to replace an existing plugin via dropping the binary plugin in the `./plugins` directory,
+make sure the filename ends in `.jpi`.
 
 #### Included plugins
 
