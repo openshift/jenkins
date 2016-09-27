@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 #
 # Test the Jenkins image.
 #
@@ -15,4 +15,4 @@ docker run ${IMAGE_NAME} oc
 docker run --entrypoint=/bin/sh ${IMAGE_NAME} -ic 'npm --version'
 docker run --entrypoint=/bin/sh ${IMAGE_NAME} -ic 'node --version'
 
-echo "SUCCESS (no tests)!"
+echo "SUCCESS!"
