@@ -1,4 +1,6 @@
 openshift-pipeline:1.0.22
+openshift-login:0.1
+
 
 # kubernetes plugin - https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin
 durable-task:1.10
@@ -6,7 +8,7 @@ kubernetes:0.8
 credentials:2.1.0
 
 # fabric8 openshift sync
-openshift-sync:0.0.12
+openshift-sync:0.0.13
 
 # Pipeline plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Plugin
 workflow-aggregator:2.1
