@@ -175,12 +175,15 @@ The admin user name is set to `admin`.  There are now two supported means of aut
 * If running outside of OpenShift, or running in OpenShift without the environment variable `OPENSHIFT_ENABLE_OAUTH` set to a value other than `false` on the container, you have to to specify the password by
 setting the `JENKINS_PASSWORD` environment variable. This process is done
 upon initialization.
-* If running in OpenShift and the environment variable `OPENSHIFT_ENABLE_OAUTH` is set to a value other than `false` on the container, the [OpenShift Login plugin](https://github.com/openshift/jenkins-openshift-login-plugin) manages the login process,
-and to login you specify whatever password is required by the identity provider used by OpenShift.  So if the default OpenShift identity provider `Allow All` is used, you can provide any non-empty string as the password for `admin`.  Otherwise, valid user/password combinations
-stored with your identity provider must be used.  Any user with the OpenShift `admin` role for the OpenShift project Jenkins is running in will have the same permissions as those this image assigns to the `admin` user.
+* If running in OpenShift and the environment variable `OPENSHIFT_ENABLE_OAUTH` is set to a value other than `false` on the container, the [OpenShift Login plugin](https://github.com/openshift/jenkins-openshift-login-plugin)
+manages the login process, and to login you specify whatever password is required by the identity provider used by OpenShift.  So if the default OpenShift identity provider `Allow All` is used, you can provide any non-empty
+string as the password for the predefined `admin` user.  If `Allow All` is not used, then valid user/password combinations stored with your identity provider must be used, and if the image's predefined `admin` user is not a user
+with a valid password stored with your identity provider, you'll no longer be able to log in with `admin`.
+
+However, any user with the OpenShift `admin` role for the OpenShift project Jenkins is running in will have the same permissions as those this image assigns to the `admin` user.
 Users with the `edit` or `view` roles for the OpenShift project Jenkins is running in will have progressively reduced permissions within Jenkins.
 
-For the `view` role:
+For the `view` role, the Jenkins permissions are:
 
 * hudson.model.Hudson.Read
 * hudson.model.Item.Read
@@ -194,10 +197,13 @@ For the `edit` role, in addition to the permissions available to `view`:
 * hudson.model.Item.Workspace
 * hudson.scm.SCM.Tag
 
-Permissions for users can be changed after they are initially established.  Note, changes to permissions in Jenkins do not result in changed permissions for the users in OpenShift.
+Users authenticated against OpenShift OAuth will be added to the Jenkins authorization matrix upon their first successful login.
 
-Also note, the OpenShift Login plugin polls the OpenShift API server for permissions and will update the permissions for each user currently defined in Jenkins.  You can control how often the polling
-occurs with the `OPENSHIFT_PERMISSIONS_POLL_INTERVAL` environment variable.  The default polling interval when no environment variable is set is 5 minutes.
+Permissions for users in Jenkins can be changed in OpenShift after those users are initially established in Jenkins.  The OpenShift Login plugin polls the OpenShift API server for permissions and will update the permissions stored in
+Jenkins for each Jenkins user with the permissions retrieved from OpenShift.  Technically speaking, you can change the permissions for a Jenkins user from the Jenkins UI as well, but those changes will be overwritten the next
+time the poll occurs.
+
+You can control how often the polling occurs with the `OPENSHIFT_PERMISSIONS_POLL_INTERVAL` environment variable.  The default polling interval when no environment variable is set is 5 minutes.
 
 
 
