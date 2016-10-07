@@ -68,12 +68,8 @@ initialization by passing `-e VAR=VALUE` to the Docker run command.
 |    Variable name          |    Description                              |
 | :------------------------ | -----------------------------------------   |
 |  `JENKINS_PASSWORD`       | Password for the 'admin' account when using default Jenkin authentication.            |
-
-| `OPENSHIFT_ENABLE_OAUTH`
-|Determines whether the OpenShift Login plugin manages authentication when logging into Jenkins.
-
-| `OPENSHIFT_PERMISSIONS_POLL_INTERVAL`
-|Specifies in milliseconds how often the OpenShift Login plugin polls OpenShift for the permissions associated with each user defined in Jenkins.
+| `OPENSHIFT_ENABLE_OAUTH` | Determines whether the OpenShift Login plugin manages authentication when logging into Jenkins. |
+| `OPENSHIFT_PERMISSIONS_POLL_INTERVAL` | Specifies in milliseconds how often the OpenShift Login plugin polls OpenShift for the permissions associated with each user defined in Jenkins. |
 
 
 
