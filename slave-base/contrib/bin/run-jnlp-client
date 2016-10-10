@@ -31,7 +31,7 @@ if [[ $# -gt 1 ]]; then
   fi
 
   echo "Downloading ${JENKINS_URL}/jnlpJars/remoting.jar ..."
-  curl -s ${JENKINS_URL}/jnlpJars/remoting.jar -o ${JAR}
+  curl -sS ${JENKINS_URL}/jnlpJars/remoting.jar -o ${JAR}
 
   # if -tunnel is not provided try env vars
   if [[ "$@" != *"-tunnel "* ]]; then
