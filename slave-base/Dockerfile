@@ -6,8 +6,7 @@ ENV HOME=/home/jenkins
 
 USER root
 # Install headless Java
-RUN yum install -y --setopt=tsflags=nodocs --enablerepo=centosplus epel-release && \
-    rpmkeys --import file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7 && \
+RUN yum install -y centos-release-scl-rh && \
     INSTALL_PKGS="bc gettext git java-1.8.0-openjdk-headless lsof nss_wrapper rsync tar unzip which zip" && \
     yum install -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
