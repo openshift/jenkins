@@ -24,7 +24,7 @@ LABEL k8s.io.description="Jenkins is a continuous integration server" \
       io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
 
 # Labels consumed by Red Hat build service
-LABEL BZComponent="openshift-jenkins-docker" \
+LABEL BZComponent="openshift-jenkins-2-docker" \
       Name="openshift3/jenkins-2-rhel7" \
       Version="2.7" \
       Architecture="x86_64" \
