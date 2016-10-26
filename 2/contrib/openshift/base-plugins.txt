@@ -8,7 +8,7 @@ kubernetes:0.8
 credentials:2.1.0
 
 # fabric8 openshift sync
-openshift-sync:0.0.13
+openshift-sync:0.0.14
 
 # Pipeline plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Plugin
 workflow-aggregator:2.1
@@ -63,3 +63,5 @@ git-server:1.6
 plain-credentials:1.2
 ace-editor:1.1
 matrix-auth:1.4
+
+blueocean:1.0.0-b10
