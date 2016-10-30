@@ -1,4 +1,4 @@
-openshift-pipeline:1.0.26
+openshift-pipeline:1.0.27
 openshift-login:0.3
 
 
