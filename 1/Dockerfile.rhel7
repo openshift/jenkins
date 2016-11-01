@@ -17,18 +17,18 @@ ENV JENKINS_VERSION=1.651.2 \
     JENKINS_HOME=/var/lib/jenkins \
     STI_SCRIPTS_URL=image:///usr/libexec/s2i
 
-LABEL k8s.io.description="Jenkins is a continuous integration server" \
-      k8s.io.display-name="Jenkins 1.651.2" \
-      openshift.io.expose-services="8080:http" \
-      openshift.io.tags="jenkins,jenkins1,ci" \
+LABEL io.k8s.description="Jenkins is a continuous integration server" \
+      io.k8s.display-name="Jenkins 1.651.2" \
+      io.openshift.tags="jenkins,jenkins1,ci" \
+      io.openshift.expose-services="8080:http" \
       io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
 
 # Labels consumed by Red Hat build service
-LABEL BZComponent="openshift-jenkins-docker" \
-      Name="openshift3/jenkins-1-rhel7" \
-      Version="1.651.2" \
-      Architecture="x86_64" \
-      Release="7"
+LABEL com.redhat.component="openshift-jenkins-docker" \
+      name="openshift3/jenkins-1-rhel7" \
+      version="1.651.2" \
+      architecture="x86_64" \
+      release="22"
 
 # 8080 for main web interface, 50000 for slave agents
 EXPOSE 8080 50000
