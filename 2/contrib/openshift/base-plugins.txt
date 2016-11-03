@@ -12,27 +12,27 @@ openshift-sync:0.0.14
 
 # Pipeline plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Plugin
 workflow-aggregator:2.1
-workflow-api:2.1
-workflow-durable-task-step:2.1
-workflow-cps-global-lib:2.0
-workflow-job:2.2
+workflow-api:2.5
+workflow-durable-task-step:2.5
+workflow-cps-global-lib:2.4
+workflow-job:2.8
 pipeline-build-step:2.1
-workflow-cps:2.6
+workflow-cps:2.22
 pipeline-stage-step:2.1
-workflow-basic-steps:2.0
+workflow-basic-steps:2.3
 pipeline-input-step:2.0
-workflow-support:2.1
-workflow-step-api:2.1
+workflow-support:2.10
+workflow-step-api:2.5
 
 # Pipeline Multibranch Plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Multibranch+Plugin
 workflow-multibranch:2.7
 cloudbees-folder:5.11
 
 # Pipeline stage view plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Stage+View+Plugin
-pipeline-stage-view:1.4
+pipeline-stage-view:2.2
 jquery-detached:1.2.1
 handlebars:1.1.1
-pipeline-rest-api:1.4
+pipeline-rest-api:2.2
 momentjs:1.1.1
 
 # remote loader https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Remote+Loader+Plugin
@@ -42,12 +42,12 @@ branch-api:1.10
 
 # Pipeline SCM Step Plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+SCM+Step+Plugin
 workflow-scm-step:2.1
-git:2.4.4
+git:3.0.0
 mapdb-api:1.0.1.0
 subversion:2.5.7
 
 # mercurial - https://wiki.jenkins-ci.org/display/JENKINS/Mercurial+Plugin
-mercurial:1.56
+mercurial:1.54
 matrix-project:1.7
 multiple-scms:0.6
 ssh-credentials:1.12
@@ -57,11 +57,12 @@ pipeline-utility-steps:1.1.5
 script-security:1.19
 
 # seem to be missing from the Jenkins docs but required to run these plugins..
-structs:1.1
-git-client:1.19.6
+structs:1.5
+git-client:2.0.0
 git-server:1.6
 plain-credentials:1.2
 ace-editor:1.1
-matrix-auth:1.4
 
+# Jenkins v2 specific
+matrix-auth:1.4
 blueocean:1.0.0-b10
