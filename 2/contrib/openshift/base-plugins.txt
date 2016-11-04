@@ -11,16 +11,17 @@ credentials:2.1.0
 openshift-sync:0.0.14
 
 # Pipeline plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Plugin
+pipeline-build-step:2.1
+pipeline-graph-analysis:1.2
+pipeline-input-step:2.0
+pipeline-stage-step:2.1
 workflow-aggregator:2.1
 workflow-api:2.5
-workflow-durable-task-step:2.5
-workflow-cps-global-lib:2.4
-workflow-job:2.8
-pipeline-build-step:2.1
-workflow-cps:2.22
-pipeline-stage-step:2.1
 workflow-basic-steps:2.3
-pipeline-input-step:2.0
+workflow-cps:2.22
+workflow-cps-global-lib:2.4
+workflow-durable-task-step:2.5
+workflow-job:2.8
 workflow-support:2.10
 workflow-step-api:2.5
 
