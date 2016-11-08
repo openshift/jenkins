@@ -116,7 +116,6 @@ function generate_kubernetes_config() {
           <privileged>false</privileged>
           <command></command>
           <args></args>
-          <remoteFs>/home/jenkins</remoteFs>
           <instanceCap>2147483647</instanceCap>
           <label>maven</label>
           <volumes/>
@@ -131,12 +130,12 @@ function generate_kubernetes_config() {
           <privileged>false</privileged>
           <command></command>
           <args></args>
-          <remoteFs>/home/jenkins</remoteFs>
           <instanceCap>2147483647</instanceCap>
           <label>nodejs</label>
           <volumes/>
           <envVars/>
           <nodeSelector/>
+          <remoteFs>/tmp</remoteFs>
           <serviceAccount>${oc_serviceaccount_name}</serviceAccount>
         </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
       ${slave_templates}
