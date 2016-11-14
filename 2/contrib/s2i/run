@@ -16,8 +16,17 @@ image_config_path="${image_config_dir}/config.xml"
 CONTAINER_MEMORY_IN_BYTES=`cat /sys/fs/cgroup/memory/memory.limit_in_bytes`
 DEFAULT_MEMORY_CEILING=$((2**40-1))
 if [ "${CONTAINER_MEMORY_IN_BYTES}" -lt "${DEFAULT_MEMORY_CEILING}" ]; then
+
     if [ -z $CONTAINER_HEAP_PERCENT ]; then
-        CONTAINER_HEAP_PERCENT=0.60
+        LOW_MEMORY_THRESHOLD=$((640*2**20)) # 640M
+        if [ "${CONTAINER_MEMORY_IN_BYTES}" -lt "${LOW_MEMORY_THRESHOLD}" ]; then
+            # If the user is not actively tailoring environment variables to adjust memory use,
+            # then tailor the runtime for limited memory automatically.
+            CONTAINER_HEAP_PERCENT=0.40
+            LOW_MEMORY_PARAMS="-Xss500K"
+        else
+            CONTAINER_HEAP_PERCENT=0.50
+        fi
     fi
     
     CONTAINER_MEMORY_IN_MB=$((${CONTAINER_MEMORY_IN_BYTES}/1024**2))
@@ -105,7 +114,7 @@ rm -rf /tmp/war
 
 # if `docker run` first argument start with `--` the user is passing jenkins launcher arguments
 if [[ $# -lt 1 ]] || [[ "$1" == "--"* ]]; then
-   exec java $JAVA_MAX_HEAP_PARAM -Duser.home=${HOME} $JAVA_OPTS -Dfile.encoding=UTF8 -jar /usr/lib/jenkins/jenkins.war $JENKINS_OPTS "$@"
+   exec java $JAVA_MAX_HEAP_PARAM $LOW_MEMORY_PARAMS -Duser.home=${HOME} $JAVA_OPTS -Dfile.encoding=UTF8 -jar /usr/lib/jenkins/jenkins.war $JENKINS_OPTS "$@"
 fi
 
 # As argument is not jenkins, assume user want to run his own process, for sample a `bash` shell to explore this image
