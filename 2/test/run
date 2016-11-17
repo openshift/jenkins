@@ -11,6 +11,8 @@ shopt -s nullglob
 
 IMAGE_NAME=${IMAGE_NAME-openshift/jenkins-1-centos7-candidate}
 
+FAILURE=true
+
 CIDFILE_DIR=$(mktemp --suffix=jenkins_test_cidfiles -d)
 VOLUME=`mktemp -d`
 chmod a+rwx $VOLUME
@@ -22,10 +24,8 @@ function cleanup() {
     echo "Stopping and removing container $CONTAINER..."
     docker stop $CONTAINER
     exit_status=$(docker inspect -f '{{.State.ExitCode}}' $CONTAINER)
-    echo "Dumping logs for $CONTAINER"
-    # Dump the logs always (jenkins returns 143 when killed), so we can
-    # identify the failures in Jenkins
-    [[ "${exit_status}" != "143" ]] && docker logs $CONTAINER
+    [[ "${FAILURE}" == "true" ]] && echo "Dumping logs for $CONTAINER"
+    [[ "${FAILURE}" == "true" ]] && docker logs $CONTAINER
     docker rm $CONTAINER
     rm $cidfile
     echo "Done."
@@ -49,7 +49,7 @@ function get_container_ip() {
 test_connection() {
   set +e
   echo "Testing HTTP connection..."
-  local max_attempts=10
+  local max_attempts=20
   local sleep_time=6
   local attempt=1
   local result=1
@@ -137,7 +137,6 @@ function run_tests() {
   set -e
   # Stop the container so next tests can run
   docker stop $(get_cid $name)
-  echo "  Success!"
 }
 
 function run_s2i_tests() {
@@ -154,7 +153,7 @@ function run_s2i_tests() {
   cid=s2i-jenkins-test
   CONTAINER_IP=$(get_container_ip ${cid})
   test_connection ${cid}
-  
+
   if ! docker exec ${cid} ls /var/lib/jenkins/plugins/sample.jpi.pinned; then
     echo "Fail: The sample.jpi.pinned plugin was not copied"
     return 1
@@ -172,7 +171,7 @@ function run_s2i_tests() {
     echo "Fail: The config.xml was not copied"
     return 1
   fi
-  
+
   test_get_job admin password sample-app-test
   test_create_job admin password testJob
   test_get_job admin password testJob
@@ -185,5 +184,7 @@ run_tests jenkins_test
 
 # S2I tests
 run_s2i_tests
+
+FAILURE=false
 
 echo "SUCCESS!"
