@@ -107,6 +107,18 @@ function run_tests() {
   create_container $name $VOLUME
   CONTAINER_IP=$(get_container_ip $name)
   test_connection $name
+
+  # Make sure no plugins failed to load
+  set +e
+  CONTAINER=$(cat $cidfile)
+  docker logs $CONTAINER |& grep "Failed Loading plugin"
+  rc=$?
+  set -e
+  if [ $rc -eq 0 ]; then
+    echo "Failed loading plugins"
+    return 1
+  fi
+
   test_create_job admin password testJob
   test_get_job admin password testJob
   set +e
