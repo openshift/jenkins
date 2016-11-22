@@ -20,7 +20,7 @@ ENV JENKINS_VERSION=2.19 \
 LABEL k8s.io.description="Jenkins is a continuous integration server" \
       k8s.io.display-name="Jenkins 2.19" \
       openshift.io.expose-services="8080:http" \
-      openshift.io.tags="jenkins,jenkins1,ci" \
+      openshift.io.tags="jenkins,jenkins2,ci" \
       io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
 
 # 8080 for main web interface, 50000 for slave agents
