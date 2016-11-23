@@ -20,14 +20,14 @@ ENV JENKINS_VERSION=2.19 \
 LABEL k8s.io.description="Jenkins is a continuous integration server" \
       k8s.io.display-name="Jenkins 2.19" \
       openshift.io.expose-services="8080:http" \
-      openshift.io.tags="jenkins,jenkins1,ci" \
+      openshift.io.tags="jenkins,jenkins2,ci" \
       io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
 
 # 8080 for main web interface, 50000 for slave agents
 EXPOSE 8080 50000
 
-RUN curl http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo -o /etc/yum.repos.d/jenkins.repo && \
-    rpm --import http://pkg.jenkins-ci.org/redhat-stable/jenkins-ci.org.key && \
+RUN curl https://pkg.jenkins.io/redhat-stable/jenkins.repo -o /etc/yum.repos.d/jenkins.repo && \
+    rpm --import https://pkg.jenkins.io/redhat-stable/jenkins-ci.org.key && \
     yum install -y centos-release-scl-rh && \
     INSTALL_PKGS="rsync gettext git tar zip unzip java-1.8.0-openjdk java-1.8.0-openjdk-devel jenkins-2.19.3-1.1 nss_wrapper" && \
     yum -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
