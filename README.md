@@ -14,7 +14,8 @@ official [OpenShift Documentation](https://docs.openshift.org/latest/using_image
 Versions
 ---------------------------------
 Jenkins versions currently provided are:
-* jenkins-1.6x
+* [jenkins-1.6x](../master/1)
+* [jenkins-2.x](../master/2)
 
 RHEL versions currently supported are:
 * RHEL7
