@@ -24,12 +24,12 @@ JNLP_PORT=${!T_PORT}
 
 export JNLP_PORT=${JNLP_PORT:-50000}
 
-NODEJS_SLAVE=registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7
-MAVEN_SLAVE=registry.access.redhat.com/openshift3/jenkins-slave-maven-rhel7
+NODEJS_SLAVE=${NODEJS_SLAVE_IMAGE:-registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7}
+MAVEN_SLAVE=${MAVEN_SLAVE_IMAGE:-registry.access.redhat.com/openshift3/jenkins-slave-maven-rhel7}
 # if the master is running the centos image, use the centos slave images.
 if [[ `grep CentOS /etc/redhat-release` ]]; then
-  NODEJS_SLAVE=openshift/jenkins-slave-nodejs-centos7
-  MAVEN_SLAVE=openshift/jenkins-slave-maven-centos7
+  NODEJS_SLAVE=${NODEJS_SLAVE_IMAGE:-openshift/jenkins-slave-nodejs-centos7}
+  MAVEN_SLAVE=${MAVEN_SLAVE_IMAGE:-openshift/jenkins-slave-maven-centos7}
 fi
 
 
