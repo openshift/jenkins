@@ -16,7 +16,7 @@ pipeline-graph-analysis:1.2
 pipeline-input-step:2.0
 pipeline-stage-step:2.2
 workflow-aggregator:2.1
-workflow-api:2.5
+workflow-api:2.8
 workflow-basic-steps:2.3
 workflow-cps:2.22
 workflow-cps-global-lib:2.4
