@@ -58,7 +58,7 @@ function has_service_account() {
 if has_service_account; then
   export oc_auth="--token=$(cat $AUTH_TOKEN) --certificate-authority=${KUBE_CA}"
   export oc_cmd="oc --server=$OPENSHIFT_API_URL ${oc_auth}"
-  export oc_serviceaccount_name="$(expr "$(oc whoami)" : 'system:serviceaccount:\w\+:\(\w\+\)' || true)"
+  export oc_serviceaccount_name="$(expr "$(oc whoami)" : 'system:serviceaccount:[a-z0-9][-a-z0-9]*:\([a-z0-9][-a-z0-9]*\)' || true)"
 fi
 
 # get_imagestream_names returns a list of image streams that match the
