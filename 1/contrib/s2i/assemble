@@ -31,5 +31,6 @@ if [ -d ${JENKINS_INSTALL_DIR}/configuration ]; then
   fi
   echo "---> Installing new Jenkins configuration ..."
   /usr/local/bin/fix-permissions ${JENKINS_INSTALL_DIR}/configuration
+  shopt -s dotglob
   mv ${JENKINS_INSTALL_DIR}/configuration/* ${JENKINS_DIR}/configuration/
 fi
