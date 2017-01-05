@@ -8,7 +8,7 @@
 
 # make sure oc is installed
 docker run ${IMAGE_NAME} oc
-# make sure npm and nodejs are available
+# make sure gem and ruby are available
 # the default entrypoint for the image assumes if you supply more than
 # one arg, you are trying to invoke the slave logic, so we have to
 # override the entrypoing to run complicated commands for testing.

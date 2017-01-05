@@ -2,16 +2,6 @@ FROM openshift/jenkins-slave-base-centos7
 
 MAINTAINER Adam Saleh <asaleh@redhat.com>
 
-# Labels consumed by Red Hat build service
-LABEL com.redhat.component="jenkins-slave-ruby-rhel7-docker" \
-      name="openshift3/jenkins-slave-ruby-rhel7" \
-      version="1" \
-      architecture="x86_64" \
-      release="1" \
-      io.k8s.display-name="Jenkins Slave Ruby" \
-      io.k8s.description="The jenkins slave ruby image has the ruby tools on top of the jenkins slave base image." \
-      io.openshift.tags="openshift,jenkins,slave,ruby"
-
 ENV RUBY_VERSION=2.3 \
     BASH_ENV=/usr/local/bin/scl_enable \
     ENV=/usr/local/bin/scl_enable \
