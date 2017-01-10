@@ -169,30 +169,34 @@ Jenkins admin user
 ---------------------------------
 
 The admin user name is set to `admin`.  There are now two supported means of authenticating:
-* If running outside of OpenShift, or running in OpenShift without the environment variable `OPENSHIFT_ENABLE_OAUTH` set to a value other than `false` on the container, you have to to specify the password by
-setting the `JENKINS_PASSWORD` environment variable. This process is done
-upon initialization.
-* If running in OpenShift and the environment variable `OPENSHIFT_ENABLE_OAUTH` is set to a value other than `false` on the container, the [OpenShift Login plugin](https://github.com/openshift/jenkins-openshift-login-plugin)
-manages the login process, and to login you specify whatever password is required by the identity provider used by OpenShift.  So if the default OpenShift identity provider `Allow All` is used, you can provide any non-empty
-string as the password for the predefined `admin` user.  If `Allow All` is not used, then valid user/password combinations stored with your identity provider must be used, and if the image's predefined `admin` user is not a user
-with a valid password stored with your identity provider, you'll no longer be able to log in with `admin`.
 
-However, any user with the OpenShift `admin` role for the OpenShift project Jenkins is running in will have the same permissions as those this image assigns to the `admin` user.
+* If running outside of OpenShift, or running in OpenShift with the environment variable `OPENSHIFT_ENABLE_OAUTH` set to `false` on the container, default Jenkins authentication is used. 
+You log in with the user name `admin`, supplying the password specified by the `JENKINS_PASSWORD` environment variable. If you do not override `JENKINS_PASSWORD`, the default password for `admin` is `password`.
+* If running in OpenShift and the environment variable `OPENSHIFT_ENABLE_OAUTH` is set to a value other than `false` on the container, the [OpenShift Login plugin](https://github.com/openshift/jenkins-openshift-login-plugin)
+manages the login process, and to login you specify valid credentials as required by the identity provider used by OpenShift.  In this case, the predefined `admin` user in the default Jenkins user database is now ignored.
+Unless there is an `admin` user defined within OpenShift with sufficient permissions to the project Jenkins is running in, you will not be able to do anything with Jenkins by logging in as `admin`.  
+
+A quick reminder on OpenShift identity providers, if, for example, the default OpenShift identity provider `Allow All` is used, you can provide any non-empty
+string as the password for any valid user for the OpenShift project Jenkins is running in.  Otherwise, if `Allow All` is not used as the identity provider, then valid credentials stored with your identity provider must be provided.
+
+Once authenticated, OpenShift roles determine which Jenkins permissions you have.  Any user with the OpenShift `admin` role for the OpenShift project Jenkins is running in will have the same permissions as those assigned to an administrative user within Jenkins.
 Users with the `edit` or `view` roles for the OpenShift project Jenkins is running in will have progressively reduced permissions within Jenkins.
 
 For the `view` role, the Jenkins permissions are:
 
-* hudson.model.Hudson.Read
-* hudson.model.Item.Read
+* hudson.model.Hudson.READ
+* hudson.model.Item.READ
+* com.cloudbees.plugins.credentials.CredentialsProvider.VIEW
 
 For the `edit` role, in addition to the permissions available to `view`:
 
-* hudson.model.Item.Build
-* hudson.model.Item.Configure
-* hudson.model.Item.Create
-* hudson.model.Item.Delete
-* hudson.model.Item.Workspace
-* hudson.scm.SCM.Tag
+* hudson.model.Item.BUILD
+* hudson.model.Item.CONFIGURE
+* hudson.model.Item.CREATE
+* hudson.model.Item.DELETE
+* hudson.model.Item.WORKSPACE
+* hudson.scm.SCM.TAG
+* jenkins.model.Jenkins.RUN_SCRIPTS
 
 Users authenticated against OpenShift OAuth will be added to the Jenkins authorization matrix upon their first successful login.
 
