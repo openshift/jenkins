@@ -176,8 +176,17 @@ You log in with the user name `admin`, supplying the password specified by the `
 manages the login process, and to login you specify valid credentials as required by the identity provider used by OpenShift.  In this case, the predefined `admin` user in the default Jenkins user database is now ignored.
 Unless there is an `admin` user defined within OpenShift with sufficient permissions to the project Jenkins is running in, you will not be able to do anything with Jenkins by logging in as `admin`.  
 
-A quick reminder on OpenShift identity providers, if, for example, the default OpenShift identity provider `Allow All` is used, you can provide any non-empty
+A quick reminder on OpenShift identity providers: if, for example, the default OpenShift identity provider `Allow All` is used, you can provide any non-empty
 string as the password for any valid user for the OpenShift project Jenkins is running in.  Otherwise, if `Allow All` is not used as the identity provider, then valid credentials stored with your identity provider must be provided.
+
+For non-browser, direct HTTP or HTTPS access to Jenkins when the [OpenShift Login plugin](https://github.com/openshift/jenkins-openshift-login-plugin) manages authentication, a HTTP bearer token authentication header must be supplied
+with an OpenShift token which has sufficient permissions to access the project that Jenkins is running in. A suggested token to use is a token associated with the serviceaccount for the project Jenkins in running in.  If you started
+Jenkins using the example [jenkins-ephemeral](https://github.com/openshift/origin/blob/master/examples/jenkins/jenkins-ephemeral-template.json) or [jenkins-persistent](https://github.com/openshift/origin/blob/master/examples/jenkins/jenkins-persistent-template.json) templates, the commands to display the token are:
+
+	```
+	$ oc describe serviceaccount jenkins
+	$ oc describe secret <serviceaccount secret name>
+	``` 
 
 Once authenticated, OpenShift roles determine which Jenkins permissions you have.  Any user with the OpenShift `admin` role for the OpenShift project Jenkins is running in will have the same permissions as those assigned to an administrative user within Jenkins.
 Users with the `edit` or `view` roles for the OpenShift project Jenkins is running in will have progressively reduced permissions within Jenkins.
