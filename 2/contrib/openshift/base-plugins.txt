@@ -4,7 +4,7 @@ openshift-login:0.10
 
 # kubernetes plugin - https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin
 durable-task:1.12
-kubernetes:0.8
+kubernetes:0.10
 credentials:2.1.9
 
 # fabric8 openshift sync
