@@ -106,6 +106,7 @@ function generate_kubernetes_config() {
     else
       return
     fi
+    local crt_contents=$(cat "${KUBE_CA}")
     echo "
     <org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud>
       <name>openshift</name>
@@ -141,7 +142,8 @@ function generate_kubernetes_config() {
       ${slave_templates}
       </templates>
       <serverUrl>https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}</serverUrl>
-      <skipTlsVerify>true</skipTlsVerify>
+      <skipTlsVerify>false</skipTlsVerify>
+      <serverCertificate>${crt_contents}</serverCertificate>
       <namespace>${PROJECT_NAME}</namespace>
       <jenkinsUrl>http://${JENKINS_SERVICE_HOST}:${JENKINS_SERVICE_PORT}</jenkinsUrl>
       <jenkinsTunnel>${JNLP_HOST}:${JNLP_PORT}</jenkinsTunnel>
