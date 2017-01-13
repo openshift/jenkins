@@ -86,8 +86,8 @@ function convert_is_to_slave() {
     <envVars/>
     <nodeSelector/>
     <serviceAccount>${oc_serviceaccount_name}</serviceAccount>
-    <remoteFs>{{if index .metadata.annotations \"slave-directory\"}}{{index .metadata.annotations \"slave-directory\"}}{{else}}${DEFAULT_SLAVE_DIRECTORY}{{end}}</remoteFs>
-    <label>{{if index .metadata.annotations \"slave-label\"}}{{index .metadata.annotations \"slave-label\"}}{{else}}${name}{{end}}</label>
+    <remoteFs>{{if not .metadata.annotations}}${DEFAULT_SLAVE_DIRECTORY}{{else}}{{if index .metadata.annotations \"slave-directory\"}}{{index .metadata.annotations \"slave-directory\"}}{{else}}${DEFAULT_SLAVE_DIRECTORY}{{end}}{{end}}</remoteFs>
+    <label>{{if not .metadata.annotations}}${name}{{else}}{{if index .metadata.annotations \"slave-label\"}}{{index .metadata.annotations \"slave-label\"}}{{else}}${name}{{end}}{{end}}</label>
   </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
   "
   echo "${template}" > ${template_file}
