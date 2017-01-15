@@ -76,18 +76,35 @@ function convert_is_to_slave() {
   local template_file=$(mktemp)
   local template="
   <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+    <inheritFrom></inheritFrom>
     <name>{{.metadata.name}}</name>
-    <image>{{.status.dockerImageRepository}}</image>
-    <privileged>false</privileged>
-    <command></command>
-    <args></args>
     <instanceCap>5</instanceCap>
-    <volumes/>
-    <envVars/>
-    <nodeSelector/>
-    <serviceAccount>${oc_serviceaccount_name}</serviceAccount>
-    <remoteFs>{{if not .metadata.annotations}}${DEFAULT_SLAVE_DIRECTORY}{{else}}{{if index .metadata.annotations \"slave-directory\"}}{{index .metadata.annotations \"slave-directory\"}}{{else}}${DEFAULT_SLAVE_DIRECTORY}{{end}}{{end}}</remoteFs>
+    <idleMinutes>0</idleMinutes>
     <label>{{if not .metadata.annotations}}${name}{{else}}{{if index .metadata.annotations \"slave-label\"}}{{index .metadata.annotations \"slave-label\"}}{{else}}${name}{{end}}{{end}}</label>
+    <serviceAccount>${oc_serviceaccount_name}</serviceAccount>
+    <nodeSelector></nodeSelector>
+    <volumes/>
+    <containers>
+      <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+        <name>jnlp</name>
+        <image>{{.status.dockerImageRepository}}</image>
+        <privileged>false</privileged>
+        <alwaysPullImage>false</alwaysPullImage>
+        <workingDir>/tmp</workingDir>
+        <command></command>
+        <args></args>
+        <ttyEnabled>false</ttyEnabled>
+        <resourceRequestCpu></resourceRequestCpu>
+        <resourceRequestMemory></resourceRequestMemory>
+        <resourceLimitCpu></resourceLimitCpu>
+        <resourceLimitMemory></resourceLimitMemory>
+        <envVars/>
+      </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+    </containers>
+    <envVars/>
+    <annotations/>
+    <imagePullSecrets/>
+    <nodeProperties/>
   </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
   "
   echo "${template}" > ${template_file}
@@ -112,32 +129,66 @@ function generate_kubernetes_config() {
       <name>openshift</name>
       <templates>
         <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+          <inheritFrom></inheritFrom>
           <name>maven</name>
-          <image>${MAVEN_SLAVE}</image>
-          <privileged>false</privileged>
-          <command></command>
-          <args></args>
           <instanceCap>2147483647</instanceCap>
+          <idleMinutes>0</idleMinutes>
           <label>maven</label>
-          <volumes/>
-          <envVars/>
-          <nodeSelector/>
-          <remoteFs>/tmp</remoteFs>
           <serviceAccount>${oc_serviceaccount_name}</serviceAccount>
+          <nodeSelector></nodeSelector>
+          <volumes/>
+          <containers>
+            <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+              <name>jnlp</name>
+              <image>${MAVEN_SLAVE}</image>
+              <privileged>false</privileged>
+              <alwaysPullImage>false</alwaysPullImage>
+              <workingDir>/tmp</workingDir>
+              <command></command>
+              <args></args>
+              <ttyEnabled>false</ttyEnabled>
+              <resourceRequestCpu></resourceRequestCpu>
+              <resourceRequestMemory></resourceRequestMemory>
+              <resourceLimitCpu></resourceLimitCpu>
+              <resourceLimitMemory></resourceLimitMemory>
+              <envVars/>
+            </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+          </containers>
+          <envVars/>
+          <annotations/>
+          <imagePullSecrets/>
+          <nodeProperties/>
         </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
         <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+          <inheritFrom></inheritFrom>
           <name>nodejs</name>
-          <image>${NODEJS_SLAVE}</image>
-          <privileged>false</privileged>
-          <command></command>
-          <args></args>
           <instanceCap>2147483647</instanceCap>
+          <idleMinutes>0</idleMinutes>
           <label>nodejs</label>
-          <volumes/>
-          <envVars/>
-          <nodeSelector/>
-          <remoteFs>/tmp</remoteFs>
           <serviceAccount>${oc_serviceaccount_name}</serviceAccount>
+          <nodeSelector></nodeSelector>
+          <volumes/>
+          <containers>
+            <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+              <name>jnlp</name>
+              <image>${NODEJS_SLAVE}</image>
+              <privileged>false</privileged>
+              <alwaysPullImage>false</alwaysPullImage>
+              <workingDir>/tmp</workingDir>
+              <command></command>
+              <args></args>
+              <ttyEnabled>false</ttyEnabled>
+              <resourceRequestCpu></resourceRequestCpu>
+              <resourceRequestMemory></resourceRequestMemory>
+              <resourceLimitCpu></resourceLimitCpu>
+              <resourceLimitMemory></resourceLimitMemory>
+              <envVars/>
+            </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+          </containers>
+          <envVars/>
+          <annotations/>
+          <imagePullSecrets/>
+          <nodeProperties/>
         </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
       ${slave_templates}
       </templates>
