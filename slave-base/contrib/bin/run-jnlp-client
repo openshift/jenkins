@@ -42,7 +42,24 @@ if [[ $# -gt 1 ]]; then
     fi
   fi
 
-  echo Running java $JAVA_OPTS -cp $JAR hudson.remoting.jnlp.Main -headless $PARAMS "$@"
+  CONTAINER_MEMORY_IN_BYTES=`cat /sys/fs/cgroup/memory/memory.limit_in_bytes`
+  DEFAULT_MEMORY_CEILING=$((2**40-1))
+  if [ "${CONTAINER_MEMORY_IN_BYTES}" -lt "${DEFAULT_MEMORY_CEILING}" ]; then
+
+      if [ -z $CONTAINER_HEAP_PERCENT ]; then
+              CONTAINER_HEAP_PERCENT=0.50
+      fi
+      
+      CONTAINER_MEMORY_IN_MB=$((${CONTAINER_MEMORY_IN_BYTES}/1024**2))
+      CONTAINER_HEAP_MAX=$(echo "${CONTAINER_MEMORY_IN_MB} ${CONTAINER_HEAP_PERCENT}" | awk '{ printf "%d", $1 * $2 }')      
+      JAVA_MAX_HEAP_PARAM="-Xmx${CONTAINER_HEAP_MAX}m"
+  fi 
+
+  if [ - z $JAVA_GC_OPTS ]; then
+    JAVA_GC_OPTS="-XX:+UseParallelGC -XX:MaxPermSize=100m -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90"
+  fi
+
+  echo Running java $JAVA_GC_OPTS $JAVA_MAX_HEAP_PARAM $JAVA_OPTS -cp $JAR hudson.remoting.jnlp.Main -headless $PARAMS "$@"
   cd ${JENKINS_DIR} && exec java $JAVA_OPTS \
     -cp $JAR hudson.remoting.jnlp.Main -headless $PARAMS "$@"
 fi
