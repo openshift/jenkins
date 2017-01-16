@@ -92,7 +92,7 @@ function convert_is_to_slave() {
         <alwaysPullImage>false</alwaysPullImage>
         <workingDir>/tmp</workingDir>
         <command></command>
-        <args></args>
+        <args>\${computer.jnlpmac} \${computer.name}</args>
         <ttyEnabled>false</ttyEnabled>
         <resourceRequestCpu></resourceRequestCpu>
         <resourceRequestMemory></resourceRequestMemory>
@@ -145,7 +145,7 @@ function generate_kubernetes_config() {
               <alwaysPullImage>false</alwaysPullImage>
               <workingDir>/tmp</workingDir>
               <command></command>
-              <args></args>
+              <args>\${computer.jnlpmac} \${computer.name}</args>
               <ttyEnabled>false</ttyEnabled>
               <resourceRequestCpu></resourceRequestCpu>
               <resourceRequestMemory></resourceRequestMemory>
@@ -176,7 +176,7 @@ function generate_kubernetes_config() {
               <alwaysPullImage>false</alwaysPullImage>
               <workingDir>/tmp</workingDir>
               <command></command>
-              <args></args>
+              <args>\${computer.jnlpmac} \${computer.name}</args>
               <ttyEnabled>false</ttyEnabled>
               <resourceRequestCpu></resourceRequestCpu>
               <resourceRequestMemory></resourceRequestMemory>
