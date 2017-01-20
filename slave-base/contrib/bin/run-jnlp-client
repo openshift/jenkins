@@ -55,7 +55,7 @@ if [[ $# -gt 1 ]]; then
       JAVA_MAX_HEAP_PARAM="-Xmx${CONTAINER_HEAP_MAX}m"
   fi 
 
-  if [ - z $JAVA_GC_OPTS ]; then
+  if [ -z $JAVA_GC_OPTS ]; then
     JAVA_GC_OPTS="-XX:+UseParallelGC -XX:MaxPermSize=100m -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90"
   fi
 
