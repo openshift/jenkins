@@ -20,10 +20,10 @@ workflow-api:2.8
 workflow-basic-steps:2.3
 workflow-cps:2.23
 workflow-cps-global-lib:2.4
-workflow-durable-task-step:2.5
+workflow-durable-task-step:2.8
 workflow-job:2.9
-workflow-step-api:2.5
-workflow-support:2.11
+workflow-step-api:2.7
+workflow-support:2.12
 
 # Pipeline Multibranch Plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Multibranch+Plugin
 workflow-multibranch:2.9.2
@@ -55,7 +55,7 @@ ssh-credentials:1.12
 
 # Pipeline Utility Steps Plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Utility+Steps+Plugin
 pipeline-utility-steps:1.1.5
-script-security:1.24
+script-security:1.25
 
 # seem to be missing from the Jenkins docs but required to run these plugins..
 structs:1.5
