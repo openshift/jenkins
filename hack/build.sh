@@ -27,20 +27,7 @@ function docker_build_with_version {
   git_version=$(git rev-parse --short HEAD)
   echo "LABEL io.openshift.builder-version=\"${git_version}\"" >> "${dockerfile}.version"
   docker build -t ${IMAGE_NAME} -f "${dockerfile}.version" .
-  if [[ "${SKIP_SQUASH}" != "1" ]]; then
-    squash "${dockerfile}.version"
-  fi
   rm -f "${DOCKERFILE_PATH}.version"
-}
-
-# Install the docker squashing tool[1] and squash the result image
-# [1] https://github.com/goldmann/docker-squash
-function squash {
-  # FIXME: We have to use the exact versions here to avoid Docker client
-  #        compatibility issues
-  easy_install -q --user docker_py==1.6.0 docker-squash==1.0.0rc6
-  base=$(awk '/^FROM/{print $2}' $1)
-  ${HOME}/.local/bin/docker-squash -f $base ${IMAGE_NAME}
 }
 
 # Versions are stored in subdirectories. You can specify VERSION variable

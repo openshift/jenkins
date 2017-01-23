@@ -28,7 +28,7 @@ EXPOSE 8080 50000
 RUN curl https://pkg.jenkins.io/redhat-stable/jenkins.repo -o /etc/yum.repos.d/jenkins.repo && \
     rpm --import https://pkg.jenkins.io/redhat-stable/jenkins-ci.org.key && \
     yum install -y centos-release-scl-rh && \
-    INSTALL_PKGS="rsync gettext git tar zip unzip java-1.8.0-openjdk java-1.8.0-openjdk-devel jenkins-1.651.3-1.1 nss_wrapper" && \
+    INSTALL_PKGS="rsync gettext git tar zip unzip java-1.8.0-openjdk java-1.8.0-openjdk.i686 java-1.8.0-openjdk-devel java-1.8.0-openjdk-devel.i686 jenkins-1.651.3-1.1" && \
     yum -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     yum clean all  && \
@@ -48,6 +48,36 @@ RUN /usr/local/bin/plugins.sh /opt/openshift/base-plugins.txt && \
     touch /opt/openshift/plugins/subversion.jpi.pinned && \
     touch /opt/openshift/plugins/ssh-credentials.jpi.pinned && \
     touch /opt/openshift/plugins/script-security.jpi.pinned && \
+    chmod 775 /etc/passwd && \
+    chmod -R 775 /etc/alternatives && \
+    chmod -R 775 /var/lib/alternatives && \
+    chmod -R 775 /usr/lib/jvm && \
+    chmod 775 /usr/bin && \
+    chmod 775 /usr/lib/jvm-exports && \
+    chmod 775 /usr/share/man/man1 && \
+    unlink /usr/bin/java && \
+    unlink /usr/bin/jjs && \
+    unlink /usr/bin/keytool && \
+    unlink /usr/bin/orbd && \
+    unlink /usr/bin/pack200 && \
+    unlink /usr/bin/policytool && \
+    unlink /usr/bin/rmid && \
+    unlink /usr/bin/rmiregistry && \
+    unlink /usr/bin/servertool && \
+    unlink /usr/bin/tnameserv && \
+    unlink /usr/bin/unpack200 && \
+    unlink /usr/lib/jvm-exports/jre && \
+    unlink /usr/share/man/man1/java.1.gz && \
+    unlink /usr/share/man/man1/jjs.1.gz && \
+    unlink /usr/share/man/man1/keytool.1.gz && \
+    unlink /usr/share/man/man1/orbd.1.gz && \
+    unlink /usr/share/man/man1/pack200.1.gz && \
+    unlink /usr/share/man/man1/policytool.1.gz && \
+    unlink /usr/share/man/man1/rmid.1.gz && \
+    unlink /usr/share/man/man1/rmiregistry.1.gz && \
+    unlink /usr/share/man/man1/servertool.1.gz && \
+    unlink /usr/share/man/man1/tnameserv.1.gz && \
+    unlink /usr/share/man/man1/unpack200.1.gz && \
     chown -R 1001:0 /opt/openshift && \
     rmdir /var/log/jenkins && \
     /usr/local/bin/fix-permissions /opt/openshift && \

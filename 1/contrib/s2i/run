@@ -9,38 +9,55 @@
 source /usr/local/bin/jenkins-common.sh
 source /usr/local/bin/kube-slave-common.sh
 
+#get the fully qualified paths to both 32 and 64 bit java
+JVMPath32bit=`alternatives --display java | grep family | grep i386 | awk '{print $1}'`
+JVMPath64bit=`alternatives --display java | grep family | grep x86_64 | awk '{print $1}'`
+
+
+# set the java version used based on OPENSHIFT_JENKINS_JVM_ARCH
+if [ -z $OPENSHIFT_JENKINS_JVM_ARCH  ]; then
+    echo "Using 64 bit Java since OPENSHIFT_JENKINS_JVM_ARCH is not set (historic setting)"
+    alternatives --set java $JVMPath64bit
+elif [ "${OPENSHIFT_JENKINS_JVM_ARCH}" == "x86_64"  ]; then
+    echo "64 bit Java explicitly set in OPENSHIFT_JENKINS_JVM_ARCH"
+    alternatives --set java $JVMPath64bit
+else
+    echo "OPENSHIFT_JENKINS_JVM_ARCH is set to ${OPENSHIFT_JENKINS_JVM_ARCH} so using 32 bit Java"
+    alternatives --set java $JVMPath32bit
+fi
+
 image_config_dir="/opt/openshift/configuration"
 image_config_path="${image_config_dir}/config.xml"
-
 
 CONTAINER_MEMORY_IN_BYTES=`cat /sys/fs/cgroup/memory/memory.limit_in_bytes`
 DEFAULT_MEMORY_CEILING=$((2**40-1))
 if [ "${CONTAINER_MEMORY_IN_BYTES}" -lt "${DEFAULT_MEMORY_CEILING}" ]; then
 
     if [ -z $CONTAINER_HEAP_PERCENT ]; then
-        LOW_MEMORY_THRESHOLD=$((640*2**20)) # 640M
-        if [ "${CONTAINER_MEMORY_IN_BYTES}" -lt "${LOW_MEMORY_THRESHOLD}" ]; then
-            # If the user is not actively tailoring environment variables to adjust memory use,
-            # then tailor the runtime for limited memory automatically.
-            CONTAINER_HEAP_PERCENT=0.40
-            LOW_MEMORY_PARAMS="-Xss500K"
-        else
-            CONTAINER_HEAP_PERCENT=0.50
-        fi
+        CONTAINER_HEAP_PERCENT=0.50
     fi
     
     CONTAINER_MEMORY_IN_MB=$((${CONTAINER_MEMORY_IN_BYTES}/1024**2))
+    #if machine has 4GB or less, meaning max heap of 2GB given current default, force use of 32bit to save space unless user
+    #specifically want to force 64bit
+    HEAP_LIMIT_FOR_32BIT=$((2**32-1))
+    HEAP_LIMIT_FOR_32BIT_IN_MB=$((${HEAP_LIMIT_FOR_32BIT}/1024**2))
     CONTAINER_HEAP_MAX=$(echo "${CONTAINER_MEMORY_IN_MB} ${CONTAINER_HEAP_PERCENT}" | awk '{ printf "%d", $1 * $2 }')
+    if [[ -z $OPENSHIFT_JENKINS_JVM_ARCH && "${CONTAINER_HEAP_MAX}" -lt "${HEAP_LIMIT_FOR_32BIT_IN_MB}"  ]]; then
+	echo "max heap in MB is ${CONTAINER_HEAP_MAX} and 64 bit was not explicitly set so using 32 bit Java"
+	alternatives --set java $JVMPath32bit
+    fi
     
     JAVA_MAX_HEAP_PARAM="-Xmx${CONTAINER_HEAP_MAX}m"
 fi 
 
 if [ -z $JAVA_GC_OPTS ]; then
-  JAVA_GC_OPTS="-XX:+UseParallelGC -XX:MaxPermSize=100m -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90"
+  # note - MaxPermSize no longer valid with v8 of the jdk ... used to have -XX:MaxPermSize=100m
+  JAVA_GC_OPTS="-XX:+UseParallelGC -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90"
 fi
 
 # Since OpenShift runs this Docker image under random user ID, we have to assign
-# the 'jenkins' user name to this UID. For that we use nss_wrapper
+# the 'jenkins' user name to this UID.
 generate_passwd_file
 
 mkdir /tmp/war
@@ -126,7 +143,7 @@ fi
 
 # if `docker run` first argument start with `--` the user is passing jenkins launcher arguments
 if [[ $# -lt 1 ]] || [[ "$1" == "--"* ]]; then
-   exec java $JAVA_GC_OPTS $JAVA_MAX_HEAP_PARAM $LOW_MEMORY_PARAMS -Duser.home=${HOME} $JAVA_OPTS -Dfile.encoding=UTF8 -jar /usr/lib/jenkins/jenkins.war $JENKINS_OPTS $JENKINS_ACCESSLOG "$@"
+   exec java $JAVA_GC_OPTS $JAVA_MAX_HEAP_PARAM -Duser.home=${HOME} $JAVA_OPTS -Dfile.encoding=UTF8 -jar /usr/lib/jenkins/jenkins.war $JENKINS_OPTS $JENKINS_ACCESSLOG "$@"
 fi
 
 # As argument is not jenkins, assume user want to run his own process, for sample a `bash` shell to explore this image
