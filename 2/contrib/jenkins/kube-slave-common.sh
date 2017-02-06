@@ -126,7 +126,7 @@ function generate_kubernetes_config() {
     local crt_contents=$(cat "${KUBE_CA}")
     echo "
     <org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud>
-      <name>openshift</name>
+      <name>kubernetes</name>
       <templates>
         <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
           <inheritFrom></inheritFrom>
