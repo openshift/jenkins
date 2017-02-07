@@ -49,9 +49,11 @@ RUN /usr/local/bin/install-plugins.sh /opt/openshift/base-plugins.txt && \
     # need to create <plugin>.pinned files when upgrading "core" plugins like credentials or subversion that are bundled with the jenkins server
     # Currently jenkins v2 does not embed any plugins, but for reference:
     # touch /opt/openshift/plugins/credentials.jpi.pinned && \
+    rmdir /var/log/jenkins && \
     chown -R 1001:0 /opt/openshift && \
     /usr/local/bin/fix-permissions /opt/openshift && \
-    /usr/local/bin/fix-permissions /var/lib/jenkins
+    /usr/local/bin/fix-permissions /var/lib/jenkins && \
+    /usr/local/bin/fix-permissions /var/log
 
 VOLUME ["/var/lib/jenkins"]
 

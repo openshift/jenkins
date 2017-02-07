@@ -50,6 +50,9 @@ if [ -e ${JENKINS_HOME}/password ]; then
 fi
 new_password_hash=`obfuscate_password ${JENKINS_PASSWORD:-password} $old_salt`
 
+# finish the move of the default logs dir, /var/log/jenkins, to the volume mount
+mkdir ${JENKINS_HOME}/logs
+ln -sf ${JENKINS_HOME}/logs /var/log/jenkins
 
 if [ ! -e ${JENKINS_HOME}/configured ]; then
   # This container hasn't been configured yet, so copy the default configuration from
@@ -116,9 +119,14 @@ fi
 
 rm -rf /tmp/war
 
+# default log rotation in /etc/logrotate.d/jenkins handles /var/log/jenkins/access_log
+if [ ! -z "${OPENSHIFT_USE_ACCESS_LOG}" ]; then
+    JENKINS_ACCESSLOG="--accessLoggerClassName=winstone.accesslog.SimpleAccessLogger --simpleAccessLogger.format=combined --simpleAccessLogger.file=/var/log/jenkins/access_log"
+fi
+
 # if `docker run` first argument start with `--` the user is passing jenkins launcher arguments
 if [[ $# -lt 1 ]] || [[ "$1" == "--"* ]]; then
-   exec java $JAVA_GC_OPTS $JAVA_MAX_HEAP_PARAM $LOW_MEMORY_PARAMS -Duser.home=${HOME} $JAVA_OPTS -Dfile.encoding=UTF8 -jar /usr/lib/jenkins/jenkins.war $JENKINS_OPTS "$@"
+   exec java $JAVA_GC_OPTS $JAVA_MAX_HEAP_PARAM $LOW_MEMORY_PARAMS -Duser.home=${HOME} $JAVA_OPTS -Dfile.encoding=UTF8 -jar /usr/lib/jenkins/jenkins.war $JENKINS_OPTS $JENKINS_ACCESSLOG "$@"
 fi
 
 # As argument is not jenkins, assume user want to run his own process, for sample a `bash` shell to explore this image
