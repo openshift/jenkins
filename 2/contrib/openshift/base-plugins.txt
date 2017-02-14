@@ -39,7 +39,7 @@ momentjs:1.1.1
 
 # remote loader https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Remote+Loader+Plugin
 workflow-remote-loader:1.2
-scm-api:2.0.2
+scm-api:2.0.3
 branch-api:2.0.2
 
 # Pipeline SCM Step Plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+SCM+Step+Plugin
