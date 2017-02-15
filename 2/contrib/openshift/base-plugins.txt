@@ -32,14 +32,13 @@ cloudbees-folder:5.17
 
 # Pipeline stage view plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Stage+View+Plugin
 pipeline-stage-view:2.2
-jquery-detached:1.2.1
 handlebars:1.1.1
 pipeline-rest-api:2.2
 momentjs:1.1.1
 
 # remote loader https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Remote+Loader+Plugin
 workflow-remote-loader:1.2
-scm-api:2.0.3
+scm-api:2.0.4
 branch-api:2.0.2
 
 # Pipeline SCM Step Plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+SCM+Step+Plugin
