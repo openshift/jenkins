@@ -103,11 +103,10 @@ function test_get_job() {
 
 function run_tests() {
   local name=$1 ; shift
-  CONTAINER_ARGS="-u 10000:0"
   create_container $name $VOLUME
   CONTAINER_IP=$(get_container_ip $name)
   test_connection $name
- 
+
   # Make sure no plugins failed to load
   set +e
   CONTAINER=$(cat $cidfile)
@@ -192,6 +191,16 @@ function run_s2i_tests() {
 # Tests.
 
 # Normal tests
+echo "Normal test: 64 bit"
+CONTAINER_ARGS="-u 10000:0 -e OPENSHIFT_JENKINS_JVM_ARCH=x86_64"
+run_tests jenkins_test
+cleanup
+sleep 5
+echo "Normal test: 32 bit"
+CIDFILE_DIR=$(mktemp --suffix=jenkins_test_cidfiles -d)
+VOLUME=`mktemp -d`
+chmod a+rwx $VOLUME
+CONTAINER_ARGS="-u 10000:0 -e OPENSHIFT_JENKINS_JVM_ARCH=i386 "
 run_tests jenkins_test
 
 # S2I tests

@@ -6,6 +6,22 @@
 
 source /usr/local/bin/generate_container_user
 
+#get the fully qualified paths to both 32 and 64 bit java
+JVMPath32bit=`alternatives --display java | grep family | grep i386 | awk '{print $1}'`
+JVMPath64bit=`alternatives --display java | grep family | grep x86_64 | awk '{print $1}'`
+
+# set the java version used based on OPENSHIFT_JENKINS_JVM_ARCH
+if [ -z $OPENSHIFT_JENKINS_JVM_ARCH  ]; then
+    echo "Using 64 bit Java since OPENSHIFT_JENKINS_JVM_ARCH is not set"
+    alternatives --set java $JVMPath64bit
+elif [ "${OPENSHIFT_JENKINS_JVM_ARCH}" == "x86_64"  ]; then
+    echo "64 bit Java explicitly set in OPENSHIFT_JENKINS_JVM_ARCH"
+    alternatives --set java $JVMPath64bit
+else
+    echo "OPENSHIFT_JENKINS_JVM_ARCH is set to ${OPENSHIFT_JENKINS_JVM_ARCH} so using 32 bit Java"
+    alternatives --set java $JVMPath32bit
+fi
+
 # The directory that Jenkins will execute the builds and store cache files.
 # The directory has to be writeable for the user that the container is running
 # under.

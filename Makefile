@@ -1,4 +1,3 @@
-SKIP_SQUASH?=0
 # The master images follow the normal numbering scheme in which the
 # major version is used as the directory name and incorporated into
 # the image name (jenkins-1-centos7 in this case).  For the slave
@@ -19,8 +18,8 @@ endif
 
 .PHONY: build
 build:
-	SKIP_SQUASH=$(SKIP_SQUASH) VERSIONS=$(VERSIONS) hack/build.sh $(OS) $(VERSION)
+	VERSIONS=$(VERSIONS) hack/build.sh $(OS) $(VERSION)
 
 .PHONY: test
 test:
-	SKIP_SQUASH=$(SKIP_SQUASH) VERSIONS=$(VERSIONS) TAG_ON_SUCCESS=$(TAG_ON_SUCCESS) TEST_MODE=true hack/build.sh $(OS) $(VERSION)
+	VERSIONS=$(VERSIONS) TAG_ON_SUCCESS=$(TAG_ON_SUCCESS) TEST_MODE=true hack/build.sh $(OS) $(VERSION)

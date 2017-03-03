@@ -16,15 +16,8 @@ function generate_passwd_file() {
 
   if [ x"$USER_ID" != x"0" -a x"$USER_ID" != x"997" ]; then
 
-    NSS_WRAPPER_PASSWD=/opt/openshift/passwd
-    NSS_WRAPPER_GROUP=/etc/group
+    echo "default:x:${USER_ID}:${GROUP_ID}:Default Application User:${HOME}:/sbin/nologin" >> /etc/passwd
 
-    cp /etc/passwd $NSS_WRAPPER_PASSWD
-    echo "default:x:${USER_ID}:${GROUP_ID}:Default Application User:${HOME}:/sbin/nologin" >> $NSS_WRAPPER_PASSWD
-
-    export NSS_WRAPPER_PASSWD
-    export NSS_WRAPPER_GROUP
-    export LD_PRELOAD=libnss_wrapper.so
   fi
 }
 
