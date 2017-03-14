@@ -20,7 +20,7 @@ workflow-aggregator:2.1
 workflow-api:2.12
 workflow-basic-steps:2.3
 workflow-cps:2.29
-workflow-cps-global-lib:2.6
+workflow-cps-global-lib:2.7
 workflow-durable-task-step:2.9
 workflow-job:2.10
 workflow-step-api:2.9
