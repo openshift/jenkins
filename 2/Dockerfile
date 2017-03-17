@@ -10,14 +10,16 @@ FROM centos:centos7
 # Environment:
 # * $JENKINS_PASSWORD - Password for the Jenkins 'admin' user.
 
-MAINTAINER Ben Parees <bparees@redhat.com>
+#MAINTAINER Ben Parees <bparees@redhat.com>
 
 # Jenkins LTS packages from
 # https://pkg.jenkins.io/redhat-stable/
 ENV JENKINS_VERSION=2.32 \
     HOME=/var/lib/jenkins \
     JENKINS_HOME=/var/lib/jenkins \
-    JENKINS_UC=https://updates.jenkins-ci.org
+    JENKINS_UC=https://updates.jenkins-ci.org \
+    JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk \
+    PATH=$PATH:$JAVA_HOME/bin
 
 LABEL k8s.io.description="Jenkins is a continuous integration server" \
       k8s.io.display-name="Jenkins 2.32" \
@@ -30,13 +32,16 @@ EXPOSE 8080 50000
 
 RUN curl https://pkg.jenkins.io/redhat-stable/jenkins.repo -o /etc/yum.repos.d/jenkins.repo && \
     rpm --import https://pkg.jenkins.io/redhat-stable/jenkins-ci.org.key && \
+    yum -y -q upgrade && \
     yum install -y centos-release-scl-rh && \
-    INSTALL_PKGS="rsync gettext git tar zip unzip java-1.8.0-openjdk java-1.8.0-openjdk.i686 java-1.8.0-openjdk-devel java-1.8.0-openjdk-devel.i686 jenkins-2.32.2-1.1" && \
+    ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    echo "Asia/Shanghai" >> /etc/timezone && \
+    INSTALL_PKGS="rsync gettext git tar zip unzip java-1.8.0-openjdk java-1.8.0-openjdk.i686 java-1.8.0-openjdk-devel java-1.8.0-openjdk-devel.i686 jenkins-2.32.3-1.1" && \
     yum -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     yum clean all  && \
     localedef -f UTF-8 -i en_US en_US.UTF-8 && \
-    set -o pipefail && curl -L https://github.com/openshift/origin/releases/download/v1.4.1/openshift-origin-client-tools-v1.4.1-3f9807a-linux-64bit.tar.gz | \
+    set -o pipefail && curl -L https://github.com/openshift/origin/releases/download/v1.5.0-alpha.3/openshift-origin-client-tools-v1.5.0-alpha.3-cf7e336-linux-64bit.tar.gz | \
     tar -zx && \
     mv openshift*/oc /usr/local/bin && \
     rm -rf openshift-origin-client-tools-*
@@ -87,5 +92,5 @@ RUN /usr/local/bin/install-plugins.sh /opt/openshift/base-plugins.txt && \
 
 VOLUME ["/var/lib/jenkins"]
 
-USER 1001
+USER root
 CMD ["/usr/libexec/s2i/run"]

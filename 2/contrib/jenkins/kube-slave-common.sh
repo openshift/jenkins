@@ -24,10 +24,12 @@ JNLP_PORT=${!T_PORT}
 
 export JNLP_PORT=${JNLP_PORT:-50000}
 
+GRADLE_SLAVE=${GRADLE_SLAVE_IMAGE:-registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7}
 NODEJS_SLAVE=${NODEJS_SLAVE_IMAGE:-registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7}
 MAVEN_SLAVE=${MAVEN_SLAVE_IMAGE:-registry.access.redhat.com/openshift3/jenkins-slave-maven-rhel7}
 # if the master is running the centos image, use the centos slave images.
 if [[ `grep CentOS /etc/redhat-release` ]]; then
+  GRADLE_SLAVE=${GRADLE_SLAVE_IMAGE:-openshift/jenkins-slave-gradle-alpine}
   NODEJS_SLAVE=${NODEJS_SLAVE_IMAGE:-openshift/jenkins-slave-nodejs-centos7}
   MAVEN_SLAVE=${MAVEN_SLAVE_IMAGE:-openshift/jenkins-slave-maven-centos7}
 fi
@@ -130,6 +132,37 @@ function generate_kubernetes_config() {
       <templates>
         <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
           <inheritFrom></inheritFrom>
+          <name>gradle</name>
+          <instanceCap>2147483647</instanceCap>
+          <idleMinutes>0</idleMinutes>
+          <label>gradle</label>
+          <serviceAccount>${oc_serviceaccount_name}</serviceAccount>
+          <nodeSelector></nodeSelector>
+          <volumes/>
+          <containers>
+            <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+              <name>jnlp</name>
+              <image>${GRADLE_SLAVE}</image>
+              <privileged>false</privileged>
+              <alwaysPullImage>false</alwaysPullImage>
+              <workingDir>/tmp</workingDir>
+              <command></command>
+              <args>\${computer.jnlpmac} \${computer.name}</args>
+              <ttyEnabled>false</ttyEnabled>
+              <resourceRequestCpu></resourceRequestCpu>
+              <resourceRequestMemory></resourceRequestMemory>
+              <resourceLimitCpu></resourceLimitCpu>
+              <resourceLimitMemory></resourceLimitMemory>
+              <envVars/>
+            </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+          </containers>
+          <envVars/>
+          <annotations/>
+          <imagePullSecrets/>
+          <nodeProperties/>
+        </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+        <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+          <inheritFrom></inheritFrom>
           <name>maven</name>
           <instanceCap>2147483647</instanceCap>
           <idleMinutes>0</idleMinutes>
@@ -190,6 +223,7 @@ function generate_kubernetes_config() {
           <imagePullSecrets/>
           <nodeProperties/>
         </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+	
       ${slave_templates}
       </templates>
       <serverUrl>https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}</serverUrl>
@@ -213,7 +247,7 @@ function generate_kubernetes_credentials() {
         <specifications/>
       </com.cloudbees.plugins.credentials.domains.Domain>
       <java.util.concurrent.CopyOnWriteArrayList>
-        <org.csanchez.jenkins.plugins.kubernetes.ServiceAccountCredential plugin=\"kubernetes@0.4.1\">
+        <org.csanchez.jenkins.plugins.kubernetes.ServiceAccountCredential plugin=\"kubernetes@0.11\">
           <scope>GLOBAL</scope>
           <id>1a12dfa4-7fc5-47a7-aa17-cc56572a41c7</id>
           <description></description>
