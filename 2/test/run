@@ -101,6 +101,23 @@ function test_get_job() {
   curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/job/$3
 }
 
+function test_non_pipeline_dependencies_pulled() {
+    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/ace-editor/thirdPartyLicenses
+    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/branch-api/thirdPartyLicenses
+    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/credentials/thirdPartyLicenses
+    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/durable-task/thirdPartyLicenses
+    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/cloudbees-folder/thirdPartyLicenses
+    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/git-server/thirdPartyLicenses
+    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/git-client/thirdPartyLicenses
+    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/git/thirdPartyLicenses
+    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/handlebars/thirdPartyLicenses
+    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/momentjs/thirdPartyLicenses
+    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/plain-credentials/thirdPartyLicenses
+    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/scm-api/thirdPartyLicenses
+    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/script-security/thirdPartyLicenses
+    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/structs/thirdPartyLicenses
+}
+
 function run_tests() {
   local name=$1 ; shift
   create_container $name $VOLUME
@@ -146,6 +163,7 @@ function run_tests() {
     return 1
   fi
   set -e
+  test_non_pipeline_dependencies_pulled admin newpassword
   # Stop the container so next tests can run
   docker stop $(get_cid $name)
 }
