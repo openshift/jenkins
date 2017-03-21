@@ -33,7 +33,8 @@ export HOME=${JENKINS_HOME}
 set -e
 
 # if `docker run` has 2 or more arguments the user is passing jenkins launcher arguments
-if [[ $# -gt 1 ]]; then
+# also check the JENKINS_URL  envar as this is useful for s2i builds
+if [ $# -gt 1 ] && [ ! -z $JENKINS_URL ]; then
   JAR="${JENKINS_HOME}/remoting.jar"
   PARAMS=""
 
