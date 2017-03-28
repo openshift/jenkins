@@ -7,7 +7,7 @@ openshift-client:0.9.2
 kubernetes:0.10
 
 # fabric8 openshift sync
-openshift-sync:0.1.11
+openshift-sync:0.1.12
 
 # Pipeline plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Plugin
 workflow-aggregator:2.1
@@ -27,7 +27,7 @@ pipeline-utility-steps:1.1.5
 
 # Jenkins v2 specific
 matrix-auth:1.4
-blueocean:1.0.0-b23
+blueocean:1.0.0-rc2
 
 # Legacy stuff
 mapdb-api:1.0.1.0
