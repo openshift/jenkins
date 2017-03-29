@@ -15,6 +15,7 @@ RUN INSTALL_PKGS="java-1.8.0-openjdk-devel" && \
     mkdir -p $HOME/.m2
 
 ADD ./contrib/settings.xml $HOME/.m2/
+ADD contrib/bin/configure-slave /usr/local/bin/configure-slave
 
 RUN chown -R 1001:0 $HOME && \
     chmod -R g+rw $HOME
