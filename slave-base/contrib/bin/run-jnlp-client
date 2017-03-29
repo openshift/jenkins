@@ -4,6 +4,14 @@
 # will use for the auto-discovery of this slave.
 #
 
+# The directory that Jenkins will execute the builds and store cache files.
+# The directory has to be writeable for the user that the container is running
+# under.
+export JENKINS_HOME=/home/jenkins
+
+# Make sure the Java clients have valid $HOME directory set
+export HOME=${JENKINS_HOME}
+
 source /usr/local/bin/generate_container_user
 
 #get the fully qualified paths to both 32 and 64 bit java
@@ -21,14 +29,6 @@ else
     echo "OPENSHIFT_JENKINS_JVM_ARCH is set to ${OPENSHIFT_JENKINS_JVM_ARCH} so using 32 bit Java"
     alternatives --set java $JVMPath32bit
 fi
-
-# The directory that Jenkins will execute the builds and store cache files.
-# The directory has to be writeable for the user that the container is running
-# under.
-export JENKINS_HOME=/home/jenkins
-
-# Make sure the Java clients have valid $HOME directory set
-export HOME=${JENKINS_HOME}
 
 # Configure the slave image
 source /usr/local/bin/configure-slave
