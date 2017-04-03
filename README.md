@@ -14,7 +14,7 @@ official [OpenShift Documentation](https://docs.openshift.org/latest/using_image
 Versions
 ---------------------------------
 Jenkins versions currently provided are:
-* [jenkins-1.6x](../master/1)
+* [jenkins-1.6x](../master/1) - DEPRECATED
 * [jenkins-2.x](../master/2)
 
 RHEL versions currently supported are:
@@ -237,14 +237,14 @@ Users can choose between testing Jenkins based on a RHEL or CentOS image.
 
     ```
     $ cd jenkins
-    $ make test TARGET=rhel7 VERSION=5.5
+    $ make test TARGET=rhel7 VERSION=2
     ```
 
 *  **CentOS based image**
 
     ```
     $ cd jenkins
-    $ make test VERSION=1
+    $ make test VERSION=2
     ```
 
 **Notice: By omitting the `VERSION` parameter, the build/test action will be performed
