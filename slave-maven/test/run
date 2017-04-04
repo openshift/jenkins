@@ -7,6 +7,6 @@
 #
 
 docker run ${IMAGE_NAME} oc
-docker run --entrypoint="mvn" ${IMAGE_NAME} --version
+docker run --entrypoint="/bin/bash" ${IMAGE_NAME} "-c" "mvn --version"
 
 echo "SUCCESS!"
