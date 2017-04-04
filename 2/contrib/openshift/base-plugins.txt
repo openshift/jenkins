@@ -32,3 +32,6 @@ blueocean:1.0.0-rc2
 # Legacy stuff
 mapdb-api:1.0.1.0
 subversion:2.5.7
+
+# Declarative Pipeline
+pipeline-model-definition:1.1.1
