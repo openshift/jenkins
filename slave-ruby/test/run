@@ -1,0 +1,18 @@
+#!/bin/bash -e
+#
+# Test the Jenkins image.
+#
+# IMAGE_NAME specifies the name of the candidate image used for testing.
+# The image has to be available before this script is executed.
+#
+
+# make sure oc is installed
+docker run ${IMAGE_NAME} oc
+# make sure gem and ruby are available
+# the default entrypoint for the image assumes if you supply more than
+# one arg, you are trying to invoke the slave logic, so we have to
+# override the entrypoing to run complicated commands for testing.
+docker run --entrypoint=/bin/sh ${IMAGE_NAME} -ic 'gem --version'
+docker run --entrypoint=/bin/sh ${IMAGE_NAME} -ic 'ruby --version'
+
+echo "SUCCESS!"
