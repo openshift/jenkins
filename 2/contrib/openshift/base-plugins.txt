@@ -26,7 +26,7 @@ ssh-credentials:1.12
 pipeline-utility-steps:1.1.5
 
 # Jenkins v2 specific
-matrix-auth:1.4
+matrix-auth:1.5
 blueocean:1.0.0-rc2
 
 # Legacy stuff
