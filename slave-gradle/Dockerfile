@@ -1,5 +1,5 @@
 #FROM openjdk:8-jdk-alpine
-FROM hub.jucaicat.net/openshift/jenkins-2-centos7
+FROM openshift/jenkins-2-centos7
 
 ENV JAVA_HOME /usr/lib/jvm/java-1.8.0-openjdk
 ENV HOME /root
