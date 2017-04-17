@@ -12,8 +12,7 @@ OS=$1
 VERSION=$2
 
 DOCKERFILE_PATH=""
-BASE_DIR_NAME=$(echo $(basename `pwd`) | sed -e 's/-.*$//g')
-BASE_IMAGE_NAME="openshift/${BASE_DIR_NAME#s2i-}"
+BASE_IMAGE_NAME="openshift/jenkins"
 
 # Cleanup the temporary Dockerfile created by docker build with version
 trap "rm -f ${DOCKERFILE_PATH}.version" SIGINT SIGQUIT EXIT

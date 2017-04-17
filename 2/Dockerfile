@@ -5,7 +5,7 @@ FROM centos:centos7
 # This image provides a Jenkins server, primarily intended for integration with
 # OpenShift v3.
 #
-# Volumes: 
+# Volumes:
 # * /var/jenkins_home
 # Environment:
 # * $JENKINS_PASSWORD - Password for the Jenkins 'admin' user.
@@ -14,7 +14,7 @@ FROM centos:centos7
 
 # Jenkins LTS packages from
 # https://pkg.jenkins.io/redhat-stable/
-ENV JENKINS_VERSION=2.32 \
+ENV JENKINS_VERSION=2.46.1 \
     HOME=/var/lib/jenkins \
     JENKINS_HOME=/var/lib/jenkins \
     JENKINS_UC=https://updates.jenkins-ci.org \
@@ -22,7 +22,7 @@ ENV JENKINS_VERSION=2.32 \
     PATH=$PATH:$JAVA_HOME/bin
 
 LABEL k8s.io.description="Jenkins is a continuous integration server" \
-      k8s.io.display-name="Jenkins 2.32" \
+      k8s.io.display-name="Jenkins 2.46.1" \
       openshift.io.expose-services="8080:http" \
       openshift.io.tags="jenkins,jenkins2,ci" \
       io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
@@ -34,9 +34,12 @@ RUN curl https://pkg.jenkins.io/redhat-stable/jenkins.repo -o /etc/yum.repos.d/j
     rpm --import https://pkg.jenkins.io/redhat-stable/jenkins-ci.org.key && \
     yum -y -q upgrade && \
     yum install -y centos-release-scl-rh && \
+
     ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo "Asia/Shanghai" >> /etc/timezone && \
-    INSTALL_PKGS="rsync gettext git tar zip unzip java-1.8.0-openjdk java-1.8.0-openjdk.i686 java-1.8.0-openjdk-devel java-1.8.0-openjdk-devel.i686 jenkins-2.32.3-1.1" && \
+
+    INSTALL_PKGS="rsync gettext git tar zip unzip java-1.8.0-openjdk java-1.8.0-openjdk.i686 java-1.8.0-openjdk-devel java-1.8.0-openjdk-devel.i686 jenkins-2.46.1-1.1" && \
+
     yum -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     yum clean all  && \

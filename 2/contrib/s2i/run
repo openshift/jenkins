@@ -103,6 +103,25 @@ if [ ! -e ${JENKINS_HOME}/configured ]; then
   cp -r /opt/openshift/configuration/* ${JENKINS_HOME}
   rm -rf /opt/openshift/configuration/*
 
+
+  # If the INSTALL_PLUGINS variable is populated, then attempt to install
+  # those plugins before copying them over to JENKINS_HOME
+  # The format of the INSTALL_PLUGINS variable is a comma-separated list
+  # of pluginId:pluginVersion strings
+  if [[ -n "${INSTALL_PLUGINS:-}" ]]; then
+    echo "Installing additional plugins: ${INSTALL_PLUGINS} ..."
+
+    # Create a temporary file in the format of plugins.txt
+    plugins_file=$(mktemp)
+    IFS=',' read -ra plugins <<< "${INSTALL_PLUGINS}"
+    for plugin in "${plugins[@]}"; do
+        echo "${plugin}" >> "${plugins_file}"
+    done
+
+    # Call install plugins with the temporary file
+    /usr/local/bin/install-plugins.sh "${plugins_file}"
+  fi
+
   if [ "$(ls -A /opt/openshift/plugins 2>/dev/null)" ]; then
     mkdir -p ${JENKINS_HOME}/plugins
     echo "Copying $(ls /opt/openshift/plugins | wc -l) Jenkins plugins to ${JENKINS_HOME} ..."

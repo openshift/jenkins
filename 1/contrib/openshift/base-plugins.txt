@@ -1,5 +1,5 @@
 openshift-pipeline:1.0.42
-openshift-login:0.11
+openshift-login:0.12
 openshift-client:0.9.2
 
 
@@ -9,7 +9,7 @@ kubernetes:0.10
 credentials:2.1.9
 
 # fabric8 openshift sync
-openshift-sync:0.1.11
+openshift-sync:0.1.12
 
 # Pipeline plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Plugin
 pipeline-build-step:2.1

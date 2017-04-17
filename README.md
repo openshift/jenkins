@@ -14,7 +14,7 @@ official [OpenShift Documentation](https://docs.openshift.org/latest/using_image
 Versions
 ---------------------------------
 Jenkins versions currently provided are:
-* [jenkins-1.6x](../master/1)
+* [jenkins-1.6x](../master/1) - DEPRECATED
 * [jenkins-2.x](../master/2)
 
 RHEL versions currently supported are:
@@ -71,6 +71,7 @@ initialization by passing `-e VAR=VALUE` to the Docker run command.
 |  `JENKINS_PASSWORD`       | Password for the 'admin' account when using default Jenkin authentication.            |
 | `OPENSHIFT_ENABLE_OAUTH` | Determines whether the OpenShift Login plugin manages authentication when logging into Jenkins. |
 | `OPENSHIFT_PERMISSIONS_POLL_INTERVAL` | Specifies in milliseconds how often the OpenShift Login plugin polls OpenShift for the permissions associated with each user defined in Jenkins. |
+| `INSTALL_PLUGINS`         | Comma-separated list of additional plugins to install on startup. The format of each plugin spec is `plugin-id:version` (as in plugins.txt) |
 
 
 
@@ -143,6 +144,17 @@ $ s2i build https://github.com/your/repository openshift/jenkins-1-centos7 your_
 ```
 NOTE:  if instead of adding a plugin you want to replace an existing plugin via dropping the binary plugin in the `./plugins` directory,
 make sure the filename ends in `.jpi`.
+
+####  Installing on Startup
+
+The INSTALL_PLUGINS environment variable may be used to install a set of plugins on startup. When using a
+persistent volume for /var/lib/jenkins, plugin installation will only happen on the initial run of the image.
+
+In the following example, the Groovy and Pull Request Builder plugins are installed
+
+```
+INSTALL_PLUGINS=groovy:1.30,ghprb:1.35.0
+```
 
 #### Plugins of note
 
@@ -237,14 +249,14 @@ Users can choose between testing Jenkins based on a RHEL or CentOS image.
 
     ```
     $ cd jenkins
-    $ make test TARGET=rhel7 VERSION=5.5
+    $ make test TARGET=rhel7 VERSION=2
     ```
 
 *  **CentOS based image**
 
     ```
     $ cd jenkins
-    $ make test VERSION=1
+    $ make test VERSION=2
     ```
 
 **Notice: By omitting the `VERSION` parameter, the build/test action will be performed

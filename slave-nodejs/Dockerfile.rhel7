@@ -5,7 +5,7 @@ MAINTAINER Ben Parees <bparees@redhat.com>
 # Labels consumed by Red Hat build service
 LABEL com.redhat.component="jenkins-slave-nodejs-rhel7-docker" \
       name="openshift3/jenkins-slave-nodejs-rhel7" \
-      version="4" \
+      version="3.6" \
       architecture="x86_64" \
       release="4" \
       io.k8s.display-name="Jenkins Slave Nodejs" \
