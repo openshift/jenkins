@@ -4,7 +4,7 @@ FROM openshift/jenkins-2-centos7
 ENV JAVA_HOME /usr/lib/jvm/java-1.8.0-openjdk
 ENV HOME /root
 ENV GRADLE_OPTS -Dorg.gradle.daemon=false
-#USER root
+USER root
 
 COPY gradle /usr/local/gradle
 #RUN userdel  jenkins \
