@@ -7,6 +7,9 @@
 # The directory that Jenkins will execute the builds and store cache files.
 # The directory has to be writeable for the user that the container is running
 # under.
+
+#NOTE:  periodically check https://ce-gitlab.usersys.redhat.com/ce/jboss-dockerfiles/blob/develop/scripts/os-java-run/added/java-default-options for updates
+
 export JENKINS_HOME=/home/jenkins
 
 # Make sure the Java clients have valid $HOME directory set
@@ -72,13 +75,29 @@ if [[ $# -gt 1 ]]; then
       CONTAINER_MEMORY_IN_MB=$((${CONTAINER_MEMORY_IN_BYTES}/1024**2))
       CONTAINER_HEAP_MAX=$(echo "${CONTAINER_MEMORY_IN_MB} ${CONTAINER_HEAP_PERCENT}" | awk '{ printf "%d", $1 * $2 }')      
       JAVA_MAX_HEAP_PARAM="-Xmx${CONTAINER_HEAP_MAX}m"
+      if [-z $CONTAINTER_INITIAL_PERCENT]; then
+	  # jboss default was 100% or ms==mx
+	  JAVA_INITIAL_HEAP_PARAM="-Xms${CONTAINER_HEAP_MAX}m"
+      else
+	  CONTAINER_INITIAL_HEAP=$(echo "${CONTAINER_HEAP_MAX} ${CONTAINER_INITIAL_PERCENT}" | awk '{ printf "%d", $1 * $2 }')
+	  JAVA_INITIAL_HEAP_PARAM="-Xms${CONTAINER_INITIAL_HEAP}m"
+      fi
   fi 
 
   if [ -z $JAVA_GC_OPTS ]; then
-    JAVA_GC_OPTS="-XX:+UseParallelGC -XX:MaxPermSize=100m -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90"
+    JAVA_GC_OPTS="-XX:+UseParallelGC -XX:MaxPermSize=100m -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -XX:MaxMetaspaceSize=100m"
   fi
 
-  echo Running java $JAVA_GC_OPTS $JAVA_MAX_HEAP_PARAM $JAVA_OPTS -cp $JAR hudson.remoting.jnlp.Main -headless $PARAMS "$@"
+
+  if [ ! -z "${USE_JAVA_DIAGNOSTICS}" ]; then
+      JAVA_DIAGNOSTICS="-XX:NativeMemoryTracking=summary -XX:+PrintGC -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+UnlockDiagnosticVMOptions"
+  fi
+
+  if [ ! -z "${CONTAINER_CORE_LIMIT}" ]; then
+      JAVA_CORE_LIMIT="-XX:ParallelGCThreads=${CONTAINER_CORE_LIMIT} -Djava.util.concurrent.ForkJoinPool.common.parallelism=${CONTAINER_CORE_LIMT} -XX:CICompilerCount=2"
+  fi
+
+  echo Running java $JAVA_GC_OPTS $JAVA_INITIAL_HEAP_PARAM $JAVA_MAX_HEAP_PARAM $JAVA_CORE_LIMIT $JAVA_DIAGNOSTICS $JAVA_OPTS -cp $JAR hudson.remoting.jnlp.Main -headless $PARAMS "$@"
   cd ${JENKINS_DIR} && exec java $JAVA_OPTS \
     -cp $JAR hudson.remoting.jnlp.Main -headless $PARAMS "$@"
 fi
