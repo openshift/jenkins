@@ -24,7 +24,7 @@ workflow-cps-global-lib:2.7
 workflow-durable-task-step:2.10
 workflow-job:2.10
 workflow-step-api:2.9
-workflow-support:2.13
+workflow-support:2.14
 
 # Pipeline Multibranch Plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Multibranch+Plugin
 workflow-multibranch:2.14
