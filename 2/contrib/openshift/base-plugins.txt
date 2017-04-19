@@ -45,6 +45,7 @@ branch-api:2.0.8
 workflow-scm-step:2.4
 git:3.2.0
 github-organization-folder:1.6
+github:1.27.0
 
 # mercurial - https://wiki.jenkins-ci.org/display/JENKINS/Mercurial+Plugin
 mercurial:1.59
@@ -67,7 +68,7 @@ ace-editor:1.1
 matrix-auth:1.5
 blueocean:1.0.1
 blueocean-pipeline-editor:0.2.0
-
+blueocean-autofavorite:2.7.1
 bouncycastle-api:2.16.1
 
 # Legacy stuff
