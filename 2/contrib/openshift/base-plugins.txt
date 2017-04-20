@@ -9,7 +9,7 @@ kubernetes:0.11
 credentials:2.1.13
 
 # fabric8 openshift sync
-openshift-sync:0.1.12
+openshift-sync:0.1.13
 
 # Pipeline plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Plugin
 pipeline-build-step:2.5
@@ -49,7 +49,7 @@ github:1.27.0
 
 # mercurial - https://wiki.jenkins-ci.org/display/JENKINS/Mercurial+Plugin
 mercurial:1.59
-matrix-project:1.9
+matrix-project:1.10
 multiple-scms:0.6
 ssh-credentials:1.13
 
