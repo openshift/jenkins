@@ -17,7 +17,9 @@ MAINTAINER Ben Parees <bparees@redhat.com>
 ENV JENKINS_VERSION=2.46.1 \
     HOME=/var/lib/jenkins \
     JENKINS_HOME=/var/lib/jenkins \
-    JENKINS_UC=https://updates.jenkins-ci.org
+    JENKINS_UC=https://updates.jenkins-ci.org \
+    LANG=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8
 
 LABEL k8s.io.description="Jenkins is a continuous integration server" \
       k8s.io.display-name="Jenkins 2.46.1" \
