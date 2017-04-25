@@ -20,7 +20,7 @@ workflow-remote-loader:1.2
 mercurial:1.54
 matrix-project:1.7.1
 multiple-scms:0.6
-ssh-credentials:1.12
+ssh-credentials:1.13
 
 # Pipeline Utility Steps Plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Utility+Steps+Plugin
 pipeline-utility-steps:1.1.5
