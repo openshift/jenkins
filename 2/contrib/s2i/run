@@ -46,17 +46,17 @@ if [ "${CONTAINER_MEMORY_IN_BYTES}" -lt "${DEFAULT_MEMORY_CEILING}" ]; then
     HEAP_LIMIT_FOR_32BIT_IN_MB=$((${HEAP_LIMIT_FOR_32BIT}/1024**2))
     CONTAINER_HEAP_MAX=$(echo "${CONTAINER_MEMORY_IN_MB} ${CONTAINER_HEAP_PERCENT}" | awk '{ printf "%d", $1 * $2 }')
     if [[ -z $OPENSHIFT_JENKINS_JVM_ARCH && "${CONTAINER_HEAP_MAX}" -lt "${HEAP_LIMIT_FOR_32BIT_IN_MB}"  ]]; then
-	echo "max heap in MB is ${CONTAINER_HEAP_MAX} and 64 bit was not explicitly set so using 32 bit Java"
-	alternatives --set java $JVMPath32bit
+      echo "max heap in MB is ${CONTAINER_HEAP_MAX} and 64 bit was not explicitly set so using 32 bit Java"
+      alternatives --set java $JVMPath32bit
     fi
     
     JAVA_MAX_HEAP_PARAM="-Xmx${CONTAINER_HEAP_MAX}m"
     if [-z $CONTAINTER_INITIAL_PERCENT]; then
-	# jboss default was 100% or ms==mx
-	JAVA_INITIAL_HEAP_PARAM="-Xms${CONTAINER_HEAP_MAX}m"
+      # jboss default was 100% or ms==mx
+      JAVA_INITIAL_HEAP_PARAM="-Xms${CONTAINER_HEAP_MAX}m"
     else
-	CONTAINER_INITIAL_HEAP=$(echo "${CONTAINER_HEAP_MAX} ${CONTAINER_INITIAL_PERCENT}" | awk '{ printf "%d", $1 * $2 }')
-	JAVA_INITIAL_HEAP_PARAM="-Xms${CONTAINER_INITIAL_HEAP}m"
+      CONTAINER_INITIAL_HEAP=$(echo "${CONTAINER_HEAP_MAX} ${CONTAINER_INITIAL_PERCENT}" | awk '{ printf "%d", $1 * $2 }')
+      JAVA_INITIAL_HEAP_PARAM="-Xms${CONTAINER_INITIAL_HEAP}m"
     fi
 fi 
 
