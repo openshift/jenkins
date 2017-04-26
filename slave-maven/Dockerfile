@@ -12,9 +12,9 @@ RUN INSTALL_PKGS="java-1.8.0-openjdk-devel rh-maven33*" && \
     yum install -y centos-release-scl-rh && \
     yum install -y --enablerepo=centosplus $INSTALL_PKGS && \
     rpm -V ${INSTALL_PKGS//\*/} && \
-    rpm -e java-1.7.0-openjdk --nodeps && \
-    rpm -e java-1.7.0-openjdk-devel --nodeps && \
-    rpm -e java-1.7.0-openjdk-headless --nodeps && \
+    rpm -e java-1.7.0-openjdk --nodeps || true && \
+    rpm -e java-1.7.0-openjdk-devel --nodeps || true && \
+    rpm -e java-1.7.0-openjdk-headless --nodeps || true && \
     yum clean all -y && \
     mkdir -p $HOME/.m2
 
