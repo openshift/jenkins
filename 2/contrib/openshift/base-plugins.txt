@@ -27,7 +27,7 @@ pipeline-utility-steps:1.1.5
 
 # Jenkins v2 specific
 matrix-auth:1.5
-blueocean:1.0.0-rc2
+blueocean:1.0.1
 
 # Legacy stuff
 mapdb-api:1.0.1.0
