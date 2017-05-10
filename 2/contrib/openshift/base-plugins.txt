@@ -7,7 +7,7 @@ openshift-client:0.9.3
 kubernetes:0.10
 
 # fabric8 openshift sync
-openshift-sync:0.1.13
+openshift-sync:0.1.14
 
 # Pipeline plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Plugin
 workflow-aggregator:2.1
