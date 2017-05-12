@@ -185,53 +185,14 @@ $ docker run -d -e JENKINS_PASSWORD=<password> -v /tmp/jenkins:/var/lib/jenkins 
 Jenkins admin user
 ---------------------------------
 
-The admin user name is set to `admin`.  There are now two supported means of authenticating:
+Authenticating into a Jenkins server running within the OpenShift Jenkins image is controlled by the [OpenShift Login plugin](https://github.com/openshift/jenkins-openshift-login-plugin), taking into account:
 
-* If running outside of OpenShift, or running in OpenShift with the environment variable `OPENSHIFT_ENABLE_OAUTH` set to `false` on the container, default Jenkins authentication is used. 
-You log in with the user name `admin`, supplying the password specified by the `JENKINS_PASSWORD` environment variable. If you do not override `JENKINS_PASSWORD`, the default password for `admin` is `password`.
-* If running in OpenShift and the environment variable `OPENSHIFT_ENABLE_OAUTH` is set to a value other than `false` on the container, the [OpenShift Login plugin](https://github.com/openshift/jenkins-openshift-login-plugin)
-manages the login process, and to login you specify valid credentials as required by the identity provider used by OpenShift.  In this case, the predefined `admin` user in the default Jenkins user database is now ignored.
-Unless there is an `admin` user defined within OpenShift with sufficient permissions to the project Jenkins is running in, you will not be able to do anything with Jenkins by logging in as `admin`.  
+* Whether or not the container is running in an OpenShift Pod
+* How the [environment variables](https://github.com/openshift/jenkins#environment-variables) recognized by the image are set
 
-A quick reminder on OpenShift identity providers: if, for example, the default OpenShift identity provider `Allow All` is used, you can provide any non-empty
-string as the password for any valid user for the OpenShift project Jenkins is running in.  Otherwise, if `Allow All` is not used as the identity provider, then valid credentials stored with your identity provider must be provided.
+See the [OpenShift Login plugin documentation](https://github.com/openshift/jenkins-openshift-login-plugin) for details on how it manages authentication.
 
-For non-browser, direct HTTP or HTTPS access to Jenkins when the [OpenShift Login plugin](https://github.com/openshift/jenkins-openshift-login-plugin) manages authentication, a HTTP bearer token authentication header must be supplied
-with an OpenShift token which has sufficient permissions to access the project that Jenkins is running in. A suggested token to use is a token associated with the serviceaccount for the project Jenkins in running in.  If you started
-Jenkins using the example [jenkins-ephemeral](https://github.com/openshift/origin/blob/master/examples/jenkins/jenkins-ephemeral-template.json) or [jenkins-persistent](https://github.com/openshift/origin/blob/master/examples/jenkins/jenkins-persistent-template.json) templates, the commands to display the token are:
-
-	```
-	$ oc describe serviceaccount jenkins
-	$ oc describe secret <serviceaccount secret name>
-	``` 
-
-Once authenticated, OpenShift roles determine which Jenkins permissions you have.  Any user with the OpenShift `admin` role for the OpenShift project Jenkins is running in will have the same permissions as those assigned to an administrative user within Jenkins.
-Users with the `edit` or `view` roles for the OpenShift project Jenkins is running in will have progressively reduced permissions within Jenkins.
-
-For the `view` role, the Jenkins permissions are:
-
-* hudson.model.Hudson.READ
-* hudson.model.Item.READ
-* com.cloudbees.plugins.credentials.CredentialsProvider.VIEW
-
-For the `edit` role, in addition to the permissions available to `view`:
-
-* hudson.model.Item.BUILD
-* hudson.model.Item.CONFIGURE
-* hudson.model.Item.CREATE
-* hudson.model.Item.DELETE
-* hudson.model.Item.WORKSPACE
-* hudson.scm.SCM.TAG
-* jenkins.model.Jenkins.RUN_SCRIPTS
-
-Users authenticated against OpenShift OAuth will be added to the Jenkins authorization matrix upon their first successful login.
-
-Permissions for users in Jenkins can be changed in OpenShift after those users are initially established in Jenkins.  The OpenShift Login plugin polls the OpenShift API server for permissions and will update the permissions stored in
-Jenkins for each Jenkins user with the permissions retrieved from OpenShift.  Technically speaking, you can change the permissions for a Jenkins user from the Jenkins UI as well, but those changes will be overwritten the next
-time the poll occurs.
-
-You can control how often the polling occurs with the `OPENSHIFT_PERMISSIONS_POLL_INTERVAL` environment variable.  The default polling interval when no environment variable is set is 5 minutes.
-
+However, when the default authentication mechanism for Jenkins is used, if you are using the OpenShift Jenkins image, you log in with the user name `admin`, supplying the password specified by the `JENKINS_PASSWORD` environment variable set on the container. If you do not override `JENKINS_PASSWORD`, the default password for `admin` is `password`. 
 
 
 Test
