@@ -8,7 +8,7 @@
 # * https://wiki.centos.org/ContainerPipeline
 
 # This will be part of the name of the container. It should match the job-id in index entry
-job-id: jenkins-slave-maven-centos7 
+job-id: jenkins-slave-gradle-centos7
 
 #the following are optional, can be left blank
 #defaults, where applicable are filled in

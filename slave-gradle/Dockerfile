@@ -1,6 +1,6 @@
 FROM openshift/jenkins-slave-base-centos7
 
-ENV GRADLE_VERSION=3.4.1 \
+ENV GRADLE_VERSION=3.5 \
     BASH_ENV=/usr/local/bin/scl_enable \
     ENV=/usr/local/bin/scl_enable \
     PROMPT_COMMAND=". /usr/local/bin/scl_enable"
