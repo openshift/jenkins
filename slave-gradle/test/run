@@ -7,6 +7,6 @@
 #
 
 docker run ${IMAGE_NAME} oc
-docker run --entrypoint="/bin/bash" ${IMAGE_NAME} "-c" "mvn --version"
+docker run --entrypoint="/bin/bash" ${IMAGE_NAME} "-c" "gradle --version"
 
 echo "SUCCESS!"
