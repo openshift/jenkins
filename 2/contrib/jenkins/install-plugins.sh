@@ -219,7 +219,9 @@ function resolveDependencies() {
     plugin="$1"
     jpi="$(getArchiveFilename "$plugin")"
 
+    set +o pipefail
     dependencies="$(unzip -p "$jpi" META-INF/MANIFEST.MF | tr -d '\r' | tr '\n' '|' | sed -e 's#| ##g' | tr '|' '\n' | grep "^Plugin-Dependencies: " | sed -e 's#^Plugin-Dependencies: ##')"
+    set -o pipefail
 
     if [[ ! $dependencies ]]; then
         echo " > $plugin has no dependencies"
@@ -233,22 +235,55 @@ function resolveDependencies() {
     for d in "${array[@]}"
     do
         plugin="$(cut -d':' -f1 - <<< "$d")"
+        #
+        # Note, matrix-auth plugin notes cloudbees-folder as optional in the archive, but then failed to
+        # load, citing a dependency that is too old, during testing ... so we will download optional dependencies
+        #
+        local versionFromPluginParam
         if [[ $d == *"resolution:=optional"* ]]; then
-            echo "Skipping optional dependency $plugin"
-        else
-            local pluginInstalled
-            if pluginInstalled="$(echo "${bundledPlugins}" | grep "^${plugin}:")"; then
-                pluginInstalled="${pluginInstalled//[$'\r']}"
-                local versionInstalled; versionInstalled=$(versionFromPlugin "${pluginInstalled}")
-                local minVersion; minVersion=$(versionFromPlugin "${d}")
-                if versionLT "${versionInstalled}" "${minVersion}"; then
-                    echo "Upgrading bundled dependency $d ($minVersion > $versionInstalled)"
-                    download "$plugin" &
-                else
-                    echo "Skipping already bundled dependency $d ($minVersion <= $versionInstalled)"
-                fi
+            #echo "Skipping optional dependency $plugin"
+            versionFromPluginParam="$(cut -d';' -f1 - <<< "$d")"
+	else
+            versionFromPluginParam=$d
+        fi
+        local pluginInstalled
+        local minVersion; minVersion=$(versionFromPlugin "${versionFromPluginParam}")
+
+	set +o pipefail
+	local filename; filename=$(getArchiveFilename "$plugin")
+	local previouslyDownloadedVersion; previouslyDownloadedVersion=$(get_plugin_version $filename)
+	set -o pipefail
+	
+        # ${bundledPlugins} checks for plugins bundled in the jenkins.war file; per 
+        # https://wiki.jenkins-ci.org/display/JENKINS/Bundling+plugins+with+Jenkins this is getting
+        # phased out, but we are keeping this check in for now while that transition bakes a bit more	
+        if pluginInstalled="$(echo "${bundledPlugins}" | grep "^${plugin}:")"; then
+            pluginInstalled="${pluginInstalled//[$'\r']}"
+            # get the version of the plugin bundled
+            local versionInstalled; versionInstalled=$(versionFromPlugin "${pluginInstalled}")
+            # if the bundled plugins is older than the minimum version needed for the dependency,
+            # download the dependence; passing "true" is needed for "download" to replace the existing dependency
+            if versionLT "${versionInstalled}" "${minVersion}"; then
+                echo "Upgrading bundled dependency $d ($minVersion > $versionInstalled)"
+                download "$plugin" "$minVersion" "true"
             else
-                download "$plugin" &
+                echo "Skipping already bundled dependency $d ($minVersion <= $versionInstalled)"
+            fi
+            # bypass further processing if a bundled plugin
+            continue
+        fi
+
+        # if the dependency plugin has yet to be downloaded (hence the var is not set) download
+        if [[ -z "${previouslyDownloadedVersion:-}" ]]; then
+            echo "Downloading dependency plugin $plugin version $minVersion that has yet to be installed"
+            download "$plugin" "$minVersion"
+        else
+            # get the version of the dependency plugin already downloaded; if not recent enough, download
+            # the minimum version required; the "true" parameter is need for "download" to overwrite the existing
+            # version of the plugin
+            if versionLT "${previouslyDownloadedVersion}" "${minVersion}"; then
+                echo "Upgrading previously downloaded plugin $plugin at $previouslyDownloadedVersion to $minVersion"
+                download "$plugin" "$minVersion" "true"
             fi
         fi
     done
@@ -321,7 +356,7 @@ main() {
             plugin="${plugin%%:*}"
         fi
 
-        download "$plugin" "$version" "true" &
+        download "$plugin" "$version" "true"
     done
     wait
 
