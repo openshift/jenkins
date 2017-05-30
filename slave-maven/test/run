@@ -10,7 +10,7 @@
 
 docker run ${IMAGE_NAME} oc
 docker run --entrypoint="/bin/bash" ${IMAGE_NAME} "-c" "mvn --version"
-if [[ ${IMAGE_NAME} != *"rhel"* ]]; then
+if [[ ${IMAGE_NAME} != *"rhel"* ]]; then
     docker run --entrypoint="/bin/bash" ${IMAGE_NAME} "-c" "gradle --version"
 fi
 
