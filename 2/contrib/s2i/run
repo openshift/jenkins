@@ -51,7 +51,7 @@ if [ "${CONTAINER_MEMORY_IN_BYTES}" -lt "${DEFAULT_MEMORY_CEILING}" ]; then
     fi
     
     JAVA_MAX_HEAP_PARAM="-Xmx${CONTAINER_HEAP_MAX}m"
-    if [ -z $CONTAINTER_INITIAL_PERCENT ]; then
+    if [ -z $CONTAINER_INITIAL_PERCENT ]; then
       # jboss default was 100% or ms==mx
       JAVA_INITIAL_HEAP_PARAM="-Xms${CONTAINER_HEAP_MAX}m"
     else
