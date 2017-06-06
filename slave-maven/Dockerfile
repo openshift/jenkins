@@ -6,8 +6,8 @@ ENV MAVEN_VERSION=3.3 \
     GRADLE_VERSION=3.5 \
     BASH_ENV=/usr/local/bin/scl_enable \
     ENV=/usr/local/bin/scl_enable \
-    PROMPT_COMMAND=". /usr/local/bin/scl_enable"
-ENV PATH=$PATH:/opt/gradle-${GRADLE_VERSION}/bin
+    PROMPT_COMMAND=". /usr/local/bin/scl_enable" \
+    PATH=$PATH:/opt/gradle-3.5/bin
 
 # Install Maven
 RUN INSTALL_PKGS="java-1.8.0-openjdk-devel rh-maven33*" && \
