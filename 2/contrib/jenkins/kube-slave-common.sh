@@ -61,68 +61,10 @@ if has_service_account; then
   export oc_serviceaccount_name="$(expr "$(oc whoami)" : 'system:serviceaccount:[a-z0-9][-a-z0-9]*:\([a-z0-9][-a-z0-9]*\)' || true)"
 fi
 
-# get_imagestream_names returns a list of image streams that match the
-# SLAVE_LABEL
-function get_is_names() {
-  [ -z "$oc_cmd" ] && return
-  $oc_cmd get is -n "${PROJECT_NAME}" -l role=${SLAVE_LABEL} -o template --template "{{range .items}}{{.metadata.name}} {{end}}"
-}
-
-# convert_is_to_slave converts the OpenShift imagestream to a Jenkins Kubernetes
-# Plugin slave configuration.
-function convert_is_to_slave() {
-  [ -z "$oc_cmd" ] && return
-  local name=$1
-  local template_file=$(mktemp)
-  local template="
-  <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
-    <inheritFrom></inheritFrom>
-    <name>{{.metadata.name}}</name>
-    <instanceCap>5</instanceCap>
-    <idleMinutes>0</idleMinutes>
-    <label>{{if not .metadata.annotations}}${name}{{else}}{{if index .metadata.annotations \"slave-label\"}}{{index .metadata.annotations \"slave-label\"}}{{else}}${name}{{end}}{{end}}</label>
-    <serviceAccount>${oc_serviceaccount_name}</serviceAccount>
-    <nodeSelector></nodeSelector>
-    <volumes/>
-    <containers>
-      <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
-        <name>jnlp</name>
-        <image>{{.status.dockerImageRepository}}</image>
-        <privileged>false</privileged>
-        <alwaysPullImage>false</alwaysPullImage>
-        <workingDir>/tmp</workingDir>
-        <command></command>
-        <args>\${computer.jnlpmac} \${computer.name}</args>
-        <ttyEnabled>false</ttyEnabled>
-        <resourceRequestCpu></resourceRequestCpu>
-        <resourceRequestMemory></resourceRequestMemory>
-        <resourceLimitCpu></resourceLimitCpu>
-        <resourceLimitMemory></resourceLimitMemory>
-        <envVars/>
-      </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
-    </containers>
-    <envVars/>
-    <annotations/>
-    <imagePullSecrets/>
-    <nodeProperties/>
-  </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
-  "
-  echo "${template}" > ${template_file}
-  $oc_cmd get -n "${PROJECT_NAME}" is/${name} -o templatefile --template ${template_file}
-  rm -f ${template_file} &>/dev/null
-}
-
 # generate_kubernetes_config generates a configuration for the kubernetes plugin
 function generate_kubernetes_config() {
     [ -z "$oc_cmd" ] && return
-    local slave_templates=""
-    if has_service_account; then
-      for name in $(get_is_names); do
-        slave_templates+=$(convert_is_to_slave ${name})
-      done
-    else
-      return
-    fi
+    [ ! has_service_account ] && return
     local crt_contents=$(cat "${KUBE_CA}")
     echo "
     <org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud>
@@ -190,7 +132,6 @@ function generate_kubernetes_config() {
           <imagePullSecrets/>
           <nodeProperties/>
         </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
-      ${slave_templates}
       </templates>
       <serverUrl>https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}</serverUrl>
       <skipTlsVerify>false</skipTlsVerify>
