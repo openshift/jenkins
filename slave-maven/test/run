@@ -5,8 +5,13 @@
 # IMAGE_NAME specifies the name of the candidate image used for testing.
 # The image has to be available before this script is executed.
 #
+# TODO: When the rhel image get gradle remove the if
+#
 
 docker run ${IMAGE_NAME} oc
 docker run --entrypoint="/bin/bash" ${IMAGE_NAME} "-c" "mvn --version"
+if [[ ${IMAGE_NAME} != *"rhel"* ]]; then
+    docker run --entrypoint="/bin/sh" ${IMAGE_NAME} "-c" "/usr/local/bin/run-jnlp-client;gradle --version"
+fi
 
 echo "SUCCESS!"
