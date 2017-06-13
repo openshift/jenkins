@@ -11,7 +11,7 @@
 docker run ${IMAGE_NAME} oc
 docker run --entrypoint="/bin/bash" ${IMAGE_NAME} "-c" "mvn --version"
 if [[ ${IMAGE_NAME} != *"rhel"* ]]; then
-    docker run --entrypoint="/bin/bash" ${IMAGE_NAME} "-c" "gradle --version"
+    docker run --entrypoint="/bin/sh" ${IMAGE_NAME} "-c" "/usr/local/bin/run-jnlp-client;gradle --version"
 fi
 
 echo "SUCCESS!"
