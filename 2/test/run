@@ -70,7 +70,7 @@ test_connection() {
   return $result
 }
 
-function create_container() {
+function run_image() {
   local name=$1 ; shift
   local volume=$1; shift
   local cargs=${CONTAINER_ARGS:-}
@@ -91,36 +91,36 @@ function delete_container() {
 # $2 - password
 # $3 - job name
 function test_create_job() {
-  curl --fail --user $1:$2 -X POST -H "Content-Type: application/xml" -H "Expect: " --data-binary '@test/testjob.xml' http://${CONTAINER_IP}:8080/createItem\?name=$3
+  curl -s --fail --user $1:$2 -X POST -H "Content-Type: application/xml" -H "Expect: " --data-binary '@test/testjob.xml' http://${CONTAINER_IP}:8080/createItem\?name=$3
 }
 
 # $1 - username
 # $2 - password
 # $3 - job name
 function test_get_job() {
-  curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/job/$3
+  curl -s --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/job/$3
 }
 
 function test_non_pipeline_dependencies_pulled() {
-    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/ace-editor/thirdPartyLicenses
-    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/branch-api/thirdPartyLicenses
-    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/credentials/thirdPartyLicenses
-    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/durable-task/thirdPartyLicenses
-    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/cloudbees-folder/thirdPartyLicenses
-    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/git-server/thirdPartyLicenses
-    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/git-client/thirdPartyLicenses
-    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/git/thirdPartyLicenses
-    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/handlebars/thirdPartyLicenses
-    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/momentjs/thirdPartyLicenses
-    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/plain-credentials/thirdPartyLicenses
-    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/scm-api/thirdPartyLicenses
-    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/script-security/thirdPartyLicenses
-    curl --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/structs/thirdPartyLicenses
+    curl -s --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/ace-editor/thirdPartyLicenses
+    curl -s --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/branch-api/thirdPartyLicenses
+    curl -s --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/credentials/thirdPartyLicenses
+    curl -s --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/durable-task/thirdPartyLicenses
+    curl -s --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/cloudbees-folder/thirdPartyLicenses
+    curl -s --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/git-server/thirdPartyLicenses
+    curl -s --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/git-client/thirdPartyLicenses
+    curl -s --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/git/thirdPartyLicenses
+    curl -s --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/handlebars/thirdPartyLicenses
+    curl -s --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/momentjs/thirdPartyLicenses
+    curl -s --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/plain-credentials/thirdPartyLicenses
+    curl -s --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/scm-api/thirdPartyLicenses
+    curl -s --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/script-security/thirdPartyLicenses
+    curl -s --fail -u $1:$2 -X GET http://${CONTAINER_IP}:8080/pluginManager/plugin/structs/thirdPartyLicenses
 }
 
 function run_tests() {
   local name=$1 ; shift
-  create_container $name $VOLUME
+  run_image $name $VOLUME
   CONTAINER_IP=$(get_container_ip $name)
   test_connection $name
 
@@ -139,16 +139,17 @@ function run_tests() {
   test_get_job admin password testJob
   set +e
   test_create_job admin badpassword failJob
-  if [ $? -eq 0 ]; then
+  rc=$?
+  set -e
+  if [ $rc -eq 0 ]; then
     echo "Fail: was able to create job with bad password"
     return 1
   fi
-  set -e
 
   delete_container
 
   # start a new container with the old volume so we can try to change the password
-  CONTAINER_ARGS="-u 10000:0 -e JENKINS_PASSWORD=newpassword" create_container $name $VOLUME
+  CONTAINER_ARGS="-u 10000:0 -e JENKINS_PASSWORD=newpassword" run_image $name $VOLUME
   CONTAINER_IP=$(get_container_ip $name)
 
   # need this to wait for the container to start up
@@ -158,11 +159,12 @@ function run_tests() {
   set +e
   # old password should not
   test_get_job admin password testJob
-  if [ $? -eq 0 ]; then
+  rc=$?
+  set -e
+  if [ $rc -eq 0 ]; then
     echo "Fail: was able to get job with bad password"
     return 1
   fi
-  set -e
   test_non_pipeline_dependencies_pulled admin newpassword
   # Stop the container so next tests can run
   docker stop $(get_cid $name)
@@ -178,7 +180,7 @@ function run_s2i_tests() {
     file://$(pwd)/.. $IMAGE_NAME $output_image
   s2i_volume=$(mktemp -d)
   chmod a+rwx $s2i_volume
-  IMAGE_NAME="${output_image}" create_container s2i-jenkins-test $s2i_volume
+  IMAGE_NAME="${output_image}" run_image s2i-jenkins-test $s2i_volume
   cid=s2i-jenkins-test
   CONTAINER_IP=$(get_container_ip ${cid})
   test_connection ${cid}
@@ -195,11 +197,16 @@ function run_s2i_tests() {
     echo "Fail: The sample-app-test job was not copied"
     return 1
   fi
+
+  set +e
   docker exec ${cid} cat /var/lib/jenkins/config.xml | grep -q "s2i-test-config"
   if [ "$?" != "0" ]; then
     echo "Fail: The config.xml was not copied"
+    docker exec ${cid} cat /var/lib/jenkins/config.xml
+    set -e
     return 1
   fi
+  set -e
 
   if [[ -n "{VERIFY_INSTALLED:-}" ]]; then
 	  if ! docker exec ${cid} ls /var/lib/jenkins/plugins/${VERIFY_INSTALLED}.jpi; then
