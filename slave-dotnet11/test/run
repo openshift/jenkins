@@ -8,10 +8,13 @@
 
 # make sure oc is installed
 docker run ${IMAGE_NAME} oc
-# make sure npm and nodejs are available
 # the default entrypoint for the image assumes if you supply more than
 # one arg, you are trying to invoke the slave logic, so we have to
 # override the entrypoing to run complicated commands for testing.
+# make sure dotnet is available
 docker run --entrypoint=/bin/sh ${IMAGE_NAME} -ic 'dotnet --version'
+# make sure npm and nodejs are available
+docker run --entrypoint=/bin/sh ${IMAGE_NAME} -ic 'npm --version'
+docker run --entrypoint=/bin/sh ${IMAGE_NAME} -ic 'node --version'
 
 echo "SUCCESS!"
