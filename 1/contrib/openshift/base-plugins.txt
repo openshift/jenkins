@@ -1,6 +1,6 @@
-openshift-pipeline:1.0.46
+openshift-pipeline:1.0.47
 openshift-login:0.12
-openshift-client:0.9.5
+openshift-client:0.9.6
 
 
 # kubernetes plugin - https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin
