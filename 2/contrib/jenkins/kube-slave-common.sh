@@ -134,68 +134,76 @@ function generate_kubernetes_config() {
           <imagePullSecrets/>
           <nodeProperties/>
         </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+    "
+
+    if [ -n "$DOTNET10_SLAVE" ]; then
+    echo "
         <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
-          <inheritFrom></inheritFrom>
-          <name>dotnet10</name>
-          <instanceCap>2147483647</instanceCap>
-          <idleMinutes>0</idleMinutes>
-          <label>dotnet10</label>
-          <serviceAccount>${oc_serviceaccount_name}</serviceAccount>
-          <nodeSelector></nodeSelector>
-          <volumes/>
-          <containers>
-            <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
-              <name>jnlp</name>
-              <image>${DOTNET10_SLAVE}</image>
-              <privileged>false</privileged>
-              <alwaysPullImage>false</alwaysPullImage>
-              <workingDir>/tmp</workingDir>
-              <command></command>
-              <args>\${computer.jnlpmac} \${computer.name}</args>
-              <ttyEnabled>false</ttyEnabled>
-              <resourceRequestCpu></resourceRequestCpu>
-              <resourceRequestMemory></resourceRequestMemory>
-              <resourceLimitCpu></resourceLimitCpu>
-              <resourceLimitMemory></resourceLimitMemory>
-              <envVars/>
-            </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
-          </containers>
-          <envVars/>
-          <annotations/>
-          <imagePullSecrets/>
-          <nodeProperties/>
-        </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
-        <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
-          <inheritFrom></inheritFrom>
-          <name>dotnet11</name>
-          <instanceCap>2147483647</instanceCap>
-          <idleMinutes>0</idleMinutes>
-          <label>dotnet11</label>
-          <serviceAccount>${oc_serviceaccount_name}</serviceAccount>
-          <nodeSelector></nodeSelector>
-          <volumes/>
-          <containers>
-            <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
-              <name>jnlp</name>
-              <image>${DOTNET11_SLAVE}</image>
-              <privileged>false</privileged>
-              <alwaysPullImage>false</alwaysPullImage>
-              <workingDir>/tmp</workingDir>
-              <command></command>
-              <args>\${computer.jnlpmac} \${computer.name}</args>
-              <ttyEnabled>false</ttyEnabled>
-              <resourceRequestCpu></resourceRequestCpu>
-              <resourceRequestMemory></resourceRequestMemory>
-              <resourceLimitCpu></resourceLimitCpu>
-              <resourceLimitMemory></resourceLimitMemory>
-              <envVars/>
-            </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
-          </containers>
-          <envVars/>
-          <annotations/>
-          <imagePullSecrets/>
-          <nodeProperties/>
-        </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+            <inheritFrom></inheritFrom>
+            <name>dotnet10</name>
+            <instanceCap>2147483647</instanceCap>
+            <idleMinutes>0</idleMinutes>
+            <label>dotnet10</label>
+            <serviceAccount>${oc_serviceaccount_name}</serviceAccount>
+            <nodeSelector></nodeSelector>
+            <volumes/>
+            <containers>
+              <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+                <name>jnlp</name>
+                <image>${DOTNET10_SLAVE}</image>
+                <privileged>false</privileged>
+                <alwaysPullImage>false</alwaysPullImage>
+                <workingDir>/tmp</workingDir>
+                <command></command>
+                <args>\${computer.jnlpmac} \${computer.name}</args>
+                <ttyEnabled>false</ttyEnabled>
+                <resourceRequestCpu></resourceRequestCpu>
+                <resourceRequestMemory></resourceRequestMemory>
+                <resourceLimitCpu></resourceLimitCpu>
+                <resourceLimitMemory></resourceLimitMemory>
+                <envVars/>
+              </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+            </containers>
+            <envVars/>
+            <annotations/>
+            <imagePullSecrets/>
+            <nodeProperties/>
+          </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+          <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+            <inheritFrom></inheritFrom>
+            <name>dotnet11</name>
+            <instanceCap>2147483647</instanceCap>
+            <idleMinutes>0</idleMinutes>
+            <label>dotnet11</label>
+            <serviceAccount>${oc_serviceaccount_name}</serviceAccount>
+            <nodeSelector></nodeSelector>
+            <volumes/>
+            <containers>
+              <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+                <name>jnlp</name>
+                <image>${DOTNET11_SLAVE}</image>
+                <privileged>false</privileged>
+                <alwaysPullImage>false</alwaysPullImage>
+                <workingDir>/tmp</workingDir>
+                <command></command>
+                <args>\${computer.jnlpmac} \${computer.name}</args>
+                <ttyEnabled>false</ttyEnabled>
+                <resourceRequestCpu></resourceRequestCpu>
+                <resourceRequestMemory></resourceRequestMemory>
+                <resourceLimitCpu></resourceLimitCpu>
+                <resourceLimitMemory></resourceLimitMemory>
+                <envVars/>
+              </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+            </containers>
+            <envVars/>
+            <annotations/>
+            <imagePullSecrets/>
+            <nodeProperties/>
+          </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+    "
+    fi
+
+    echo "
       </templates>
       <serverUrl>https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}</serverUrl>
       <skipTlsVerify>false</skipTlsVerify>
