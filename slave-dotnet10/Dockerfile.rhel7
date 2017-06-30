@@ -11,12 +11,10 @@ LABEL com.redhat.component="jenkins-slave-dotnet10-rhel7-docker" \
       io.openshift.tags="openshift,jenkins,slave,dotnet,dotnet10"
 
 # Don't download/extract docs for nuget packages
-# Don't do initially populate of package cache
 ENV BASH_ENV=/usr/local/bin/scl_enable \
     ENV=/usr/local/bin/scl_enable \
     PROMPT_COMMAND=". /usr/local/bin/scl_enable" \
-    NUGET_XMLDOC_MODE=skip \
-    DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
+    NUGET_XMLDOC_MODE=skip
 
 COPY contrib/bin/scl_enable /usr/local/bin/scl_enable
 
@@ -34,10 +32,9 @@ RUN chown -R 1001:0 $HOME && \
 
 USER 1001
 
-# Warmup NuGet cache
+# Do initial population of package cache
 RUN mkdir /tmp/cache-warmup && \
     cd /tmp/cache-warmup && \
-    scl enable rh-dotnetcore10 -- dotnet new -t web && \
-    scl enable rh-dotnetcore10 -- dotnet restore && \
+    scl enable rh-dotnetcore10 -- dotnet new && \
     cd && \
     rm -rf /tmp/cache-warmup
