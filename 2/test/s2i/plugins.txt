@@ -1,3 +1,1 @@
-credentials:1.23
-analysis-core:1.71
 ansicolor:0.4.1
