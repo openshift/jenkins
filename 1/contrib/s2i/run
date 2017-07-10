@@ -81,9 +81,6 @@ if [ ! -e ${JENKINS_HOME}/configured ]; then
     # the configuration.
     if [ -f "${image_config_path}.tpl" ]; then
       export KUBERNETES_CONFIG=$(generate_kubernetes_config)
-      for name in $(get_is_names); do
-        echo "Adding image ${name}:latest as Kubernetes slave ..."
-      done
       echo "Generating kubernetes-plugin configuration (${image_config_path}.tpl) ..."
       envsubst < "${image_config_path}.tpl" > "${image_config_path}"
     fi
