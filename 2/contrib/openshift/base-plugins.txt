@@ -1,16 +1,18 @@
-openshift-pipeline:1.0.42
+openshift-pipeline:1.0.47
 openshift-login:0.12
-openshift-client:0.9.3
+openshift-client:0.9.6
 
 
 # kubernetes plugin - https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin
 kubernetes:0.10
 
 # fabric8 openshift sync
-openshift-sync:0.1.14
+openshift-sync:0.1.23
 
 # Pipeline plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Plugin
-workflow-aggregator:2.1
+# 2.5 now includes pipeline-model-definition (declaritive pipeline)
+# 2.4 brought in pipeline-milestone-step
+workflow-aggregator:2.5
 
 
 # remote loader https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Remote+Loader+Plugin
@@ -33,5 +35,3 @@ blueocean:1.0.1
 mapdb-api:1.0.1.0
 subversion:2.5.7
 
-# Declarative Pipeline
-pipeline-model-definition:1.1.4

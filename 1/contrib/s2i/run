@@ -24,6 +24,7 @@ elif [ "${OPENSHIFT_JENKINS_JVM_ARCH}" == "x86_64"  ]; then
 else
     echo "OPENSHIFT_JENKINS_JVM_ARCH is set to ${OPENSHIFT_JENKINS_JVM_ARCH} so using 32 bit Java"
     alternatives --set java $JVMPath32bit
+    export MALLOC_ARENA_MAX=1
 fi
 
 image_config_dir="/opt/openshift/configuration"
@@ -46,6 +47,7 @@ if [ "${CONTAINER_MEMORY_IN_BYTES}" -lt "${DEFAULT_MEMORY_CEILING}" ]; then
     if [[ -z $OPENSHIFT_JENKINS_JVM_ARCH && "${CONTAINER_HEAP_MAX}" -lt "${HEAP_LIMIT_FOR_32BIT_IN_MB}"  ]]; then
 	echo "max heap in MB is ${CONTAINER_HEAP_MAX} and 64 bit was not explicitly set so using 32 bit Java"
 	alternatives --set java $JVMPath32bit
+        export MALLOC_ARENA_MAX=1
     fi
     
     JAVA_MAX_HEAP_PARAM="-Xmx${CONTAINER_HEAP_MAX}m"

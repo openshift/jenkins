@@ -13,6 +13,7 @@ VERSION=$2
 
 DOCKERFILE_PATH=""
 BASE_IMAGE_NAME="openshift/jenkins"
+RHEL_BASE_IMAGE_NAME="registry.access.redhat.com/openshift3/jenkins"
 
 # Cleanup the temporary Dockerfile created by docker build with version
 trap "rm -f ${DOCKERFILE_PATH}.version" SIGINT SIGQUIT EXIT
@@ -46,6 +47,10 @@ for dir in ${dirs}; do
   fi
 done
 
+if [ "$OS" == "rhel7" -o "$OS" == "rhel7-candidate" ]; then
+  BASE_IMAGE_NAME=${RHEL_BASE_IMAGE_NAME}
+fi
+
 for dir in ${dirs}; do
   IMAGE_NAME="${BASE_IMAGE_NAME}-${dir//./}-${OS}"
 
@@ -68,11 +73,6 @@ for dir in ${dirs}; do
     if [[ $? -eq 0 ]] && [[ "${TAG_ON_SUCCESS}" == "true" || "${dir}" == "slave-base" ]]; then
       echo "-> Re-tagging ${IMAGE_NAME} image to ${IMAGE_NAME%"-candidate"}"
       docker tag $IMAGE_NAME ${IMAGE_NAME%"-candidate"}
-    fi
-
-    if [[ ! -z "${REGISTRY}" ]]; then
-      echo "-> Tagging image as" ${REGISTRY}/${IMAGE_NAME%"-candidate"}
-      docker tag $IMAGE_NAME ${REGISTRY}/${IMAGE_NAME%"-candidate"}
     fi
   fi
 
