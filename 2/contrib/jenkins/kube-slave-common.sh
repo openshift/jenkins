@@ -26,8 +26,12 @@ export JNLP_PORT=${JNLP_PORT:-50000}
 
 NODEJS_SLAVE=${NODEJS_SLAVE_IMAGE:-registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7}
 MAVEN_SLAVE=${MAVEN_SLAVE_IMAGE:-registry.access.redhat.com/openshift3/jenkins-slave-maven-rhel7}
-DOTNET10_SLAVE=${NODEJS_SLAVE_IMAGE:-registry.access.redhat.com/openshift3/jenkins-slave-dotnet10-rhel7}
-DOTNET11_SLAVE=${NODEJS_SLAVE_IMAGE:-registry.access.redhat.com/openshift3/jenkins-slave-dotnet11-rhel7}
+# dotnet slave images are only available for RHEL
+# see: https://github.com/redhat-developer/s2i-dotnetcore/issues/36
+if [[ `grep 'Red Hat Enterprise Linux' /etc/redhat-release` ]]; then
+  DOTNET10_SLAVE=${DOTNET10_SLAVE:-registry.access.redhat.com/openshift3/jenkins-slave-dotnet10-rhel7}
+  DOTNET11_SLAVE=${DOTNET11_SLAVE:-registry.access.redhat.com/openshift3/jenkins-slave-dotnet11-rhel7}
+fi
 # if the master is running the centos image, use the centos slave images.
 if [[ `grep CentOS /etc/redhat-release` ]]; then
   NODEJS_SLAVE=${NODEJS_SLAVE_IMAGE:-openshift/jenkins-slave-nodejs-centos7}
