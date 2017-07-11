@@ -9,7 +9,7 @@
 set -eo nounset
 shopt -s nullglob
 
-IMAGE_NAME=${IMAGE_NAME-openshift/jenkins-1-centos7-candidate}
+IMAGE_NAME=${IMAGE_NAME-openshift/jenkins-2-centos7-candidate}
 
 FAILURE=true
 
@@ -174,7 +174,7 @@ function run_s2i_tests() {
     return
   fi
   output_image="openshift/s2i-test-jenkins"
-  s2i build --context-dir="1/test/s2i" --loglevel=3 --pull-policy=never \
+  s2i build --context-dir="2/test/s2i" --loglevel=3 --pull-policy=never \
     file://$(pwd)/.. $IMAGE_NAME $output_image
   s2i_volume=$(mktemp -d)
   chmod a+rwx $s2i_volume
@@ -224,7 +224,7 @@ function run_s2i_tests() {
 
 # Normal tests
 echo "Normal test: 64 bit"
-VERIFY_NOT_INSTALLED=ghprb
+VERIFY_NOT_INSTALLED=ansicolor
 CONTAINER_ARGS="-u 10000:0 -e OPENSHIFT_JENKINS_JVM_ARCH=x86_64"
 run_tests jenkins_test
 cleanup
@@ -241,9 +241,9 @@ echo "Test: install plugins on start"
 CIDFILE_DIR=$(mktemp --suffix=jenkins_test_cidfiles -d)
 VOLUME=$(mktemp -d)
 chmod a+rwx $VOLUME
-VERIFY_INSTALLED=ghprb
+VERIFY_INSTALLED=ansicolor
 VERIFY_NOT_INSTALLED=""
-CONTAINER_ARGS="-u 10000:0 -e OPENSHIFT_JENKINS_JVM_ARCH=x86_64 -e INSTALL_PLUGINS=ghprb:1.35.0"
+CONTAINER_ARGS="-u 10000:0 -e OPENSHIFT_JENKINS_JVM_ARCH=x86_64 -e INSTALL_PLUGINS=ansicolor:0.4.1"
 run_tests jenkins_test
 
 # S2I tests
