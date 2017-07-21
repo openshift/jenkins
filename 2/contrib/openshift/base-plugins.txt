@@ -7,7 +7,7 @@ openshift-client:0.9.6
 kubernetes:0.10
 
 # fabric8 openshift sync
-openshift-sync:0.1.23
+openshift-sync:0.1.24
 
 # Pipeline plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Plugin
 # 2.5 now includes pipeline-model-definition (declaritive pipeline)
