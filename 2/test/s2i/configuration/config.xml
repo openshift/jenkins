@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <hudson>
-  <!-- s2i-test-config -->
   <disabledAdministrativeMonitors/>
   <version>1.619</version>
   <numExecutors>5</numExecutors>
@@ -49,7 +48,7 @@
   </views>
   <primaryView>All</primaryView>
   <slaveAgentPort>49187</slaveAgentPort>
-  <label>master</label>
+  <label>s2i-test-config</label>
   <nodeProperties/>
   <globalNodeProperties/>
   <noUsageStatistics>true</noUsageStatistics>
