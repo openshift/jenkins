@@ -37,7 +37,7 @@ if [ "${CONTAINER_MEMORY_IN_BYTES}" -lt "${DEFAULT_MEMORY_CEILING}" ]; then
     if [ -z $CONTAINER_HEAP_PERCENT ]; then
         CONTAINER_HEAP_PERCENT=0.50
     fi
-    
+
     CONTAINER_MEMORY_IN_MB=$((${CONTAINER_MEMORY_IN_BYTES}/1024**2))
     #if machine has 4GB or less, meaning max heap of 2GB given current default, force use of 32bit to save space unless user
     #specifically want to force 64bit
@@ -49,11 +49,11 @@ if [ "${CONTAINER_MEMORY_IN_BYTES}" -lt "${DEFAULT_MEMORY_CEILING}" ]; then
 	alternatives --set java $JVMPath32bit
         export MALLOC_ARENA_MAX=1
     fi
-    
-    JAVA_MAX_HEAP_PARAM="-Xmx${CONTAINER_HEAP_MAX}m"
-fi 
 
-if [ -z $JAVA_GC_OPTS ]; then
+    JAVA_MAX_HEAP_PARAM="-Xmx${CONTAINER_HEAP_MAX}m"
+fi
+
+if [ -z "$JAVA_GC_OPTS" ]; then
   # note - MaxPermSize no longer valid with v8 of the jdk ... used to have -XX:MaxPermSize=100m
   JAVA_GC_OPTS="-XX:+UseParallelGC -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90"
 fi
