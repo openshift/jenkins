@@ -36,6 +36,8 @@ RUN curl https://pkg.jenkins.io/redhat-stable/jenkins.repo -o /etc/yum.repos.d/j
     INSTALL_PKGS="rsync gettext git tar zip unzip java-1.8.0-openjdk java-1.8.0-openjdk.i686 java-1.8.0-openjdk-devel java-1.8.0-openjdk-devel.i686 jenkins-2.60.1-1.1" && \
     yum -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
+    RUBY_PKGS="rh-ruby23 rh-ruby23-ruby-devel rh-ruby23-rubygem-rake rh-ruby23-rubygem-bundler rh-nodejs4 cmake ImageMagick-devel ImageMagick" && \
+    yum install -y --setopt=tsflags=nodocs $RUBY_PKGS && rpm -V $RUBY_PKGS && \
     yum clean all  && \
     localedef -f UTF-8 -i en_US en_US.UTF-8 && \
     set -o pipefail && curl -L https://github.com/openshift/origin/releases/download/v3.6.0-alpha.2/openshift-origin-client-tools-v3.6.0-alpha.2-3c221d5-linux-64bit.tar.gz| \
@@ -86,6 +88,9 @@ RUN /usr/local/bin/install-plugins.sh /opt/openshift/base-plugins.txt && \
     /usr/local/bin/fix-permissions /opt/openshift && \
     /usr/local/bin/fix-permissions /var/lib/jenkins && \
     /usr/local/bin/fix-permissions /var/log
+
+ENV LD_LIBRARY_PATH /opt/rh/rh-nodejs4/root/usr/lib64:/opt/rh/rh-ruby23/root/usr/local/lib64:/opt/rh/rh-ruby23/root/usr/lib64
+RUN /opt/rh/rh-ruby23/root/usr/bin/gem install bundler
 
 VOLUME ["/var/lib/jenkins"]
 
