@@ -9,6 +9,65 @@
 source /usr/local/bin/jenkins-common.sh
 source /usr/local/bin/kube-slave-common.sh
 
+function update_admin_password() {
+    sed -i "s,<passwordHash>.*</passwordHash>,<passwordHash>$new_password_hash</passwordHash>,g" "${JENKINS_HOME}/users/admin/config.xml"
+    echo $new_password_hash > ${JENKINS_HOME}/password
+}
+
+function create_jenkins_config_xml() {
+    # copy the default configuration from the image into the jenkins config path (which should be a volume for persistence).
+    if [ ! -f "${image_config_path}" ]; then
+	# If it contains a template (tpl) file, we can do additional manipulations to customize
+	# the configuration.
+	if [ -f "${image_config_path}.tpl" ]; then
+	    export KUBERNETES_CONFIG=$(generate_kubernetes_config)
+	    echo "Generating kubernetes-plugin configuration (${image_config_path}.tpl) ..."
+	    envsubst < "${image_config_path}.tpl" > "${image_config_path}"
+	fi
+    fi
+}
+
+function create_jenkins_credentials_xml() {
+    if [ ! -f "${image_config_dir}/credentials.xml" ]; then
+	if [ -f "${image_config_dir}/credentials.xml.tpl" ]; then
+	    if [ ! -z "${KUBERNETES_CONFIG}" ]; then
+		echo "Generating kubernetes-plugin credentials (${JENKINS_HOME}/credentials.xml.tpl) ..."
+		export KUBERNETES_CREDENTIALS=$(generate_kubernetes_credentials)
+	    fi
+	    # Fix the envsubst trying to substitute the $Hash inside credentials.xml
+	    export Hash="\$Hash"
+	    envsubst < "${image_config_dir}/credentials.xml.tpl" > "${image_config_dir}/credentials.xml"
+	fi
+    fi
+}
+
+function install_plugins() {
+    # If the INSTALL_PLUGINS variable is populated, then attempt to install
+    # those plugins before copying them over to JENKINS_HOME
+    # The format of the INSTALL_PLUGINS variable is a comma-separated list
+    # of pluginId:pluginVersion strings
+    if [[ -n "${INSTALL_PLUGINS:-}" ]]; then
+	echo "Installing additional plugins: ${INSTALL_PLUGINS} ..."
+	
+	# Create a temporary file in the format of plugins.txt
+	plugins_file=$(mktemp)
+	IFS=',' read -ra plugins <<< "${INSTALL_PLUGINS}"
+	for plugin in "${plugins[@]}"; do
+            echo "${plugin}" >> "${plugins_file}"
+	done
+	
+	# Call install plugins with the temporary file
+	/usr/local/bin/install-plugins.sh "${plugins_file}"
+    fi
+    
+    if [ "$(ls -A /opt/openshift/plugins 2>/dev/null)" ]; then
+	mkdir -p ${JENKINS_HOME}/plugins
+	echo "Copying $(ls /opt/openshift/plugins | wc -l) Jenkins plugins to ${JENKINS_HOME} ..."
+	cp -r /opt/openshift/plugins/* ${JENKINS_HOME}/plugins/
+	rm -rf /opt/openshift/plugins
+    fi
+}
+
 #NOTE:  periodically check https://ce-gitlab.usersys.redhat.com/ce/jboss-dockerfiles/blob/develop/scripts/os-java-run/added/java-default-options for updates
 
 #get the fully qualified paths to both 32 and 64 bit java
@@ -91,64 +150,38 @@ mkdir ${JENKINS_HOME}/logs
 ln -sf ${JENKINS_HOME}/logs /var/log/jenkins
 
 if [ ! -e ${JENKINS_HOME}/configured ]; then
-  # This container hasn't been configured yet, so copy the default configuration from
-  # the image into the jenkins config path (which should be a volume for persistence).
-  if [ ! -f "${image_config_path}" ]; then
-    # If it contains a template (tpl) file, we can do additional manipulations to customize
-    # the configuration.
-    if [ -f "${image_config_path}.tpl" ]; then
-      export KUBERNETES_CONFIG=$(generate_kubernetes_config)
-      echo "Generating kubernetes-plugin configuration (${image_config_path}.tpl) ..."
-      envsubst < "${image_config_path}.tpl" > "${image_config_path}"
+    # This container hasn't been configured yet
+    create_jenkins_config_xml
+
+    create_jenkins_credentials_xml
+
+    echo "Copying Jenkins configuration to ${JENKINS_HOME} ..."
+    cp -r /opt/openshift/configuration/* ${JENKINS_HOME}
+
+    install_plugins
+
+    echo "Creating initial Jenkins 'admin' user ..."
+    
+    update_admin_password
+    
+    touch ${JENKINS_HOME}/configured
+else  
+    if [ ! -z "${OVERRIDE_PV_CONFIG_WITH_IMAGE_CONFIG}" ]; then
+	echo "Overriding jenkins config.xml stored in ${JENKINS_HOME}/config.xml"
+	rm -f ${JENKINS_HOME}/config.xml
+
+	create_jenkins_config_xml
+
+	cp -r ${image_config_path} ${JENKINS_HOME}
     fi
-  fi
+    
+    if [ ! -z "${OVERRIDE_PV_PLUGINS_WITH_IMAGE_PLUGINS}" ]; then
+	echo "Overriding plugins stored in ${JENKINS_HOME}/plugins"
+	rm -rf ${JENKINS_HOME}/plugins
 
-  if [ ! -f "${image_config_dir}/credentials.xml" ]; then
-    if [ -f "${image_config_dir}/credentials.xml.tpl" ]; then
-      if [ ! -z "${KUBERNETES_CONFIG}" ]; then
-        echo "Generating kubernetes-plugin credentials (${JENKINS_HOME}/credentials.xml.tpl) ..."
-        export KUBERNETES_CREDENTIALS=$(generate_kubernetes_credentials)
-      fi
-      # Fix the envsubst trying to substitute the $Hash inside credentials.xml
-      export Hash="\$Hash"
-      envsubst < "${image_config_dir}/credentials.xml.tpl" > "${image_config_dir}/credentials.xml"
+	install_plugins
     fi
-  fi
-
-  echo "Copying Jenkins configuration to ${JENKINS_HOME} ..."
-  cp -r /opt/openshift/configuration/* ${JENKINS_HOME}
-  rm -rf /opt/openshift/configuration/*
-
-
-  # If the INSTALL_PLUGINS variable is populated, then attempt to install
-  # those plugins before copying them over to JENKINS_HOME
-  # The format of the INSTALL_PLUGINS variable is a comma-separated list
-  # of pluginId:pluginVersion strings
-  if [[ -n "${INSTALL_PLUGINS:-}" ]]; then
-    echo "Installing additional plugins: ${INSTALL_PLUGINS} ..."
-
-    # Create a temporary file in the format of plugins.txt
-    plugins_file=$(mktemp)
-    IFS=',' read -ra plugins <<< "${INSTALL_PLUGINS}"
-    for plugin in "${plugins[@]}"; do
-        echo "${plugin}" >> "${plugins_file}"
-    done
-
-    # Call install plugins with the temporary file
-    /usr/local/bin/install-plugins.sh "${plugins_file}"
-  fi
-
-  if [ "$(ls -A /opt/openshift/plugins 2>/dev/null)" ]; then
-    mkdir -p ${JENKINS_HOME}/plugins
-    echo "Copying $(ls /opt/openshift/plugins | wc -l) Jenkins plugins to ${JENKINS_HOME} ..."
-    cp -r /opt/openshift/plugins/* ${JENKINS_HOME}/plugins/
-    rm -rf /opt/openshift/plugins
-  fi
-
-  echo "Creating initial Jenkins 'admin' user ..."
-  sed -i "s,<passwordHash>.*</passwordHash>,<passwordHash>$new_password_hash</passwordHash>,g" "${JENKINS_HOME}/users/admin/config.xml"
-  echo $new_password_hash > ${JENKINS_HOME}/password
-  touch ${JENKINS_HOME}/configured
+    
 fi
 
 if [ -e ${JENKINS_HOME}/password ]; then
@@ -158,9 +191,8 @@ if [ -e ${JENKINS_HOME}/password ]; then
   # the original value.
   old_password_hash=`cat ${JENKINS_HOME}/password`
   if [ $old_password_hash != $new_password_hash ]; then
-    echo "Detected password environment variable change, updating Jenkins configuration ..."
-    sed -i "s,<passwordHash>.*</passwordHash>,<passwordHash>$new_password_hash</passwordHash>,g" "${JENKINS_HOME}/users/admin/config.xml"
-    echo $new_password_hash > ${JENKINS_HOME}/password
+      echo "Detected password environment variable change, updating Jenkins configuration ..."
+      update_admin_password
   fi
 fi
 
