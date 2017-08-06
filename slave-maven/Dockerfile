@@ -2,7 +2,7 @@ FROM openshift/jenkins-slave-base-centos7
 
 MAINTAINER Ben Parees <bparees@redhat.com>
 
-ENV MAVEN_VERSION=3.3 \
+ENV MAVEN_VERSION=3.5 \
     GRADLE_VERSION=3.5 \
     BASH_ENV=/usr/local/bin/scl_enable \
     ENV=/usr/local/bin/scl_enable \
@@ -10,7 +10,7 @@ ENV MAVEN_VERSION=3.3 \
     PATH=$PATH:/opt/gradle-3.5/bin
 
 # Install Maven
-RUN INSTALL_PKGS="java-1.8.0-openjdk-devel rh-maven33*" && \
+RUN INSTALL_PKGS="java-1.8.0-openjdk-devel rh-maven35*" && \
     yum install -y centos-release-scl-rh && \
     yum install -y --enablerepo=centosplus $INSTALL_PKGS && \
     curl -LOk https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip && \
