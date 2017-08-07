@@ -33,5 +33,21 @@ blueocean:1.1.4
 
 # Legacy stuff
 mapdb-api:1.0.1.0
-subversion:2.5.7
+
+# explicitly pull in plugins previously pulled in by dependencies (except for subversion) because of
+# security advisory https://jenkins.io/blog/2017/07/10/security-advisory/ ...excluded plugins from that
+# advisory that were not previously pulled in by what is listed above
+# also, as the plugins above raise their dependency levels for these plugins let's see about removing
+# items from the list below
+docker-commons:1.8
+git:3.3.2
+git-client:2.4.4
+github-branch-source:2.0.8
+job-dsl:1.60
+parameterized-trigger:2.35.1
+pipeline-build-step:2.5.1
+workflow-cps:2.36.1
+script-security:1.29.1
+subversion:2.9
+
 
