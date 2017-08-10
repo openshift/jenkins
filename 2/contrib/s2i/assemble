@@ -3,6 +3,8 @@
 JENKINS_DIR=/opt/openshift
 JENKINS_INSTALL_DIR=$(mktemp -d --suffix=jenkins)
 
+shopt -s dotglob
+
 echo "---> Copying repository files ..."
 cp -Rf /tmp/src/. ${JENKINS_INSTALL_DIR}
 
@@ -31,6 +33,5 @@ if [ -d ${JENKINS_INSTALL_DIR}/configuration ]; then
   fi
   echo "---> Installing new Jenkins configuration ..."
   /usr/local/bin/fix-permissions ${JENKINS_INSTALL_DIR}/configuration
-  shopt -s dotglob
   mv ${JENKINS_INSTALL_DIR}/configuration/* ${JENKINS_DIR}/configuration/
 fi

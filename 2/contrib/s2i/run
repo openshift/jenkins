@@ -9,6 +9,8 @@
 source /usr/local/bin/jenkins-common.sh
 source /usr/local/bin/kube-slave-common.sh
 
+shopt -s dotglob
+
 function update_admin_password() {
     sed -i "s,<passwordHash>.*</passwordHash>,<passwordHash>$new_password_hash</passwordHash>,g" "${JENKINS_HOME}/users/admin/config.xml"
     echo $new_password_hash > ${JENKINS_HOME}/password
