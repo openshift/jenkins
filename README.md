@@ -36,7 +36,7 @@ Choose either the CentOS7 or RHEL7 based image:
     ```
     $ git clone https://github.com/openshift/jenkins.git
     $ cd jenkins
-    $ make build TARGET=rhel7 VERSION=1
+    $ make build TARGET=rhel7 VERSION=2
     ```
 
 *  **CentOS7 based image**
@@ -44,7 +44,7 @@ Choose either the CentOS7 or RHEL7 based image:
 	This image is available on DockerHub. To download it run:
 
 	```
-	$ docker pull openshift/jenkins-1-centos7
+	$ docker pull openshift/jenkins-2-centos7
 	```
 
 	To build a Jenkins image from scratch run:
@@ -52,12 +52,11 @@ Choose either the CentOS7 or RHEL7 based image:
 	```
 	$ git clone https://github.com/openshift/jenkins.git
 	$ cd jenkins
-	$ make build VERSION=1
+	$ make build VERSION=2
 	```
 
 **Notice: By omitting the `VERSION` parameter, the build/test action will be performed
-on all provided versions of Jenkins. Since we are currently providing only version `1`,
-you can omit this parameter.**
+on all provided versions of Jenkins.**
 
 
 Environment variables
