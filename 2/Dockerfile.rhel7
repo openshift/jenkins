@@ -37,7 +37,7 @@ EXPOSE 8080 50000
 
 RUN yum-config-manager --disable epel >/dev/null || : && \
     yum-config-manager --enable rhel-7-server-ose-onlineint-rpms || : && \
-    INSTALL_PKGS="rsync gettext git tar zip unzip java-1.8.0-openjdk java-1.8.0-openjdk.i686 java-1.8.0-openjdk-devel java-1.8.0-openjdk-devel.i686 jenkins-2.46.3 jenkins-plugin-ace-editor jenkins-plugin-branch-api jenkins-plugin-cloudbees-folder jenkins-plugin-credentials jenkins-plugin-display-url-api jenkins-plugin-durable-task jenkins-plugin-git jenkins-plugin-git-client jenkins-plugin-git-server jenkins-plugin-handlebars jenkins-plugin-icon-shim jenkins-plugin-jquery-detached jenkins-plugin-junit jenkins-plugin-kubernetes jenkins-plugin-mailer jenkins-plugin-mapdb-api jenkins-plugin-matrix-project jenkins-plugin-matrix-auth jenkins-plugin-mercurial jenkins-plugin-momentjs jenkins-plugin-multiple-scms jenkins-plugin-openshift-pipeline jenkins-plugin-openshift-login jenkins-plugin-openshift-sync jenkins-plugin-pipeline-build-step jenkins-plugin-pipeline-graph-analysis jenkins-plugin-pipeline-input-step jenkins-plugin-pipeline-rest-api jenkins-plugin-pipeline-stage-step jenkins-plugin-pipeline-stage-view jenkins-plugin-pipeline-utility-steps jenkins-plugin-plain-credentials jenkins-plugin-scm-api jenkins-plugin-script-security jenkins-plugin-ssh-credentials jenkins-plugin-structs jenkins-plugin-subversion jenkins-plugin-workflow-aggregator jenkins-plugin-workflow-api jenkins-plugin-workflow-basic-steps jenkins-plugin-workflow-cps jenkins-plugin-workflow-cps-global-lib jenkins-plugin-workflow-durable-task-step jenkins-plugin-workflow-job jenkins-plugin-workflow-multibranch jenkins-plugin-workflow-remote-loader jenkins-plugin-workflow-scm-step jenkins-plugin-workflow-step-api jenkins-plugin-workflow-step-api jenkins-plugin-workflow-support" && \
+    INSTALL_PKGS="wget rsync gettext git tar zip unzip java-1.8.0-openjdk java-1.8.0-openjdk.i686 java-1.8.0-openjdk-devel java-1.8.0-openjdk-devel.i686 atomic-openshift-clients jenkins-2.46.3 jenkins-2-plugins" && \
     yum install -y $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     yum clean all  && \
@@ -53,7 +53,7 @@ RUN rm /opt/openshift/base-plugins.txt && \
     mkdir -p /opt/openshift/plugins && \
     # NOTE: When adding new Jenkins plugin, you have to create the symlink for the
     # HPI file created by rpm to /opt/openshift/plugins folder.
-    for FILENAME in /usr/lib64/jenkins/*hpi ; do ln -s $FILENAME /opt/openshift/plugins/`basename $FILENAME .hpi`.jpi; done &&\
+    for FILENAME in /usr/lib/jenkins/*hpi ; do ln -s $FILENAME /opt/openshift/plugins/`basename $FILENAME .hpi`.jpi; done &&\
     chmod 775 /etc/passwd && \
     chmod -R 775 /etc/alternatives && \
     chmod -R 775 /var/lib/alternatives && \
@@ -91,7 +91,7 @@ RUN rm /opt/openshift/base-plugins.txt && \
     /usr/local/bin/fix-permissions /opt/openshift && \
     chown -R 1001:0 /opt/openshift && \
     # the prior chown doesn't traverse the /opt/openshift/plugins links .. this one will assist fix-permission/assemble for extension builds like master/slave
-    chown 1001:0 /usr/lib64/jenkins/*hpi && \ 
+    chown 1001:0 /usr/lib/jenkins/*hpi && \ 
     /usr/local/bin/fix-permissions /var/lib/jenkins && \
     /usr/local/bin/fix-permissions /var/log
 
