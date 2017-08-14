@@ -17,9 +17,6 @@ RUN INSTALL_PKGS="java-1.8.0-openjdk-devel rh-maven33*" && \
     unzip gradle-${GRADLE_VERSION}-bin.zip -d /opt && \
     rm -f gradle-${GRADLE_VERSION}-bin.zip && \
     rpm -V ${INSTALL_PKGS//\*/} && \
-    rpm -e java-1.7.0-openjdk --nodeps || true && \
-    rpm -e java-1.7.0-openjdk-devel --nodeps || true && \
-    rpm -e java-1.7.0-openjdk-headless --nodeps || true && \
     yum clean all -y && \
     mkdir -p $HOME/.m2 && \
     mkdir -p $HOME/.gradle

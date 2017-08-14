@@ -1,4 +1,4 @@
-FROM centos:centos7
+FROM openshift/origin
 
 MAINTAINER Ben Parees <bparees@redhat.com>
 
@@ -11,10 +11,6 @@ RUN yum install -y centos-release-scl-rh && \
     yum install -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     yum clean all && \
-    set -o pipefail && curl -L https://github.com/openshift/origin/releases/download/v3.6.0/openshift-origin-client-tools-v3.6.0-c4dd4cf-linux-64bit.tar.gz | \
-    tar -zx && \
-    mv openshift*/oc /usr/local/bin && \
-    rm -rf openshift-origin-client-tools-* && \
     mkdir -p /home/jenkins && \
     chown -R 1001:0 /home/jenkins && \
     chmod -R g+w /home/jenkins && \

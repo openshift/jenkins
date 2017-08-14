@@ -1,4 +1,4 @@
-FROM centos:centos7
+FROM openshift/origin
 
 # Jenkins image for OpenShift
 #
@@ -37,11 +37,7 @@ RUN curl https://pkg.jenkins.io/redhat-stable/jenkins.repo -o /etc/yum.repos.d/j
     yum -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     yum clean all  && \
-    localedef -f UTF-8 -i en_US en_US.UTF-8 && \
-    set -o pipefail && curl -L https://github.com/openshift/origin/releases/download/v3.6.0/openshift-origin-client-tools-v3.6.0-c4dd4cf-linux-64bit.tar.gz| \
-    tar -zx && \
-    mv openshift*/oc /usr/local/bin && \
-    rm -rf openshift-origin-client-tools-*
+    localedef -f UTF-8 -i en_US en_US.UTF-8
 
 COPY ./contrib/openshift /opt/openshift
 COPY ./contrib/jenkins /usr/local/bin
@@ -90,4 +86,5 @@ RUN /usr/local/bin/install-plugins.sh /opt/openshift/base-plugins.txt && \
 VOLUME ["/var/lib/jenkins"]
 
 USER 1001
+ENTRYPOINT []
 CMD ["/usr/libexec/s2i/run"]
