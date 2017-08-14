@@ -29,16 +29,22 @@ pipeline-utility-steps:1.1.5
 
 # Jenkins v2 specific
 matrix-auth:1.5
-blueocean:1.1.4
+blueocean:1.1.6
 
 # Legacy stuff
 mapdb-api:1.0.1.0
+subversion:2.9
 
-# explicitly pull in plugins previously pulled in by dependencies (except for subversion) because of
-# security advisory https://jenkins.io/blog/2017/07/10/security-advisory/ ...excluded plugins from that
-# advisory that were not previously pulled in by what is listed above
+# explicitly pull in plugins previously pulled in by dependencies because of
+# security advisories  ...exclude plugins from 
+# advisories that were not previously pulled in by what is listed above
 # also, as the plugins above raise their dependency levels for these plugins let's see about removing
 # items from the list below
+#
+# processed sec adv https://jenkins.io/blog/2017/07/10/security-advisory/
+# processed sec adv https://jenkins.io/security/advisory/2017-08-07/
+#
+config-file-provider:2.16.2
 docker-commons:1.8
 git:3.3.2
 git-client:2.4.4
@@ -46,8 +52,8 @@ github-branch-source:2.0.8
 job-dsl:1.60
 parameterized-trigger:2.35.1
 pipeline-build-step:2.5.1
-workflow-cps:2.36.1
-script-security:1.29.1
-subversion:2.9
+pipeline-input-step:2.8
+workflow-cps:2.39
+script-security:1.31
 
 
