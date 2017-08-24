@@ -46,7 +46,7 @@ function get_container_ip() {
   docker inspect --format='{{.NetworkSettings.IPAddress}}' $(get_cid "$id")
 }
 
-test_connection() {
+function test_connection() {
   set +e
   echo "Testing HTTP connection..."
   local max_attempts=20
@@ -76,6 +76,7 @@ function run_image() {
   local cargs=${CONTAINER_ARGS:-}
   cidfile="$CIDFILE_DIR/$name"
   # create container with a cidfile in a directory for cleanup
+  echo "Creating container for image $IMAGE_NAME with carg=$cargs and function args=$@"
   docker run $cargs --name=$name --cidfile $cidfile -d -v $volume:/var/lib/jenkins:Z -p 8080:8080 "$@" $IMAGE_NAME
   echo "Created container $(cat $cidfile)"
 }
@@ -228,7 +229,7 @@ function run_s2i_tests() {
 }
 
 # Tests.
-
+echo "Testing image $IMAGE_NAME"
 # Normal tests
 echo "Normal test: 64 bit"
 VERIFY_NOT_INSTALLED=ansicolor
