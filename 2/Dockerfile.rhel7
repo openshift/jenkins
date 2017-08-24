@@ -98,4 +98,5 @@ RUN rm /opt/openshift/base-plugins.txt && \
 VOLUME ["/var/lib/jenkins"]
 
 USER 1001
+ENTRYPOINT []
 CMD ["/usr/libexec/s2i/run"]
