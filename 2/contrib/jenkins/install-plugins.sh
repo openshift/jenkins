@@ -241,7 +241,13 @@ function resolveDependencies() {
         #
         local versionFromPluginParam
         if [[ $d == *"resolution:=optional"* ]]; then
-            #echo "Skipping optional dependency $plugin"
+            echo "Examining optional dependency $plugin"
+	    optional_jpi="$(getArchiveFilename "$plugin")"
+	    if [ ! -f "${optional_jpi}" ]; then
+		echo "Optional dependency $plugin not installed already, skipping"
+		continue
+	    fi
+	    echo "Optional dependency $plugin already installed, need to determine if it is at a sufficient version"
             versionFromPluginParam="$(cut -d';' -f1 - <<< "$d")"
 	else
             versionFromPluginParam=$d
