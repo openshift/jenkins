@@ -26,6 +26,11 @@ export JNLP_PORT=${JNLP_PORT:-50000}
 
 NODEJS_SLAVE=${NODEJS_SLAVE_IMAGE:-registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7}
 MAVEN_SLAVE=${MAVEN_SLAVE_IMAGE:-registry.access.redhat.com/openshift3/jenkins-slave-maven-rhel7}
+# .NET Core jenkins slave images are only available for RHEL
+# see: https://github.com/redhat-developer/s2i-dotnetcore/issues/36
+if [[ `grep 'Red Hat Enterprise Linux' /etc/redhat-release` ]]; then
+  DOTNET_20_SLAVE=${DOTNET_20_SLAVE:-registry.access.redhat.com/dotnet/dotnet-20-jenkins-slave-rhel7}
+fi
 # if the master is running the centos image, use the centos slave images.
 if [[ `grep CentOS /etc/redhat-release` ]]; then
   NODEJS_SLAVE=${NODEJS_SLAVE_IMAGE:-openshift/jenkins-slave-nodejs-centos7}
@@ -132,6 +137,47 @@ function generate_kubernetes_config() {
           <imagePullSecrets/>
           <nodeProperties/>
         </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+    "
+
+    # Add config for .NET Core slave only if variable is defined.
+    # It'll be defined on RHEL only at this point.
+    if [ -n "$DOTNET_20_SLAVE" ]; then
+    echo "
+        <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+            <inheritFrom></inheritFrom>
+            <name>dotnet-20</name>
+            <instanceCap>2147483647</instanceCap>
+            <idleMinutes>0</idleMinutes>
+            <label>dotnet-20</label>
+            <serviceAccount>${oc_serviceaccount_name}</serviceAccount>
+            <nodeSelector></nodeSelector>
+            <volumes/>
+            <containers>
+              <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+                <name>jnlp</name>
+                <image>${DOTNET_20_SLAVE}</image>
+                <privileged>false</privileged>
+                <alwaysPullImage>false</alwaysPullImage>
+                <workingDir>/tmp</workingDir>
+                <command></command>
+                <args>\${computer.jnlpmac} \${computer.name}</args>
+                <ttyEnabled>false</ttyEnabled>
+                <resourceRequestCpu></resourceRequestCpu>
+                <resourceRequestMemory></resourceRequestMemory>
+                <resourceLimitCpu></resourceLimitCpu>
+                <resourceLimitMemory></resourceLimitMemory>
+                <envVars/>
+              </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+            </containers>
+            <envVars/>
+            <annotations/>
+            <imagePullSecrets/>
+            <nodeProperties/>
+          </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+    "
+    fi
+
+    echo "
       </templates>
       <serverUrl>https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}</serverUrl>
       <skipTlsVerify>false</skipTlsVerify>
