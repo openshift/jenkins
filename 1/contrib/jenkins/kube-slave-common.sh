@@ -32,6 +32,14 @@ if [[ `grep CentOS /etc/redhat-release` ]]; then
   MAVEN_SLAVE=${MAVEN_SLAVE_IMAGE:-openshift/jenkins-slave-maven-centos7}
 fi
 
+JENKINS_SERVICE_NAME=${JENKINS_SERVICE_NAME:-JENKINS}
+JENKINS_SERVICE_NAME=`echo ${JENKINS_SERVICE_NAME} | tr '[a-z]' '[A-Z]' | tr '-' '_'`
+
+J_HOST=${JENKINS_SERVICE_NAME}_SERVICE_HOST
+JENKINS_SERVICE_HOST=${!J_HOST}
+
+J_PORT=${JENKINS_SERVICE_NAME}_SERVICE_PORT
+JENKINS_SERVICE_PORT=${!J_PORT}
 
 # The project name equals to the namespace name where the container with jenkins
 # runs. You can override it by setting the PROJECT_NAME variable.
