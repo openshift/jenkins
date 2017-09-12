@@ -27,6 +27,10 @@ ssh-credentials:1.13
 # Pipeline Utility Steps Plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Utility+Steps+Plugin
 pipeline-utility-steps:1.1.5
 
+# some plugins helpful for global shared libs were broken out of workflow aggregator
+pipeline-github-lib:1.0
+github-organization-folder:1.6
+
 # Jenkins v2 specific
 matrix-auth:1.5
 blueocean:1.1.6
