@@ -43,6 +43,22 @@ function create_jenkins_credentials_xml() {
   fi
 }
 
+function create_jenkins_config_from_templates() {
+    find ${image_config_dir} -type f -name "*.tpl" -print0 | while IFS= read -r -d '' template_path; do
+        local target_path=${template_path%.tpl}
+        if [[ ! -f "${target_path}" ]]; then
+            if [[ "${target_path}" == "${image_config_path}" ]]; then
+                create_jenkins_config_xml
+            elif [[ "${target_path}" == "${image_config_dir}/credentials.xml" ]]; then
+                create_jenkins_credentials_xml
+            else
+                # Allow usage of environment variables in templated files, e.g. ${DOLLAR}MY_VAR is replaced by $MY_VAR
+                DOLLAR='$' envsubst < "${template_path}" > "${target_path}"
+            fi
+        fi
+    done
+}
+
 function install_plugins() {
   # If the INSTALL_PLUGINS variable is populated, then attempt to install
   # those plugins before copying them over to JENKINS_HOME
@@ -153,9 +169,7 @@ ln -sf ${JENKINS_HOME}/logs /var/log/jenkins
 
 if [ ! -e ${JENKINS_HOME}/configured ]; then
     # This container hasn't been configured yet
-    create_jenkins_config_xml
-
-    create_jenkins_credentials_xml
+    create_jenkins_config_from_templates
 
     echo "Copying Jenkins configuration to ${JENKINS_HOME} ..."
     cp -r /opt/openshift/configuration/* ${JENKINS_HOME}
