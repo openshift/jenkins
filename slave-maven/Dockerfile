@@ -10,7 +10,7 @@ ENV MAVEN_VERSION=3.3 \
     PATH=$PATH:/opt/gradle-3.5/bin
 
 # Install Maven
-RUN INSTALL_PKGS="java-1.8.0-openjdk-devel rh-maven33*" && \
+RUN INSTALL_PKGS="java-1.8.0-openjdk-devel.x86_64 java-1.8.0-openjdk-devel.i686 rh-maven33*" && \
     yum install -y centos-release-scl-rh && \
     yum install -y --enablerepo=centosplus $INSTALL_PKGS && \
     curl -LOk https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip && \
