@@ -338,6 +338,11 @@ main() {
 
     mkdir -p "$REF_DIR" || exit 1
 
+    for file in $@; do
+	# clean up any dos file injected carriage returns
+	sed -i 's/\r$//' $file
+    done
+
     # Create lockfile manually before first run to make sure any explicit version set is used.
     echo "Creating initial locks..."
     for plugin in `cat $@ | grep -v ^#`; do
