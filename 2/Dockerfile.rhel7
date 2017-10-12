@@ -12,7 +12,7 @@ FROM registry.access.redhat.com/openshift3/ose
 
 MAINTAINER Ben Parees <bparees@redhat.com>
 
-ENV JENKINS_VERSION=2.46 \
+ENV JENKINS_VERSION=2.73 \
     HOME=/var/lib/jenkins \
     JENKINS_HOME=/var/lib/jenkins \
     JENKINS_UC=https://updates.jenkins-ci.org \
@@ -20,7 +20,7 @@ ENV JENKINS_VERSION=2.46 \
     LC_ALL=en_US.UTF-8
 
 LABEL io.k8s.description="Jenkins is a continuous integration server" \
-      io.k8s.display-name="Jenkins 2.46" \
+      io.k8s.display-name="Jenkins 2.73" \
       io.openshift.tags="jenkins,jenkins2,ci" \
       io.openshift.expose-services="8080:http" \
       io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
