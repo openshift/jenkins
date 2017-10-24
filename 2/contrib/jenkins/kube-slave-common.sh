@@ -26,15 +26,12 @@ export JNLP_PORT=${JNLP_PORT:-50000}
 
 NODEJS_SLAVE=${NODEJS_SLAVE_IMAGE:-registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7}
 MAVEN_SLAVE=${MAVEN_SLAVE_IMAGE:-registry.access.redhat.com/openshift3/jenkins-slave-maven-rhel7}
-# .NET Core jenkins slave images are only available for RHEL
-# see: https://github.com/redhat-developer/s2i-dotnetcore/issues/36
-if [[ `grep 'Red Hat Enterprise Linux' /etc/redhat-release` ]]; then
-  DOTNET_20_SLAVE=${DOTNET_20_SLAVE:-registry.access.redhat.com/dotnet/dotnet-20-jenkins-slave-rhel7}
-fi
+DOTNET_20_SLAVE=${DOTNET_20_SLAVE:-registry.access.redhat.com/dotnet/dotnet-20-jenkins-slave-rhel7}
 # if the master is running the centos image, use the centos slave images.
 if [[ `grep CentOS /etc/redhat-release` ]]; then
   NODEJS_SLAVE=${NODEJS_SLAVE_IMAGE:-openshift/jenkins-slave-nodejs-centos7}
   MAVEN_SLAVE=${MAVEN_SLAVE_IMAGE:-openshift/jenkins-slave-maven-centos7}
+  DOTNET_20_SLAVE=${DOTNET_20_SLAVE:-registry.centos.org/dotnet/dotnet-20-jenkins-slave-centos7}
 fi
 
 JENKINS_SERVICE_NAME=${JENKINS_SERVICE_NAME:-JENKINS}
@@ -145,12 +142,6 @@ function generate_kubernetes_config() {
           <imagePullSecrets/>
           <nodeProperties/>
         </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
-    "
-
-    # Add config for .NET Core slave only if variable is defined.
-    # It'll be defined on RHEL only at this point.
-    if [ -n "$DOTNET_20_SLAVE" ]; then
-    echo "
         <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
             <inheritFrom></inheritFrom>
             <name>dotnet-20</name>
@@ -182,10 +173,6 @@ function generate_kubernetes_config() {
             <imagePullSecrets/>
             <nodeProperties/>
           </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
-    "
-    fi
-
-    echo "
       </templates>
       <serverUrl>https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}</serverUrl>
       <skipTlsVerify>false</skipTlsVerify>
