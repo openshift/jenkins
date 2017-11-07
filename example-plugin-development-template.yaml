@@ -1,0 +1,130 @@
+apiVersion: v1
+kind: Template
+metadata: 
+  name: jenkins-sync-plugin
+parameters:
+- name: SOURCE_URL
+  required: true
+  value: https://github.com/openshift/jenkins-sync-plugin.git
+- name: SOURCE_REF
+  required: true
+  value: master
+objects:
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      build: jenkins-sync-plugin
+    name: jenkins-sync-plugin
+  spec:
+    failedBuildsHistoryLimit: 5
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: jenkins-sync-plugin:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      git:
+        ref: "${SOURCE_REF}"
+        uri: "${SOURCE_URL}"
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: java:latest
+      type: Source
+    successfulBuildsHistoryLimit: 5
+    triggers:
+    - github:
+        secret: HRDWcgVd1CEk0Ei9sHYB
+      type: GitHub
+    - generic:
+        secret: NSv2E8bQ5ghBFJPwt4TV
+      type: Generic
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      build: jenkins
+    name: jenkins
+  spec:
+    failedBuildsHistoryLimit: 5
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: jenkins:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      dockerfile: |
+        FROM jenkins:latest
+        COPY binary/openshift-sync.hpi /opt/openshift/plugins/openshift-sync.jpi
+      images:
+      - from:
+          kind: ImageStreamTag
+          name: jenkins-sync-plugin:latest
+        paths:
+        - destinationDir: binary/
+          sourcePath: /tmp/src/target/openshift-sync.hpi
+      type: Dockerfile
+    strategy:
+      dockerStrategy:
+        from:
+          kind: ImageStreamTag
+          name: jenkins:latest
+          namespace: openshift
+      type: Docker
+    successfulBuildsHistoryLimit: 5
+    triggers:
+    - github:
+        secret: dFtZzfIKt7ZaGiEYden5
+      type: GitHub
+    - generic:
+        secret: 9DKSrxXvPUeEnqKu-n36
+      type: Generic
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+  status:
+    lastVersion: 0
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: java
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - from:
+        kind: DockerImage
+        name: registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:latest
+      name: latest
+      referencePolicy:
+        type: Source
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    labels:
+      build: jenkins-sync-plugin
+    name: jenkins-sync-plugin
+  spec:
+    lookupPolicy:
+      local: false
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    labels:
+      build: jenkins
+    name: jenkins
+  spec:
+    lookupPolicy:
+      local: false
