@@ -25,7 +25,7 @@ multiple-scms:0.6
 ssh-credentials:1.13
 
 # Pipeline Utility Steps Plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Utility+Steps+Plugin
-pipeline-utility-steps:1.1.5
+pipeline-utility-steps:1.5.1
 
 # some plugins helpful for global shared libs were broken out of workflow aggregator
 pipeline-github-lib:1.0
