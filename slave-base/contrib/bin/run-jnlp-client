@@ -110,6 +110,12 @@ if [[ $# -gt 1 ]]; then
 
   if [ -z "${JAVA_OPTS}" ]; then
       JAVA_OPTS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true"
+      export JAVA_OPTS
+  fi
+
+  if [ -z "${MAVEN_OPTS}" ]; then
+      MAVEN_OPTS="${JAVA_OPTS}"
+      export MAVEN_OPTS
   fi
 
   echo Running java $JAVA_GC_OPTS $JAVA_INITIAL_HEAP_PARAM $JAVA_MAX_HEAP_PARAM $JAVA_CORE_LIMIT $JAVA_DIAGNOSTICS $JAVA_OPTS -cp $JAR hudson.remoting.jnlp.Main -headless $PARAMS "$@"
