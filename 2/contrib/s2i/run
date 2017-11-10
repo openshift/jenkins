@@ -131,17 +131,16 @@ if [ "${CONTAINER_MEMORY_IN_BYTES}" -lt "${DEFAULT_MEMORY_CEILING}" ]; then
 
     JAVA_MAX_HEAP_PARAM="-Xmx${CONTAINER_HEAP_MAX}m"
     if [ -z $CONTAINER_INITIAL_PERCENT ]; then
-      # jboss default was 100% or ms==mx
-      JAVA_INITIAL_HEAP_PARAM="-Xms${CONTAINER_HEAP_MAX}m"
-    else
-      CONTAINER_INITIAL_HEAP=$(echo "${CONTAINER_HEAP_MAX} ${CONTAINER_INITIAL_PERCENT}" | awk '{ printf "%d", $1 * $2 }')
-      JAVA_INITIAL_HEAP_PARAM="-Xms${CONTAINER_INITIAL_HEAP}m"
+      CONTAINER_INITIAL_PERCENT=0.07
     fi
+    CONTAINER_INITIAL_HEAP=$(echo "${CONTAINER_HEAP_MAX} ${CONTAINER_INITIAL_PERCENT}" | awk '{ printf "%d", $1 * $2 }')
+    JAVA_INITIAL_HEAP_PARAM="-Xms${CONTAINER_INITIAL_HEAP}m"
 fi
 
 if [ -z "$JAVA_GC_OPTS" ]; then
-  # note - MaxPermSize no longer valid with v8 of the jdk ... used to have -XX:MaxPermSize=100m
-  JAVA_GC_OPTS="-XX:+UseParallelGC -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -XX:MaxMetaspaceSize=100m"
+    # We no longer set MaxMetaspaceSize because the JVM should expand metaspace until it reaches the container limit.
+    # See http://hg.openjdk.java.net/jdk8u/jdk8u/hotspot/file/4dd24f4ca140/src/share/vm/memory/metaspace.cpp#l1470
+    JAVA_GC_OPTS="-XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90"
 fi
 
 if [ ! -z "${USE_JAVA_DIAGNOSTICS}" ]; then
@@ -150,6 +149,10 @@ fi
 
 if [ ! -z "${CONTAINER_CORE_LIMIT}" ]; then
     JAVA_CORE_LIMIT="-XX:ParallelGCThreads=${CONTAINER_CORE_LIMIT} -Djava.util.concurrent.ForkJoinPool.common.parallelism=${CONTAINER_CORE_LIMT} -XX:CICompilerCount=2"
+fi
+
+if [ -z "${JAVA_OPTS}" ]; then
+    JAVA_OPTS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true"
 fi
 
 # Since OpenShift runs this Docker image under random user ID, we have to assign
