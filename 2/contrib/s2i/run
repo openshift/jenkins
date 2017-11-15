@@ -188,8 +188,19 @@ else
   if [ ! -z "${OVERRIDE_PV_CONFIG_WITH_IMAGE_CONFIG}" ]; then
     echo "Overriding jenkins config.xml stored in ${JENKINS_HOME}/config.xml"
     rm -f ${JENKINS_HOME}/config.xml
-	
-    create_jenkins_config_xml
+    create_jenkins_config_from_templates
+
+    if [ -d ${JENKINS_HOME}/configuration/init.groovy.d ]; then
+      echo "---> Removing jenkins init script ..."
+      rm -rf ${JENKINS_HOME}/configuration/init.groovy.d
+    fi
+    if [ -d ${JENKINS_HOME}/configuration/jobs ]; then
+      echo "---> Removing Jenkins job ..."
+      rm -rf ${JENKINS_HOME}/configuration/jobs
+    fi
+
+    echo "Copying Jenkins configuration to ${JENKINS_HOME} ..."
+    cp -r /opt/openshift/configuration/* ${JENKINS_HOME}
 
     cp -r ${image_config_path} ${JENKINS_HOME}
   fi
