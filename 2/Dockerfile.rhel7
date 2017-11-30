@@ -1,4 +1,6 @@
-FROM registry.access.redhat.com/openshift3/ose
+# Note: uses v3.6 base image because we want the v3.6 oc client binary
+# which is backwards compatible to 3.4 and forwards compatible to 3.7.
+FROM registry.access.redhat.com/openshift3/ose:v3.6
 
 # Jenkins image for OpenShift
 #

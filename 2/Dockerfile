@@ -1,4 +1,6 @@
-FROM openshift/origin
+# Note: uses v3.6 base image because we want the v3.6 oc client binary
+# which is backwards compatible to 3.4 and forwards compatible to 3.7.
+FROM openshift/origin:v3.6.1
 
 # Jenkins image for OpenShift
 #
