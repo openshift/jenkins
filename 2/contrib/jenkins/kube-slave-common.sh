@@ -24,14 +24,12 @@ JNLP_PORT=${!T_PORT}
 
 export JNLP_PORT=${JNLP_PORT:-50000}
 
-NODEJS_SLAVE=${NODEJS_SLAVE_IMAGE:-registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7}
-MAVEN_SLAVE=${MAVEN_SLAVE_IMAGE:-registry.access.redhat.com/openshift3/jenkins-slave-maven-rhel7}
-DOTNET_20_SLAVE=${DOTNET_20_SLAVE:-registry.access.redhat.com/dotnet/dotnet-20-jenkins-slave-rhel7}
+NODEJS_SLAVE=${NODEJS_SLAVE_IMAGE:-registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7:${JENKINS_SLAVE_IMAGE_TAG}}
+MAVEN_SLAVE=${MAVEN_SLAVE_IMAGE:-registry.access.redhat.com/openshift3/jenkins-slave-maven-rhel7:${JENKINS_SLAVE_IMAGE_TAG}}
 # if the master is running the centos image, use the centos slave images.
 if [[ `grep CentOS /etc/redhat-release` ]]; then
-  NODEJS_SLAVE=${NODEJS_SLAVE_IMAGE:-openshift/jenkins-slave-nodejs-centos7}
-  MAVEN_SLAVE=${MAVEN_SLAVE_IMAGE:-openshift/jenkins-slave-maven-centos7}
-  DOTNET_20_SLAVE=${DOTNET_20_SLAVE:-registry.centos.org/dotnet/dotnet-20-jenkins-slave-centos7}
+  NODEJS_SLAVE=${NODEJS_SLAVE_IMAGE:-openshift/jenkins-slave-nodejs-centos7:${JENKINS_SLAVE_IMAGE_TAG}}
+  MAVEN_SLAVE=${MAVEN_SLAVE_IMAGE:-openshift/jenkins-slave-maven-centos7:${JENKINS_SLAVE_IMAGE_TAG}}
 fi
 
 JENKINS_SERVICE_NAME=${JENKINS_SERVICE_NAME:-JENKINS}
@@ -94,7 +92,7 @@ function generate_kubernetes_config() {
               <name>jnlp</name>
               <image>${MAVEN_SLAVE}</image>
               <privileged>false</privileged>
-              <alwaysPullImage>false</alwaysPullImage>
+              <alwaysPullImage>true</alwaysPullImage>
               <workingDir>/tmp</workingDir>
               <command></command>
               <args>\${computer.jnlpmac} \${computer.name}</args>
@@ -125,7 +123,7 @@ function generate_kubernetes_config() {
               <name>jnlp</name>
               <image>${NODEJS_SLAVE}</image>
               <privileged>false</privileged>
-              <alwaysPullImage>false</alwaysPullImage>
+              <alwaysPullImage>true</alwaysPullImage>
               <workingDir>/tmp</workingDir>
               <command></command>
               <args>\${computer.jnlpmac} \${computer.name}</args>
@@ -142,37 +140,6 @@ function generate_kubernetes_config() {
           <imagePullSecrets/>
           <nodeProperties/>
         </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
-        <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
-            <inheritFrom></inheritFrom>
-            <name>dotnet-20</name>
-            <instanceCap>2147483647</instanceCap>
-            <idleMinutes>0</idleMinutes>
-            <label>dotnet-20</label>
-            <serviceAccount>${oc_serviceaccount_name}</serviceAccount>
-            <nodeSelector></nodeSelector>
-            <volumes/>
-            <containers>
-              <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
-                <name>jnlp</name>
-                <image>${DOTNET_20_SLAVE}</image>
-                <privileged>false</privileged>
-                <alwaysPullImage>false</alwaysPullImage>
-                <workingDir>/tmp</workingDir>
-                <command></command>
-                <args>\${computer.jnlpmac} \${computer.name}</args>
-                <ttyEnabled>false</ttyEnabled>
-                <resourceRequestCpu></resourceRequestCpu>
-                <resourceRequestMemory></resourceRequestMemory>
-                <resourceLimitCpu></resourceLimitCpu>
-                <resourceLimitMemory></resourceLimitMemory>
-                <envVars/>
-              </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
-            </containers>
-            <envVars/>
-            <annotations/>
-            <imagePullSecrets/>
-            <nodeProperties/>
-          </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
       </templates>
       <serverUrl>https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}</serverUrl>
       <skipTlsVerify>false</skipTlsVerify>
