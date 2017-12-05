@@ -6,6 +6,10 @@
 #
 # It also sets the admin password to ${JENKINS_PASSWORD}.
 #
+
+default_version=$(cat /tmp/release.version)
+JENKINS_SLAVE_IMAGE_TAG=${JENKINS_SLAVE_IMAGE_TAG:-${default_version}}
+
 source /usr/local/bin/jenkins-common.sh
 source /usr/local/bin/kube-slave-common.sh
 
@@ -90,6 +94,17 @@ function install_plugins() {
     rm -rf /opt/openshift/plugins
   fi
 }
+
+function migrate_slave_configuration() {
+  # replace [docker.io/]openshift/jekins-slave-xxxx-centos7[:optionaltag] with docker.io/openshift/jenkins-slave-xxxx-centos7:VersionTag
+  sed -i "s#<image>\(docker.io/\)\{0,1\}openshift/jenkins-slave-maven-centos7\(:.*\)\{0,1\}</image>#<image>docker.io/openshift/jenkins-slave-maven-centos7:${JENKINS_SLAVE_IMAGE_TAG}</image>#" /var/lib/jenkins/config.xml
+  sed -i "s#<image>\(docker.io/\)\{0,1\}openshift/jenkins-slave-nodejs-centos7\(:.*\)\{0,1\}</image>#<image>docker.io/openshift/jenkins-slave-nodejs-centos7:${JENKINS_SLAVE_IMAGE_TAG}</image>#" /var/lib/jenkins/config.xml
+
+  # replace registry.access.redhat.com/openshift3/jekins-slave-xxxx-rhel7[:optionaltag] with registry.access.redhat.com/openshift3/jenkins-slave-xxxx-rhel7:VersionTag
+  sed -i "s#<image>registry.access.redhat.com/openshift3/jenkins-slave-maven-rhel7\(:.*\)\{0,1\}</image>#<image>registry.access.redhat.com/openshift3/jenkins-slave-maven-rhel7:${JENKINS_SLAVE_IMAGE_TAG}</image>#" /var/lib/jenkins/config.xml
+  sed -i "s#<image>registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7\(:.*\)\{0,1\}</image>#<image>registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7:${JENKINS_SLAVE_IMAGE_TAG}</image>#" /var/lib/jenkins/config.xml
+}
+
 
 #NOTE:  periodically check https://ce-gitlab.usersys.redhat.com/ce/jboss-dockerfiles/blob/develop/scripts/os-java-run/added/java-default-options for updates
 
@@ -280,6 +295,11 @@ if [ -f "${CONFIG_PATH}.tpl" -a ! -f "${CONFIG_PATH}" ]; then
 fi
 
 rm -rf /tmp/war
+
+if [ -z ${SKIP_SLAVE_CONFIG_MIGRATION} ]; then
+  echo "Migrating slave image configuration to current version tag ..."
+  migrate_slave_configuration
+fi
 
 # default log rotation in /etc/logrotate.d/jenkins handles /var/log/jenkins/access_log
 if [ ! -z "${OPENSHIFT_USE_ACCESS_LOG}" ]; then
