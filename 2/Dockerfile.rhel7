@@ -50,6 +50,7 @@ RUN yum-config-manager --disable epel >/dev/null || : && \
 COPY ./contrib/openshift /opt/openshift
 COPY ./contrib/jenkins /usr/local/bin
 ADD ./contrib/s2i /usr/libexec/s2i
+ADD release.version /tmp/release.version
 
 # Remove the base-plugins.txt file because it's only used for Centos
 # and its presence in the rhel image is confusing.
