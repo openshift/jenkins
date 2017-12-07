@@ -1,13 +1,13 @@
-openshift-pipeline:1.0.52
-openshift-login:1.0.0
-openshift-client:1.0.2
+openshift-pipeline:1.0.53
+openshift-login:1.0.1
+openshift-client:1.0.3
 
 
 # kubernetes plugin - https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin
 kubernetes:1.0
 
 # fabric8 openshift sync
-openshift-sync:0.1.32
+openshift-sync:0.9.1
 
 # Pipeline plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Plugin
 # 2.5 now includes pipeline-model-definition (declaritive pipeline)
