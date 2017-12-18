@@ -17,22 +17,20 @@ export HOME=${JENKINS_HOME}
 
 source /usr/local/bin/generate_container_user
 
-#get the fully qualified paths to both 32 and 64 bit java
-JVMPath32bit=`alternatives --display java | grep family | grep i386 | awk '{print $1}'`
-JVMPath64bit=`alternatives --display java | grep family | grep x86_64 | awk '{print $1}'`
+CONTAINER_MEMORY_IN_BYTES=$(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)
+CONTAINER_MEMORY_IN_MB=$((CONTAINER_MEMORY_IN_BYTES/2**20))
 
-# set the java version used based on OPENSHIFT_JENKINS_JVM_ARCH
-if [ -z $OPENSHIFT_JENKINS_JVM_ARCH  ]; then
-    echo "Using 64 bit Java since OPENSHIFT_JENKINS_JVM_ARCH is not set"
-    alternatives --set java $JVMPath64bit
-elif [ "${OPENSHIFT_JENKINS_JVM_ARCH}" == "x86_64"  ]; then
-    echo "64 bit Java explicitly set in OPENSHIFT_JENKINS_JVM_ARCH"
-    alternatives --set java $JVMPath64bit
+# Set the JVM architecture used.  Follow OPENSHIFT_JENKINS_JVM_ARCH if set.  If
+# not, use 32 bit JVM for space efficiency if container size < 2GiB.
+if [[ "${OPENSHIFT_JENKINS_JVM_ARCH}" == "x86_64" || \
+    ( "${OPENSHIFT_JENKINS_JVM_ARCH}" == "" && "${CONTAINER_MEMORY_IN_MB}" -ge 2048 ) ]]; then
+  alternatives --set java $(alternatives --display java | awk '/family.*x86_64/ { print $1; }')
 else
-    echo "OPENSHIFT_JENKINS_JVM_ARCH is set to ${OPENSHIFT_JENKINS_JVM_ARCH} so using 32 bit Java"
-    alternatives --set java $JVMPath32bit
-    export MALLOC_ARENA_MAX=1
+  alternatives --set java $(alternatives --display java | awk '/family.*i386/ { print $1; }')
+  export MALLOC_ARENA_MAX=${MALLOC_ARENA_MAX:-1}
 fi
+
+echo "OPENSHIFT_JENKINS_JVM_ARCH='${OPENSHIFT_JENKINS_JVM_ARCH}', CONTAINER_MEMORY_IN_MB='${CONTAINER_MEMORY_IN_MB}', using $(readlink /etc/alternatives/java)"
 
 # Configure the slave image
 source /usr/local/bin/configure-slave
@@ -65,57 +63,68 @@ if [[ $# -gt 1 ]]; then
     fi
   fi
 
-  CONTAINER_MEMORY_IN_BYTES=`cat /sys/fs/cgroup/memory/memory.limit_in_bytes`
-  DEFAULT_MEMORY_CEILING=$((2**40-1))
-  if [ "${CONTAINER_MEMORY_IN_BYTES}" -lt "${DEFAULT_MEMORY_CEILING}" ]; then
+  if [[ -z "${JAVA_TOOL_OPTIONS}" ]]; then
+    # these options will automatically be picked up by any JVM process but can
+    # be overridden on that process' command line.
+    JAVA_TOOL_OPTIONS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true"
+    export JAVA_TOOL_OPTIONS
+  fi
 
-    if [ -z $CONTAINER_HEAP_PERCENT ]; then
+  # assume k8s/docker memory limit was set if memory.limit_in_bytes < 1TiB
+  if [[ "${CONTAINER_MEMORY_IN_BYTES}" -lt $((2**40)) ]]; then
+    # set this JVM's -Xmx and -Xms if not set already (not propagated to any
+    # child JVMs).  -Xmx can be calculated as a percentage, capped to a maximum,
+    # or specified straight.  -Xms can be calculated as a percentage or
+    # specified straight.  For the JNLP slave by default we specify -Xmx of 50%,
+    # uncapped; -Xms unspecified (JVM default is 1/64 of -Xmx).
+
+    if [[ -z "$CONTAINER_HEAP_PERCENT" ]]; then
         CONTAINER_HEAP_PERCENT=0.50
     fi
 
-    CONTAINER_MEMORY_IN_MB=$((${CONTAINER_MEMORY_IN_BYTES}/1024**2))
-    #if machine has 4GB or less, meaning max heap of 2GB given current default, force use of 32bit to save space unless user
-    #specifically want to force 64bit
-    HEAP_LIMIT_FOR_32BIT=$((2**32-1))
-    HEAP_LIMIT_FOR_32BIT_IN_MB=$((${HEAP_LIMIT_FOR_32BIT}/1024**2))
     CONTAINER_HEAP_MAX=$(echo "${CONTAINER_MEMORY_IN_MB} ${CONTAINER_HEAP_PERCENT}" | awk '{ printf "%d", $1 * $2 }')
-    if [[ -z $OPENSHIFT_JENKINS_JVM_ARCH && "${CONTAINER_HEAP_MAX}" -lt "${HEAP_LIMIT_FOR_32BIT_IN_MB}"  ]]; then
-      echo "max heap in MB is ${CONTAINER_HEAP_MAX} and 64 bit was not explicitly set so using 32 bit Java"
-      alternatives --set java $JVMPath32bit
-      export MALLOC_ARENA_MAX=1
+    if [[ $JNLP_MAX_HEAP_UPPER_BOUND_MB && $CONTAINER_HEAP_MAX -gt $JNLP_MAX_HEAP_UPPER_BOUND_MB ]]; then
+      CONTAINER_HEAP_MAX=$JNLP_MAX_HEAP_UPPER_BOUND_MB
+    fi
+    if [[ -z "$JAVA_MAX_HEAP_PARAM" ]]; then
+      JAVA_MAX_HEAP_PARAM="-Xmx${CONTAINER_HEAP_MAX}m"
     fi
 
-    JAVA_MAX_HEAP_PARAM="-Xmx${CONTAINER_HEAP_MAX}m"
-    if [ -z $CONTAINER_INITIAL_PERCENT ]; then
-      CONTAINER_INITIAL_PERCENT=0.07
+    if [[ "$CONTAINER_INITIAL_PERCENT" ]]; then
+      CONTAINER_INITIAL_HEAP=$(echo "${CONTAINER_HEAP_MAX} ${CONTAINER_INITIAL_PERCENT}" | awk '{ printf "%d", $1 * $2 }')
+      if [[ -z "$JAVA_INITIAL_HEAP_PARAM" ]]; then
+        JAVA_INITIAL_HEAP_PARAM="-Xms${CONTAINER_INITIAL_HEAP}m"
+      fi
     fi
-    CONTAINER_INITIAL_HEAP=$(echo "${CONTAINER_HEAP_MAX} ${CONTAINER_INITIAL_PERCENT}" | awk '{ printf "%d", $1 * $2 }')
-    JAVA_INITIAL_HEAP_PARAM="-Xms${CONTAINER_INITIAL_HEAP}m"
   fi
 
-  if [ -z $JAVA_GC_OPTS ]; then
-      # We no longer set MaxMetaspaceSize because the JVM should expand metaspace until it reaches the container limit.
-      # See http://hg.openjdk.java.net/jdk8u/jdk8u/hotspot/file/4dd24f4ca140/src/share/vm/memory/metaspace.cpp#l1470
-      JAVA_GC_OPTS="-XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90"
+  if [[ -z "$JAVA_GC_OPTS" ]]; then
+    # See https://developers.redhat.com/blog/2014/07/22/dude-wheres-my-paas-memory-tuning-javas-footprint-in-openshift-part-2/ .
+    # The values are aggressively set with the intention of relaxing GC CPU time
+    # restrictions to enable it to free as much as possible, as well as
+    # encouraging the GC to free unused heap memory back to the OS.
+    JAVA_GC_OPTS="-XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90"
   fi
 
-
-  if [ ! -z "${USE_JAVA_DIAGNOSTICS}" ]; then
-      JAVA_DIAGNOSTICS="-XX:NativeMemoryTracking=summary -XX:+PrintGC -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+UnlockDiagnosticVMOptions"
+  if [[ "${USE_JAVA_DIAGNOSTICS}" || "${JAVA_DIAGNOSTICS}" ]]; then
+    echo "Warning: USE_JAVA_DIAGNOSTICS and JAVA_DIAGNOSTICS are legacy and may be removed in a future version of this script."
   fi
 
-  if [ ! -z "${CONTAINER_CORE_LIMIT}" ]; then
-      JAVA_CORE_LIMIT="-XX:ParallelGCThreads=${CONTAINER_CORE_LIMIT} -Djava.util.concurrent.ForkJoinPool.common.parallelism=${CONTAINER_CORE_LIMIT} -XX:CICompilerCount=2"
+  if [[ "${USE_JAVA_DIAGNOSTICS}" ]]; then
+    JAVA_DIAGNOSTICS="-XX:NativeMemoryTracking=summary -XX:+PrintGC -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+UnlockDiagnosticVMOptions"
   fi
 
-  if [ -z "${JAVA_OPTS}" ]; then
-      JAVA_OPTS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true"
+  if [[ "${CONTAINER_CORE_LIMIT}" ]]; then
+    JAVA_CORE_LIMIT="-XX:ParallelGCThreads=${CONTAINER_CORE_LIMIT} -Djava.util.concurrent.ForkJoinPool.common.parallelism=${CONTAINER_CORE_LIMIT} -XX:CICompilerCount=2"
   fi
 
-  echo Running java $JAVA_GC_OPTS $JAVA_INITIAL_HEAP_PARAM $JAVA_MAX_HEAP_PARAM $JAVA_CORE_LIMIT $JAVA_DIAGNOSTICS $JAVA_OPTS -cp $JAR hudson.remoting.jnlp.Main -headless $PARAMS "$@"
-  cd ${JENKINS_DIR} && exec java $JAVA_GC_OPTS $JAVA_INITIAL_HEAP_PARAM  \
-                                 $JAVA_MAX_HEAP_PARAM $JAVA_CORE_LIMIT $JAVA_DIAGNOSTICS \
-                                 $JAVA_OPTS -cp $JAR hudson.remoting.jnlp.Main \
+  if [[ -z "${JNLP_JAVA_OPTIONS}" ]]; then
+    JNLP_JAVA_OPTIONS="$JAVA_GC_OPTS $JAVA_INITIAL_HEAP_PARAM $JAVA_MAX_HEAP_PARAM $JAVA_CORE_LIMIT $JAVA_DIAGNOSTICS"
+  fi
+
+  set -x
+  cd ${JENKINS_DIR} && exec java $JNLP_JAVA_OPTIONS $JNLP_JAVA_OVERRIDES \
+                                 -cp $JAR hudson.remoting.jnlp.Main \
                                  -headless $PARAMS "$@"
 fi
 
