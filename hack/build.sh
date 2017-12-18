@@ -12,7 +12,7 @@ OS=$1
 VERSION=$2
 
 DOCKERFILE_PATH=""
-BASE_IMAGE_NAME="openshift/jenkins"
+BASE_IMAGE_NAME="docker.io/openshift/jenkins"
 RHEL_BASE_IMAGE_NAME="registry.access.redhat.com/openshift3/jenkins"
 
 # Cleanup the temporary Dockerfile created by docker build with version
@@ -36,7 +36,7 @@ dirs=${VERSION:-$VERSIONS}
 
 # enforce building of the slave-base image if we're building any of
 # the slave images.  Note that we might build the slave-base
-# twice if it was explicitly requested.  That's ok, it's 
+# twice if it was explicitly requested.  That's ok, it's
 # cheap to build it a second time.  The important thing
 # is we have to build it before building any other
 # slave image.
