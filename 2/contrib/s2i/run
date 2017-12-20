@@ -212,11 +212,9 @@ for FILENAME in ${JENKINS_HOME}/plugins/*.jpi; do
     fi
 done
 
-# for rhel, some maintenance wrt copying plugins is done on every startup;  this logic
-# covers the following scenarios:
-# 1) this is the initial start of the image and the JENKINS_HOME/configured file is not
-# yet present
-# 2) this is a release upgrade, and new plugins need to be added
+# for rhel, while the plugins are initially linked to the image volume on initial start,
+# some maintenance wrt transferring plugins is done on every startup;  this logic
+# covers the case of a release upgrade that introduces new plugins.
 #
 # we employ links instead of copies, and check for the existance in JENKINS_HOME/plugins,
 # so that:
