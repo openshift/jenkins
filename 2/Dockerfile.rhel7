@@ -56,6 +56,11 @@ ADD release.version /tmp/release.version
 # and its presence in the rhel image is confusing.
 RUN rm /opt/openshift/base-plugins.txt && \ 
     mkdir -p /opt/openshift/plugins && \
+    # we symlink the rpm installed plugins from /usr/lib/jenkins to /opt/openshift/plugins so that
+    # future upgrades of the image and their RPM install automatically get picked by jenkins;
+    # we use symlinks vs. actual files to delineate whether the user has overridden a plugin (and
+    # by extension taken over its future maintenance)
+    for FILENAME in /usr/lib/jenkins/*hpi ; do ln -s $FILENAME /opt/openshift/plugins/`basename $FILENAME .hpi`.jpi; done &&\
     chmod 775 /etc/passwd && \
     chmod -R 775 /etc/alternatives && \
     chmod -R 775 /var/lib/alternatives && \
