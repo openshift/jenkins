@@ -64,6 +64,4 @@ parameterized-trigger:2.35.1
 pipeline-build-step:2.5.1
 pipeline-input-step:2.8
 workflow-cps:2.39
-script-security:1.31
-
-
+script-security:1.39
