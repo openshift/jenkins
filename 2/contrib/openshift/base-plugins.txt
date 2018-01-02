@@ -23,6 +23,10 @@ mercurial:1.54
 matrix-project:1.7.1
 multiple-scms:0.6
 ssh-credentials:1.13
+# pulling in 1.13 for https://issues.jenkins-ci.org/browse/JENKINS-41760, but this is also a dependency
+# of pipeline-model-definition (declaritive pipeline) pulls it in directly, as well as indirectly via its
+# dependency on docker-workflow/docker-common.  We should monitor when that dependency is
+# bumped to 1.13 or later, and then remove this line
 credentials-binding:1.13
 
 
