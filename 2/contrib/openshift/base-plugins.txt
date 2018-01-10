@@ -4,7 +4,7 @@ openshift-client:1.0.5
 
 
 # kubernetes plugin - https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin
-kubernetes:1.0
+kubernetes:1.1
 
 # fabric8 openshift sync
 openshift-sync:0.9.2
