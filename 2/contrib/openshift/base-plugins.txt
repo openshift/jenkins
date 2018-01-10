@@ -21,7 +21,6 @@ workflow-remote-loader:1.2
 # mercurial - https://wiki.jenkins-ci.org/display/JENKINS/Mercurial+Plugin
 mercurial:1.54
 matrix-project:1.7.1
-multiple-scms:0.6
 ssh-credentials:1.13
 # pulling in 1.13 for https://issues.jenkins-ci.org/browse/JENKINS-41760, but this is also a dependency
 # of pipeline-model-definition (declaritive pipeline) pulls it in directly, as well as indirectly via its
