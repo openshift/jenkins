@@ -73,11 +73,10 @@ function test_connection() {
 function run_image() {
   local name=$1 ; shift
   local volume=$1; shift
-  local cargs=${CONTAINER_ARGS:-}
   cidfile="$CIDFILE_DIR/$name"
   # create container with a cidfile in a directory for cleanup
-  echo "Creating container for image $IMAGE_NAME with carg=$cargs and function args=$@"
-  docker run $cargs --name=$name --cidfile $cidfile -d -v $volume:/var/lib/jenkins:Z -p 8080:8080 "$@" $IMAGE_NAME
+  echo "Creating container for image $IMAGE_NAME with cargs=${CONTAINER_ARGS[@]} and function args=$@"
+  docker run "${CONTAINER_ARGS[@]}" --name=$name --cidfile $cidfile -d -v $volume:/var/lib/jenkins:Z -p 8080:8080 "$@" $IMAGE_NAME
   echo "Created container $(cat $cidfile)"
 }
 
@@ -85,7 +84,7 @@ function delete_container() {
   CONTAINER=$(cat $cidfile)
   docker stop $CONTAINER
   docker rm $CONTAINER
-  rm $cidfile  
+  rm $cidfile
 }
 
 # $1 - username
@@ -179,11 +178,12 @@ function run_tests() {
 
   tests_installed_plugins $name
   tests_not_installed_plugins $name
-  
+
   delete_container
 
   # start a new container with the old volume so we can try to change the password
-  CONTAINER_ARGS="-u 10000:0 -e JENKINS_PASSWORD=newpassword" run_image $name $VOLUME
+  CONTAINER_ARGS=(-u 10000:0 -e JENKINS_PASSWORD=newpassword)
+  run_image $name $VOLUME
   CONTAINER_IP=$(get_container_ip $name)
 
   # need this to wait for the container to start up
@@ -200,12 +200,24 @@ function run_tests() {
     return 1
   fi
   test_non_pipeline_dependencies_pulled admin newpassword
-  
+
   tests_installed_plugins $name
   tests_not_installed_plugins $name
-    
+
   # Stop the container so next tests can run
   docker stop $(get_cid $name)
+}
+
+function run_cmdline_test() {
+  local name=$1 ; shift
+  run_image $name $VOLUME
+  CONTAINER_IP=$(get_container_ip $name)
+  test_connection $name
+
+  if ! docker exec ${name} sh -c 'grep -qP "\x00-Dcontains space\x00-Dnospace\x00" /proc/$(pidof java)/cmdline'; then
+    echo "Fail: command line arguments were not handled correctly"
+    return 1
+  fi
 }
 
 function run_s2i_tests() {
@@ -244,7 +256,7 @@ function run_s2i_tests() {
 
   tests_installed_plugins ${cid}
   tests_not_installed_plugins ${cid}
-  
+
   test_get_job admin password sample-app-test
   test_create_job admin password testJob
   test_get_job admin password testJob
@@ -256,7 +268,7 @@ echo "Testing image $IMAGE_NAME"
 echo "Normal test: 64 bit"
 VERIFY_INSTALLED=""
 VERIFY_NOT_INSTALLED=ansicolor,greenballs
-CONTAINER_ARGS="-u 10000:0 -e OPENSHIFT_JENKINS_JVM_ARCH=x86_64"
+CONTAINER_ARGS=(-u 10000:0 -e OPENSHIFT_JENKINS_JVM_ARCH=x86_64)
 run_tests jenkins_test
 cleanup
 sleep 5
@@ -267,8 +279,19 @@ VOLUME=$(mktemp -d)
 chmod a+rwx $VOLUME
 VERIFY_INSTALLED=""
 VERIFY_NOT_INSTALLED=ansicolor,greenballs
-CONTAINER_ARGS="-u 10000:0 -e OPENSHIFT_JENKINS_JVM_ARCH=i386 "
+CONTAINER_ARGS=(-u 10000:0 -e OPENSHIFT_JENKINS_JVM_ARCH=i386)
 run_tests jenkins_test
+cleanup
+sleep 5
+
+echo "Command line test"
+CIDFILE_DIR=$(mktemp --suffix=jenkins_test_cidfiles -d)
+VOLUME=$(mktemp -d)
+chmod a+rwx $VOLUME
+VERIFY_INSTALLED=""
+VERIFY_NOT_INSTALLED=ansicolor,greenballs
+CONTAINER_ARGS=(-u 10000:0 -e "JENKINS_JAVA_OVERRIDES=-Dcontains\ space -Dnospace")
+run_cmdline_test jenkins_test
 cleanup
 sleep 5
 
@@ -278,7 +301,7 @@ VOLUME=$(mktemp -d)
 chmod a+rwx $VOLUME
 VERIFY_INSTALLED=ansicolor,greenballs
 VERIFY_NOT_INSTALLED=""
-CONTAINER_ARGS="-u 10000:0 -e OPENSHIFT_JENKINS_JVM_ARCH=x86_64 -e INSTALL_PLUGINS=ansicolor:0.4.1,greenballs"
+CONTAINER_ARGS=(-u 10000:0 -e OPENSHIFT_JENKINS_JVM_ARCH=x86_64 -e INSTALL_PLUGINS=ansicolor:0.4.1,greenballs)
 run_tests jenkins_test
 cleanup
 sleep 5
@@ -287,9 +310,12 @@ sleep 5
 echo "Test: s2i build"
 CIDFILE_DIR=$(mktemp --suffix=jenkins_test_cidfiles -d)
 VOLUME=$(mktemp -d)
+chmod a+rwx $VOLUME
 VERIFY_INSTALLED=ansicolor,greenballs
 VERIFY_NOT_INSTALLED=""
+CONTAINER_ARGS=(-u 10000:0 -e OPENSHIFT_JENKINS_JVM_ARCH=x86_64 -e INSTALL_PLUGINS=ansicolor:0.4.1,greenballs)
 run_s2i_tests
+# last cleanup is run via EXIT trap
 
 FAILURE=false
 

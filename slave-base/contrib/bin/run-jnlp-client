@@ -122,8 +122,14 @@ if [[ $# -gt 1 ]]; then
     JNLP_JAVA_OPTIONS="$JAVA_GC_OPTS $JAVA_INITIAL_HEAP_PARAM $JAVA_MAX_HEAP_PARAM $JAVA_CORE_LIMIT $JAVA_DIAGNOSTICS"
   fi
 
+  # Deal with embedded escaped spaces in JNLP_JAVA_OVERRIDES.
+  # JNLP_JAVA_OVERRIDES='-Dfoo -Dbar' => append -Dfoo -Dbar to java invocation
+  # JNLP_JAVA_OVERRIDES='-Dfoo\ bar' => append '-Dfoo bar' to java invocation
+  read -a JNLP_JAVA_OVERRIDES_ARRAY <<< "$JNLP_JAVA_OVERRIDES"
+
   set -x
-  cd ${JENKINS_DIR} && exec java $JNLP_JAVA_OPTIONS $JNLP_JAVA_OVERRIDES \
+  cd ${JENKINS_DIR} && exec java $JNLP_JAVA_OPTIONS \
+                                 "${JNLP_JAVA_OVERRIDES_ARRAY[@]}" \
                                  -cp $JAR hudson.remoting.jnlp.Main \
                                  -headless $PARAMS "$@"
 fi

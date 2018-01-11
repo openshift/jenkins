@@ -321,12 +321,17 @@ if [[ -z "${JENKINS_JAVA_OPTIONS}" ]]; then
   JENKINS_JAVA_OPTIONS="$JAVA_GC_OPTS $JAVA_INITIAL_HEAP_PARAM $JAVA_MAX_HEAP_PARAM $JAVA_CORE_LIMIT $JAVA_DIAGNOSTICS -Dfile.encoding=UTF8 $JENKINS_ACCESSLOG"
 fi
 
+# Deal with embedded escaped spaces in JENKINS_JAVA_OVERRIDES.
+# JENKINS_JAVA_OVERRIDES='-Dfoo -Dbar' => append -Dfoo -Dbar to java invocation
+# JENKINS_JAVA_OVERRIDES='-Dfoo\ bar' => append '-Dfoo bar' to java invocation
+read -a JENKINS_JAVA_OVERRIDES_ARRAY <<< "$JENKINS_JAVA_OVERRIDES"
+
 # if `docker run` first argument start with `--` the user is passing jenkins launcher arguments
 if [[ $# -lt 1 ]] || [[ "$1" == "--"* ]]; then
   set -x
   exec java $JENKINS_JAVA_OPTIONS -Duser.home=${HOME} \
             -Djavamelody.application-name=${JENKINS_SERVICE_NAME} \
-            $JENKINS_JAVA_OVERRIDES \
+            "${JENKINS_JAVA_OVERRIDES_ARRAY[@]}" \
             -jar /usr/lib/jenkins/jenkins.war $JENKINS_OPTS "$@"
 fi
 
