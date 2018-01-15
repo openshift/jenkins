@@ -1,1 +1,3 @@
 ansicolor:0.4.1
+# try to install the latest version of the plugin
+greenballs

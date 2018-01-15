@@ -16,7 +16,7 @@
 set -e
 
 # TODO: Move this Dockerfile
-JENKINS_UC=${JENKINS_UC:-https://updates.jenkins-ci.org}
+JENKINS_UC=${JENKINS_UC:-https://updates.jenkins.io}
 DOWNLOAD_JOBS=()
 mkdir -p /opt/openshift/plugins
 mkdir -p /tmp/.plugin-download

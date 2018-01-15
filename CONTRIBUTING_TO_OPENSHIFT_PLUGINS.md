@@ -158,10 +158,10 @@ For our Jenkins image repository to include particular versions of our plugins i
 need to be available at these locations, depending on the particular plugin of course.  These are the official landing spots 
 for a newly minted version of a particular plugin.
 
-* [https://updates.jenkins-ci.org/download/plugins/openshift-client](https://updates.jenkins-ci.org/download/plugins/openshift-client)
-* [https://updates.jenkins-ci.org/download/plugins/openshift-pipeline](https://updates.jenkins-ci.org/download/plugins/openshift-pipeline)
-* [https://updates.jenkins-ci.org/download/plugins/openshift-sync](https://updates.jenkins-ci.org/download/plugins/openshift-sync)
-* [https://updates.jenkins-ci.org/download/plugins/openshift-login](https://updates.jenkins-ci.org/download/plugins/openshift-login)
+* [https://updates.jenkins.io/download/plugins/openshift-client](https://updates.jenkins.io/download/plugins/openshift-client)
+* [https://updates.jenkins.io/download/plugins/openshift-pipeline](https://updates.jenkins.io/download/plugins/openshift-pipeline)
+* [https://updates.jenkins.io/download/plugins/openshift-sync](https://updates.jenkins.io/download/plugins/openshift-sync)
+* [https://updates.jenkins.io/download/plugins/openshift-login](https://updates.jenkins.io/download/plugins/openshift-login)
 
 We as of yet have not had to pay attention to them, but the CI jobs over on CloudBee's Jenkins server for our 4 plugins are:
 
@@ -257,7 +257,7 @@ If the repositories are no longer in sync, then you will have to fetch/cherry-pi
 
 ## FINALLY .... updating our OpenShift Jenkins images with the new plugin versions
 
-As referred to previously, the new plugin version will land at `https://updates.jenkins-ci.org/download/plugins/<plugin-name>`.  Monitor that page for the existence of the new version of the plugin.  Warning: the link for the new version can show up, but does not mean the file is available yet.  Click the link to confirm you can download the new version of the plugin.  When you can download the new version file, the new release is available.
+As referred to previously, the new plugin version will land at `https://updates.jenkins.io/download/plugins/<plugin-name>`.  Monitor that page for the existence of the new version of the plugin.  Warning: the link for the new version can show up, but does not mean the file is available yet.  Click the link to confirm you can download the new version of the plugin.  When you can download the new version file, the new release is available.
 
 At this point, we are back to the steps articulated in [the base plugin installation section of this repository's README](https://github.com/openshift/jenkins/blob/master/README.md#base-set-of-plugins).  You'll 
 modify the text file with the new version for whatever OpenShift plugin you have cut a new version for, create a new PR, and confirm (either via `[test]` or `[merge]` in the PR) the new version of the plugin does in fact exist at the Jenkins Update center and can be successfully downloaded and installed.  Assuming so, you will go through the RHEL7 process also articulated in [the base plugin installation section of this repository's README](https://github.com/openshift/jenkins/blob/master/README.md#base-set-of-plugins), and voila!
