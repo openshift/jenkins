@@ -1,0 +1,16 @@
+package: github.com/openshift/jenkins
+import:
+- package: github.com/docker/docker
+  subpackages:
+  - api/types
+  - api/types/container
+  - api/types/mount
+  - api/types/volume
+  - client
+- package: github.com/docker/distribution
+  version: v2.6.2
+  subpackages:
+  - reference
+testImport:
+- package: github.com/onsi/ginkgo
+- package: github.com/onsi/gomega
