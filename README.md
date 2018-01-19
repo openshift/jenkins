@@ -109,6 +109,38 @@ You can also set the following mount points by passing the `-v /host:/container`
 directory has the appropriate permissions and that the owner and group of the directory
 matches the user UID or name which is running inside the container.**
 
+Inclusion of the `oc` binary
+---------------------------------
+
+To assist in interacting with the OpenShift API server while using this image, the `oc` binary, the CLI command for OpenShift, has been
+installed in the master and slave images defined in this repository.
+
+
+However, it needs to be noted that backward compatibility is not guaranteed between different versions of `oc` and the OpenShift
+API Server.  As such, it is recommended that you align versions of this image present in the nodes of your cluster with your 
+OpenShift API server.  In other words, you should use the version specific tag instead of the `latest` tag.
+
+|  Jenkins image version      | `oc` client version      |
+| :-------------------------- | ------------------------ |
+|  `jenkins-*-centos7:v3.7`   | 3.7 `oc` binary          |
+|  `jenkins-*-centos7:v3.6`   | 3.6 `oc` binary          |
+|  `jenkins-*-centos7:latest` | `oc` binary from `docker.io/openshift/origin:latest` image          |
+|  `jenkins-*-rhel7:v3.7`     | 3.7 `oc` binary          |
+|  `jenkins-*-rhel7:v3.6`     | 3.6 `oc` binary          |
+|  `jenkins-*-rhel7:latest`   | 3.6 `oc` binary \*\*     |
+
+
+**Notice: the `latest` tag for the RHEL7 images will point to 3.6 indefinitely in order to support users on older clusters with older slave 
+configurations that point to the "latest" tag.  This way, they will have an older `oc` client which should be able to communicate with both 3.6
+and newer versions of OpenShift API Servers.  As the support policy is less stringent for the CentOS7 image, the `latest` tag there will 
+make the more obvious correlation to the latest built version of OpenShift (which can include pre-GA versions). 
+
+**Notice:  There is an additional consideration with the pod configurations for the Kubernetes Plugin; earlier versions of this image
+did not specify the "pull always" policy for the default agents/slaves configured.  As a result, users may have older/different images on 
+your nodes depending when the images were pulled.  Starting with the 3.7 release, the default changed to "pull always" to avoid this problem 
+in the future.  But if you started using this image prior to 3.7, verification of your Kubernetes plugin configurations for the image pull 
+policy used is warranted to guarantee consistency around what image is being used on each of your nodes.
+
 
 Plugins
 ---------------------------------
