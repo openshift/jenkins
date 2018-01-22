@@ -66,6 +66,19 @@ Choose either the CentOS7 or RHEL7 based image:
 **Notice: By omitting the `VERSION` parameter, the build/test action will be performed
 on all provided versions of Jenkins.**
 
+If you are curious about the precise level of Jenkins for either `jenkins-2-centos7` or `jenkins-2-rhel7`, then
+you can execute:
+
+    ```
+    $ docker run -it <image spec> /etc/alternatives/java -jar /usr/lib/jenkins/jenkins.war --version
+    ```
+    
+For example:
+
+    ```
+    $ docker run -it docker.io/openshift/jenkins-2-centos7:latest /etc/alternatives/java -jar /usr/lib/jenkins/jenkins.war --version
+    ```
+
 
 Environment variables
 ---------------------------------
