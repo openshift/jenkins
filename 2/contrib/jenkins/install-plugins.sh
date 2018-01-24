@@ -114,7 +114,8 @@ copy_reference_file() {
             action=${action:-"INSTALLED"}
             log=true
             mkdir -p "$JENKINS_HOME/${dir:23}"
-            cp -r "${f}" "$JENKINS_HOME/${rel}";
+	    # if done on rhel, we may need to override a link to /usr/lib/jenkins, so include --remove-destination
+            cp --remove-destination -r "${f}" "$JENKINS_HOME/${rel}";
             # pin plugins on initial copy
             touch "$JENKINS_HOME/${rel}.pinned"
             echo "$image_version" > "$JENKINS_HOME/${version_marker}"
@@ -128,7 +129,8 @@ copy_reference_file() {
             action="INSTALLED"
             log=true
             mkdir -p "$JENKINS_HOME/${dir:23}"
-            cp -r "${f}" "$JENKINS_HOME/${rel}";
+	    # if done on rhel, we may need to override a link to /usr/lib/jenkins, so include --remove-destination
+            cp --remove-destination -r "${f}" "$JENKINS_HOME/${rel}";
         else
             action="SKIPPED"
         fi
