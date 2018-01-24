@@ -15,6 +15,7 @@ MAINTAINER Ben Parees <bparees@redhat.com>
 # Jenkins LTS packages from
 # https://pkg.jenkins.io/redhat-stable/
 ENV JENKINS_VERSION=2 \
+    JENKINS_RELEASE=2.89.2-1.1 \
     HOME=/var/lib/jenkins \
     JENKINS_HOME=/var/lib/jenkins \
     JENKINS_UC=https://updates.jenkins.io \
@@ -25,7 +26,8 @@ LABEL k8s.io.description="Jenkins is a continuous integration server" \
       k8s.io.display-name="Jenkins 2" \
       openshift.io.expose-services="8080:http" \
       openshift.io.tags="jenkins,jenkins2,ci" \
-      io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
+      io.openshift.s2i.scripts-url=image:///usr/libexec/s2i \
+      jenkins-release="${JENKINS_RELEASE}"
 
 # 8080 for main web interface, 50000 for slave agents
 EXPOSE 8080 50000
@@ -34,7 +36,7 @@ RUN curl https://pkg.jenkins.io/redhat-stable/jenkins.repo -o /etc/yum.repos.d/j
     rpm --import https://pkg.jenkins.io/redhat-stable/jenkins-ci.org.key && \
     yum install -y centos-release-scl-rh && \
     curl https://copr.fedorainfracloud.org/coprs/alsadi/dumb-init/repo/epel-7/alsadi-dumb-init-epel-7.repo -o /etc/yum.repos.d/alsadi-dumb-init-epel-7.repo && \
-    INSTALL_PKGS="dejavu-sans-fonts rsync gettext git tar zip unzip dumb-init java-1.8.0-openjdk java-1.8.0-openjdk.i686 java-1.8.0-openjdk-devel java-1.8.0-openjdk-devel.i686 jenkins-2.89.2-1.1" && \
+    INSTALL_PKGS="dejavu-sans-fonts rsync gettext git tar zip unzip dumb-init java-1.8.0-openjdk java-1.8.0-openjdk.i686 java-1.8.0-openjdk-devel java-1.8.0-openjdk-devel.i686 jenkins-${JENKINS_RELEASE}" && \
     yum -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     yum clean all  && \
