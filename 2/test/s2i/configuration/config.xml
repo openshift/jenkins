@@ -49,7 +49,7 @@
   </views>
   <primaryView>All</primaryView>
   <slaveAgentPort>49187</slaveAgentPort>
-  <label>master</label>
+  <label>s2i-test-config</label>
   <nodeProperties/>
   <globalNodeProperties/>
   <noUsageStatistics>true</noUsageStatistics>
