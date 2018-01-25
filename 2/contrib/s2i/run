@@ -90,6 +90,49 @@ new_password_hash=`obfuscate_password ${JENKINS_PASSWORD:-password} $old_salt`
 mkdir ${JENKINS_HOME}/logs
 ln -sf ${JENKINS_HOME}/logs /var/log/jenkins
 
+# clean up any plugins in JENKINS_HOME/plugins which we previously linked, but
+# have since deleted from the image
+for FILENAME in ${JENKINS_HOME}/plugins/*.jpi; do
+    # test if it is a sym link, otherwise users have overriden, so leave alone
+    # test command silent, don't need dev/null
+    test -h $FILENAME
+    if [ $? -eq 0 ]; then
+	stat -L $FILENAME >& /dev/null
+	if [ $? -eq 0 ]; then
+	    continue
+	fi
+	echo "Unlinking plugin ${FILENAME} since it has been removed"
+	unlink $FILENAME
+    fi
+done
+
+# for rhel, while the plugins are initially linked to the image volume on initial start,
+# some maintenance wrt transferring plugins is done on every startup;  this logic
+# covers the case of a release upgrade that introduces new plugins.
+#
+# we employ links instead of copies, and check for the existance in JENKINS_HOME/plugins,
+# so that:
+# 1) we don't copy over plugins the user has overridden since this image first was started
+# (either via this image's extension mechanisms or the jenkins plugin mgr console)
+# 2) if versions of an existing plugin change as a result of a release upgrade, those changes
+# are picked up
+#
+# all of this is moot on centos, since our centos image does not store any plugins in /usr/lib/jenkins
+if [ "$(ls /usr/lib/jenkins/*.hpi 2>/dev/null)" ]; then
+    # in case very first time through, make sure plugins dir is there
+    mkdir -p ${JENKINS_HOME}/plugins
+   
+   for FILENAME in /usr/lib/jenkins/*.hpi ; do
+        basefilename=`basename $FILENAME .hpi`
+        plugin_image_volume_location="${JENKINS_HOME}/plugins/${basefilename}.*"
+        if [ "$(ls ${plugin_image_volume_location} 2>/dev/null)" ]; then
+          continue
+        fi
+	echo "Linking ${FILENAME} RPM installed Jenkins plugins to ${JENKINS_HOME} ..."  
+        ln -s  $FILENAME ${JENKINS_HOME}/plugins/${basefilename}.jpi
+   done
+fi
+
 if [ ! -e ${JENKINS_HOME}/configured ]; then
   # This container hasn't been configured yet, so copy the default configuration from
   # the image into the jenkins config path (which should be a volume for persistence).
@@ -138,10 +181,15 @@ if [ ! -e ${JENKINS_HOME}/configured ]; then
     /usr/local/bin/install-plugins.sh "${plugins_file}"
   fi
 
-  if [ "$(ls -A /opt/openshift/plugins 2>/dev/null)" ]; then
+  if [ "$(ls /opt/openshift/plugins/* 2>/dev/null)" ]; then
     mkdir -p ${JENKINS_HOME}/plugins
-    echo "Copying $(ls /opt/openshift/plugins | wc -l) Jenkins plugins to ${JENKINS_HOME} ..."
-    cp -r /opt/openshift/plugins/* ${JENKINS_HOME}/plugins/
+    echo "Copying $(ls /opt/openshift/plugins/* | wc -l) files to ${JENKINS_HOME} ..."
+    # in case of rhel, if there are plugins in /opt/openshift/plugins, that means the user is overriding
+    # the image's base set of plugins and taking ownership of the plugin's version going forward; and
+    # so we break the link to /usr/lib/jenkins via use of --remove-destination; in the case of centos, it
+    # is not necessary (no links are in play) but has no ill effect so we maintain a common path for
+    # both offerings
+    for FILENAME in /opt/openshift/plugins/* ; do cp --remove-destination $FILENAME ${JENKINS_HOME}/plugins; done
     rm -rf /opt/openshift/plugins
   fi
 
