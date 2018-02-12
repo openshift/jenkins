@@ -4,7 +4,7 @@ openshift-client:1.0.5
 
 
 # kubernetes plugin - https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin
-kubernetes:1.1.3
+kubernetes:1.2
 
 # fabric8 openshift sync
 openshift-sync:1.0.2
@@ -18,30 +18,29 @@ openshift-sync:1.0.2
 # processed sec adv https://jenkins.io/blog/2017/07/10/security-advisory/
 # processed sec adv https://jenkins.io/security/advisory/2017-08-07/
 #
-config-file-provider:2.16.2
-docker-commons:1.8
-job-dsl:1.60
-parameterized-trigger:2.35.1
-pipeline-build-step:2.5.1
+config-file-provider:2.17
+docker-commons:1.11
+job-dsl:1.68
+parameterized-trigger:2.35.2
+pipeline-build-step:2.7
 pipeline-input-step:2.8
-script-security:1.39
+script-security:1.41
 
 # Legacy stuff
-mapdb-api:1.0.1.0
-subversion:2.9
+mapdb-api:1.0.9.0
+subversion:2.10.2
 
 # remote loader https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Remote+Loader+Plugin
-workflow-remote-loader:1.2
+workflow-remote-loader:1.4
 
 # mercurial - https://wiki.jenkins-ci.org/display/JENKINS/Mercurial+Plugin
-mercurial:1.54
-matrix-project:1.7.1
+mercurial:2.2
+matrix-project:1.12
 ssh-credentials:1.13
-# pulling in 1.13 for https://issues.jenkins-ci.org/browse/JENKINS-41760, but this is also a dependency
-# of pipeline-model-definition (declaritive pipeline) pulls it in directly, as well as indirectly via its
-# dependency on docker-workflow/docker-common.  We should monitor when that dependency is
-# bumped to 1.13 or later, and then remove this line
-credentials-binding:1.13
+
+# release 1.15: https://jenkins.io/security/advisory/2018-02-05/
+# (new version fixed the previous issue: https://issues.jenkins-ci.org/browse/JENKINS-41760)
+credentials-binding:1.15
 
 
 # Pipeline Utility Steps Plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Utility+Steps+Plugin
@@ -52,8 +51,8 @@ pipeline-github-lib:1.0
 github-organization-folder:1.6
 
 # Jenkins v2 specific
-matrix-auth:1.5
-blueocean:1.4.0
+matrix-auth:2.2
+blueocean:1.4.1
 
 # Pipeline plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Plugin
 # 2.5 now includes pipeline-model-definition (declaritive pipeline)
