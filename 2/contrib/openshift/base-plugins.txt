@@ -17,6 +17,10 @@ openshift-sync:1.0.5
 #
 # processed sec adv https://jenkins.io/blog/2017/07/10/security-advisory/
 # processed sec adv https://jenkins.io/security/advisory/2017-08-07/
+# processed sec adv https://jenkins.io/security/advisory/2018-01-22/
+# processed sec adv https://jenkins.io/security/advisory/2018-02-05/
+# processed sec adv https://jenkins.io/security/advisory/2018-02-14/
+# processed sec adv https://jenkins.io/security/advisory/2018-02-26/
 #
 config-file-provider:2.17
 docker-commons:1.11
@@ -25,23 +29,22 @@ parameterized-trigger:2.35.2
 pipeline-build-step:2.7
 pipeline-input-step:2.8
 script-security:1.41
+credentials-binding:1.15
+junit:1.24
+workflow-durable-task-step:2.18
+workflow-support:2.18
+git:3.8.0
+mercurial:2.3
+subversion:2.10.3
 
 # Legacy stuff
 mapdb-api:1.0.9.0
-subversion:2.10.2
 
 # remote loader https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Remote+Loader+Plugin
 workflow-remote-loader:1.4
 
-# mercurial - https://wiki.jenkins-ci.org/display/JENKINS/Mercurial+Plugin
-mercurial:2.2
 matrix-project:1.12
 ssh-credentials:1.13
-
-# release 1.15: https://jenkins.io/security/advisory/2018-02-05/
-# (new version fixed the previous issue: https://issues.jenkins-ci.org/browse/JENKINS-41760)
-credentials-binding:1.15
-
 
 # Pipeline Utility Steps Plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Utility+Steps+Plugin
 pipeline-utility-steps:1.5.1
