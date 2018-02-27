@@ -7,7 +7,7 @@ openshift-client:1.0.7
 kubernetes:1.2
 
 # fabric8 openshift sync
-openshift-sync:1.0.6
+openshift-sync:1.0.7
 
 # explicitly pull in plugins previously pulled in by dependencies because of
 # security advisories  ...exclude plugins from
