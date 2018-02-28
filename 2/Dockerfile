@@ -18,6 +18,7 @@ ENV JENKINS_VERSION=2 \
     HOME=/var/lib/jenkins \
     JENKINS_HOME=/var/lib/jenkins \
     JENKINS_UC=https://updates.jenkins.io \
+    OPENSHIFT_JENKINS_IMAGE_VERSION=3.9 \
     LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8
 
