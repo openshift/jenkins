@@ -153,20 +153,20 @@ of verification with that image, the RHEL7 image is updated.
 
 #### Plugin installation for CentOS7
 
-The top level list of plugins to install is located [here](blob/master/2/contrib/openshift/base-plugins.txt).  The
+The top level list of plugins to install is located [here](2/contrib/openshift/base-plugins.txt).  The
 format of the file is:
 
 ```
 pluginId:pluginVersion
 ```
 
-The file is processed by the following call in the [CentOS7 Dockerfile](blob/master/2/Dockerfile):
+The file is processed by the following call in the [CentOS7 Dockerfile](2/Dockerfile):
 
 ```
 /usr/local/bin/install-plugins.sh /opt/openshift/base-plugins.txt
 ```
 
-Where both [base-plugins.txt](blob/master/2/contrib/openshift/base-plugins.txt) and [install-plugins.sh](blob/master/2/contrib/jenkins/install-plugins.sh)
+Where both [base-plugins.txt](2/contrib/openshift/base-plugins.txt) and [install-plugins.sh](2/contrib/jenkins/install-plugins.sh)
 are copied into the image prior to that invocation.
 
 The running of `install-plugins.sh` will download the files listed in `base-plugins.txt`, and then open each plugin's manifest
@@ -187,7 +187,7 @@ Only OpenShift developers working for Red Hat can update the list of plugins for
 The complete list of plugins (i.e. including dependencies) needs to be provided though.  The most straight forward approach is to mine the output of the CentOS7 build which passed verification for the complete list.  Just search for `Installed plugins:` and leverage copy/paste to compile what is needed.
 
 Although this document will refrain on detailing the precise details, once the build on the internal Jenkins server is complete, 
-the processes will be set in motion to build the `jenkins-2-plugins` RPM that is installed by the [RHEL7 Dockerfile](blob/master/2/Dockerfile.rhel7) when the next version of the RHEL7 based OpenShift Jenkins image is built.  When new versions of OpenShift are released, associated versions of the RHEL7 based versions of the images produced by this repository are pushed to the Docker registry provided to RHEL7 subscribers.
+the processes will be set in motion to build the `jenkins-2-plugins` RPM that is installed by the [RHEL7 Dockerfile](2/Dockerfile.rhel7) when the next version of the RHEL7 based OpenShift Jenkins image is built.  When new versions of OpenShift are released, associated versions of the RHEL7 based versions of the images produced by this repository are pushed to the Docker registry provided to RHEL7 subscribers.
 
 Some reference links for the OpenShift Jenkins developers and where things cross over with the CD/CL/Atomic/RHEL teams:
 * http://pkgs.devel.redhat.com/cgit/rpms/?q=jenkins
