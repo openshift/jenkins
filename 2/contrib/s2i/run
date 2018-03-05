@@ -94,7 +94,7 @@ function install_plugins() {
         # also need to nuke the metadir; it will get properly populated on jenkins startup
         basefilename=`basename $FILENAME .jpi`
         rm -rf "${JENKINS_HOME}/plugins/${basefilename}"
-	cp --remove-destination $FILENAME ${JENKINS_HOME}/plugins
+        cp --remove-destination $FILENAME ${JENKINS_HOME}/plugins
     done
     rm -rf /opt/openshift/plugins
   fi
