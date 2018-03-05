@@ -68,7 +68,7 @@ for dir in ${dirs}; do
   fi
 
   if [[ ! -z "${TEST_MODE}" ]]; then
-    ( cd test && IMAGE_NAME=${IMAGE_NAME} go test -v -ginkgo.v . )
+    ( cd test && IMAGE_NAME=${IMAGE_NAME} go test -timeout 30m -v -ginkgo.v . )
     # always re-tag slave-base because we need it to build the other images even if we are just testing them.
     if [[ $? -eq 0 ]] && [[ "${TAG_ON_SUCCESS}" == "true" || "${dir}" == "slave-base" ]]; then
       echo "-> Re-tagging ${IMAGE_NAME} image to ${IMAGE_NAME%"-candidate"}"
