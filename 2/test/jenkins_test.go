@@ -193,6 +193,7 @@ var _ = Describe("Jenkins testing (v2)", func() {
 				s2i,
 				"build",
 				"--pull-policy=never",
+				"--loglevel=5",
 				"testdata/s2i",
 				imageName,
 				destImage,
