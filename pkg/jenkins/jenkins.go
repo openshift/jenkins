@@ -80,7 +80,7 @@ func (j *Jenkins) Start(image string, env []string) error {
 }
 
 func (j *Jenkins) wait() error {
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), 8*time.Minute)
 	defer cancel()
 
 	for {
