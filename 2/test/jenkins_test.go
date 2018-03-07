@@ -1,6 +1,7 @@
 package test
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -187,6 +188,12 @@ var _ = Describe("Jenkins testing (v2)", func() {
 		By("running s2i build")
 		destImage := fmt.Sprintf("jenkins-test-s2i-%d", rand.Intn(1e9))
 
+		By("set up docker debug")
+		ctx, cancel := context.WithTimeout(context.Background(), 25*time.Minute)
+		cmdstrs := []string{"ps", "-ef"}
+		go dockercli.ExecInActiveContainers(GinkgoWriter, ctx, cmdstrs)
+		go dockercli.InspectActiveContainers(GinkgoWriter, ctx)
+
 		cmd := exec.Cmd{
 			Path: s2i,
 			Args: []string{
@@ -203,6 +210,7 @@ var _ = Describe("Jenkins testing (v2)", func() {
 		}
 		err = cmd.Run()
 		Expect(err).NotTo(HaveOccurred())
+		cancel()
 
 		imageNamesToRemove = append(imageNamesToRemove, destImage)
 
