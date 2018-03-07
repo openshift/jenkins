@@ -1,7 +1,11 @@
 package docker
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"fmt"
+	"io"
 	"io/ioutil"
 	"time"
 
@@ -17,6 +21,68 @@ type Client struct {
 func NewEnvClient() (*Client, error) {
 	client, err := client.NewEnvClient()
 	return &Client{Client: client}, err
+}
+
+func (c *Client) ExecInActiveContainers(w io.Writer, ctx context.Context, cmd []string) {
+	for {
+		time.Sleep(60 * time.Second)
+		select {
+		case <-ctx.Done():
+			return
+		default:
+			containers, err := c.ContainerList()
+			if err != nil {
+				fmt.Fprintf(w, "container list error: %#v\n", err)
+				continue
+			}
+			fmt.Fprintf(w, "found %d containers\n", len(containers))
+			for _, container := range containers {
+				fmt.Fprintf(w, "found container %s running command %s\n", container.ID, container.Command)
+				rc, buf, err := c.ContainerExec(container.ID, cmd)
+				if err != nil {
+					fmt.Fprintf(w, "container exec error: %#v\n", err)
+					continue
+				}
+				fmt.Fprintf(w, "exec of command %#v into %s had rc %d and text %s\n", cmd, container.ID, rc, string(buf))
+			}
+		}
+	}
+}
+
+func (c *Client) InspectActiveContainers(w io.Writer, ctx context.Context) {
+	for {
+		time.Sleep(60 * time.Second)
+		select {
+		case <-ctx.Done():
+			return
+		default:
+			containers, err := c.ContainerList()
+			if err != nil {
+				fmt.Fprintf(w, "container list error: %#v\n", err)
+				continue
+			}
+			fmt.Fprintf(w, "found %d containers\n", len(containers))
+			for _, container := range containers {
+				fmt.Fprintf(w, "found container %s running command %s\n", container.ID, container.Command)
+				_, body, err := c.Client.ContainerInspectWithRaw(context.Background(), container.ID, true)
+				if err != nil {
+					fmt.Fprintf(w, "container inspect error: %#v\n", err)
+					continue
+				}
+				var prettyJSON bytes.Buffer
+				error := json.Indent(&prettyJSON, body, "", "\t")
+				if error != nil {
+					fmt.Fprintf(w, "inspect of %s returned raw json %s\n", container.ID, string(body))
+					continue
+				}
+				fmt.Fprintf(w, "inspect of %s returned formatted json:\n%s\n", container.ID, string(prettyJSON.Bytes()))
+			}
+		}
+	}
+}
+
+func (c *Client) ContainerList() ([]types.Container, error) {
+	return c.Client.ContainerList(context.Background(), types.ContainerListOptions{})
 }
 
 func (c *Client) ContainerCreate(config *container.Config, hostconfig *container.HostConfig) (string, error) {
