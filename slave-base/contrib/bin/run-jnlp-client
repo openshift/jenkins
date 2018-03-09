@@ -36,6 +36,7 @@ echo "OPENSHIFT_JENKINS_JVM_ARCH='${OPENSHIFT_JENKINS_JVM_ARCH}', CONTAINER_MEMO
 
 # Configure the slave image
 source /usr/local/bin/configure-slave
+source /usr/local/bin/configure-agent
 
 set -e
 

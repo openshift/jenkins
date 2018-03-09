@@ -35,13 +35,13 @@ function docker_build_with_version {
 dirs=${VERSION:-$VERSIONS}
 
 # enforce building of the slave-base image if we're building any of
-# the slave images.  Note that we might build the slave-base
+# the slave/agent images.  Note that we might build the slave-base
 # twice if it was explicitly requested.  That's ok, it's
 # cheap to build it a second time.  The important thing
 # is we have to build it before building any other
 # slave image.
 for dir in ${dirs}; do
-  if [[ "$dir" =~ "slave" ]]; then
+  if [[ "$dir" =~ "slave" || "$dir" =~ "agent" ]]; then
     dirs=( "slave-base ${dirs[@]}")
     break
   fi
