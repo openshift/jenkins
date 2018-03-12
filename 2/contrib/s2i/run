@@ -104,10 +104,16 @@ function migrate_slave_configuration() {
   # replace [docker.io/]openshift/jekins-slave-xxxx-centos7[:optionaltag] with docker.io/openshift/jenkins-slave-xxxx-centos7:VersionTag
   sed -i "s#<image>\(docker.io/\)\{0,1\}openshift/jenkins-slave-maven-centos7\(:.*\)\{0,1\}</image>#<image>docker.io/openshift/jenkins-slave-maven-centos7:${JENKINS_SLAVE_IMAGE_TAG}</image>#" /var/lib/jenkins/config.xml
   sed -i "s#<image>\(docker.io/\)\{0,1\}openshift/jenkins-slave-nodejs-centos7\(:.*\)\{0,1\}</image>#<image>docker.io/openshift/jenkins-slave-nodejs-centos7:${JENKINS_SLAVE_IMAGE_TAG}</image>#" /var/lib/jenkins/config.xml
+  # replace [docker.io/]openshift/jekins-agent-xxxx-centos7[:optionaltag] with docker.io/openshift/jenkins-agent-xxxx-centos7:VersionTag
+  sed -i "s#<image>\(docker.io/\)\{0,1\}openshift/jenkins-agent-maven-35-centos7\(:.*\)\{0,1\}</image>#<image>docker.io/openshift/jenkins-agent-maven-35-centos7:${JENKINS_SLAVE_IMAGE_TAG}</image>#" /var/lib/jenkins/config.xml
+  sed -i "s#<image>\(docker.io/\)\{0,1\}openshift/jenkins-agent-nodejs-8-centos7\(:.*\)\{0,1\}</image>#<image>docker.io/openshift/jenkins-agent-nodejs-8-centos7:${JENKINS_SLAVE_IMAGE_TAG}</image>#" /var/lib/jenkins/config.xml
 
   # replace registry.access.redhat.com/openshift3/jekins-slave-xxxx-rhel7[:optionaltag] with registry.access.redhat.com/openshift3/jenkins-slave-xxxx-rhel7:VersionTag
   sed -i "s#<image>registry.access.redhat.com/openshift3/jenkins-slave-maven-rhel7\(:.*\)\{0,1\}</image>#<image>registry.access.redhat.com/openshift3/jenkins-slave-maven-rhel7:${JENKINS_SLAVE_IMAGE_TAG}</image>#" /var/lib/jenkins/config.xml
   sed -i "s#<image>registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7\(:.*\)\{0,1\}</image>#<image>registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7:${JENKINS_SLAVE_IMAGE_TAG}</image>#" /var/lib/jenkins/config.xml
+  # replace registry.access.redhat.com/openshift3/jekins-agent-xxxx-rhel7[:optionaltag] with registry.access.redhat.com/openshift3/jenkins-agent-xxxx-rhel7:VersionTag
+  sed -i "s#<image>registry.access.redhat.com/openshift3/jenkins-agent-maven-35-rhel7\(:.*\)\{0,1\}</image>#<image>registry.access.redhat.com/openshift3/jenkins-agent-maven-35-rhel7:${JENKINS_SLAVE_IMAGE_TAG}</image>#" /var/lib/jenkins/config.xml
+  sed -i "s#<image>registry.access.redhat.com/openshift3/jenkins-agent-nodejs-8-rhel7\(:.*\)\{0,1\}</image>#<image>registry.access.redhat.com/openshift3/jenkins-agent-nodejs-8-rhel7:${JENKINS_SLAVE_IMAGE_TAG}</image>#" /var/lib/jenkins/config.xml
 }
 
 function force_copy_plugins() {
