@@ -18,6 +18,7 @@ ENV JENKINS_VERSION=2.46.3 \
     HOME=/var/lib/jenkins \
     JENKINS_HOME=/var/lib/jenkins \
     JENKINS_UC=https://updates.jenkins-ci.org \
+    OPENSHIFT_JENKINS_IMAGE_VERSION=3.6 \
     LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8
 
