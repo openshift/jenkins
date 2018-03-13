@@ -72,6 +72,7 @@ initialization by passing `-e VAR=VALUE` to the Docker run command.
 | `OPENSHIFT_ENABLE_OAUTH` | Determines whether the OpenShift Login plugin manages authentication when logging into Jenkins. |
 | `OPENSHIFT_PERMISSIONS_POLL_INTERVAL` | Specifies in milliseconds how often the OpenShift Login plugin polls OpenShift for the permissions associated with each user defined in Jenkins. |
 | `INSTALL_PLUGINS`         | Comma-separated list of additional plugins to install on startup. The format of each plugin spec is `plugin-id:version` (as in plugins.txt) |
+|  `OVERRIDE_RELEASE_MIGRATION_OVERWRITE`       | When running this image with an OpenShift persistent volume for the Jenkins config directory, and this image is starting in an existing deployment created with an earlier version of this image, unless the environment variable is set to some non-empty value, the plugins from the image will replace any versions of those plugins currently residing in the Jenkins plugin directory.  |
 
 
 
