@@ -90,7 +90,12 @@ function install_plugins() {
     # so we break the link to /usr/lib/jenkins via use of --remove-destination; in the case of centos, it
     # is not necessary (no links are in play) but has no ill effect so we maintain a common path for
     # both offerings
-    for FILENAME in /opt/openshift/plugins/* ; do cp --remove-destination $FILENAME ${JENKINS_HOME}/plugins; done
+    for FILENAME in /opt/openshift/plugins/* ; do
+        # also need to nuke the metadir; it will get properly populated on jenkins startup
+        basefilename=`basename $FILENAME .jpi`
+        rm -rf "${JENKINS_HOME}/plugins/${basefilename}"
+        cp --remove-destination $FILENAME ${JENKINS_HOME}/plugins
+    done
     rm -rf /opt/openshift/plugins
   fi
 }
@@ -103,6 +108,36 @@ function migrate_slave_configuration() {
   # replace registry.access.redhat.com/openshift3/jekins-slave-xxxx-rhel7[:optionaltag] with registry.access.redhat.com/openshift3/jenkins-slave-xxxx-rhel7:VersionTag
   sed -i "s#<image>registry.access.redhat.com/openshift3/jenkins-slave-maven-rhel7\(:.*\)\{0,1\}</image>#<image>registry.access.redhat.com/openshift3/jenkins-slave-maven-rhel7:${JENKINS_SLAVE_IMAGE_TAG}</image>#" /var/lib/jenkins/config.xml
   sed -i "s#<image>registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7\(:.*\)\{0,1\}</image>#<image>registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7:${JENKINS_SLAVE_IMAGE_TAG}</image>#" /var/lib/jenkins/config.xml
+}
+
+function force_copy_plugins() {
+    echo "Either the version of this image does not match the version"
+    echo "of this existing deployment, or that equality could not be established."
+    echo "A one time replacement of all the plugins from the image to the"
+    echo "jenkins plugin directory will occur."
+    echo ""
+    echo "Image version: ${OPENSHIFT_JENKINS_IMAGE_VERSION}"
+    deploymentversion=`cat ${JENKINS_HOME}/image-version`
+    echo "Deployment version: ${deploymentversion}"
+   if [ "$(ls /usr/lib/jenkins/*.hpi 2>/dev/null)" ]; then
+      # if rhel
+      for FILENAME in /usr/lib/jenkins/*.hpi ; do
+         basefilename=`basename $FILENAME .hpi`
+         plugin_image_volume_location="${JENKINS_HOME}/plugins/${basefilename}.jpi"
+         echo "Force linking ${FILENAME} to ${plugin_image_volume_location}"
+         ln -sf $FILENAME $plugin_image_volume_location
+         # also need to nuke the metadir; it will get properly populated on jenkins startup
+         rm -rf "${JENKINS_HOME}/plugins/${basefilename}"
+      done
+   else
+       #if centos
+       # first a one time clean up:  there were versions of 3.6 and 3.7 that
+       # mistakingly installed optional plugins;  those optional plugins, at
+       # the older levels, will mess up plugins we do install at 3.9 or later;
+       # we are removing those here
+       rm -rf $JENKINS_HOME/plugins/managed-scripts*
+        install_plugins
+   fi 
 }
 
 
@@ -203,7 +238,27 @@ for FILENAME in ${JENKINS_HOME}/plugins/*.jpi; do
     fi
 done
 
-# for rhel, while the plugins are initially linked to the image volume on initial start,
+if [ -z "${OVERRIDE_RELEASE_MIGRATION_OVERWRITE}" ]; then
+   # image release migration
+   if [[ ! -e ${JENKINS_HOME}/image-version && -e ${JENKINS_HOME}/configured ]]; then
+      # 1) if the image-version file does not exist, but the configured file does, then we are upgrading from
+      # earlier versions of the image which may have not sorted out the migration
+      # scenario for PVs; we will do a one time replace of the /var/lib/jenkins/plugins
+      # files from the appropriate image source
+      force_copy_plugins
+   elif [ -e ${JENKINS_HOME}/image-version ]; then
+      # 2) if the image-version file does exist, but does not match this image
+      # then do the one time replace
+      currentversion=`cat ${JENKINS_HOME}/image-version`
+      if [ "${currentversion}" != "${OPENSHIFT_JENKINS_IMAGE_VERSION}" ]; then
+         force_copy_plugins
+      fi
+   fi
+fi
+echo ${OPENSHIFT_JENKINS_IMAGE_VERSION} > ${JENKINS_HOME}/image-version
+
+
+# otherwise, for rhel, while the plugins are initially linked to the image volume on initial start,
 # some maintenance wrt transferring plugins is done on every startup;  this logic
 # covers the case of a release upgrade that introduces new plugins.
 #
@@ -213,6 +268,7 @@ done
 # (either via this image's extension mechanisms or the jenkins plugin mgr console)
 # 2) if versions of an existing plugin change as a result of a release upgrade, those changes
 # are picked up
+# 3) if new plugins result from plugin changes within a given release, they are picked up
 #
 # all of this is moot on centos, since our centos image does not store any plugins in /usr/lib/jenkins
 if [ "$(ls /usr/lib/jenkins/*.hpi 2>/dev/null)" ]; then
@@ -225,9 +281,43 @@ if [ "$(ls /usr/lib/jenkins/*.hpi 2>/dev/null)" ]; then
         if [ "$(ls ${plugin_image_volume_location} 2>/dev/null)" ]; then
           continue
         fi
+	# this will link new plugins introduced into /usr/lib/jenkins to JENKINS_HOME
 	echo "Linking ${FILENAME} RPM installed Jenkins plugins to ${JENKINS_HOME} ..."  
         ln -s  $FILENAME ${JENKINS_HOME}/plugins/${basefilename}.jpi
    done
+   
+   # since this is rhel, if it is also the initial start of the image, we can remove the 
+   # the /usr/lib/jenkins/*.hpi link from /opt/openshift/plugins/*.jpi that 
+   # was done in the rhel7 dockefile; that link is done to assist our s2i
+   # extension scenario, so that the existing plugins are available during 
+   # the s2i assemble step (which precedes the s2i run step handled by this
+   # script); however, we must keep any plugins pulled in by s2i assemble, so
+   # we only remove files which are the same as /usr/lib/jenkins
+   #
+   # also, removing the /opt/openshift/plugin file will mean install_plugins
+   # will not process it, and this will preserve the links if nothing has changed so that subsequent
+   # release to release migrations can work since the links will result in picking
+   # up the new content in /usr/lib/jenkins
+   if [ ! -e ${JENKINS_HOME}/configured ]; then
+      echo "Cleaning up links to base image plugins in /opt/openshift/plugins as part of this initial image start"
+      for FILENAME in /opt/openshift/plugins/* ; do
+         basefilename=`basename $FILENAME .jpi`
+         rpm_plugin_location="/usr/lib/jenkins/${basefilename}.hpi"
+         echo "Looking at ${FILENAME} and ${rpm_plugin_location}"
+         if [ "$(ls ${rpm_plugin_location} 2>/dev/null)" ]; then
+            optcksum=`cksum ${FILENAME} | awk '{ print $1 }'`
+            rpmcksum=`cksum ${rpm_plugin_location} | awk '{ print $1 }'`
+            echo "${FILENAME} cksum ${optcksum} and ${rpm_plugin_location} cksum ${rpmcksum}"
+            if [ "${optcksum}" == "${rpmcksum}" ]; then
+               echo "Removing ${FILENAME}"
+               rm -f $FILENAME
+            fi
+         fi
+      done
+      if [ "$(ls /opt/openshift/plugins/* 2>/dev/null)" ]; then
+         echo "Remaining plugins in /opt/openshift/plugins are $(ls /opt/openshift/plugins)"
+      fi
+   fi
 fi
 
 if [ ! -e ${JENKINS_HOME}/configured ]; then
