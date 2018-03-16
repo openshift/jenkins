@@ -3,6 +3,7 @@ FROM openshift/jenkins-slave-base-centos7
 MAINTAINER Gabe Montero <gmontero@redhat.com>
 
 ENV NODEJS_VERSION=8 \
+    YARN_VERSION=1.5.1 \
     NPM_CONFIG_PREFIX=$HOME/.npm-global \
     PATH=$HOME/node_modules/.bin/:$HOME/.npm-global/bin/:$PATH \
     BASH_ENV=/usr/local/bin/scl_enable \
@@ -17,6 +18,8 @@ RUN yum install -y centos-release-scl-rh && \
     ln -s /usr/lib/node_modules/nodemon/bin/nodemon.js /usr/bin/nodemon && \
     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
+    source /usr/local/bin/scl_enable && \ 
+    npm install -g yarn@${YARN_VERSION} && \
     yum clean all -y
 
 RUN chown -R 1001:0 $HOME && \

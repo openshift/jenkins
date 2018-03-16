@@ -2,6 +2,7 @@ package test
 
 import (
 	"os"
+	"strings"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
@@ -101,6 +102,32 @@ var _ = Describe("NodeJS agent testing", func() {
 			&container.Config{
 				Image:      imageName,
 				Entrypoint: []string{"/bin/bash", "-c", "node --version"},
+				Tty:        true,
+			},
+			nil)
+		Expect(err).NotTo(HaveOccurred())
+
+		err = dockercli.ContainerStart(id)
+		Expect(err).NotTo(HaveOccurred())
+
+		code, err := dockercli.ContainerWait(id)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(code).To(Equal(0))
+	})
+
+	It("should contain a runnable yarn", func() {
+		// the default entrypoint for the image assumes if you supply more than
+		// one arg, you are trying to invoke the slave logic, so we have to
+		// override the entrypoint to run complicated commands for testing.
+		if strings.Contains(imageName, "rhel") {
+			Skip("n/a on RHEL image")
+		}
+
+		var err error
+		id, err = dockercli.ContainerCreate(
+			&container.Config{
+				Image:      imageName,
+				Entrypoint: []string{"/bin/bash", "-c", "yarn --version"},
 				Tty:        true,
 			},
 			nil)
