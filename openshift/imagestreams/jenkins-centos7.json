@@ -21,6 +21,9 @@
         "from": {
           "kind": "ImageStreamTag",
           "name": "2"
+        },
+        "referencePolicy": {
+          "type": "Local"
         }
       },
       {
@@ -36,6 +39,9 @@
         "from": {
           "kind": "DockerImage",
           "name": "docker.io/openshift/jenkins-1-centos7:latest"
+        },
+        "referencePolicy": {
+          "type": "Local"
         }
       },
       {
@@ -51,6 +57,9 @@
         "from": {
           "kind": "DockerImage",
           "name": "docker.io/openshift/jenkins-2-centos7:v3.10"
+        },
+        "referencePolicy": {
+          "type": "Local"
         }
       }
     ]
