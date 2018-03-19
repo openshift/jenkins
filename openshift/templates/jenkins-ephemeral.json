@@ -118,6 +118,10 @@
                     "value": "true"
                   },
                   {
+                    "name": "DISABLE_ADMINISTRATIVE_MONITORS",
+                    "value": "${DISABLE_ADMINISTRATIVE_MONITORS}"
+                  },
+                  {
                     "name": "KUBERNETES_MASTER",
                     "value": "https://kubernetes.default:443"
                   },
@@ -276,6 +280,12 @@
       "displayName": "Jenkins ImageStream Namespace",
       "description": "The OpenShift Namespace where the Jenkins ImageStream resides.",
       "value": "openshift"
+    },
+    {
+      "name": "DISABLE_ADMINISTRATIVE_MONITORS",
+      "displayName": "Disable memory intensive administrative monitors",
+      "description": "Whether to perform memory intensive, possibly slow, synchronization with the Jenkins Update Center on start.  If true, the Jenkins core update monitor and site warnings monitor are disabled.",
+      "value": "false"
     },
     {
       "name": "JENKINS_IMAGE_STREAM_TAG",
