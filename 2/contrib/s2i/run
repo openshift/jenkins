@@ -28,9 +28,22 @@ function create_jenkins_config_xml() {
     if [ -f "${image_config_path}.tpl" ]; then
       export KUBERNETES_CONFIG=$(generate_kubernetes_config)
       echo "Generating kubernetes-plugin configuration (${image_config_path}.tpl) ..."
+      export ADMIN_MON_CONFIG=$(generate_administrative_monitors_config)
+      echo "Generating administrative monitor configuration (${image_config_path}.tpl) ..."
       envsubst < "${image_config_path}.tpl" > "${image_config_path}"
     fi
   fi
+}
+
+function generate_administrative_monitors_config() {
+  if [[ "${DISABLE_ADMINISTRATIVE_MONITORS}" == "true" ]]; then
+      echo '
+        <string>hudson.model.UpdateCenter$CoreUpdateMonitor</string>
+        <string>jenkins.security.UpdateSiteWarningsMonitor</string>
+      '
+      return
+  fi
+  echo ""
 }
 
 function create_jenkins_credentials_xml() {
@@ -377,6 +390,20 @@ else
 
     install_plugins
   fi  
+fi
+
+if [[ "${DISABLE_ADMINISTRATIVE_MONITORS}" == "true" ]]; then
+    echo "Disabling administrative monitors that contact the update center"
+    if [ -e "${JENKINS_HOME}/init.groovy.d/update-center-init.groovy" ]; then
+	echo "Turning off startup groovy init update center administrative monitor initialization"
+	mv "${JENKINS_HOME}/init.groovy.d/update-center-init.groovy" "${JENKINS_HOME}/init.groovy.d/update-center-init.disabled"
+    fi
+else
+    echo "Administrative monitors that contact the update center will remain active"
+    if [ -e "${JENKINS_HOME}/init.groovy.d/update-center-init.disabled" ]; then
+	echo "Turning on startup groovy init update center administrative monitor initialization"
+	mv "${JENKINS_HOME}/init.groovy.d/update-center-init.disabled" "${JENKINS_HOME}/init.groovy.d/update-center-init.groovy"
+    fi
 fi
 
 if [ -e ${JENKINS_HOME}/password ]; then

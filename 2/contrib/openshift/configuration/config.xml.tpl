@@ -1,6 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <hudson>
-  <disabledAdministrativeMonitors/>
+  <disabledAdministrativeMonitors>
+    ${ADMIN_MON_CONFIG}
+  </disabledAdministrativeMonitors>
   <version>2.89.2</version>
   <numExecutors>5</numExecutors>
   <mode>NORMAL</mode>
