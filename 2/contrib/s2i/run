@@ -28,6 +28,16 @@ function create_jenkins_config_xml() {
     if [ -f "${image_config_path}.tpl" ]; then
       export KUBERNETES_CONFIG=$(generate_kubernetes_config)
       echo "Generating kubernetes-plugin configuration (${image_config_path}.tpl) ..."
+      # we check the value of KUBE_CA here too, but print an informational message
+      # in the log here, vs. simply not including it in the config returned by the echo
+      # performed in generate_kubernetes_config
+      if [ ! -z "${KUBE_CA}" ]; then
+        openssl x509 -in $KUBE_CA > /dev/null
+        if [ $? -eq 1 ] ; then
+            echo "The file referenced by the KUBE_CA environment variable does not have a valid x509 certificate."
+            echo "You will need to manually configure the server certificate used by the kubernetes-plugin."
+        fi
+      fi
       export ADMIN_MON_CONFIG=$(generate_administrative_monitors_config)
       echo "Generating administrative monitor configuration (${image_config_path}.tpl) ..."
       envsubst < "${image_config_path}.tpl" > "${image_config_path}"
