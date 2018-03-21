@@ -74,6 +74,11 @@ function generate_kubernetes_config() {
     [ -z "$oc_cmd" ] && return
     [ ! has_service_account ] && return
     local crt_contents=$(cat "${KUBE_CA}")
+    # do not dump contents of cert here, but allow any error messages to be seen
+    openssl x509 -in $KUBE_CA > /dev/null
+    if [ $? -eq 1 ] ; then
+      crt_contents=""
+    fi
     echo "
     <org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud>
       <name>openshift</name>
