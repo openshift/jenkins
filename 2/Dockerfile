@@ -51,7 +51,7 @@ RUN /usr/local/bin/install-plugins.sh /opt/openshift/base-plugins.txt && \
     # Currently jenkins v2 does not embed any plugins, but for reference:
     # touch /opt/openshift/plugins/credentials.jpi.pinned && \
     rmdir /var/log/jenkins && \
-    chmod 775 /etc/passwd && \
+    chmod 664 /etc/passwd && \
     chmod -R 775 /etc/alternatives && \
     chmod -R 775 /var/lib/alternatives && \
     chmod -R 775 /usr/lib/jvm && \
