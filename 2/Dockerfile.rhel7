@@ -62,7 +62,7 @@ RUN rm /opt/openshift/base-plugins.txt && \
     # we use symlinks vs. actual files to delineate whether the user has overridden a plugin (and
     # by extension taken over its future maintenance)
     for FILENAME in /usr/lib/jenkins/*hpi ; do ln -s $FILENAME /opt/openshift/plugins/`basename $FILENAME .hpi`.jpi; done &&\
-    chmod 775 /etc/passwd && \
+    chmod 664 /etc/passwd && \
     chmod -R 775 /etc/alternatives && \
     chmod -R 775 /var/lib/alternatives && \
     chmod -R 775 /usr/lib/jvm && \
