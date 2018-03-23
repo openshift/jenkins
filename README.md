@@ -11,15 +11,12 @@ The images are pushed to DockerHub as openshift/jenkins-2-centos7, openshift/jen
 The slave-maven and slave-nodejs for both centos7 and rhel7  are being deprecated as part of v3.10 of OpenShift.
 Additionally, development of these images will cease as of v3.10.
 
-Development of the V1 Jenkins images has ceased.
-
 For more information about using these images with OpenShift, please see the
 official [OpenShift Documentation](https://docs.openshift.org/latest/using_images/other_images/jenkins.html).
 
 Versions
 ---------------------------------
 Jenkins versions currently provided are:
-* [jenkins-1.6x](../master/1) - DEPRECATED
 * [jenkins-2.x](../master/2)
 
 RHEL versions currently supported are:
@@ -217,7 +214,7 @@ as described in this documentation, in addition it will also include all plugins
 To create a derived image in this fashion, create the following `Dockerfile`:
 
 ```
-FROM openshift/jenkins-1-centos7
+FROM openshift/jenkins-2-centos7
 COPY plugins.txt /opt/openshift/configuration/plugins.txt
 RUN /usr/local/bin/install-plugins.sh /opt/openshift/configuration/plugins.txt
 ```
@@ -259,7 +256,7 @@ folder, so you can also include additional files (like `credentials.xml`, etc.).
 To build your customized Jenkins image, you can then execute following command:
 
 ```console
-$ s2i build https://github.com/your/repository openshift/jenkins-1-centos7 your_image_name
+$ s2i build https://github.com/your/repository openshift/jenkins-2-centos7 your_image_name
 ```
 NOTE:  if instead of adding a plugin you want to replace an existing plugin via dropping the binary plugin in the `./plugins` directory,
 make sure the filename ends in `.jpi`.
@@ -300,12 +297,12 @@ Though not originated out of the OpenShift organization, this plugin is invaluab
 Usage
 ---------------------------------
 
-For this, we will assume that you are using the `openshift/jenkins-1-centos7` image.
+For this, we will assume that you are using the `openshift/jenkins-2-centos7` image.
 If you want to set only the mandatory environment variables and store the database
 in the `/tmp/jenkins` directory on the host filesystem, execute the following command:
 
 ```
-$ docker run -d -e JENKINS_PASSWORD=<password> -v /tmp/jenkins:/var/lib/jenkins openshift/jenkins-1-centos7
+$ docker run -d -e JENKINS_PASSWORD=<password> -v /tmp/jenkins:/var/lib/jenkins openshift/jenkins-2-centos7
 ```
 
 
