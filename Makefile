@@ -1,6 +1,6 @@
 # The master images follow the normal numbering scheme in which the
 # major version is used as the directory name and incorporated into
-# the image name (jenkins-1-centos7 in this case).  For the slave
+# the image name (jenkins-2-centos7 in this case).  For the slave
 # images we are not versioning them (they actually pull their
 # jars from the jenkins master, so they don't have a jenkins version,
 # so the only thing we'd version is the maven/nodejs version).
