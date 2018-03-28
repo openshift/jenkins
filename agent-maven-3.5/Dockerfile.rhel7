@@ -3,8 +3,8 @@ FROM registry.access.redhat.com/openshift3/jenkins-slave-base-rhel7
 MAINTAINER Gabe Montero <gmontero@redhat.com>
 
 # Labels consumed by Red Hat build service
-LABEL com.redhat.component="jenkins-slave-maven-rhel7-docker" \
-      name="openshift3/jenkins-slave-maven-rhel7" \
+LABEL com.redhat.component="jenkins-agent-maven-35-rhel7-docker" \
+      name="openshift3/jenkins-agent-maven-35-rhel7" \
       version="3.10" \
       architecture="x86_64" \
       release="4" \
