@@ -34,4 +34,7 @@ if [ -d ${JENKINS_INSTALL_DIR}/configuration ]; then
   echo "---> Installing new Jenkins configuration ..."
   /usr/local/bin/fix-permissions ${JENKINS_INSTALL_DIR}/configuration
   mv ${JENKINS_INSTALL_DIR}/configuration/* ${JENKINS_DIR}/configuration/
+  # merge our baked init scripts into user init scripts
+  mkdir -p ${JENKINS_DIR}/configuration/init.groovy.d
+  mv ${JENKINS_DIR}/configuration/init.groovy.d{.s2i/*,}
 fi
