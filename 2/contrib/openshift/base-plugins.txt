@@ -62,3 +62,6 @@ blueocean:1.4.1
 # 2.4 brought in pipeline-milestone-step
 workflow-aggregator:2.5
 
+# CheckMarx plugin
+Checkmarx:8.60.0
+
