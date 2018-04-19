@@ -22,7 +22,9 @@ openshift-sync:1.0.12
 # processed sec adv https://jenkins.io/security/advisory/2018-02-14/
 # processed sec adv https://jenkins.io/security/advisory/2018-02-26/
 # processed sec adv https://jenkins.io/security/advisory/2018-03-26/
+# processed sec adv https://jenkins.io/security/advisory/2018-04-16/
 #
+htmlpublisher:1.16
 mailer:1.21
 config-file-provider:2.17
 docker-commons:1.11
