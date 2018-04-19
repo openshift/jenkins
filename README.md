@@ -1,7 +1,7 @@
 Jenkins Docker Image
 ====================
 
-This repository contains Dockerfiles for Jenkins Docker images intended for 
+This repository contains Dockerfiles for Jenkins Docker images intended for
 use with [OpenShift v3](https://github.com/openshift/origin)
 
 For an example of how to use it, [see this sample.](https://github.com/openshift/origin/blob/master/examples/jenkins/README.md)
@@ -74,7 +74,7 @@ you can execute:
     ```
     $ docker run -it <image spec> /etc/alternatives/java -jar /usr/lib/jenkins/jenkins.war --version
     ```
-    
+
 For example:
 
     ```
@@ -120,7 +120,7 @@ installed in the master and slave images defined in this repository.
 
 
 However, it needs to be noted that backward compatibility is not guaranteed between different versions of `oc` and the OpenShift
-API Server.  As such, it is recommended that you align versions of this image present in the nodes of your cluster with your 
+API Server.  As such, it is recommended that you align versions of this image present in the nodes of your cluster with your
 OpenShift API server.  In other words, you should use the version specific tag instead of the `latest` tag.
 
 |  Jenkins image version      | `oc` client version      |
@@ -133,15 +133,15 @@ OpenShift API server.  In other words, you should use the version specific tag i
 |  `jenkins-*-rhel7:latest`   | 3.6 `oc` binary \*\*     |
 
 
-**Notice: the `latest` tag for the RHEL7 images will point to 3.6 indefinitely in order to support users on older clusters with older slave 
+**Notice: the `latest` tag for the RHEL7 images will point to 3.6 indefinitely in order to support users on older clusters with older slave
 configurations that point to the "latest" tag.  This way, they will have an older `oc` client which should be able to communicate with both 3.6
-and newer versions of OpenShift API Servers.  As the support policy is less stringent for the CentOS7 image, the `latest` tag there will 
-make the more obvious correlation to the latest built version of OpenShift (which can include pre-GA versions). 
+and newer versions of OpenShift API Servers.  As the support policy is less stringent for the CentOS7 image, the `latest` tag there will
+make the more obvious correlation to the latest built version of OpenShift (which can include pre-GA versions).
 
 **Notice:  There is an additional consideration with the pod configurations for the Kubernetes Plugin; earlier versions of this image
-did not specify the "pull always" policy for the default agents/slaves configured.  As a result, users may have older/different images on 
-your nodes depending when the images were pulled.  Starting with the 3.7 release, the default changed to "pull always" to avoid this problem 
-in the future.  But if you started using this image prior to 3.7, verification of your Kubernetes plugin configurations for the image pull 
+did not specify the "pull always" policy for the default agents/slaves configured.  As a result, users may have older/different images on
+your nodes depending when the images were pulled.  Starting with the 3.7 release, the default changed to "pull always" to avoid this problem
+in the future.  But if you started using this image prior to 3.7, verification of your Kubernetes plugin configurations for the image pull
 policy used is warranted to guarantee consistency around what image is being used on each of your nodes.
 
 
@@ -150,8 +150,8 @@ Plugins
 
 ### Base set of plugins
 
-An initial set of Jenkins plugins are included in the OpenShift Jenkins images.  The general methodology 
-is that the CentOS7 image if first updated with any changes to the list of plugins.  After some level 
+An initial set of Jenkins plugins are included in the OpenShift Jenkins images.  The general methodology
+is that the CentOS7 image if first updated with any changes to the list of plugins.  After some level
 of verification with that image, the RHEL7 image is updated.
 
 #### Plugin installation for CentOS7
@@ -178,7 +178,7 @@ and download any needed dependencies listed, including upgrading any previously 
 To update the version of a plugin or add a new plugin, construct a PR for this repository that updates `base-plugins.txt` appropriately.
 Administrators for this repository will make sure necessary tests are run and merge the PR when things are ready.
 
-When PRs for this repository are merged, they kick off associated builds in the [`push_jenkins_images` job on OpenShift's public 
+When PRs for this repository are merged, they kick off associated builds in the [`push_jenkins_images` job on OpenShift's public
 Jenkins CI/CD server](https://ci.openshift.redhat.com/jenkins/view/All/job/push_jenkins_images/).  When those builds complete,
 new versions of the CentOS7 based versions of the images produced by this repository are pushed to Docker Hub.  See the top of the README for the precise list.
 
@@ -189,7 +189,7 @@ Only OpenShift developers working for Red Hat can update the list of plugins for
 
 The complete list of plugins (i.e. including dependencies) needs to be provided though.  The most straight forward approach is to mine the output of the CentOS7 build which passed verification for the complete list.  Just search for `Installed plugins:` and leverage copy/paste to compile what is needed.
 
-Although this document will refrain on detailing the precise details, once the build on the internal Jenkins server is complete, 
+Although this document will refrain on detailing the precise details, once the build on the internal Jenkins server is complete,
 the processes will be set in motion to build the `jenkins-2-plugins` RPM that is installed by the [RHEL7 Dockerfile](2/Dockerfile.rhel7) when the next version of the RHEL7 based OpenShift Jenkins image is built.  When new versions of OpenShift are released, associated versions of the RHEL7 based versions of the images produced by this repository are pushed to the Docker registry provided to RHEL7 subscribers.
 
 Some reference links for the OpenShift Jenkins developers and where things cross over with the CD/CL/Atomic/RHEL teams:
@@ -199,14 +199,14 @@ Some reference links for the OpenShift Jenkins developers and where things cross
 ### Adding plugins or updating existing plugins
 
 A combination of the contents of this repository and the capabilities of OpenShift allow for a variety of ways to modify
-the list of plugins either for the images directly produced from this repository, or by creating images which build 
+the list of plugins either for the images directly produced from this repository, or by creating images which build
 from the images directly produced from this repository.
 
 The specifics for each approach are detailed below.
 
 #### Installing using layering
 
-In order to install additional Jenkins plugins, the OpenShift Jenkins image provides a way similar to how 
+In order to install additional Jenkins plugins, the OpenShift Jenkins image provides a way similar to how
 the [initial set of plugins are added](#plugin-installation-for-centos7) to this image that will allow one
 to add or update by layering on top of this image. The derived image will provide the same functionality
 as described in this documentation, in addition it will also include all plugins you list in the `plugins.txt` file.
@@ -245,7 +245,7 @@ customized Docker image or you can use OpenShift Source build strategy.
 In order to include your modifications in Jenkins image, you need to have a Git
 repository with following directory structure:
 
-* `./plugins` folder that contains binary Jenkins plugins you want to copy into Jenkins 
+* `./plugins` folder that contains binary Jenkins plugins you want to copy into Jenkins
 * `./plugins.txt` file that list the plugins you want to install (see the section above)
 * `./configuration/jobs` folder that contains the Jenkins job definitions
 * `./configuration/config.xml` file that contains your custom Jenkins configuration
@@ -274,7 +274,7 @@ INSTALL_PLUGINS=groovy:1.30,ghprb:1.35.0
 
 ### Plugins focused on integration with OpenShift
 
-A subset of the plugins included by the images of this repository play a direct part in integrating between Jenkins and OpenShift. 
+A subset of the plugins included by the images of this repository play a direct part in integrating between Jenkins and OpenShift.
 
 * **OpenShift Pipeline Plugin**
 Visit [the upstream repository](https://github.com/openshift/jenkins-plugin), which demonstrates example usage of the plugin's capabilities with the [OpenShift Sample Job](https://github.com/openshift/jenkins/tree/master/1/contrib/openshift/configuration/jobs/OpenShift%20Sample) included in this image. For more details visit the Jenkins [plugin](https://wiki.jenkins-ci.org/display/JENKINS/OpenShift+Pipeline+Plugin) website.  Future development of this plugin is being deprioritized in favor of the **OpenShift Client Plugin** detailed below.  But this plugin is still supported for existing users who have yet to finish migrating to **OpenShift Client Plugin**.  It also serves as an option if the use of the `oc` binary from your Jenkins jobs is not viable for some reason (we are actually curious if such use cases in fact exist), as it interacts with OpenShift via HTTP REST.  Remember though only a subset of the functionality provided by `oc` is available from this plugin.
@@ -283,12 +283,12 @@ Visit [the upstream repository](https://github.com/openshift/jenkins-plugin), wh
 Visit [the upstream repository](https://github.com/openshift/jenkins-client-plugin) as well as the [Jenkins plugin wiki](https://wiki.jenkins-ci.org/display/JENKINS/OpenShift+Client+Plugin).  With the lessons learned from OpenShift Pipeline Plugin, as well as adjustments to the rapid evolutions of both Jenkins and OpenShift, this plugin, with its fluent styled syntax and use of the `oc` binary (exposing all the capabilities of that command), is the preferred choice for interacting with OpenShift via either Jenkins Pipeline or Freestyle jobs.
 
 * **OpenShift Sync Plugin**
-Visit [the upstream repository](https://github.com/openshift/jenkins-sync-plugin) as well as the [Jenkins plugin wiki](https://wiki.jenkins-ci.org/display/JENKINS/OpenShift+Sync+Plugin).  This plugin facilitates the integration between the OpenShift Jenkinsfile Build Strategy and Jenkins Pipelines.  It also facilitates auto-configuration of the slave pod templates for the Kubernetes Plugin.  See the [OpenShift documentation](https://docs.openshift.com) for more details. 
+Visit [the upstream repository](https://github.com/openshift/jenkins-sync-plugin) as well as the [Jenkins plugin wiki](https://wiki.jenkins-ci.org/display/JENKINS/OpenShift+Sync+Plugin).  This plugin facilitates the integration between the OpenShift Jenkinsfile Build Strategy and Jenkins Pipelines.  It also facilitates auto-configuration of the slave pod templates for the Kubernetes Plugin.  See the [OpenShift documentation](https://docs.openshift.com) for more details.
 
 * **OpenShift Login Plugin**
 Visit [the upstream repository](https://github.com/openshift/jenkins-openshift-login-plugin) as well as the [Jenkins plugin wiki](https://wiki.jenkins-ci.org/display/JENKINS/OpenShift+Login+Plugin).  This plugin integrates the authentication and authorization of your Jenkins instance with you OpenShift cluster, providing a single sign-on look and feel.  You'll sign into the Jenkins server using the same credentials that you use to sign into the OpenShift Web Console or interact with OpenShift via the `oc` CLI.  See the [OpenShift documentation](https://docs.openshift.com) for more details.
 
-For the above OpenShift Jenkins plugins, each of their READMEs have specifics unique to each of them on how to use and if so desired contribute to their development.  That said, there is a good deal of commonality and shared infrastructure 
+For the above OpenShift Jenkins plugins, each of their READMEs have specifics unique to each of them on how to use and if so desired contribute to their development.  That said, there is a good deal of commonality and shared infrastructure
 related to developing, creating new versions, and ultimately updating the images of this repository with those new versions.  If you would like to understand the specifics of that process, please visit our [plugin contribution guide](CONTRIBUTING_TO_OPENSHIFT_PLUGINS.md).
 
 * **Kubernetes Plugin**
@@ -316,7 +316,7 @@ Authenticating into a Jenkins server running within the OpenShift Jenkins image 
 
 See the [OpenShift Login plugin documentation](https://github.com/openshift/jenkins-openshift-login-plugin) for details on how it manages authentication.
 
-However, when the default authentication mechanism for Jenkins is used, if you are using the OpenShift Jenkins image, you log in with the user name `admin`, supplying the password specified by the `JENKINS_PASSWORD` environment variable set on the container. If you do not override `JENKINS_PASSWORD`, the default password for `admin` is `password`. 
+However, when the default authentication mechanism for Jenkins is used, if you are using the OpenShift Jenkins image, you log in with the user name `admin`, supplying the password specified by the `JENKINS_PASSWORD` environment variable set on the container. If you do not override `JENKINS_PASSWORD`, the default password for `admin` is `password`.
 
 
 Test
@@ -345,5 +345,5 @@ Users can choose between testing Jenkins based on a RHEL or CentOS image.
     ```
 
 **Notice: By omitting the `VERSION` parameter, the build/test action will be performed
-on all provided versions of Jenkins. Since we are currently providing only version `1`,
+on all provided versions of Jenkins. Since we are currently providing only version `2`,
 you can omit this parameter.**
