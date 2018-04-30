@@ -42,8 +42,9 @@ RUN yum-config-manager --disable epel >/dev/null || : && \
     # establishing a symbolic link for that guy as well, so that existing plugins in JENKINS_HOME/plugins pointing to /usr/lib64/jenkins
     # will subsequently get redirected to /usr/lib/jenkins; it is confirmed that the 3.7 jenkins RHEL images do *NOT* have a /usr/lib64/jenkins path
     ln -s /usr/lib/jenkins /usr/lib64/jenkins && \
-    INSTALL_PKGS="dejavu-sans-fonts wget rsync gettext git tar zip unzip openssl bzip2 dumb-init  java-1.8.0-openjdk java-1.8.0-openjdk.i686 java-1.8.0-openjdk-devel java-1.8.0-openjdk-devel.i686 atomic-openshift-clients jenkins-2.* jenkins-2-plugins" && \
-    yum install -y $INSTALL_PKGS && \
+    x86_EXTRA_RPMS=$(if [ "$(uname -m)" == "x86_64" ]; then echo -n java-1.8.0-openjdk.i686 java-1.8.0-openjdk-devel.i686 ; fi) && \
+    INSTALL_PKGS="dejavu-sans-fonts wget rsync gettext git tar zip unzip openssl bzip2 dumb-init  java-1.8.0-openjdk atomic-openshift-clients jenkins-2.* jenkins-2-plugins" && \
+    yum install -y $INSTALL_PKGS $x86_EXTRA_RPMS && \
     # have temporarily removed the validation for java to work aroun known rhel 7.5 problem fixed in fedora; jupierce and gmontero are working with
     # the requisit folks to get that addressed ... will switch back to rpm -V $INSTALL_PKGS when that occurs
     rpm -V dejavu-sans-fonts wget rsync gettext git tar zip unzip openssl bzip2 dumb-init  atomic-openshift-clients jenkins-2.* jenkins-2-plugins && \
