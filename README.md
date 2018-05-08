@@ -73,6 +73,7 @@ initialization by passing `-e VAR=VALUE` to the Docker run command.
 | `OPENSHIFT_PERMISSIONS_POLL_INTERVAL` | Specifies in milliseconds how often the OpenShift Login plugin polls OpenShift for the permissions associated with each user defined in Jenkins. |
 | `INSTALL_PLUGINS`         | Comma-separated list of additional plugins to install on startup. The format of each plugin spec is `plugin-id:version` (as in plugins.txt) |
 |  `OVERRIDE_RELEASE_MIGRATION_OVERWRITE`       | When running this image with an OpenShift persistent volume for the Jenkins config directory, and this image is starting in an existing deployment created with an earlier version of this image, unless the environment variable is set to some non-empty value, the plugins from the image will replace any versions of those plugins currently residing in the Jenkins plugin directory.  |
+|  `SKIP_NO_PROXY_DEFAULT`       | This environment variable applies to the agent/slave images produced by this repository.  By default, the agent/slave images will create/update the 'no_proxy' environment variable with the hostnames for the Jenkins server endpoint and Jenkins JNLP endpoint, as communication flows to endpoints typically should *NOT* go through a HTTP Proxy.  However, if your use case dictates those flows should not be exempt from the proxy, set this environment variable to any non-empty value.    |
 
 
 
