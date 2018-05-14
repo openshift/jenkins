@@ -25,38 +25,36 @@ if [[ "$(uname -m)" == "x86_64" ]]; then
     # Set the JVM architecture used.  Follow OPENSHIFT_JENKINS_JVM_ARCH if set.  If
     # not, use 32 bit JVM for space efficiency if container size < 2GiB
     if [[ "${OPENSHIFT_JENKINS_JVM_ARCH}" == "x86_64" || \
-	      ( "${OPENSHIFT_JENKINS_JVM_ARCH}" == "" && "${CONTAINER_MEMORY_IN_MB}" -ge 2048 ) ]]; then
-	alternatives --set java $(alternatives --display java | awk '/family.*x86_64/ { print $1; }')
-	alternatives --set javac $(alternatives --display javac | awk '/family.*x86_64/ { print $1; }')
+        ( "${OPENSHIFT_JENKINS_JVM_ARCH}" == "" && "${CONTAINER_MEMORY_IN_MB}" -ge 2048 ) ]]; then
+      alternatives --set java $(alternatives --display java | awk '/family.*x86_64/ { print $1; }')
     else
-	alternatives --set java $(alternatives --display java | awk '/family.*i386/ { print $1; }')
-	alternatives --set javac $(alternatives --display javac | awk '/family.*i386/ { print $1; }')
-	export MALLOC_ARENA_MAX=${MALLOC_ARENA_MAX:-1}
+      alternatives --set java $(alternatives --display java | awk '/family.*i386/ { print $1; }')
+      export MALLOC_ARENA_MAX=${MALLOC_ARENA_MAX:-1}
     fi
 fi
 
-echo "OPENSHIFT_JENKINS_JVM_ARCH='${OPENSHIFT_JENKINS_JVM_ARCH}', CONTAINER_MEMORY_IN_MB='${CONTAINER_MEMORY_IN_MB}', using $(readlink /etc/alternatives/java) and $(readlink /etc/alternatives/javac)"
+echo "OPENSHIFT_JENKINS_JVM_ARCH='${OPENSHIFT_JENKINS_JVM_ARCH}', CONTAINER_MEMORY_IN_MB='${CONTAINER_MEMORY_IN_MB}', using $(readlink /etc/alternatives/java)"
 
 if [[ -z "${SKIP_NO_PROXY_DEFAULT}" ]]; then
-    # we do not want jenkins svc or jenkins-jnlp svc
-    # communication going through a http proxy
-    # env vars to consider:
-    # - no_proxy and NO_PROXY; case of string varies tool to tool
-    # - JENKINS_URL and JENKINS_TUNNEL comes from k8s plugin
-    # based on how our master image configures the cloud, but we need to strip the host / port
-    jenkins_http_host=`echo $JENKINS_URL | sed 's#https://##' | sed 's#http://##' | cut -f1 -d":"`
-    jnlp_http_host=`echo $JENKINS_TUNNEL | sed 's#https://##' | sed 's#http://##' | cut -f1 -d":"`
-    # check if set to avoid having a comma as the last char
-    if [[ -z "${no_proxy}" ]]; then
-       export no_proxy=$jenkins_http_host,$jnlp_http_host
-    else
-	export no_proxy=$jenkins_http_host,$jnlp_http_host,$no_proxy
-    fi
-    if [[ -z "${NO_PROXY}" ]]; then
-       export NO_PROXY=$jenkins_http_host,$jnlp_http_host
-    else
-	export NO_PROXY=$jenkins_http_host,$jnlp_http_host,$NO_PROXY
-    fi
+  # we do not want jenkins svc or jenkins-jnlp svc
+  # communication going through a http proxy
+  # env vars to consider:
+  # - no_proxy and NO_PROXY; case of string varies tool to tool
+  # - JENKINS_URL and JENKINS_TUNNEL comes from k8s plugin
+  # based on how our master image configures the cloud, but we need to strip the host / port
+  jenkins_http_host=`echo $JENKINS_URL | sed 's#https://##' | sed 's#http://##' | cut -f1 -d":"`
+  jnlp_http_host=`echo $JENKINS_TUNNEL | sed 's#https://##' | sed 's#http://##' | cut -f1 -d":"`
+  # check if set to avoid having a comma as the last char
+  if [[ -z "${no_proxy}" ]]; then
+     export no_proxy=$jenkins_http_host,$jnlp_http_host
+  else
+    export no_proxy=$jenkins_http_host,$jnlp_http_host,$no_proxy
+  fi
+  if [[ -z "${NO_PROXY}" ]]; then
+     export NO_PROXY=$jenkins_http_host,$jnlp_http_host
+  else
+    export NO_PROXY=$jenkins_http_host,$jnlp_http_host,$NO_PROXY
+  fi
 fi
 
 # Configure the slave image
