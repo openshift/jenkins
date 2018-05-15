@@ -34,15 +34,15 @@ function docker_build_with_version {
 # to build just one single version. By default we build all versions
 dirs=${VERSION:-$VERSIONS}
 
-# enforce building of the slave-base image if we're building any of
-# the slave/agent images.  Note that we might build the slave-base
+# enforce building of the agent-base image if we're building any of
+# the slave/agent images.  Note that we might build the agent-base
 # twice if it was explicitly requested.  That's ok, it's
 # cheap to build it a second time.  The important thing
 # is we have to build it before building any other
 # slave image.
 for dir in ${dirs}; do
-  if [[ "$dir" =~ "slave" || "$dir" =~ "agent" ]]; then
-    dirs=( "slave-base ${dirs[@]}")
+  if [[ "$dir" =~ "agent" ]]; then
+    dirs=( "agent-base ${dirs[@]}")
     break
   fi
 done
@@ -69,8 +69,8 @@ for dir in ${dirs}; do
 
   if [[ ! -z "${TEST_MODE}" ]]; then
     ( cd test && IMAGE_NAME=${IMAGE_NAME} go test -timeout 30m -v -ginkgo.v . )
-    # always re-tag slave-base because we need it to build the other images even if we are just testing them.
-    if [[ $? -eq 0 ]] && [[ "${TAG_ON_SUCCESS}" == "true" || "${dir}" == "slave-base" ]]; then
+    # always re-tag agent-base because we need it to build the other images even if we are just testing them.
+    if [[ $? -eq 0 ]] && [[ "${TAG_ON_SUCCESS}" == "true" || "${dir}" == "agent-base" ]]; then
       echo "-> Re-tagging ${IMAGE_NAME} image to ${IMAGE_NAME%"-candidate"}"
       docker tag $IMAGE_NAME ${IMAGE_NAME%"-candidate"}
     fi
