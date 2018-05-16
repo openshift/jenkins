@@ -3,6 +3,8 @@
 JENKINS_DIR=/opt/openshift
 JENKINS_INSTALL_DIR=$(mktemp -d --suffix=jenkins)
 
+INCREMENTAL_BUILD_ARTIFACTS_DIR=/tmp/artifacts
+
 shopt -s dotglob
 
 echo "---> Copying repository files ..."
@@ -19,6 +21,9 @@ if [ -f ${JENKINS_INSTALL_DIR}/plugins.txt ]; then
   fi
   /usr/local/bin/fix-permissions ${JENKINS_DIR}/plugins
 fi
+
+echo "Deleting $INCREMENTAL_BUILD_ARTIFACTS_DIR/plugins"
+rm -rf "$INCREMENTAL_BUILD_ARTIFACTS_DIR/plugins"
 
 if [ -d ${JENKINS_INSTALL_DIR}/plugins ]; then
   echo "---> Installing $(ls -l ${JENKINS_INSTALL_DIR}/plugins | grep ^- | wc -l) Jenkins plugins from plugins/ directory ..."

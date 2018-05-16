@@ -150,6 +150,8 @@ FAILED="$REF_DIR/failed-plugins.txt"
 
 JENKINS_WAR=/usr/lib/jenkins/jenkins.war
 
+INCREMENTAL_BUILD_ARTIFACTS_DIR="/tmp/artifacts"
+
 function getLockFile() {
     echo -n "$REF_DIR/${1}.lock"
 }
@@ -199,6 +201,17 @@ function doDownload() {
         echo "Using provided plugin: $plugin"
         return 0
     fi
+
+    # Check if the plugin is cached and in correct version; if so, use it instead of downloading
+    # Some plugins do not follow the naming conventions and include the "-plugin" suffix; both cases need to be covered
+    for pluginFilename in "$plugin.jpi" "$plugin-plugin.jpi"; do
+        local cachedPlugin="$INCREMENTAL_BUILD_ARTIFACTS_DIR/plugins/$pluginFilename"
+        if test -f "$cachedPlugin" && [[ $(get_plugin_version "$cachedPlugin") == "$version" ]]; then
+            echo "Copying plugin from a cache created by s2i: $cachedPlugin"
+            cp "$cachedPlugin" "$jpi"
+            return 0
+        fi
+    done
 
     if [[ "$version" == "latest" && -n "$JENKINS_UC_LATEST" ]]; then
         # If version-specific Update Center is available, which is the case for LTS versions,
