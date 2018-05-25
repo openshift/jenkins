@@ -402,7 +402,7 @@ else
     rm -rf ${JENKINS_HOME}/plugins
 
     install_plugins
-  fi  
+  fi
 fi
 
 if [[ "${DISABLE_ADMINISTRATIVE_MONITORS}" == "true" ]]; then
@@ -455,10 +455,17 @@ fi
 JENKINS_SERVICE_NAME=${JENKINS_SERVICE_NAME:-JENKINS}
 JENKINS_SERVICE_NAME=`echo ${JENKINS_SERVICE_NAME} | tr '[a-z]' '[A-Z]' | tr '-' '_'`
 
+FATAL_ERROR_OPTION=""
+
+if [[ "${ENABLE_FATAL_ERROR_LOG_FILE}" == "true" ]]; then
+    echo "Fatal error log file is true. We need to set the Error File to reside in the PV."
+    FATAL_ERROR_OPTION="-XX:ErrorFile=/var/lib/jenkins/logs"
+fi
+
 if [[ -z "${JENKINS_JAVA_OPTIONS}" ]]; then
     # a discover was made upstream that if the monitor plugin is installed, it creates httpsession's via its filter, which impact the login plugin bearer token support,
     # so the displayed-counters setting turns that off
-    JENKINS_JAVA_OPTIONS="$JAVA_GC_OPTS $JAVA_INITIAL_HEAP_PARAM $JAVA_MAX_HEAP_PARAM $JAVA_CORE_LIMIT $JAVA_DIAGNOSTICS -Dfile.encoding=UTF8 -Djavamelody.displayed-counters=log,error $JENKINS_ACCESSLOG"
+    JENKINS_JAVA_OPTIONS="$JAVA_GC_OPTS $JAVA_INITIAL_HEAP_PARAM $JAVA_MAX_HEAP_PARAM $JAVA_CORE_LIMIT $JAVA_DIAGNOSTICS -Dfile.encoding=UTF8 -Djavamelody.displayed-counters=log,error $JENKINS_ACCESSLOG $FATAL_ERROR_OPTION"
 fi
 
 # Deal with embedded escaped spaces in JENKINS_JAVA_OVERRIDES.
