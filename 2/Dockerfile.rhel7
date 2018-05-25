@@ -16,7 +16,7 @@ ENV JENKINS_VERSION=2 \
     HOME=/var/lib/jenkins \
     JENKINS_HOME=/var/lib/jenkins \
     JENKINS_UC=https://updates.jenkins.io \
-    OPENSHIFT_JENKINS_IMAGE_VERSION=3.10 \
+    OPENSHIFT_JENKINS_IMAGE_VERSION=3.11 \
     LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8
 
@@ -29,7 +29,7 @@ LABEL io.k8s.description="Jenkins is a continuous integration server" \
 # Labels consumed by Red Hat build service
 LABEL com.redhat.component="openshift-jenkins-2-docker" \
       name="openshift3/jenkins-2-rhel7" \
-      version="3.10" \
+      version="3.11" \
       architecture="x86_64" \
       release="7"
 
