@@ -40,7 +40,3 @@ RUN chown -R 1001:0 $HOME && \
     chmod -R g+rw $HOME
 
 USER 1001
-
-# Set Jenkins for git pushing tags etc in pipeline
-RUN git config --global user.email "jenkins@agent-nodejs.com" && \
-    git config --global user.name "jenkins"
