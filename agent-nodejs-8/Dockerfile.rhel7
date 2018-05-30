@@ -17,23 +17,30 @@ ENV NODEJS_VERSION=8 \
     PATH=$HOME/node_modules/.bin/:$HOME/.npm-global/bin/:$PATH \
     BASH_ENV=/usr/local/bin/scl_enable \
     ENV=/usr/local/bin/scl_enable \
-    PROMPT_COMMAND=". /usr/local/bin/scl_enable"
+    PROMPT_COMMAND=". /usr/local/bin/scl_enable" \
+    CHROME_BIN=/bin/google-chrome
 
 COPY contrib/bin/scl_enable /usr/local/bin/scl_enable
+ADD https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm google-chrome-stable_current_x86_64.rpm
 
-# Install NodeJS
+# Install NodeJS & Google Chrome
 RUN yum-config-manager --enable rhel-server-rhscl-7-rpms && \    
     yum-config-manager --enable rhel-7-server-optional-rpms && \
     yum-config-manager --enable rhel-server-rhscl-8-rpms && \ 
     yum-config-manager --enable rhel-8-server-optional-rpms && \
     yum-config-manager --disable epel >/dev/null || : && \
-    INSTALL_PKGS="rh-nodejs${NODEJS_VERSION} rh-nodejs${NODEJS_VERSION}-nodejs-nodemon make gcc-c++" && \
+    INSTALL_PKGS="rh-nodejs${NODEJS_VERSION} rh-nodejs${NODEJS_VERSION}-nodejs-nodemon make gcc-c++ nss_wrapper redhat-lsb libXScrnSaver xdg-utils" && \
     ln -s /usr/lib/node_modules/nodemon/bin/nodemon.js /usr/bin/nodemon && \
     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
+    yum -y localinstall google-chrome-stable_current_x86_64.rpm && \
     yum clean all -y
 
 RUN chown -R 1001:0 $HOME && \
     chmod -R g+rw $HOME
 
 USER 1001
+
+# Set Jenkins for git pushing tags etc in pipeline
+RUN git config --global user.email "jenkins@agent-nodejs.com" && \
+    git config --global user.name "jenkins"
