@@ -1,0 +1,7 @@
+#!/bin/bash
+
+pushd "/opt/openshift" > /dev/null
+if [ -d plugins ]; then
+    tar cf - ./plugins
+fi
+popd > /dev/null

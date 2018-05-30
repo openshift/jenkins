@@ -4,10 +4,14 @@ openshift-client:1.0.12
 
 
 # kubernetes plugin - https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin
-kubernetes:1.2
+# 1.6.0 has the support we added for allowing the use of pod yaml for pod template
+# config from the config panel (there was a flavor for this already with the k8s plugin's
+# pipeline DSL, and 1.6.2 has the support for opting in the transfer of proxy related
+# env vars from the master to the client
+kubernetes:1.6.2
 
 # fabric8 openshift sync
-openshift-sync:1.0.18
+openshift-sync:1.0.19
 
 # explicitly pull in plugins previously pulled in by dependencies because of
 # security advisories  ...exclude plugins from
@@ -49,6 +53,7 @@ workflow-remote-loader:1.4
 
 matrix-project:1.12
 ssh-credentials:1.13
+ssh-agent:1.15
 
 # Pipeline Utility Steps Plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Utility+Steps+Plugin
 pipeline-utility-steps:1.5.1

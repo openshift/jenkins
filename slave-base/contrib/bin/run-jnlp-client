@@ -63,8 +63,25 @@ source /usr/local/bin/configure-agent
 
 set -e
 
+# As of version 1.6.0 of the Jenkins Kubernetes plugin,
+# args are no longer passed to jnlp container if not present in containerTemplate
+# See https://github.com/jenkinsci/kubernetes-plugin/pull/315
+# In this case, we use JENKINS_SECRET and JENKINS_NAME for launcher arguments
+# This is made worse if using Declarative pipeline and specifying yaml for the podTemplate
+# In this case, ${computer.*} is not resolvable.
+
+# If no args are given, we examine env vars and add to arg list.
+if [[ $# -eq 0 ]]; then
+  if [ ! -z "$JENKINS_SECRET" ]; then
+    set -- "${@}" "$JENKINS_SECRET"
+  fi
+  if [ ! -z "$JENKINS_NAME" ]; then
+    set -- "${@}" "$JENKINS_NAME"
+  fi
+fi
+
 # if `docker run` has 2 or more arguments the user is passing jenkins launcher arguments
-if [[ $# -gt 1 ]]; then
+if [[ $(echo "$@" | awk '{print NF}') -gt 1 ]]; then
   JAR="${JENKINS_HOME}/remoting.jar"
   PARAMS=""
 
