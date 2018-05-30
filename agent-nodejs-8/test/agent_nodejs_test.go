@@ -133,23 +133,4 @@ var _ = Describe("NodeJS agent testing", func() {
 		Expect(code).To(Equal(0))
 	})
 
-
-	It("should contain jenkins git config", func() {
-		var err error
-		id, err = dockercli.ContainerCreate(
-			&container.Config{
-				Image:      imageName,
-				Entrypoint: []string{"/bin/bash", "-c", "git config --global --list | grep jenkins"},
-				Tty:        true,
-			},
-			nil)
-		Expect(err).NotTo(HaveOccurred())
-
-		err = dockercli.ContainerStart(id)
-		Expect(err).NotTo(HaveOccurred())
-
-		code, err := dockercli.ContainerWait(id)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(code).To(Equal(0))
-	})
 })
