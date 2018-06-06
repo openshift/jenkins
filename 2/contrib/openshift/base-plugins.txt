@@ -7,8 +7,9 @@ openshift-client:1.0.12
 # 1.6.0 has the support we added for allowing the use of pod yaml for pod template
 # config from the config panel (there was a flavor for this already with the k8s plugin's
 # pipeline DSL, and 1.6.2 has the support for opting in the transfer of proxy related
-# env vars from the master to the client
-kubernetes:1.6.2
+# env vars from the master to the client, and 1.7.1 fixes
+# https://issues.jenkins-ci.org/browse/SECURITY-883
+kubernetes:1.7.1
 
 # fabric8 openshift sync
 openshift-sync:1.0.19
@@ -27,6 +28,7 @@ openshift-sync:1.0.19
 # processed sec adv https://jenkins.io/security/advisory/2018-02-26/
 # processed sec adv https://jenkins.io/security/advisory/2018-03-26/
 # processed sec adv https://jenkins.io/security/advisory/2018-04-16/
+# processed sec adv https://jenkins.io/security/advisory/2018-06-04/
 #
 htmlpublisher:1.16
 mailer:1.21
@@ -41,9 +43,11 @@ credentials-binding:1.15
 junit:1.24
 workflow-durable-task-step:2.18
 workflow-support:2.18
-git:3.8.0
+git:3.9.1
 mercurial:2.3
 subversion:2.10.3
+github:1.29.1
+github-branch-source:2.3.6
 
 # Legacy stuff
 mapdb-api:1.0.9.0
