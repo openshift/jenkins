@@ -36,11 +36,11 @@ RUN curl https://pkg.jenkins.io/redhat-stable/jenkins.repo -o /etc/yum.repos.d/j
     yum install -y centos-release-scl-rh && \
     curl https://copr.fedorainfracloud.org/coprs/alsadi/dumb-init/repo/epel-7/alsadi-dumb-init-epel-7.repo -o /etc/yum.repos.d/alsadi-dumb-init-epel-7.repo && \
     x86_EXTRA_RPMS=$(if [ "$(uname -m)" == "x86_64" ]; then echo -n java-1.8.0-openjdk.i686 java-1.8.0-openjdk-devel.i686 ; fi) && \
-    INSTALL_PKGS="dejavu-sans-fonts rsync gettext git tar zip unzip openssl bzip2 dumb-init java-1.8.0-openjdk jenkins-2.107.3-1.1" && \
+    INSTALL_PKGS="dejavu-sans-fonts rsync gettext git tar zip unzip openssl bzip2 dumb-init java-1.8.0-openjdk jenkins-2.121.1-1.1" && \
     yum -y --setopt=tsflags=nodocs install $INSTALL_PKGS $x86_EXTRA_RPMS && \
     # have temporarily removed the validation for java to work around known problem fixed in fedora; jupierce and gmontero are working with
     # the requisit folks to get that addressed ... will switch back to rpm -V $INSTALL_PKGS when that occurs
-    rpm -V  dejavu-sans-fonts rsync gettext git tar zip unzip openssl bzip2 dumb-init jenkins-2.107.3-1.1 && \
+    rpm -V  dejavu-sans-fonts rsync gettext git tar zip unzip openssl bzip2 dumb-init jenkins-2.121.1-1.1 && \
     yum clean all  && \
     localedef -f UTF-8 -i en_US en_US.UTF-8
 
