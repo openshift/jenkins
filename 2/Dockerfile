@@ -89,7 +89,10 @@ RUN /usr/local/bin/install-plugins.sh /opt/openshift/base-plugins.txt && \
     /usr/local/bin/fix-permissions /opt/openshift && \
     /usr/local/bin/fix-permissions /opt/openshift/configuration/init.groovy.d && \
     /usr/local/bin/fix-permissions /var/lib/jenkins && \
-    /usr/local/bin/fix-permissions /var/log
+    /usr/local/bin/fix-permissions /var/log && \
+    git config --global user.email "openshift@openshift.com" && \
+    git config --global user.name "openshift"
+
 
 VOLUME ["/var/lib/jenkins"]
 

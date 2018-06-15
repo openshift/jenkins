@@ -47,7 +47,9 @@ RUN yum install -y centos-release-scl-rh && \
     unlink /usr/share/man/man1/rmiregistry.1.gz && \
     unlink /usr/share/man/man1/servertool.1.gz && \
     unlink /usr/share/man/man1/tnameserv.1.gz && \
-    unlink /usr/share/man/man1/unpack200.1.gz
+    unlink /usr/share/man/man1/unpack200.1.gz && \
+    git config --global user.email "openshift@openshift.com" && \
+    git config --global user.name "openshift"
 
 # Copy the entrypoint
 ADD contrib/bin/* /usr/local/bin/
