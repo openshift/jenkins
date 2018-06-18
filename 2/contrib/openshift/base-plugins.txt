@@ -1,6 +1,6 @@
 openshift-pipeline:1.0.54
 openshift-login:1.0.8
-openshift-client:1.0.12
+openshift-client:1.0.13
 
 
 # kubernetes plugin - https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin
@@ -12,7 +12,7 @@ openshift-client:1.0.12
 kubernetes:1.7.1
 
 # fabric8 openshift sync
-openshift-sync:1.0.19
+openshift-sync:1.0.20
 
 # explicitly pull in plugins previously pulled in by dependencies because of
 # security advisories  ...exclude plugins from
