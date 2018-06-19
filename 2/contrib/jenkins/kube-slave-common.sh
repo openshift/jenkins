@@ -146,6 +146,7 @@ function generate_kubernetes_config() {
       </templates>
       <serverUrl>https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}</serverUrl>
       <skipTlsVerify>false</skipTlsVerify>
+      <addMasterProxyEnvVars>true</addMasterProxyEnvVars>
       <serverCertificate>${crt_contents}</serverCertificate>
       <namespace>${PROJECT_NAME}</namespace>
       <jenkinsUrl>http://${JENKINS_SERVICE_HOST}:${JENKINS_SERVICE_PORT}</jenkinsUrl>
