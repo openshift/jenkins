@@ -182,7 +182,7 @@ Two approaches have evolved with the four plugins:
 
 #### Commits between [https://github.com/openshift](https://github.com/openshift) and [https://github.com/jenkinsci](https://github.com/jenkinsci) repositories are in sync
 
-This condition still exists for the `openshift-pipeline` and `openshift-login` plugins.  As such, the process and maintenance is a bit simpler, as we can `git rebase`.
+This condition still exists for the `openshift-pipeline` plugin.  As such, the process and maintenance is a bit simpler, as we can `git rebase`.
 Set up your git remotes so origin is the `https://github.com/jenkinsci/<plugin dir>` repository, and upstream is the `https://github.com/openshift/<plugin dir>/` repository.  Using `openshift-pipeline` as an example (and substitute the 
 other plugin names if working with those plugins):
 
@@ -201,7 +201,7 @@ other plugin names if working with those plugins):
 
 #### Commits between [https://github.com/openshift](https://github.com/openshift) and [https://github.com/jenkinsci](https://github.com/jenkinsci) repositories are no longer in sync
 
-This condition now exists for the `openshift-sync` and `openshift-client` plugins.  As such, we have to `git cherry-pick`.  The recipe is the same as above, except the `git rebase upstream/master` is replaced with either a `git cherry-pick <commit id>` or `git cherry-pick -m 1 <merge commit id>` based on whether you are pulling in a direct commit or merge commit.
+This condition now exists for the `openshift-sync`, `openshift-login`, and `openshift-client` plugins.  As such, we have to `git cherry-pick`.  The recipe is the same as above, except the `git rebase upstream/master` is replaced with either a `git cherry-pick <commit id>` or `git cherry-pick -m 1 <merge commit id>` based on whether you are pulling in a direct commit or merge commit.  Also, the `git fetch` will be something like `git fetch git://github.com/openshift/jenkins-sync-plugin` when you are getting ready to pick commits from openshift to jenkinsci, and `git fetch git@github.com:jenkinsci/openshift-sync-plugin.git` when your are getting ready to pick commits from jenkinsci to openshift.
 
 ### Submit the new release to the Jenkins organization
 
@@ -251,9 +251,9 @@ If the plugin's commits are in sync between the various [https://github.com/open
 
 * Run `git push https://github.com/openshift/jenkins-plugin.git master` to upload the 2 commits created for cutting the new release to our upstream, development repository, and get the two repositories back in sync.  If coordinating the two repositories via `git rebase ...`, this is necessary.  
 
-While we only cut new releases of the plugins from [https://github.com/jenkinsci](https://github.com/jenkinsci), pushing the commits back to [https://github.com/openshift](https://github.com/openshift) is helpful when you are working in your local version of that repository, and are say building patches for users.  You'll have some sense of which official release the patch is built off of.
+If they are not in sync, as noted before, go the `git fetch ...` followed by `git cherry-pick ..` this time in the [https://github.com/jenkinsci](https://github.com/jenkinsci) to [https://github.com/openshift](https://github.com/openshift) direction.
 
-If the repositories are no longer in sync, then you will have to fetch/cherry-pick this time in the [https://github.com/jenkinsci](https://github.com/jenkinsci) to [https://github.com/openshift](https://github.com/openshift) direction.
+While we only cut new releases of the plugins from [https://github.com/jenkinsci](https://github.com/jenkinsci), pushing the commits back to [https://github.com/openshift](https://github.com/openshift) is helpful when you are working in your local version of that repository, and are say building patches for users.  You'll have some sense of which official release the patch is built off of.
 
 ## FINALLY .... updating our OpenShift Jenkins images with the new plugin versions
 
