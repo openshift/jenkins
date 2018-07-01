@@ -29,6 +29,7 @@ openshift-sync:1.0.20
 # processed sec adv https://jenkins.io/security/advisory/2018-03-26/
 # processed sec adv https://jenkins.io/security/advisory/2018-04-16/
 # processed sec adv https://jenkins.io/security/advisory/2018-06-04/
+# processed sec adv https://jenkins.io/security/advisory/2018-06-25/
 #
 htmlpublisher:1.16
 mailer:1.21
@@ -46,7 +47,7 @@ workflow-support:2.18
 git:3.9.1
 mercurial:2.3
 subversion:2.10.3
-github:1.29.1
+github:1.29.2
 github-branch-source:2.3.6
 
 # Legacy stuff
@@ -56,7 +57,7 @@ mapdb-api:1.0.9.0
 workflow-remote-loader:1.4
 
 matrix-project:1.12
-ssh-credentials:1.13
+ssh-credentials:1.14
 
 # Pipeline Utility Steps Plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Utility+Steps+Plugin
 pipeline-utility-steps:1.5.1
