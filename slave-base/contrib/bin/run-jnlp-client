@@ -8,8 +8,6 @@
 # The directory has to be writeable for the user that the container is running
 # under.
 
-#NOTE:  periodically check https://ce-gitlab.usersys.redhat.com/ce/jboss-dockerfiles/blob/develop/scripts/os-java-run/added/java-default-options for updates
-
 export JENKINS_HOME=/home/jenkins
 
 # Make sure the Java clients have valid $HOME directory set
