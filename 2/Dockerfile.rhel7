@@ -27,11 +27,10 @@ LABEL io.k8s.description="Jenkins is a continuous integration server" \
       io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
 
 # Labels consumed by Red Hat build service
-LABEL com.redhat.component="openshift-jenkins-2-docker" \
+LABEL com.redhat.component="openshift-jenkins-2-container" \
       name="openshift3/jenkins-2-rhel7" \
       version="3.11" \
-      architecture="x86_64" \
-      release="7"
+      architecture="x86_64"
 
 # 8080 for main web interface, 50000 for slave agents
 EXPOSE 8080 50000
