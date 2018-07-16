@@ -3,11 +3,10 @@ FROM registry.access.redhat.com/openshift3/jenkins-slave-base-rhel7
 MAINTAINER Ben Parees <bparees@redhat.com>
 
 # Labels consumed by Red Hat build service
-LABEL com.redhat.component="jenkins-slave-maven-rhel7-docker" \
+LABEL com.redhat.component="jenkins-slave-maven-rhel7-container" \
       name="openshift3/jenkins-slave-maven-rhel7" \
       version="3.6" \
       architecture="x86_64" \
-      release="4" \
       io.k8s.display-name="Jenkins Slave Maven" \
       io.k8s.description="The jenkins slave maven image has the maven tools on top of the jenkins slave base image." \
       io.openshift.tags="openshift,jenkins,slave,maven"
