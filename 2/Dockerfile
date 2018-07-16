@@ -37,7 +37,9 @@ RUN curl https://pkg.jenkins.io/redhat-stable/jenkins.repo -o /etc/yum.repos.d/j
     curl https://copr.fedorainfracloud.org/coprs/alsadi/dumb-init/repo/epel-7/alsadi-dumb-init-epel-7.repo -o /etc/yum.repos.d/alsadi-dumb-init-epel-7.repo && \
     INSTALL_PKGS="dejavu-sans-fonts rsync gettext git tar zip unzip dumb-init java-1.8.0-openjdk java-1.8.0-openjdk.i686 java-1.8.0-openjdk-devel java-1.8.0-openjdk-devel.i686 jenkins-2.89.4-1.1" && \
     yum -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
-    rpm -V $INSTALL_PKGS && \
+    # have temporarily removed the validation for java to work around known problem fixed in fedora; jupierce and gmontero are working with
+    # the requisit folks to get that addressed ... will switch back to rpm -V $INSTALL_PKGS when that occurs
+    rpm -V dejavu-sans-fonts rsync gettext git tar zip unzip dumb-init jenkins-2.89.4-1.1 && \
     yum clean all  && \
     localedef -f UTF-8 -i en_US en_US.UTF-8
 
