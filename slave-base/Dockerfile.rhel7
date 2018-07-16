@@ -3,11 +3,10 @@ FROM registry.access.redhat.com/openshift3/ose
 MAINTAINER Ben Parees <bparees@redhat.com>
 
 # Labels consumed by Red Hat build service
-LABEL com.redhat.component="jenkins-slave-base-rhel7-docker" \
+LABEL com.redhat.component="jenkins-slave-base-rhel7-container" \
       name="openshift3/jenkins-slave-base-rhel7" \
       version="3.6" \
       architecture="x86_64" \
-      release="4" \
       io.k8s.display-name="Jenkins Slave Base" \
       io.k8s.description="The jenkins slave base image is intended to be built on top of, to add your own tools that your jenkins job needs. The slave base image includes all the jenkins logic to operate as a slave, so users just have to yum install any additional packages their specific jenkins job will need" \
       io.openshift.tags="openshift,jenkins,slave"
