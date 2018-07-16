@@ -16,9 +16,9 @@ RUN INSTALL_PKGS="java-1.8.0-openjdk-devel rh-maven33*" && \
     curl -LOk https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip && \
     unzip gradle-${GRADLE_VERSION}-bin.zip -d /opt && \
     rm -f gradle-${GRADLE_VERSION}-bin.zip && \
-    rpm -V ${INSTALL_PKGS//\*/} && \
-    rpm -e java-1.7.0-openjdk --nodeps || true && \
-    rpm -e java-1.7.0-openjdk-devel --nodeps || true && \
+    # have temporarily removed the validation for java to work around known problem fixed in fedora; jupierce and gmontero are working with
+    # the requisit folks to get that addressed ... will switch back to rpm -V $INSTALL_PKGS when that occurs
+    rpm -V  rh-maven33 && \
     rpm -e java-1.7.0-openjdk-headless --nodeps || true && \
     yum clean all -y && \
     mkdir -p $HOME/.m2 && \
