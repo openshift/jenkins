@@ -1,6 +1,6 @@
 openshift-pipeline:1.0.54
 openshift-login:1.0.9
-openshift-client:1.0.13
+openshift-client:1.0.14
 
 
 # kubernetes plugin - https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin
@@ -12,7 +12,7 @@ openshift-client:1.0.13
 kubernetes:1.7.1
 
 # fabric8 openshift sync
-openshift-sync:1.0.20
+openshift-sync:1.0.23
 
 # we leverage this plugin in the openshift-client DSL groovy shim
 lockable-resources:2.3
