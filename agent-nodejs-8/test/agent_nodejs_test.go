@@ -113,4 +113,24 @@ var _ = Describe("NodeJS agent testing", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(code).To(Equal(0))
 	})
+
+	It("should contain a runnable chrome", func() {
+		var err error
+		id, err = dockercli.ContainerCreate(
+			&container.Config{
+				Image:      imageName,
+				Entrypoint: []string{"/bin/bash", "-c", "/bin/google-chrome --headless --no-sandbox"},
+				Tty:        true,
+			},
+			nil)
+		Expect(err).NotTo(HaveOccurred())
+
+		err = dockercli.ContainerStart(id)
+		Expect(err).NotTo(HaveOccurred())
+
+		code, err := dockercli.ContainerWait(id)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(code).To(Equal(0))
+	})
+
 })
