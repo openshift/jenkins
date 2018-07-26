@@ -56,7 +56,7 @@
         },
         "from": {
           "kind": "DockerImage",
-          "name": "registry.access.redhat.com/openshift3/jenkins-2-rhel7:v3.11"
+          "name": "registry.redhat.io/openshift3/jenkins-2-rhel7:v3.11"
         },
         "referencePolicy": {
           "type": "Local"
