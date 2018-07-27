@@ -12,7 +12,7 @@ openshift-client:1.0.14
 kubernetes:1.7.1
 
 # fabric8 openshift sync
-openshift-sync:1.0.23
+openshift-sync:1.0.24
 
 # we leverage this plugin in the openshift-client DSL groovy shim
 lockable-resources:2.3
