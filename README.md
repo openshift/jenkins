@@ -25,7 +25,7 @@ RHEL versions currently supported are:
 CentOS versions currently supported are:
 * CentOS7
 
-
+sdf
 Installation
 ---------------------------------
 Choose either the CentOS7 or RHEL7 based image:
