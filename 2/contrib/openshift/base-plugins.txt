@@ -6,7 +6,7 @@ openshift-client:1.0.14
 # kubernetes plugin - https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin
 # 1.7.1 fixed https://jenkins.io/security/advisory/2018-06-04/#SECURITY-883
 # 1.12.0 fixed https://jenkins.io/security/advisory/2018-07-30/#SECURITY-1016
-kubernetes:1.12.0
+kubernetes:1.12.1
 
 # fabric8 openshift sync
 openshift-sync:1.0.24
