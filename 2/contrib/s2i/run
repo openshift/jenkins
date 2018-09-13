@@ -279,7 +279,9 @@ for FILENAME in ${JENKINS_HOME}/plugins/*.jpi; do
   fi
 done
 
-if [ -z "${OVERRIDE_RELEASE_MIGRATION_OVERWRITE}" ]; then
+shopt -s nocasematch
+if [ -z "${OVERRIDE_RELEASE_MIGRATION_OVERWRITE}" || \
+   "${OVERRIDE_RELEASE_MIGRATION_OVERWRITE}" != "false" ]; then
   # image release migration
   if [[ ! -e ${JENKINS_HOME}/image-version && -e ${JENKINS_HOME}/configured ]]; then
     # 1) if the image-version file does not exist, but the configured file does, then we are upgrading from
@@ -296,6 +298,7 @@ if [ -z "${OVERRIDE_RELEASE_MIGRATION_OVERWRITE}" ]; then
     fi
   fi
 fi
+shopt -u nocasematch
 echo ${OPENSHIFT_JENKINS_IMAGE_VERSION} > ${JENKINS_HOME}/image-version
 
 
@@ -375,8 +378,10 @@ if [ ! -e ${JENKINS_HOME}/configured ]; then
   update_admin_password
   
   touch ${JENKINS_HOME}/configured
-else  
-  if [ ! -z "${OVERRIDE_PV_CONFIG_WITH_IMAGE_CONFIG}" ]; then
+else
+  shopt -s nocasematch
+  if [ ! -z "${OVERRIDE_PV_CONFIG_WITH_IMAGE_CONFIG}" && \
+     "${OVERRIDE_PV_CONFIG_WITH_IMAGE_CONFIG}" != "false" ]; then
     echo "Overriding jenkins configuration stored in ${JENKINS_HOME}"
 
     # remove any files/directories in $JENKINS_HOME that are specified in $image_config_dir, 
@@ -395,12 +400,14 @@ else
     cp -r $image_config_dir/* ${JENKINS_HOME}
   fi
     
-  if [ ! -z "${OVERRIDE_PV_PLUGINS_WITH_IMAGE_PLUGINS}" ]; then
+  if [ ! -z "${OVERRIDE_PV_PLUGINS_WITH_IMAGE_PLUGINS}" && \
+     "${OVERRIDE_PV_PLUGINS_WITH_IMAGE_PLUGINS}" != "false" ]; then
     echo "Overriding plugins stored in ${JENKINS_HOME}/plugins"
     rm -rf ${JENKINS_HOME}/plugins
 
     install_plugins
   fi
+  shopt -u nocasematch
 fi
 
 if [[ "${DISABLE_ADMINISTRATIVE_MONITORS}" == "true" ]]; then
@@ -436,15 +443,19 @@ fi
 
 rm -rf /tmp/war
 
-if [ -z ${SKIP_SLAVE_CONFIG_MIGRATION} ]; then
+shopt -s nocasematch
+if [[ -z ${SKIP_SLAVE_CONFIG_MIGRATION} || \
+   "${SKIP_SLAVE_CONFIG_MIGRATION}" != "false" ]]; then
   echo "Migrating slave image configuration to current version tag ..."
   migrate_slave_configuration
 fi
 
 # default log rotation in /etc/logrotate.d/jenkins handles /var/log/jenkins/access_log
-if [ ! -z "${OPENSHIFT_USE_ACCESS_LOG}" ]; then
+if [[ ! -z "${OPENSHIFT_USE_ACCESS_LOG}" && \
+   "${OPENSHIFT_USE_ACCESS_LOG}" != "false" ]]; then
     JENKINS_ACCESSLOG="--accessLoggerClassName=winstone.accesslog.SimpleAccessLogger --simpleAccessLogger.format=combined --simpleAccessLogger.file=/var/log/jenkins/access_log"
 fi
+shopt -u nocasematch
 
 ## The Jenkins monitoring plugin stores its data in /var/lib/jenkins/monitoring/<hostName>.
 ## Since the pod name changes everytime there is a deployment, any trending data is lost over
