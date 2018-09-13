@@ -33,7 +33,9 @@ fi
 
 echo "OPENSHIFT_JENKINS_JVM_ARCH='${OPENSHIFT_JENKINS_JVM_ARCH}', CONTAINER_MEMORY_IN_MB='${CONTAINER_MEMORY_IN_MB}', using $(readlink /etc/alternatives/java)"
 
-if [[ -z "${SKIP_NO_PROXY_DEFAULT}" ]]; then
+shopt -s nocasematch
+if [[ -z "${SKIP_NO_PROXY_DEFAULT}" || \
+    "${SKIP_NO_PROXY_DEFAULT}" != "false" ]]; then
   # we do not want jenkins svc or jenkins-jnlp svc
   # communication going through a http proxy
   # env vars to consider:
@@ -54,6 +56,7 @@ if [[ -z "${SKIP_NO_PROXY_DEFAULT}" ]]; then
     export NO_PROXY=$jenkins_http_host,$jnlp_http_host,$NO_PROXY
   fi
 fi
+shopt -u nocasematch
 
 # Configure the slave image
 source /usr/local/bin/configure-slave
