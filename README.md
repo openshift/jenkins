@@ -91,7 +91,7 @@ initialization by passing `-e VAR=VALUE` to the Docker run command.
 |    Variable name          |    Description                              |
 | :------------------------ | -----------------------------------------   |
 |  `JENKINS_PASSWORD`       | Password for the 'admin' account when using default Jenkins authentication.            |
-| `OPENSHIFT_ENABLE_OAUTH` | Determines whether the OpenShift Login plugin manages authentication when logging into Jenkins. |
+| `OPENSHIFT_ENABLE_OAUTH`  | Determines whether the OpenShift Login plugin manages authentication when logging into Jenkins. |
 | `OPENSHIFT_PERMISSIONS_POLL_INTERVAL` | Specifies in milliseconds how often the OpenShift Login plugin polls OpenShift for the permissions associated with each user defined in Jenkins. |
 | `INSTALL_PLUGINS`         | Comma-separated list of additional plugins to install on startup. The format of each plugin spec is `plugin-id:version` (as in plugins.txt) |
 |  `OVERRIDE_PV_CONFIG_WITH_IMAGE_CONFIG`       | When running this image with an OpenShift persistent volume for the Jenkins config directory, the transfer of configuration from the image to the persistent volume is only done the first startup of the image as the persistent volume is assigned by the persistent volume claim creation. If you create a custom image that extends this image and updates configuration in the custom image after the initial startup, by default it will not be copied over, unless you set this environment variable to some non-empty value. |
@@ -99,7 +99,8 @@ initialization by passing `-e VAR=VALUE` to the Docker run command.
 |  `OVERRIDE_RELEASE_MIGRATION_OVERWRITE`       | When running this image with an OpenShift persistent volume for the Jenkins config directory, and this image is starting in an existing deployment created with an earlier version of this image, unless the environment variable is set to some non-empty value, the plugins from the image will replace any versions of those plugins currently residing in the Jenkins plugin directory.  |
 |  `SKIP_NO_PROXY_DEFAULT`       | This environment variable applies to the agent/slave images produced by this repository.  By default, the agent/slave images will create/update the 'no_proxy' environment variable with the hostnames for the Jenkins server endpoint and Jenkins JNLP endpoint, as communication flows to endpoints typically should *NOT* go through a HTTP Proxy.  However, if your use case dictates those flows should not be exempt from the proxy, set this environment variable to any non-empty value.    |
 |  `ENABLE_FATAL_ERROR_LOG_FILE`       | When running this image with an OpenShift persistent volume claim for the Jenkins config directory, this environment variable allows the fatal error log file to persist if a fatal error occurs. The fatal error file will be located at `/var/lib/jenkins/logs`.   |
-
+|  `NODEJS_SLAVE_IMAGE`  | Setting this value will override the image used for the default NodeJS agent pod configuration.  The default NodeJS agent pod uses `docker.io/openshift/jenkins-agent-nodejs-8-centos7` or `registry.redhat.io/openshift3/jenkins-agent-nodejs-8-rhel7` depending whether you are running the centos or rhel version of the Jenkins image.  This variable must be set before Jenkins starts the first time for it to have an effect.  |
+|  `MAVEN_SLAVE_IMAGE`   | Setting this value overrides the image used for the default maven agent pod configuration.  The default maven agent pod uses `docker.io/openshift/jenkins-agent-maven-35-centos7` or `registry.redhat.io/openshift3/jenkins-agent-maven-35-rhel7` depending whether you are running the centos or rhel version of the Jenkins image.  This variable must be set before Jenkins starts the first time for it to have an effect.
 
 
 
