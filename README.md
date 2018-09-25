@@ -12,7 +12,7 @@ The slave-maven and slave-nodejs for both centos7 and rhel7  are being deprecate
 Additionally, development of these images will cease as of v3.10.
 
 For more information about using these images with OpenShift, please see the
-official [OpenShift Documentation](https://docs.openshift.org/latest/using_images/other_images/jenkins.html).
+official [OpenShift Documentation](https://docs.okd.io/latest/using_images/other_images/jenkins.html).
 
 Versions
 ---------------------------------
