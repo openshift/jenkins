@@ -30,10 +30,11 @@ lockable-resources:2.3
 # processed sec adv https://jenkins.io/security/advisory/2018-04-16/
 # processed sec adv https://jenkins.io/security/advisory/2018-06-04/
 # processed sec adv https://jenkins.io/security/advisory/2018-06-25/
+# processed sec adv https://jenkins.io/security/advisory/2018-09-25/
 #
 htmlpublisher:1.16
 mailer:1.21
-config-file-provider:2.17
+config-file-provider:3.2
 docker-commons:1.11
 job-dsl:1.70
 parameterized-trigger:2.35.2
@@ -41,7 +42,7 @@ pipeline-build-step:2.7
 pipeline-input-step:2.8
 script-security:1.41
 credentials-binding:1.15
-junit:1.24
+junit:1.26.1
 workflow-durable-task-step:2.18
 workflow-support:2.18
 git:3.9.1
@@ -49,6 +50,7 @@ mercurial:2.3
 subversion:2.10.3
 github:1.29.2
 github-branch-source:2.3.6
+jira:3.0.2
 
 # Legacy stuff
 mapdb-api:1.0.9.0
