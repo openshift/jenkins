@@ -280,8 +280,8 @@ for FILENAME in ${JENKINS_HOME}/plugins/*.jpi; do
 done
 
 shopt -s nocasematch
-if [ -z "${OVERRIDE_RELEASE_MIGRATION_OVERWRITE}" || \
-   "${OVERRIDE_RELEASE_MIGRATION_OVERWRITE}" != "false" ]; then
+if [[ -z "${OVERRIDE_RELEASE_MIGRATION_OVERWRITE}" || \
+   "${OVERRIDE_RELEASE_MIGRATION_OVERWRITE}" != "false" ]]; then
   # image release migration
   if [[ ! -e ${JENKINS_HOME}/image-version && -e ${JENKINS_HOME}/configured ]]; then
     # 1) if the image-version file does not exist, but the configured file does, then we are upgrading from
@@ -380,8 +380,8 @@ if [ ! -e ${JENKINS_HOME}/configured ]; then
   touch ${JENKINS_HOME}/configured
 else
   shopt -s nocasematch
-  if [ ! -z "${OVERRIDE_PV_CONFIG_WITH_IMAGE_CONFIG}" && \
-     "${OVERRIDE_PV_CONFIG_WITH_IMAGE_CONFIG}" != "false" ]; then
+  if [[ ! -z "${OVERRIDE_PV_CONFIG_WITH_IMAGE_CONFIG}" && \
+     "${OVERRIDE_PV_CONFIG_WITH_IMAGE_CONFIG}" != "false" ]]; then
     echo "Overriding jenkins configuration stored in ${JENKINS_HOME}"
 
     # remove any files/directories in $JENKINS_HOME that are specified in $image_config_dir, 
@@ -400,8 +400,8 @@ else
     cp -r $image_config_dir/* ${JENKINS_HOME}
   fi
     
-  if [ ! -z "${OVERRIDE_PV_PLUGINS_WITH_IMAGE_PLUGINS}" && \
-     "${OVERRIDE_PV_PLUGINS_WITH_IMAGE_PLUGINS}" != "false" ]; then
+  if [[ ! -z "${OVERRIDE_PV_PLUGINS_WITH_IMAGE_PLUGINS}" && \
+     "${OVERRIDE_PV_PLUGINS_WITH_IMAGE_PLUGINS}" != "false" ]]; then
     echo "Overriding plugins stored in ${JENKINS_HOME}/plugins"
     rm -rf ${JENKINS_HOME}/plugins
 
