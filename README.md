@@ -24,7 +24,7 @@ RHEL versions currently supported are:
 
 CentOS versions currently supported are:
 * CentOS7
-
+ 
 
 Installation
 ---------------------------------
