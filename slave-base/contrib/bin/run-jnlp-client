@@ -18,7 +18,7 @@ source /usr/local/bin/generate_container_user
 CONTAINER_MEMORY_IN_BYTES=$(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)
 CONTAINER_MEMORY_IN_MB=$((CONTAINER_MEMORY_IN_BYTES/2**20))
 
-# multi-arch check ... if not x86_64, leave alone
+# multi-arch check ... if x86_64, pick between 32 and 64 bit 
 if [[ "$(uname -m)" == "x86_64" ]]; then
     # Set the JVM architecture used.  Follow OPENSHIFT_JENKINS_JVM_ARCH if set.  If
     # not, use 32 bit JVM for space efficiency if container size < 2GiB
