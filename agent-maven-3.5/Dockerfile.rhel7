@@ -20,7 +20,7 @@ ENV MAVEN_VERSION=3.5 \
 RUN yum-config-manager --enable rhel-server-rhscl-7-rpms && \
     yum-config-manager --enable rhel-server-rhscl-8-rpms && \
     yum-config-manager --disable epel >/dev/null || : && \
-    INSTALL_PKGS="java-1.8.0-openjdk-devel.x86_64 rh-maven35*" && \
+    INSTALL_PKGS="java-1.8.0-openjdk-devel rh-maven35*" && \
     x86_EXTRA_RPMS=$(if [ "$(uname -m)" == "x86_64" ]; then echo -n java-1.8.0-openjdk-devel.i686 ; fi) && \
     yum install -y $INSTALL_PKGS $x86_EXTRA_RPMS && \
     # have temporarily removed the validation for java to work aroun known rhel 7.5 problem fixed in fedora; jupierce and gmontero are working with
