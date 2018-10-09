@@ -31,6 +31,9 @@ if [[ "$(uname -m)" == "x86_64" ]]; then
       alternatives --set java $(alternatives --display java | awk '/family.*i386/ { print $1; }')
       export MALLOC_ARENA_MAX=${MALLOC_ARENA_MAX:-1}
     fi
+#set JVM for all other archs
+else
+        alternatives --set java $(alternatives --display java | awk '/family.*'$(uname -m)'/ { print $1; }')
 fi
 
 echo "OPENSHIFT_JENKINS_JVM_ARCH='${OPENSHIFT_JENKINS_JVM_ARCH}', CONTAINER_MEMORY_IN_MB='${CONTAINER_MEMORY_IN_MB}', using $(readlink /etc/alternatives/java)"
