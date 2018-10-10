@@ -26,7 +26,7 @@ CentOS versions currently supported are:
 * CentOS7
 
 
-Installation
+Installation 
 ---------------------------------
 Choose either the CentOS7 or RHEL7 based image:
 
