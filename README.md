@@ -6,7 +6,7 @@ use with [OpenShift v3](https://github.com/openshift/origin)
 
 For an example of how to use it, [see this sample.](https://github.com/openshift/origin/blob/master/examples/jenkins/README.md)
 
-The images are pushed to DockerHub as openshift/jenkins-2-centos7, openshift/jenkins-slave-base-centos7, openshift/jenkins-slave-maven-centos7, openshift/jenkins-slave-nodejs-centos7, openshift/jenkins-agent-35-centos7, and openshift/jenkins-agent-nodejs-8-centos7.
+The images are pushed to DockerHub as openshift/jenkins-2-centos7, openshift/jenkins-slave-base-centos7, openshift/jenkins-slave-maven-centos7, openshift/jenkins-slave-nodejs-centos7, openshift/jenkins-agent-35-centos7, and openshift/jenkins-agent-nodejs-8-centos7. 
 
 The slave-maven and slave-nodejs for both centos7 and rhel7  are being deprecated as part of v3.10 of OpenShift.
 Additionally, development of these images will cease as of v3.10.
