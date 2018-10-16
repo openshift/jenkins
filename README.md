@@ -6,10 +6,11 @@ use with [OpenShift v3](https://github.com/openshift/origin)
 
 For an example of how to use it, [see this sample.](https://github.com/openshift/origin/blob/master/examples/jenkins/README.md)
 
-The images are pushed to DockerHub as openshift/jenkins-2-centos7, openshift/jenkins-slave-base-centos7, openshift/jenkins-slave-maven-centos7, openshift/jenkins-slave-nodejs-centos7, openshift/jenkins-agent-35-centos7, and openshift/jenkins-agent-nodejs-8-centos7.
+The images are pushed to DockerHub as openshift/jenkins-2-centos7, openshift/jenkins-slave-base-centos7, openshift/jenkins-agent-maven-35-centos7, and openshift/jenkins-agent-nodejs-8-centos7.
 
 The slave-maven and slave-nodejs for both centos7 and rhel7  are being deprecated as part of v3.10 of OpenShift.
-Additionally, development of these images will cease as of v3.10.
+Additionally, development of these images will cease as of v3.10.  And they are removed from this repository as
+part of the v4.0 development cycle.
 
 For more information about using these images with OpenShift, please see the
 official [OpenShift Documentation](https://docs.okd.io/latest/using_images/other_images/jenkins.html).
@@ -35,8 +36,6 @@ Choose either the CentOS7 or RHEL7 based image:
     You can access these images from the Red Hat Container Catalog. See:
     * https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-2-rhel7
     * https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-slave-base-rhel7
-    * https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-slave-maven-rhel7
-    * https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7
     * https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-agent-maven-35-rhel7
     * https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-agent-nodejs-8-rhel7
 
