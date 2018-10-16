@@ -12,6 +12,9 @@ The slave-maven and slave-nodejs for both centos7 and rhel7  are being deprecate
 Additionally, development of these images will cease as of v3.10.  And they are removed from this repository as
 part of the v4.0 development cycle.
 
+Support for the [OpenShift Pipeline Plugin](https://github.com/openshift/jenkins-plugin) stopped with v3.11 of OpenShift.
+The plugin itself and any samples around it are removed as part of v4.0.
+
 For more information about using these images with OpenShift, please see the
 official [OpenShift Documentation](https://docs.okd.io/latest/using_images/other_images/jenkins.html).
 
@@ -277,9 +280,6 @@ INSTALL_PLUGINS=groovy:1.30,ghprb:1.35.0
 ### Plugins focused on integration with OpenShift
 
 A subset of the plugins included by the images of this repository play a direct part in integrating between Jenkins and OpenShift.
-
-* **OpenShift Pipeline Plugin**
-Visit [the upstream repository](https://github.com/openshift/jenkins-plugin), which demonstrates example usage of the plugin's capabilities with the [OpenShift Sample Job](https://github.com/openshift/jenkins/tree/master/1/contrib/openshift/configuration/jobs/OpenShift%20Sample) included in this image. For more details visit the Jenkins [plugin](https://wiki.jenkins-ci.org/display/JENKINS/OpenShift+Pipeline+Plugin) website.  Future development of this plugin is being deprioritized in favor of the **OpenShift Client Plugin** detailed below.  But this plugin is still supported for existing users who have yet to finish migrating to **OpenShift Client Plugin**.  It also serves as an option if the use of the `oc` binary from your Jenkins jobs is not viable for some reason (we are actually curious if such use cases in fact exist), as it interacts with OpenShift via HTTP REST.  Remember though only a subset of the functionality provided by `oc` is available from this plugin.
 
 * **OpenShift Client Plugin**
 Visit [the upstream repository](https://github.com/openshift/jenkins-client-plugin) as well as the [Jenkins plugin wiki](https://wiki.jenkins-ci.org/display/JENKINS/OpenShift+Client+Plugin).  With the lessons learned from OpenShift Pipeline Plugin, as well as adjustments to the rapid evolutions of both Jenkins and OpenShift, this plugin, with its fluent styled syntax and use of the `oc` binary (exposing all the capabilities of that command), is the preferred choice for interacting with OpenShift via either Jenkins Pipeline or Freestyle jobs.
