@@ -1,0 +1,5 @@
+compose:
+  packages:
+    - dumb-init
+    - atomic-openshift-clients
+    - jenkins-2-plugins
