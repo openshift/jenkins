@@ -1,12 +1,12 @@
-openshift-pipeline:1.0.55
 openshift-login:1.0.9
-openshift-client:1.0.18
+openshift-client:1.0.21
 
 
 # kubernetes plugin - https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin
 # 1.7.1 fixed https://jenkins.io/security/advisory/2018-06-04/#SECURITY-883
 # 1.12.0 fixed https://jenkins.io/security/advisory/2018-07-30/#SECURITY-1016
-kubernetes:1.12.1
+# 1.12.8 fixed the https://issues.jenkins-ci.org/browse/JENKINS-53260 we introduced
+kubernetes:1.12.8
 
 # fabric8 openshift sync
 openshift-sync:1.0.29
@@ -70,7 +70,9 @@ github-organization-folder:1.6
 
 # Jenkins v2 specific
 matrix-auth:2.2
-blueocean:1.4.1
+# aside from general upgrade, needed to bump blueocean to reconcile shared dependency
+# with k8s plugin
+blueocean:1.9.0
 
 # Pipeline plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Plugin
 # 2.5 now includes pipeline-model-definition (declaritive pipeline)
