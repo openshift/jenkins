@@ -430,7 +430,7 @@ main() {
     fi
 
     echo -e "\nCleaning up locks"
-    rm -r "$REF_DIR"/*.lock
+    rm -rf "$REF_DIR"/*.lock
 }
 
 main "$@"
