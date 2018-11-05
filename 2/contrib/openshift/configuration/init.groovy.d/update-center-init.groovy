@@ -10,10 +10,10 @@ ACL.impersonate(ACL.SYSTEM, new NotReallyRoleSensitiveCallable<Void, Exception>(
                     public Void call() throws Exception {
                             try {
                                 Jenkins.getInstance().getPluginManager().doCheckUpdatesServer();
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                            	Jenkins.getInstance().getUpdateCenter().getCoreSource().getData();
+                            } catch (Throwable e) {
+                                System.out.println("The OpenShift Jenkins image's attempt to accelerate Jenkins Update Center data retrieval has encounted a hiccup:  " + e.getMessage() + " ......  Moving on")
                             }
-                            Jenkins.getInstance().getUpdateCenter().getCoreSource().getData();
                         return null;
                     }
                 });
