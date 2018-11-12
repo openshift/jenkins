@@ -61,7 +61,7 @@ matrix-project:1.12
 ssh-credentials:1.14
 
 # Pipeline Utility Steps Plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Utility+Steps+Plugin
-pipeline-utility-steps:1.5.1
+pipeline-utility-steps:2.1.0
 
 # some plugins helpful for global shared libs were broken out of workflow aggregator
 pipeline-github-lib:1.0
@@ -76,4 +76,4 @@ blueocean:1.9.0
 # Pipeline plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Plugin
 # 2.5 now includes pipeline-model-definition (declaritive pipeline)
 # 2.4 brought in pipeline-milestone-step
-workflow-aggregator:2.5
+workflow-aggregator:2.6
