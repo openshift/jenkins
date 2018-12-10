@@ -13,13 +13,9 @@
 
 export DEFAULT_SLAVE_DIRECTORY=/tmp
 export SLAVE_LABEL="jenkins-slave"
-JNLP_SERVICE_NAME=${JNLP_SERVICE_NAME:-JENKINS_JNLP}
-JNLP_SERVICE_NAME=`echo ${JNLP_SERVICE_NAME} | tr '[a-z]' '[A-Z]' | tr '-' '_'`
-T_HOST=${JNLP_SERVICE_NAME}_SERVICE_HOST
-# the '!' handles env variable indirection so we can resolve the nested variable
-# see: http://stackoverflow.com/a/14204692
-JNLP_HOST=${!T_HOST}
-T_PORT=${JNLP_SERVICE_NAME}_SERVICE_PORT
+JNLP_SERVICE_NAME=${JNLP_SERVICE_NAME:-jenkins-jnlp}
+JNLP_SERVICE_NAME_KEY=`echo ${JNLP_SERVICE_NAME} | tr '[a-z]' '[A-Z]' | tr '-' '_'`
+T_PORT=${JNLP_SERVICE_NAME_KEY}_SERVICE_PORT
 JNLP_PORT=${!T_PORT}
 
 export JNLP_PORT=${JNLP_PORT:-50000}
@@ -32,13 +28,9 @@ if [[ `grep CentOS /etc/redhat-release` ]]; then
   MAVEN_SLAVE=${MAVEN_SLAVE_IMAGE:-openshift/jenkins-agent-maven-35-centos7:${JENKINS_SLAVE_IMAGE_TAG}}
 fi
 
-JENKINS_SERVICE_NAME=${JENKINS_SERVICE_NAME:-JENKINS}
-JENKINS_SERVICE_NAME=`echo ${JENKINS_SERVICE_NAME} | tr '[a-z]' '[A-Z]' | tr '-' '_'`
-
-J_HOST=${JENKINS_SERVICE_NAME}_SERVICE_HOST
-JENKINS_SERVICE_HOST=${!J_HOST}
-
-J_PORT=${JENKINS_SERVICE_NAME}_SERVICE_PORT
+JENKINS_SERVICE_NAME=${JENKINS_SERVICE_NAME:-jenkins}
+JENKINS_SERVICE_NAME_KEY=`echo ${JENKINS_SERVICE_NAME} | tr '[a-z]' '[A-Z]' | tr '-' '_'`
+J_PORT=${JENKINS_SERVICE_NAME_KEY}_SERVICE_PORT
 JENKINS_SERVICE_PORT=${!J_PORT}
 
 # The project name equals to the namespace name where the container with jenkins
@@ -149,8 +141,8 @@ function generate_kubernetes_config() {
       <addMasterProxyEnvVars>true</addMasterProxyEnvVars>
       <serverCertificate>${crt_contents}</serverCertificate>
       <namespace>${PROJECT_NAME}</namespace>
-      <jenkinsUrl>http://${JENKINS_SERVICE_HOST}:${JENKINS_SERVICE_PORT}</jenkinsUrl>
-      <jenkinsTunnel>${JNLP_HOST}:${JNLP_PORT}</jenkinsTunnel>
+      <jenkinsUrl>http://${JENKINS_SERVICE_NAME}:${JENKINS_SERVICE_PORT}</jenkinsUrl>
+      <jenkinsTunnel>${JNLP_SERVICE_NAME}:${JNLP_PORT}</jenkinsTunnel>
       <credentialsId>1a12dfa4-7fc5-47a7-aa17-cc56572a41c7</credentialsId>
       <containerCap>100</containerCap>
       <retentionTimeout>5</retentionTimeout>
