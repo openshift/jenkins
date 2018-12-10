@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/openshift3/ose
+FROM registry.access.redhat.com/openshift3/ose-cli
 
 # Jenkins image for OpenShift
 #

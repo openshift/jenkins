@@ -1,4 +1,4 @@
-FROM openshift/origin
+FROM openshift/origin-cli
 
 MAINTAINER Ben Parees <bparees@redhat.com>
 
