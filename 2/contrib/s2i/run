@@ -430,7 +430,7 @@ if [ -e ${JENKINS_HOME}/password ]; then
   # the jenkins ui, so we only want to do this if the env variable has been explicitly modified from
   # the original value.
   old_password_hash=`cat ${JENKINS_HOME}/password`
-if [ $old_password_hash != $new_password_hash ]; then
+  if [ $old_password_hash != $new_password_hash ]; then
     echo "Detected password environment variable change, updating Jenkins configuration ..."
     update_admin_password
   fi
