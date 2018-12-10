@@ -52,7 +52,7 @@
 # - namely, the "preparation" is tagging the image to be tested,
 #   i.e. the new jenkins image we built
 #   in the first step of this flow, which the template seeding noted
-#   above insures is set to the env var "IMAGE_PREPARE",
+#   above insures is set to the env var "IMAGE_2_CENTOS",
 #   into the jenkins image stream in the openshift namespace
 #   in the test cluster
 
@@ -60,5 +60,5 @@
 #   test image as part of running the tests
 #
 
-oc tag --source=docker $IMAGE_PREPARE openshift/jenkins:2
-oc tag --source=docker $IMAGE_PREPARE openshift/jenkins:latest
+oc tag --source=docker $IMAGE_2_CENTOS openshift/jenkins:2
+oc tag --source=docker $IMAGE_2_CENTOS openshift/jenkins:latest

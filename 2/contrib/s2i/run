@@ -16,7 +16,10 @@ source /usr/local/bin/kube-slave-common.sh
 shopt -s dotglob
 
 function update_admin_password() {
-  sed -i "s,<passwordHash>.*</passwordHash>,<passwordHash>$new_password_hash</passwordHash>,g" "${JENKINS_HOME}/users/admin/config.xml"
+  # get random admin dir
+  ADMIN_DIR=`ls /var/lib/jenkins/users | grep admin`
+  ls ${JENKINS_HOME}/users/${ADMIN_DIR}
+  sed -i "s,<passwordHash>.*</passwordHash>,<passwordHash>$new_password_hash</passwordHash>,g" "${JENKINS_HOME}/users/${ADMIN_DIR}/config.xml"
   echo $new_password_hash > ${JENKINS_HOME}/password
 }
 
@@ -427,7 +430,7 @@ if [ -e ${JENKINS_HOME}/password ]; then
   # the jenkins ui, so we only want to do this if the env variable has been explicitly modified from
   # the original value.
   old_password_hash=`cat ${JENKINS_HOME}/password`
-  if [ $old_password_hash != $new_password_hash ]; then
+if [ $old_password_hash != $new_password_hash ]; then
     echo "Detected password environment variable change, updating Jenkins configuration ..."
     update_admin_password
   fi
