@@ -135,10 +135,12 @@ OpenShift API server.  In other words, you should use the version specific tag i
 |  `jenkins-*-rhel7:latest`   | 3.6 `oc` binary \*\*     |
 
 
-**Notice: the `latest` tag for the RHEL7 images will point to 3.6 indefinitely in order to support users on older clusters with older slave
+**Notice: The `latest` tag for the RHEL7 images will point to 3.6 indefinitely in order to support users on older clusters with older slave
 configurations that point to the "latest" tag.  This way, they will have an older `oc` client which should be able to communicate with both 3.6
 and newer versions of OpenShift API Servers.  As the support policy is less stringent for the CentOS7 image, the `latest` tag there will
 make the more obvious correlation to the latest built version of OpenShift (which can include pre-GA versions).
+
+**Notice: The Jenkins "Global Tool Configuration" panel is the most convenient avenue for bringing in different version of `oc` into Jenkins.  The binary archives for the different releases of `oc` are available at https://github.com/openshift/origin/releases.
 
 **Notice:  There is an additional consideration with the pod configurations for the Kubernetes Plugin; earlier versions of this image
 did not specify the "pull always" policy for the default agents/slaves configured.  As a result, users may have older/different images on
