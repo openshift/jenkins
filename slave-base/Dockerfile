@@ -8,10 +8,8 @@ USER root
 # Install headless Java
 RUN yum install -y centos-release-scl-rh && \
     INSTALL_PKGS="bc gettext git java-1.8.0-openjdk-headless java-1.8.0-openjdk-headless.i686 lsof rsync tar unzip which zip" && \
-    yum install -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
-    # have temporarily removed the validation for java to work around known problem fixed in fedora; jupierce and gmontero are working with
-    # the requisit folks to get that addressed ... will switch back to rpm -V $INSTALL_PKGS when that occurs
-    rpm -V bc gettext git lsof rsync tar unzip which zip && \
+    yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
+    rpm -V  $INSTALL_PKGS && \
     yum clean all && \
     mkdir -p /home/jenkins && \
     chown -R 1001:0 /home/jenkins && \
