@@ -1,0 +1,48 @@
+{
+  "kind": "ImageStream",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "jenkins-agent-maven",
+    "annotations": {
+      "openshift.io/display-name": "Jenkins Maven Agent"
+    }
+  },
+  "spec": {
+    "tags": [
+      {
+        "name": "latest",
+        "annotations": {
+          "openshift.io/display-name": "Jenkins Maven Agent",
+          "openshift.io/provider-display-name": "Red Hat, Inc.",
+          "description": "Provides a Jenkins Agent with Maven tooling",
+          "iconClass": "icon-jenkins",
+          "tags": "jenkins"
+        },
+        "from": {
+          "kind": "ImageStreamTag",
+          "name": "v4.0"
+        },
+        "referencePolicy": {
+          "type": "Local"
+        }
+      },
+      {
+        "name": "v4.0",
+        "annotations": {
+          "openshift.io/display-name": "Jenkins Maven Agent",
+          "openshift.io/provider-display-name": "Red Hat, Inc.",
+          "description": "Provides a Jenkins Agent with Maven tooling",
+          "iconClass": "icon-jenkins",
+          "tags": "jenkins"
+        },
+        "from": {
+          "kind": "DockerImage",
+          "name": "registry.redhat.io/openshift4/ose-jenkins-agent-maven:v4.0"
+        },
+        "referencePolicy": {
+          "type": "Local"
+        }
+      }
+    ]
+  }
+}
