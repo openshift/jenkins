@@ -27,24 +27,6 @@
         }
       },
       {
-        "name": "1",
-        "annotations": {
-          "openshift.io/display-name": "Jenkins 1.X",
-          "openshift.io/provider-display-name": "Red Hat, Inc.",
-          "description": "Provides a Jenkins 1.X server on CentOS 7. For more information about using this container image, including OpenShift considerations, see https://github.com/openshift/jenkins/blob/master/README.md.",
-          "iconClass": "icon-jenkins",
-          "tags": "hidden,jenkins",
-          "version": "1.x"
-        },
-        "from": {
-          "kind": "DockerImage",
-          "name": "docker.io/openshift/jenkins-1-centos7:latest"
-        },
-        "referencePolicy": {
-          "type": "Local"
-        }
-      },
-      {
         "name": "2",
         "annotations": {
           "openshift.io/display-name": "Jenkins 2.X",
