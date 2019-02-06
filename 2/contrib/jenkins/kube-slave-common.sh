@@ -24,13 +24,12 @@ JNLP_PORT=${!T_PORT}
 
 export JNLP_PORT=${JNLP_PORT:-50000}
 
-NODEJS_SLAVE=${NODEJS_SLAVE_IMAGE:-registry.redhat.io/openshift3/jenkins-agent-nodejs-8-rhel7:${JENKINS_SLAVE_IMAGE_TAG}}
-MAVEN_SLAVE=${MAVEN_SLAVE_IMAGE:-registry.redhat.io/openshift3/jenkins-agent-maven-35-rhel7:${JENKINS_SLAVE_IMAGE_TAG}}
-# if the master is running the centos image, use the centos slave images.
-if [[ `grep CentOS /etc/redhat-release` ]]; then
-  NODEJS_SLAVE=${NODEJS_SLAVE_IMAGE:-openshift/jenkins-agent-nodejs-8-centos7:${JENKINS_SLAVE_IMAGE_TAG}}
-  MAVEN_SLAVE=${MAVEN_SLAVE_IMAGE:-openshift/jenkins-agent-maven-35-centos7:${JENKINS_SLAVE_IMAGE_TAG}}
-fi
+# pull from 4.0 payload env in image registry; we no longer
+# provide a default when running this image outside of openshift;
+# other configuration changes (like the SA) were needed as well
+# anyway
+export NODEJS_SLAVE=${NODEJS_SLAVE_IMAGE:-image-registry.openshift-image-registry.svc:5000/openshift/jenkins-agent-nodejs:latest}
+export MAVEN_SLAVE=${MAVEN_SLAVE_IMAGE:-image-registry.openshift-image-registry.svc:5000/openshift/jenkins-agent-maven:latest}
 
 JENKINS_SERVICE_NAME=${JENKINS_SERVICE_NAME:-JENKINS}
 JENKINS_SERVICE_NAME=`echo ${JENKINS_SERVICE_NAME} | tr '[a-z]' '[A-Z]' | tr '-' '_'`
