@@ -1,4 +1,4 @@
-FROM openshift/origin
+FROM quay.io/openshift/origin-cli
 
 MAINTAINER Ben Parees <bparees@redhat.com>
 
