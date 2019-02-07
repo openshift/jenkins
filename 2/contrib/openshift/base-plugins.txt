@@ -1,4 +1,4 @@
-openshift-login:1.0.15
+openshift-login:1.0.16
 openshift-client:1.0.24
 
 
