@@ -2,7 +2,7 @@ Jenkins Docker Image
 ====================
 
 This repository contains Dockerfiles for Jenkins Docker images intended for
-use with [OpenShift v3](https://github.com/openshift/origin)
+use with [OpenShift v3 and OpenShift v4](https://github.com/openshift/origin)
 
 For an example of how to use it, [see this sample.](https://github.com/openshift/origin/blob/master/examples/jenkins/README.md)
 
@@ -36,11 +36,13 @@ Choose either the CentOS7 or RHEL7 based image:
 
 *  **RHEL7 based image**
 
-    You can access these images from the Red Hat Container Catalog. See:
+    You can access these images from the Red Hat Container Catalog. For OpenShift v3 see:
     * https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-2-rhel7
     * https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-slave-base-rhel7
     * https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-agent-maven-35-rhel7
     * https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-agent-nodejs-8-rhel7
+
+    For OpenShift v4, `openshift3` in those references above will be `openshift4`
 
     To build a RHEL7 based image, you need to run Docker build on a properly
     subscribed RHEL machine.
@@ -53,11 +55,17 @@ Choose either the CentOS7 or RHEL7 based image:
 
 *  **CentOS7 based image**
 
-	The images are available on DockerHub. An example download command is:
+	The v3.x images are available on DockerHub. An example download command is:
 
 	```
 	$ docker pull openshift/jenkins-2-centos7
 	```
+
+    Starting with v4.0, the images are no longer hosted on DockerHub, but instead on Quay.  Their pull specs are:
+    * quay.io/openshift/origin-jenkins:v4.0
+    * quay.io/openshift/origin-jenkins-agent-nodejs:v4.0
+    * quay.io/openshift/origin-jenkins-agent-maven:v4.0
+    * quay.io/openshift/origin-jenkins-agent-base:v4.0
 
 	To build a Jenkins image from scratch run:
 
@@ -149,6 +157,18 @@ your nodes depending when the images were pulled.  Starting with the 3.7 release
 in the future.  But if you started using this image prior to 3.7, verification of your Kubernetes plugin configurations for the image pull
 policy used is warranted to guarantee consistency around what image is being used on each of your nodes.
 
+Jenkins security advisories, the "master" image from this repository, and the `oc` binary
+---------------------------------
+
+Any security advisory related updates to Jenkins core or the plugins we include in the OpenShift Jenkins master image will only occur in the v3.11 and v4.x 
+branches of this repository.
+
+We do support running the v3.11 version of the master image against older v3.x (as far back as v3.4) OpenShift clusters if you want to pick up Jenkins security advisory 
+updates.  Per the prior section, we advise that you import a version of `oc` into your Jenkins installation that matches your OpenShift
+cluster via the "Global Tool Configuration" option in Jenkins either via the UI, CLI, or groovy init scripts.
+
+Our OpenShift Client Plugin has some documentation on doing this [here](https://github.com/openshift/jenkins-client-plugin#setting-up-jenkins-nodes).
+
 
 Plugins
 ---------------------------------
@@ -183,9 +203,12 @@ and download any needed dependencies listed, including upgrading any previously 
 To update the version of a plugin or add a new plugin, construct a PR for this repository that updates `base-plugins.txt` appropriately.
 Administrators for this repository will make sure necessary tests are run and merge the PR when things are ready.
 
-When PRs for this repository are merged, they kick off associated builds in the [`push_jenkins_images` job on OpenShift's public
+When PRs for this repository's `openshift-3*` branches are merged, they kick off associated builds in the [`push_jenkins_images` job on OpenShift's public
 Jenkins CI/CD server](https://ci.openshift.redhat.com/jenkins/view/All/job/push_jenkins_images/).  When those builds complete,
 new versions of the CentOS7 based versions of the images produced by this repository are pushed to Docker Hub.  See the top of the README for the precise list.
+
+For v4.0, the job definitions for this repository in https://github.com/openshif/release result in our Prow based infrastructure to eventually 
+mirror the image content on quay.io.
 
 #### Plugin installation for RHEL7
 
@@ -299,7 +322,9 @@ Though not originated out of the OpenShift organization, this plugin is invaluab
 Usage
 ---------------------------------
 
-For this, we will assume that you are using the `openshift/jenkins-2-centos7` image.
+For this, we will assume that you are using an `openshift/jenkins-2-centos7` image for v3.x, or
+`quay.io/openshift/origin-jenkins` for v4.x.
+
 If you want to set only the mandatory environment variables and store the database
 in the `/tmp/jenkins` directory on the host filesystem, execute the following command:
 

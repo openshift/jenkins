@@ -1,4 +1,4 @@
-FROM openshift/jenkins-slave-base-centos7
+FROM quay.io/openshift/origin-jenkins-agent-base:v4.0
 
 MAINTAINER Gabe Montero <gmontero@redhat.com>
 
