@@ -1,5 +1,5 @@
 openshift-login:1.0.16
-openshift-client:1.0.24
+openshift-client:1.0.25
 
 
 # kubernetes plugin - https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin
