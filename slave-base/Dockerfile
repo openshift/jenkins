@@ -24,6 +24,7 @@ RUN yum install -y centos-release-scl-rh && \
     chmod 775 /usr/bin && \
     chmod 775 /usr/lib/jvm-exports && \
     chmod 775 /usr/share/man/man1 && \
+    mkdir -p /var/lib/origin && \
     chmod 775 /var/lib/origin && \    
     unlink /usr/bin/java && \
     unlink /usr/bin/jjs && \
