@@ -1,4 +1,4 @@
-FROM openshift/jenkins-slave-base-centos7
+FROM openshift/jenkins-slave-base-centos7:v3.11
 
 MAINTAINER Gabe Montero <gmontero@redhat.com>
 
