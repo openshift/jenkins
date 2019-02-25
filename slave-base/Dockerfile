@@ -1,4 +1,4 @@
-FROM openshift/origin
+FROM openshift/origin:v3.11
 
 MAINTAINER Ben Parees <bparees@redhat.com>
 

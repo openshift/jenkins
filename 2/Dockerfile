@@ -1,4 +1,4 @@
-FROM openshift/origin
+FROM openshift/origin:v3.11
 
 # Jenkins image for OpenShift
 #
