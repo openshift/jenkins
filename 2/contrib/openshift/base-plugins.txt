@@ -46,7 +46,6 @@ pipeline-input-step:2.8
 script-security:1.50
 credentials-binding:1.15
 junit:1.26.1
-workflow-durable-task-step:2.18
 workflow-support:2.18
 git:3.9.3
 mercurial:2.3
