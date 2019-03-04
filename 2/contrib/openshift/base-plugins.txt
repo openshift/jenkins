@@ -31,6 +31,8 @@ lockable-resources:2.3
 # processed sec adv https://jenkins.io/security/advisory/2018-04-16/
 # processed sec adv https://jenkins.io/security/advisory/2018-06-04/
 # processed sec adv https://jenkins.io/security/advisory/2018-06-25/
+# processed sec adv https://jenkins.io/security/advisory/2018-09-25/
+# processed sec adv https://jenkins.io/security/advisory/2018-10-29/
 # processed sec adv https://jenkins.io/security/advisory/2019-01-08/
 # processed sec adv https://jenkins.io/security/advisory/2019-01-28/
 #
@@ -44,7 +46,7 @@ pipeline-build-step:2.7
 pipeline-input-step:2.8
 script-security:1.50
 credentials-binding:1.15
-junit:1.24
+junit:1.26.1
 workflow-durable-task-step:2.18
 workflow-support:2.18
 git:3.9.3
@@ -53,6 +55,7 @@ subversion:2.10.3
 github:1.29.2
 github-branch-source:2.3.6
 workflow-cps:2.61.1
+jira:3.0.2
 pipeline-model-definition:1.3.4.1
 token-macro:2.6
 
