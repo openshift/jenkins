@@ -18,7 +18,12 @@ ENV JENKINS_VERSION=2 \
     JENKINS_UC=https://updates.jenkins.io \
     OPENSHIFT_JENKINS_IMAGE_VERSION=4.0 \
     LANG=en_US.UTF-8 \
-    LC_ALL=en_US.UTF-8
+    LC_ALL=en_US.UTF-8 \
+    INSTALL_JENKINS_VIA_RPMS=false
+# openshift/ocp-build-data will change INSTALL_JENKINS_VIA_RPMS to true
+# so that the osbs/brew builds will install via RPMs; when this runs 
+# in api.ci, it will employ the old centos style, download the plugins and
+# redhat-stable core RPM for download
 
 LABEL io.k8s.description="Jenkins is a continuous integration server" \
       io.k8s.display-name="Jenkins 2" \
@@ -42,7 +47,7 @@ RUN yum-config-manager --disable epel >/dev/null || : && \
     # will subsequently get redirected to /usr/lib/jenkins; it is confirmed that the 3.7 jenkins RHEL images do *NOT* have a /usr/lib64/jenkins path
     ln -s /usr/lib/jenkins /usr/lib64/jenkins && \
     x86_EXTRA_RPMS=$(if [ "$(uname -m)" == "x86_64" ]; then echo -n java-1.8.0-openjdk.i686 java-1.8.0-openjdk-devel.i686 ; fi) && \
-    INSTALL_PKGS="dejavu-sans-fonts wget rsync gettext git tar zip unzip openssl bzip2 dumb-init  java-1.8.0-openjdk java-1.8.0-openjdk-devel atomic-openshift-clients jenkins-2.* jenkins-2-plugins" && \
+    INSTALL_PKGS="dejavu-sans-fonts wget rsync gettext git tar zip unzip openssl bzip2 dumb-init  java-1.8.0-openjdk java-1.8.0-openjdk-devel atomic-openshift-clients" && \
     yum install -y $INSTALL_PKGS $x86_EXTRA_RPMS && \
     rpm -V  $INSTALL_PKGS $x86_EXTRA_RPMS && \
     yum clean all  && \
@@ -55,7 +60,8 @@ ADD release.version /tmp/release.version
 
 # Remove the base-plugins.txt file because it's only used for Centos
 # and its presence in the rhel image is confusing.
-RUN rm /opt/openshift/base-plugins.txt && \ 
+RUN /usr/local/bin/install-jenkins-core-plugins.sh /opt/openshift/base-plugins.txt && \
+    rm /opt/openshift/base-plugins.txt && \ 
     mkdir -p /opt/openshift/plugins && \
     # we symlink the rpm installed plugins from /usr/lib/jenkins to /opt/openshift/plugins so that
     # future upgrades of the image and their RPM install automatically get picked by jenkins;
