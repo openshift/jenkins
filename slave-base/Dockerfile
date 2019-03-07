@@ -10,8 +10,6 @@ RUN yum install -y centos-release-scl-rh && \
     x86_EXTRA_RPMS=$(if [ "$(uname -m)" == "x86_64" ]; then echo -n java-1.8.0-openjdk-headless.i686 ; fi) && \
     INSTALL_PKGS="bc gettext git java-1.8.0-openjdk-headless lsof rsync tar unzip which zip bzip2" && \
     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS $x86_EXTRA_RPMS && \
-    # have temporarily removed the validation for java to work around known problem fixed in fedora; jupierce and gmontero are working with
-    # the requisit folks to get that addressed ... will switch back to rpm -V $INSTALL_PKGS when that occurs
     rpm -V  $INSTALL_PKGS $x86_EXTRA_RPMS && \
     yum clean all && \
     mkdir -p /home/jenkins && \
