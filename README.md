@@ -89,6 +89,8 @@ For example:
 
     
     $ docker run -it docker.io/openshift/jenkins-2-centos7:latest /etc/alternatives/java -jar /usr/lib/jenkins/jenkins.war --version
+
+OpenShift v4 also removes the 32 bit JVM option.  Only 64 bit will be provided for all images.
     
 
 
