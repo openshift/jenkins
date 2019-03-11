@@ -43,7 +43,7 @@ RUN yum-config-manager --disable epel >/dev/null || : && \
     ln -s /usr/lib/jenkins /usr/lib64/jenkins && \
     x86_EXTRA_RPMS=$(if [ "$(uname -m)" == "x86_64" ]; then echo -n java-1.8.0-openjdk.i686 java-1.8.0-openjdk-devel.i686 ; fi) && \
     INSTALL_PKGS="dejavu-sans-fonts wget rsync gettext git tar zip unzip openssl bzip2 dumb-init  java-1.8.0-openjdk java-1.8.0-openjdk-devel atomic-openshift-clients jenkins-2.* jenkins-2-plugins" && \
-    yum install -y $INSTALL_PKGS $x86_EXTRA_RPMS && \
+    yum --setopt=protected_multilib=false -y install $INSTALL_PKGS $x86_EXTRA_RPMS && \
     rpm -V  $INSTALL_PKGS $x86_EXTRA_RPMS && \
     yum clean all  && \
     localedef -f UTF-8 -i en_US en_US.UTF-8
