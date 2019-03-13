@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/openshift3/ose-cli
+FROM quay.io/openshift/origin-cli
 
 MAINTAINER Ben Parees <bparees@redhat.com>
 
