@@ -1,5 +1,4 @@
-FROM registry.access.redhat.com/openshift3/jenkins-slave-base-rhel7
-
+FROM quay.io/openshift/origin-jenkins-agent-base:v4.0
 MAINTAINER Gabe Montero <gmontero@redhat.com>
 
 # Labels consumed by Red Hat build service

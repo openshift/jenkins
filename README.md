@@ -23,14 +23,19 @@ Versions
 Jenkins versions currently provided are:
 * [jenkins-2.x](../master/2)
 
+For OpenShift v3, the options for the images` operating system are as follows:
+
 RHEL versions currently supported are:
 * RHEL7
 
 CentOS versions currently supported are:
 * CentOS7
 
+For OpenShift v4, the operating system choice is reduced.  All OpenShift v4 images (including the ones from this repository) are based
+off of the ["Universal Based Image" or "UBI"](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_atomic_host/7/html/getting_started_with_containers/using_red_hat_base_container_images_standard_and_minimal#using_rhel_atomic_base_images_minimal).
 
-Installation
+
+Installation (OpenShift V3)
 ---------------------------------
 Choose either the CentOS7 or RHEL7 based image:
 
@@ -41,8 +46,6 @@ Choose either the CentOS7 or RHEL7 based image:
     * https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-slave-base-rhel7
     * https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-agent-maven-35-rhel7
     * https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-agent-nodejs-8-rhel7
-
-    For OpenShift v4, `openshift3` in those references above will be `openshift4`
 
     To build a RHEL7 based image, you need to run Docker build on a properly
     subscribed RHEL machine.
@@ -60,12 +63,6 @@ Choose either the CentOS7 or RHEL7 based image:
 	```
 	$ docker pull openshift/jenkins-2-centos7
 	```
-
-    Starting with v4.0, the images are no longer hosted on DockerHub, but instead on Quay.  Their pull specs are:
-    * quay.io/openshift/origin-jenkins:v4.0
-    * quay.io/openshift/origin-jenkins-agent-nodejs:v4.0
-    * quay.io/openshift/origin-jenkins-agent-maven:v4.0
-    * quay.io/openshift/origin-jenkins-agent-base:v4.0
 
 	To build a Jenkins image from scratch run:
 
@@ -90,7 +87,35 @@ For example:
     
     $ docker run -it docker.io/openshift/jenkins-2-centos7:latest /etc/alternatives/java -jar /usr/lib/jenkins/jenkins.war --version
 
-OpenShift v4 also removes the 32 bit JVM option.  Only 64 bit will be provided for all images.
+Installation (OpenShift V4)
+---------------------------------
+
+    Starting with v4.0, the images are no longer hosted on DockerHub, but instead on Quay, for users without entitlements/subscriptions for support.  Their pull specs are:
+    * quay.io/openshift/origin-jenkins:v4.0
+    * quay.io/openshift/origin-jenkins-agent-nodejs:v4.0
+    * quay.io/openshift/origin-jenkins-agent-maven:v4.0
+    * quay.io/openshift/origin-jenkins-agent-base:v4.0
+
+    The images are also still available at the Red Hat Container Catalog for customers with subscriptions, 
+    though with some changes in the naming.
+
+    Also, the `registry.access.redhat.com` host is being transitioned to `registry.redhat.io`.  Both exist at this time, but eventually
+    only `registry.redhat.io` will remain.  See [Transitioning the Red Hat container registry](https://www.redhat.com/en/blog/transitioning-red-hat-container-registry) for details:
+    * registry.redhat.io/openshift4/ose-jenkins:v4.0
+    * registry.redhat.io/openshift4/ose-jenkins-agent-nodejs:v4.0
+    * registry.redhat.io/openshift4/ose-jenkins-agent-maven:v4.0
+    * registry.redhat.io/openshift4/ose-jenkins-agent-base:v4.0
+
+    OpenShift v4 also removes the 32 bit JVM option.  Only 64 bit will be provided for all images.
+
+    The `Dockerfile.rhel7` variants still exists, but as part of the `CentOS` vs. `RHEL` distinction no longer existing, the various `Dockerfile` files have been renamed to `Dockerfile.localdev` to
+    more clearly denote that they are for builds on developers' local machines that most likely do not have a Red Hat subscription / entitlement.  The 
+    `Dockerfile.localdev` variants are structured to allow building of the images on machines without `RHEL` subscriptions, even though there base images are no longer based on `CentOS`.  And subscriptions
+    are still required for use of `Dockerfile.rhel7`.
+
+    With any local builds, if for example you plan on submitting a PR to this repository, you still build the same way as with OpenShift v3 with respect to the `make` invocations.  
+    
+    Be aware, no support in any way is provided for running images created from any of the `Dockerfile.localdev` files.  And in fact the images hosted on both quay.io and the Red Hat Container Catalog are based off the `Dockerfile.rhel7` files.
     
 
 
@@ -159,6 +184,8 @@ your nodes depending when the images were pulled.  Starting with the 3.7 release
 in the future.  But if you started using this image prior to 3.7, verification of your Kubernetes plugin configurations for the image pull
 policy used is warranted to guarantee consistency around what image is being used on each of your nodes.
 
+The `oc` binary is still included in the v4 images as well.  And the same recommendations around client/server version synchronization still apply.
+
 Jenkins security advisories, the "master" image from this repository, and the `oc` binary
 ---------------------------------
 
@@ -181,7 +208,7 @@ An initial set of Jenkins plugins are included in the OpenShift Jenkins images. 
 is that the CentOS7 image if first updated with any changes to the list of plugins.  After some level
 of verification with that image, the RHEL7 image is updated.
 
-#### Plugin installation for CentOS7
+#### Plugin installation for CentOS7 (V3 Only)
 
 The top level list of plugins to install is located [here](2/contrib/openshift/base-plugins.txt).  The
 format of the file is:
@@ -190,11 +217,14 @@ format of the file is:
 pluginId:pluginVersion
 ```
 
-The file is processed by the following call in the [CentOS7 Dockerfile](2/Dockerfile):
+For v3, the file is processed by the following call in the [CentOS7 Dockerfile](2/Dockerfile):
 
 ```
 /usr/local/bin/install-plugins.sh /opt/openshift/base-plugins.txt
 ```
+
+In v4. that call has been moved to [this script](2/contrib/jenkins/install-jenkins-core-plugins.sh), which is called from
+both `Dockerfile.localdev` and `Dockerfile.rhel7`.
 
 Where both [base-plugins.txt](2/contrib/openshift/base-plugins.txt) and [install-plugins.sh](2/contrib/jenkins/install-plugins.sh)
 are copied into the image prior to that invocation.
@@ -212,7 +242,7 @@ new versions of the CentOS7 based versions of the images produced by this reposi
 For v4.0, the job definitions for this repository in https://github.com/openshif/release result in our Prow based infrastructure to eventually 
 mirror the image content on quay.io.
 
-#### Plugin installation for RHEL7
+#### Plugin installation for RHEL7 (V3 and V4)
 
 Only OpenShift developers working for Red Hat can update the list of plugins for the RHEL7 image.  For those developers, visit this
 [internal Jenkins server](https://buildvm.openshift.eng.bos.redhat.com:8443/job/devex/job/devex%252Fjenkins-plugins/) and log in (contact our CD team for permissions to this job).  Click the `Build with parameters` link, update the `PLUGIN_LIST` field, and submit the build.  The format of the data for the `PLUGIN_LIST` field is the same as `base-plugins.txt`.
@@ -354,7 +384,9 @@ Test
 This repository also provides a test framework which checks basic functionality
 of the Jenkins image.
 
-Users can choose between testing Jenkins based on a RHEL or CentOS image.
+With v3, users can choose between testing Jenkins based on a RHEL (where you are running on a platform with subscriptions) or CentOS image.
+With v4, there is not CentOS vs. RHEL distinction, but we still use TARGET to control whether subscriptions are required when building the test image,
+and we reuse the v3 values (i.e. `rhel7`) for that purpose.
 
 *  **RHEL based image**
 
