@@ -1,6 +1,8 @@
 Jenkins Docker Image
 ====================
 
+Test PR to see if we get successful image build logs.
+
 This repository contains Dockerfiles for Jenkins Docker images intended for
 use with [OpenShift v3 and OpenShift v4](https://github.com/openshift/origin)
 
