@@ -49,6 +49,16 @@ Choose either the CentOS7 or RHEL7 based image:
     $ make build TARGET=rhel7 VERSION=2
     ```
 
+    Also note, as of 3.11, the RHEL images are hosted at registry.redhat.io as well.  This is the terms based 
+    registry and requires credentials for access.  See [Transitioning the Red Hat container registry](https://www.redhat.com/en/blog/transitioning-red-hat-container-registry) for details:
+    * registry.redhat.io/openshift3/jenkins-2-rhel7:v3.11
+    * registry.redhat.io/openshift3/jenkins-agent-nodejs-8-rhel7:v3.11
+    * registry.redhat.io/openshift3/jenkins-agent-maven-35-rhel7:v3.11
+    * registry.redhat.io/openshift3/jenkins-slave-base-rhel7:v3.11
+    
+    The openshift cluster install for 3.11 will insure that credentials are provided and subsequently available on the nodes
+    in the cluster to facilitate image pulling.
+
 *  **CentOS7 based image**
 
 	The images are available on DockerHub. An example download command is:
@@ -148,6 +158,17 @@ your nodes depending when the images were pulled.  Starting with the 3.7 release
 in the future.  But if you started using this image prior to 3.7, verification of your Kubernetes plugin configurations for the image pull
 policy used is warranted to guarantee consistency around what image is being used on each of your nodes.
 
+Jenkins security advisories, the "master" image from this repository, and the `oc` binary
+---------------------------------
+
+Any security advisory related updates to Jenkins core or the plugins we include in the OpenShift Jenkins master image will only occur in the v3.11 and v4.x branches of this repository.
+
+We do support running the v3.11 version of the master image against older v3.x (as far back as v3.4) OpenShift clusters if you want to pick up Jenkins security advisory updates.  Per the prior section, we advise that you import a version of `oc` into your Jenkins installation that matches your OpenShift cluster via the "Global Tool Configuration" option in Jenkins either via the UI, CLI, or groovy init scripts.
+
+Our OpenShift Client Plugin has some documentation on doing this [here](https://github.com/openshift/jenkins-client-plugin#setting-up-jenkins-nodes).
+
+Also note for the RHEL image, the v3.11 image examines whether it is running in an OpenShift Pod and what version the cluster is at.  If the cluster is at a version prior to v3.11, the Maven and NodeJS agent example configuration for the kubernetes plugin will point to registry.access.redhat.com for 
+the image setting.  If the cluster is at v3.11, the image setting will point to the terms based registry at registry.access.io.
 
 Plugins
 ---------------------------------
