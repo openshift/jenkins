@@ -56,6 +56,17 @@ Choose either the CentOS7 or RHEL7 based image:
     $ make build TARGET=rhel7 VERSION=2
     ```
 
+    Also note, as of 3.11, the RHEL images are hosted at registry.redhat.io as well.  This is the terms based 
+    registry and requires credentials for access.  See [Transitioning the Red Hat container registry](https://www.redhat.com/en/blog/transitioning-red-hat-container-registry) for details:
+    * registry.redhat.io/openshift3/jenkins-2-rhel7:v3.11
+    * registry.redhat.io/openshift3/jenkins-agent-nodejs-8-rhel7:v3.11
+    * registry.redhat.io/openshift3/jenkins-agent-maven-35-rhel7:v3.11
+    * registry.redhat.io/openshift3/jenkins-slave-base-rhel7:v3.11
+    
+    The openshift cluster install for 3.11 will insure that credentials are provided and subsequently available on the nodes
+    in the cluster to facilitate image pulling.
+
+
 *  **CentOS7 based image**
 
 	The v3.x images are available on DockerHub. An example download command is:
@@ -99,8 +110,10 @@ Installation (OpenShift V4)
     The images are also still available at the Red Hat Container Catalog for customers with subscriptions, 
     though with some changes in the naming.
 
-    Also, the `registry.access.redhat.com` host is being transitioned to `registry.redhat.io`.  Both exist at this time, but eventually
-    only `registry.redhat.io` will remain.  See [Transitioning the Red Hat container registry](https://www.redhat.com/en/blog/transitioning-red-hat-container-registry) for details:
+    As with the initial introduction in 3.11, given the [transitioning of the Red Hat container registry](https://www.redhat.com/en/blog/transitioning-red-hat-container-registry), the RHEL based images are available at both registry.access.redhat.com and registry.redhat.io.
+    The terms based registry, registry.redhat.io, which requires credentials for access, is the strategic direction, and 
+    will be the only location for RHEL8 based content when that is available.  The pull secret you obtain from try.openshift.com includes 
+    access to registry.redhat.io.  The image pull specs are:
     * registry.redhat.io/openshift4/ose-jenkins:v4.0
     * registry.redhat.io/openshift4/ose-jenkins-agent-nodejs:v4.0
     * registry.redhat.io/openshift4/ose-jenkins-agent-maven:v4.0
@@ -136,8 +149,8 @@ initialization by passing `-e VAR=VALUE` to the Docker run command.
 |  `OVERRIDE_RELEASE_MIGRATION_OVERWRITE`       | When running this image with an OpenShift persistent volume for the Jenkins config directory, and this image is starting in an existing deployment created with an earlier version of this image, unless the environment variable is set to some non-empty value other than 'false', the plugins from the image will replace any versions of those plugins currently residing in the Jenkins plugin directory.  |
 |  `SKIP_NO_PROXY_DEFAULT`       | This environment variable applies to the agent/slave images produced by this repository.  By default, the agent/slave images will create/update the 'no_proxy' environment variable with the hostnames for the Jenkins server endpoint and Jenkins JNLP endpoint, as communication flows to endpoints typically should *NOT* go through a HTTP Proxy.  However, if your use case dictates those flows should not be exempt from the proxy, set this environment variable to any non-empty value other than 'false'.    |
 |  `ENABLE_FATAL_ERROR_LOG_FILE`       | When running this image with an OpenShift persistent volume claim for the Jenkins config directory, this environment variable allows the fatal error log file to persist if a fatal error occurs. The fatal error file will be located at `/var/lib/jenkins/logs`.   |
-|  `NODEJS_SLAVE_IMAGE`  | Setting this value will override the image used for the default NodeJS agent pod configuration.  The default NodeJS agent pod uses `docker.io/openshift/jenkins-agent-nodejs-8-centos7` or `registry.redhat.io/openshift3/jenkins-agent-nodejs-8-rhel7` depending whether you are running the centos or rhel version of the Jenkins image.  This variable must be set before Jenkins starts the first time for it to have an effect.  |
-|  `MAVEN_SLAVE_IMAGE`   | Setting this value overrides the image used for the default maven agent pod configuration.  The default maven agent pod uses `docker.io/openshift/jenkins-agent-maven-35-centos7` or `registry.redhat.io/openshift3/jenkins-agent-maven-35-rhel7` depending whether you are running the centos or rhel version of the Jenkins image.  This variable must be set before Jenkins starts the first time for it to have an effect.
+|  `NODEJS_SLAVE_IMAGE`  | Setting this value will override the image used for the default NodeJS agent pod configuration.  For 3.x, the default NodeJS agent pod uses `docker.io/openshift/jenkins-agent-nodejs-8-centos7` or `registry.redhat.io/openshift3/jenkins-agent-nodejs-8-rhel7` depending whether you are running the centos or rhel version of the Jenkins image.  This variable must be set before Jenkins starts the first time for it to have an effect. For 4.x, the image is included in the 4.0 payload via an imagestream in the openshift namespace, and the image spec points to the internal image registry.  If you are running this image outside of OpenShift, you must either set this environment variable or manually update the setting to an accessible image spec. |
+|  `MAVEN_SLAVE_IMAGE`   | Setting this value overrides the image used for the default maven agent pod configuration.  For 3.x, the default maven agent pod uses `docker.io/openshift/jenkins-agent-maven-35-centos7` or `registry.redhat.io/openshift3/jenkins-agent-maven-35-rhel7` depending whether you are running the centos or rhel version of the Jenkins image.  For 4.x, the image is included in the 4.0 payload via an imagestream in the openshift namespace, and the image spec points to the internal image registry.  If you are running this image outside of OpenShift, you must either set this environment variable or manually update the setting to an accessible image spec. This variable must be set before Jenkins starts the first time for it to have an effect. |
 
 
 
@@ -197,6 +210,9 @@ updates.  Per the prior section, we advise that you import a version of `oc` int
 cluster via the "Global Tool Configuration" option in Jenkins either via the UI, CLI, or groovy init scripts.
 
 Our OpenShift Client Plugin has some documentation on doing this [here](https://github.com/openshift/jenkins-client-plugin#setting-up-jenkins-nodes).
+
+Also note for the RHEL image, the v3.11 image examines whether it is running in an OpenShift Pod and what version the cluster is at.  If the cluster is at a version prior to v3.11, the Maven and NodeJS agent example configuration for the kubernetes plugin will point to registry.access.redhat.com for 
+the image setting.  If the cluster is at v3.11, the image setting will point to the terms based registry at registry.access.io.
 
 
 Plugins
