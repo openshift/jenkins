@@ -41,14 +41,14 @@ Choose either the CentOS7 or RHEL7 based image:
 
 *  **RHEL7 based image**
 
-    You can access these images from the Red Hat Container Catalog. For OpenShift v3 see:
+You can access these images from the Red Hat Container Catalog. For OpenShift v3 see:
     * https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-2-rhel7
     * https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-slave-base-rhel7
     * https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-agent-maven-35-rhel7
     * https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-agent-nodejs-8-rhel7
 
-    To build a RHEL7 based image, you need to run Docker build on a properly
-    subscribed RHEL machine.
+To build a RHEL7 based image, you need to run Docker build on a properly
+subscribed RHEL machine.
 
     ```
     $ git clone https://github.com/openshift/jenkins.git
@@ -56,26 +56,26 @@ Choose either the CentOS7 or RHEL7 based image:
     $ make build TARGET=rhel7 VERSION=2
     ```
 
-    Also note, as of 3.11, the RHEL images are hosted at registry.redhat.io as well.  This is the terms based 
-    registry and requires credentials for access.  See [Transitioning the Red Hat container registry](https://www.redhat.com/en/blog/transitioning-red-hat-container-registry) for details:
+Also note, as of 3.11, the RHEL images are hosted at registry.redhat.io as well.  This is the terms based 
+registry and requires credentials for access.  See [Transitioning the Red Hat container registry](https://www.redhat.com/en/blog/transitioning-red-hat-container-registry) for details:
     * registry.redhat.io/openshift3/jenkins-2-rhel7:v3.11
     * registry.redhat.io/openshift3/jenkins-agent-nodejs-8-rhel7:v3.11
     * registry.redhat.io/openshift3/jenkins-agent-maven-35-rhel7:v3.11
     * registry.redhat.io/openshift3/jenkins-slave-base-rhel7:v3.11
     
-    The openshift cluster install for 3.11 will insure that credentials are provided and subsequently available on the nodes
-    in the cluster to facilitate image pulling.
+The openshift cluster install for 3.11 will ensure that credentials are provided and subsequently available on the nodes
+in the cluster to facilitate image pulling.
 
 
 *  **CentOS7 based image**
 
-	The v3.x images are available on DockerHub. An example download command is:
+The v3.x images are available on DockerHub. An example download command is:
 
 	```
 	$ docker pull openshift/jenkins-2-centos7
 	```
 
-	To build a Jenkins image from scratch run:
+To build a Jenkins image from scratch run:
 
 	```
 	$ git clone https://github.com/openshift/jenkins.git
@@ -101,34 +101,31 @@ For example:
 Installation (OpenShift V4)
 ---------------------------------
 
-    Starting with v4.0, the images are no longer hosted on DockerHub, but instead on Quay, for users without entitlements/subscriptions for support.  Their pull specs are:
-    * quay.io/openshift/origin-jenkins:v4.0
-    * quay.io/openshift/origin-jenkins-agent-nodejs:v4.0
-    * quay.io/openshift/origin-jenkins-agent-maven:v4.0
-    * quay.io/openshift/origin-jenkins-agent-base:v4.0
+Starting with v4.0, the images are only available on quay.io for public community support. Their pull specs are:
+* quay.io/openshift/origin-jenkins:v4.0
+* quay.io/openshift/origin-jenkins-agent-nodejs:v4.0
+* quay.io/openshift/origin-jenkins-agent-maven:v4.0
+* quay.io/openshift/origin-jenkins-agent-base:v4.0
 
-    The images are also still available at the Red Hat Container Catalog for customers with subscriptions, 
-    though with some changes in the naming.
+The images are also still available at the Red Hat Container Catalog for customers with subscriptions, 
+though with some changes in the naming.
 
-    As with the initial introduction in 3.11, given the [transitioning of the Red Hat container registry](https://www.redhat.com/en/blog/transitioning-red-hat-container-registry), the RHEL based images are available at both registry.access.redhat.com and registry.redhat.io.
-    The terms based registry, registry.redhat.io, which requires credentials for access, is the strategic direction, and 
-    will be the only location for RHEL8 based content when that is available.  The pull secret you obtain from try.openshift.com includes 
-    access to registry.redhat.io.  The image pull specs are:
-    * registry.redhat.io/openshift4/ose-jenkins:v4.0
-    * registry.redhat.io/openshift4/ose-jenkins-agent-nodejs:v4.0
-    * registry.redhat.io/openshift4/ose-jenkins-agent-maven:v4.0
-    * registry.redhat.io/openshift4/ose-jenkins-agent-base:v4.0
+As with the initial introduction in 3.11, given the [transitioning of the Red Hat container registry](https://www.redhat.com/en/blog/transitioning-red-hat-container-registry), the RHEL based images are available at both registry.access.redhat.com and registry.redhat.io.
+The terms based registry, registry.redhat.io, which requires credentials for access, is the strategic direction, and 
+will be the only location for RHEL8 based content when that is available.  The pull secret you obtain from try.openshift.com includes 
+access to registry.redhat.io.  The image pull specs are:
+* registry.redhat.io/openshift4/ose-jenkins:v4.0
+* registry.redhat.io/openshift4/ose-jenkins-agent-nodejs:v4.0
+* registry.redhat.io/openshift4/ose-jenkins-agent-maven:v4.0
+* registry.redhat.io/openshift4/ose-jenkins-agent-base:v4.0
 
-    OpenShift v4 also removes the 32 bit JVM option.  Only 64 bit will be provided for all images.
+OpenShift v4 also removes the 32 bit JVM option.  Only 64 bit will be provided for all images.
 
-    The `Dockerfile.rhel7` variants still exists, but as part of the `CentOS` vs. `RHEL` distinction no longer existing, the various `Dockerfile` files have been renamed to `Dockerfile.localdev` to
-    more clearly denote that they are for builds on developers' local machines that most likely do not have a Red Hat subscription / entitlement.  The 
-    `Dockerfile.localdev` variants are structured to allow building of the images on machines without `RHEL` subscriptions, even though there base images are no longer based on `CentOS`.  And subscriptions
-    are still required for use of `Dockerfile.rhel7`.
+The `Dockerfile.rhel7` variants still exists, but as part of the `CentOS` vs. `RHEL` distinction no longer existing, the various `Dockerfile` files have been renamed to `Dockerfile.localdev` to more clearly denote that they are for builds on developers' local machines that most likely do not have a Red Hat subscription / entitlement.  The `Dockerfile.localdev` variants are structured to allow building of the images on machines without `RHEL` subscriptions, even though the base images are no longer based on `CentOS`.  Subscriptions are still required for use of `Dockerfile.rhel7`.
 
-    With any local builds, if for example you plan on submitting a PR to this repository, you still build the same way as with OpenShift v3 with respect to the `make` invocations.  
+With any local builds, if for example you plan on submitting a PR to this repository, you still build the same way as with OpenShift v3 with respect to the `make` invocations.  
     
-    Be aware, no support in any way is provided for running images created from any of the `Dockerfile.localdev` files.  And in fact the images hosted on both quay.io and the Red Hat Container Catalog are based off the `Dockerfile.rhel7` files.
+Be aware, no support in any way is provided for running images created from any of the `Dockerfile.localdev` files.  And in fact the images hosted on both quay.io and the Red Hat Container Catalog are based off the `Dockerfile.rhel7` files.
     
 
 
@@ -224,7 +221,7 @@ An initial set of Jenkins plugins are included in the OpenShift Jenkins images. 
 is that the CentOS7 image if first updated with any changes to the list of plugins.  After some level
 of verification with that image, the RHEL7 image is updated.
 
-#### Plugin installation for CentOS7 (V3 Only)
+#### Plugin installation for CentOS7 V3 Only
 
 The top level list of plugins to install is located [here](2/contrib/openshift/base-plugins.txt).  The
 format of the file is:
@@ -258,7 +255,7 @@ new versions of the CentOS7 based versions of the images produced by this reposi
 For v4.0, the job definitions for this repository in https://github.com/openshif/release result in our Prow based infrastructure to eventually 
 mirror the image content on quay.io.
 
-#### Plugin installation for RHEL7 (V3 and V4)
+#### Plugin installation for RHEL7 V3 and V4
 
 Only OpenShift developers working for Red Hat can update the list of plugins for the RHEL7 image.  For those developers, visit this
 [internal Jenkins server](https://buildvm.openshift.eng.bos.redhat.com:8443/job/devex/job/devex%252Fjenkins-plugins/) and log in (contact our CD team for permissions to this job).  Click the `Build with parameters` link, update the `PLUGIN_LIST` field, and submit the build.  The format of the data for the `PLUGIN_LIST` field is the same as `base-plugins.txt`.
@@ -283,7 +280,7 @@ The specifics for each approach are detailed below.
 #### Installing using layering
 
 In order to install additional Jenkins plugins, the OpenShift Jenkins image provides a way similar to how
-the [initial set of plugins are added](#plugin-installation-for-centos7) to this image that will allow one
+the [initial set of plugins are added](#plugin-installation-for-centos7-v3-only) to this image that will allow one
 to add or update by layering on top of this image. The derived image will provide the same functionality
 as described in this documentation, in addition it will also include all plugins you list in the `plugins.txt` file.
 
@@ -362,7 +359,7 @@ Visit [the upstream repository](https://github.com/openshift/jenkins-sync-plugin
 Visit [the upstream repository](https://github.com/openshift/jenkins-openshift-login-plugin) as well as the [Jenkins plugin wiki](https://wiki.jenkins-ci.org/display/JENKINS/OpenShift+Login+Plugin).  This plugin integrates the authentication and authorization of your Jenkins instance with you OpenShift cluster, providing a single sign-on look and feel.  You'll sign into the Jenkins server using the same credentials that you use to sign into the OpenShift Web Console or interact with OpenShift via the `oc` CLI.  See the [OpenShift documentation](https://docs.openshift.com) for more details.
 
 For the above OpenShift Jenkins plugins, each of their READMEs have specifics unique to each of them on how to use and if so desired contribute to their development.  That said, there is a good deal of commonality and shared infrastructure
-related to developing, creating new versions, and ultimately updating the images of this repository with those new versions.  If you would like to understand the specifics of that process, please visit our [plugin contribution guide](CONTRIBUTING_TO_OPENSHIFT_PLUGINS.md).
+related to developing, creating new versions, and ultimately updating the images of this repository with those new versions.  If you would like to understand the specifics of that process, please visit our [contribution guide](CONTRIBUTING_TO_OPENSHIFT_JENKINS_IMAGE_AND_PLUGINS.md).
 
 * **Kubernetes Plugin**
 Though not originated out of the OpenShift organization, this plugin is invaluable in that it allows slaves to be dynamically provisioned on multiple Docker hosts using [Kubernetes](https://github.com/kubernetes/kubernetes). To learn how to use this plugin, see the [example](https://github.com/openshift/origin/tree/master/examples/jenkins/master-slave) available in the OpenShift Origin repository. For more details about this plugin, visit the [plugin](https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin) web site.
@@ -424,3 +421,7 @@ and we reuse the v3 values (i.e. `rhel7`) for that purpose.
 **Notice: By omitting the `VERSION` parameter, the build/test action will be performed
 on all provided versions of Jenkins. Since we are currently providing only version `2`,
 you can omit this parameter.**
+
+## PR testing for this repository
+
+As with the plugins focused on OpenShift integration, see [the contribution guide](CONTRIBUTING_TO_OPENSHIFT_JENKINS_IMAGE_AND_PLUGINS.md).
