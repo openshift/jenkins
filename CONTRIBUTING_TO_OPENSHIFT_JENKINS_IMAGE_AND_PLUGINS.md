@@ -103,7 +103,7 @@ Quick preamble ... some cool facts about OpenShift CI:
 
 The ci-operator based configuration, the `ci-operator/config`, for PR testing in 3.11 is at [https://github.com/openshift/release/blob/master/ci-operator/config/openshift/jenkins/openshift-jenkins-openshift-3.11.yaml](https://github.com/openshift/release/blob/master/ci-operator/config/openshift/jenkins/openshift-jenkins-openshift-3.11.yaml).
 
-The parts at the beginning and end of that file are more generic setup needs for (ci-operator)[https://github.com/openshift/ci-operator].
+The parts at the beginning and end of that file are more generic setup needs for [ci-operator](https://github.com/openshift/ci-operator).
 
 What makes 3.11 a bit more complicated than 4.0 is
 * During the 3.11 timeframe, `ci-operator` was pretty brand new.  In particular, updating image streams on the test cluster was not baked into the system... enhancements came during 4.0 that helped there
@@ -202,7 +202,7 @@ The most relevant pieces of the presubmit (aside from a bunch of Prow and ci-ope
           value: TEST_FOCUS='openshift pipeline' TEST_PARALLELISM=3 run-tests
 ```
 
-OpenShift extended tests are based on the Golang Ginkgo test framework.  We leverage the focus feature of Ginkgo to achieve this.  The `run-tests` executable actually launches the Ginkgo tests against the test cluster, and will leverage `TEST_FOCUS`.  The `TEST_PARALLELISM=3` is also worth noting, as it is unique to Jenkins e2e.  We discovered that the amount of memory Jenkins needed to run Pipelines was such that we could overload our 3.11 based GCP clusters used for CI.  Setting this environment variable restricted the amount of Jenkins based tests that would be run concurrently. 
+OpenShift extended tests are based on the Golang Ginkgo test framework.  We leverage the focus feature of Ginkgo to limit the tests executed to the ones pertaining the our OpenShift/Jenkins integrations.  The `run-tests` executable actually launches the Ginkgo tests against the test cluster, and will leverage `TEST_FOCUS`.  The `TEST_PARALLELISM=3` is also worth noting, as it is unique to Jenkins e2e.  We discovered that the amount of memory Jenkins needed to run Pipelines was such that we could overload our 3.11 based GCP clusters used for CI.  Setting this environment variable restricted the amount of Jenkins based tests that would be run concurrently. 
 
 The most relevant pieces of the postsubmit:
 * There is 1 Prow based and 1 Jenkins based task in the postsubmits.
@@ -218,9 +218,9 @@ The template is at [https://github.com/openshift/release/blob/master/ci-operator
 * Tag in the jenkins image from the PR's build into the test cluster's jenkins imagestream
 * Change the image pull spec of our example maven and nodejs agent images used to create our default k8s plugin pod templates configuration 
 
-To tag in the Jenkins image, we added a `prepare` container into the e2e pod.  It leverages the `PREPARE_COMMAND` and `IMAGE_2_CENTOS` environment variables noted above to call that script from the Jenkins repo that was added to base test container from the CI system.
+To tag in the Jenkins image, we added a `prepare` container into the e2e pod.  It leverages the `PREPARE_COMMAND` and `IMAGE_2_CENTOS` environment variables noted above to call that script from the Jenkins repo that was added to the base test container from the CI system.
 
-To update the agent images used, the `IMAGE_MAVEN_AGENT` and `IMAGE_NODEJS_AGENT` environment variables, which the `ci-operator/config` noted above sets to the pull spec of the newly built images from the PR, are read in by the extended tests in https://github.com/openshift/origin.  Those values in turn are used to set the [environment variables](https://github.com/openshift/jenkins#environment-variables) the Jenkins image recognizes for overriding the default images used for the k8s plugin configuration.
+To update the agent images used, the `IMAGE_MAVEN_AGENT` and `IMAGE_NODEJS_AGENT` environment variables, which the `ci-operator/config` noted above sets to the pull spec of the newly built images from the PR, are read in by the extended tests in https://github.com/openshift/origin.  Those values in turn are used to set the [environment variables](https://github.com/openshift/jenkins#environment-variables) that the Jenkins image recognizes for overriding the default images used for the k8s plugin configuration.
 
 ##### 4.x specifics
 
@@ -248,9 +248,9 @@ Also, with the agent images now having imagestreams in a 4.x cluster as part of 
 
 With both those removed, we no longer needed a special template under `ci-operator/templates` for jenkins.  We now use the default one in 4.x.
 
-* You will also notice the use of `Dockerfile.rhel7` vs. `Dockerfile` for the `dockerfile_path`.  This stems from the [move in 4.x to the UBI](https://github.com/openshift/jenkins#installation-openshift-v4) and the end of CentOS based content for OpenShift.
+You will also notice the use of `Dockerfile.rhel7` vs. `Dockerfile` for the `dockerfile_path`.  This stems from the [move in 4.x to the UBI](https://github.com/openshift/jenkins#installation-openshift-v4) and the end of CentOS based content for OpenShift.
 
-* The extended tests defined in [OpenShift origin](https://github.com/openshift/origin) were also reworked in 4.x.  The use of Ginkgo focuses were moved to only within the test executables, and can no longer be specified from the command line.  "Test suites" were defined for the most prominent focuses, including one for Jenkins called `openshift/jenkins-e2e`.  This simplification, along with other rework, makes it easier to run the extended tests against existing clusters (including ones you stand up for your development ... more on that later).  The tests defined for jenkins repo PRs are the specific jenkins e2e's, as well as the generic OpenShift conformance regression bucket:
+The extended tests defined in [OpenShift origin](https://github.com/openshift/origin) were also reworked in 4.x.  The use of Ginkgo focuses were moved to only within the test executables, and can no longer be specified from the command line.  "Test suites" were defined for the most prominent focuses, including one for Jenkins called `openshift/jenkins-e2e`.  This simplification, along with other rework, makes it easier to run the extended tests against existing clusters (including ones you stand up for your development ... more on that later).  The tests defined for jenkins repo PRs are the specific jenkins e2e's, as well as the generic OpenShift conformance regression bucket:
 
 ```
 tests:
@@ -293,7 +293,7 @@ base_images:
 
 ```
 
-* With that as the base image, like before, we define an OpenShift Docker Strategy build against the given plugin's checked out repo, leveraging new 4.0 specific `Dockerfile` files present for each.  The ci-operator/config is:
+* With that as the base image, like before, we define an OpenShift Docker Strategy build against the given plugin's checked out repo, leveraging the new 4.x specific `Dockerfile` files present for each.  The `ci-operator/config` for that build is:
 
 ```
 images:
@@ -344,7 +344,7 @@ The `ci-operator/jobs` files are very similar to the ones for the jenkins image 
 
 ### Extended tests
 
-First, the extended tests in [OpenShift Origin[(https://github.com/openshift/origin) that we've made some references to ... where are the Jenkins ones specifically?  There are two golang files:
+First, the extended tests in [OpenShift Origin](https://github.com/openshift/origin) that we've made some references to ... where are the Jenkins ones specifically?  There are two golang files:
 * The [reduced jenkins e2e suite](https://github.com/openshift/origin/blob/master/test/extended/builds/pipeline_origin_bld.go) run in the OpenShift Build's regression bucket
 * In addition to the minimal suite, [these tests](https://github.com/openshift/origin/blob/master/test/extended/builds/pipeline_jenkins_e2e.go) get run in the jenkins e2e for the image and each plugin
 
@@ -357,14 +357,14 @@ So you'll see less use of `g.Context(..)` and `g.It(...)`, as well as cleaning u
 * The ephemeral storage template and persistent storage template
 
 The `openshift-tests` binary in the 4.x branches of [OpenShift Origin](https://github.com/openshift/origin) includes those tests (and as it turns out, can be run against both 3.11 and 4.x clusters).  Once you have a cluster up, and the `openshift-tests` binary built (run `hack/build-go.sh cmd/openshift-tests` from you clone of origin), you can:
-* export KUBECONFIG=<to the location of the admin.kubeconfig for the cluster>
+* set and export KUBECONFIG to the location of the admin.kubeconfig for the cluster
 * run `openshift-tests run openshift/jenkins-e2e --include-success` against the cluster ... the `openshift/jenkins-e2e` is considered a "suite" in `openshift-tests` and under the covers it leverages Ginkgo focuses to pick up the tests from those two golang files.
 
-To run extended tests against one of your clusters on a set of local changes of a plugin, from one of the plugin repo's top dirs, you can:
-* run `docker build -f ./Dockerfile -t <a publicly accessible docker registry spec, like docker.io/gmontero/plugin-tests:latest>
-* run `docker push <a publicly accessible docker registry spec, like docker.io/gmontero/plugin-tests:latest>
-* run `oc tag --source=docker <a publicly accessible docker registry spec, like docker.io/gmontero/plugin-tests:latest> openshift/jenkins:2
-* run `openshift-tests run openshift/jenkins-e2e --include-success`  ... the imagestream controller in OpenShift will pull the <publicly accessible docker registry spec, like docker.io/gmontero/plugin-tests:latest> image when the standard jenkins template is provisioned. 
+To run extended tests against one of your clusters using a set of local changes of a plugin, from one of the plugin repo's top dirs, you can:
+* run `docker build -f ./Dockerfile -t <a publicly accessible docker registry spec, like docker.io/gmontero/plugin-tests:latest>`
+* run `docker push <a publicly accessible docker registry spec, like docker.io/gmontero/plugin-tests:latest>`
+* run `oc tag --source=docker <a publicly accessible docker registry spec, like docker.io/gmontero/plugin-tests:latest> openshift/jenkins:2`
+* run `openshift-tests run openshift/jenkins-e2e --include-success`  ... the imagestream controller in OpenShift will pull the publicly accessible docker registry spec, like docker.io/gmontero/plugin-tests:latest, when the standard jenkins template is provisioned. 
 
 ### the "PR-Testing" folders in the plugins
 
@@ -411,7 +411,7 @@ These kick in when we cut the official version at the Jenkins Update Center for 
 
 ### Set up local repository to cut release:
 
-To cut a new release of any of our 4 plugins, you will set up a local clone of the [https://github.com/jenkinsci](https://github.com/jenkinsci) repository for the plugin in question, like [https://github.com/jenkinsci/openshift-client-plugin](https://github.com/jenkinsci/openshift-client-plugin),
+To cut a new release of any of our plugins, you will set up a local clone of the [https://github.com/jenkinsci](https://github.com/jenkinsci) repository for the plugin in question, like [https://github.com/jenkinsci/openshift-client-plugin](https://github.com/jenkinsci/openshift-client-plugin),
 and then transfer the necessary commits from the corresponding [https://github.com/openshift](https://github.com/openshift) repository, like [https://github.com/openshift/jenkins-client-plugin](https://github.com/openshift/jenkins-client-plugin).
 
 ### Transfer commits from the [https://github.com/openshift](https://github.com/openshift) repositories to the [https://github.com/jenkinsci](https://github.com/jenkinsci) repositories ... prior to generating a new plugin release
@@ -435,7 +435,7 @@ In your clone of `https://github.com/jenkinsci/<plugin dir>`, set up your git re
 
 After pushing the desired commits to the [https://github.com/jenkinsci](https://github.com/jenkinsci) repository for the plugin in question, you can now actually initiate the process to create a new version of the plugin in the Jenkins Update Center.
 
-Prerequisite: your Git ID should have push access to the [https://github.com/openshift](https://github.com/openshift) and [https://github.com/jenkinsci](https://github.com/jenkinsci) repositories for this plugin; your Jenkins ID (again see [https://wiki.jenkins-ci.org/display/JENKINS/User+Account+on+Jenkins](https://wiki.jenkins-ci.org/display/JENKINS/User+Account+on+Jenkins)) is listed in the permission file for the plugin, like [https://github.com/jenkins-infra/repository-permissions-updater/blob/master/permissions/plugin-openshift-pipeline.yml](https://github.com/jenkins-infra/repository-permissions-updater/blob/master/permissions/plugin-openshift-pipeline.yml).  Given these assumptions:
+Prerequisite: your Git ID should have push access to the [https://github.com/jenkinsci](https://github.com/jenkinsci) repositories for this plugin; your Jenkins ID (again see [https://wiki.jenkins-ci.org/display/JENKINS/User+Account+on+Jenkins](https://wiki.jenkins-ci.org/display/JENKINS/User+Account+on+Jenkins)) is listed in the permission file for the plugin, like [https://github.com/jenkins-infra/repository-permissions-updater/blob/master/permissions/plugin-openshift-pipeline.yml](https://github.com/jenkins-infra/repository-permissions-updater/blob/master/permissions/plugin-openshift-pipeline.yml).  Given these assumptions:
 
 1. Then run `mvn release:prepare release:perform`
 1. You'll minimally be prompted for the `release version`, `release tag`, and the `new development version`.  Default choices will be provided for each, and the defaults are acceptable, so you can just hit the enter key for all three prompts.  As an example, if we are currently at v1.0.36, it will provide 1.0.37 for the new `release version` and `release tag`.  For the `new development version` it will provide 1.0.38-SNAPSHOT, which is again acceptable.  
@@ -458,7 +458,7 @@ Date:   Thu Oct 26 14:18:48 2017 -0400
 
 ### Transfer commits from the [https://github.com/jenkinsci](https://github.com/jenkinsci) repositories to the [https://github.com/openshift](https://github.com/openshift) repositories ... after generating a new plugin release
 
-Keeping the commit lists between the openshift and jenkinsci repositories as close as possible helps with general sanity, as we do our development work on the openshift side, but have to cut the plugin releases on the jenkinsci side.  So we want to pick the 2 version commits back into our corresponding repositories.
+Keeping the commit lists between the openshift and jenkinsci repositories as close as possible helps with general sanity, as we do our development work on the openshift side, but have to cut the plugin releases on the jenkinsci side.  So we want to pick the 2 version commits back into our corresponding openshift repositories.
 
 First, from you clone on the openshift side, say for example the clone for the sync plugin, run `git fetch git@github.com:jenkinsci/openshift-sync-plugin.git`
 
@@ -470,17 +470,17 @@ Lastly, push the branch and create a PR against the https://github.com/openshift
 
 ### Testing:
 
-* We can employ our CI server and extended test framework for respositories in [https://github.com/openshift](https://github.com/openshift).  We cannot for [https://github.com/jenkinsci](https://github.com/jenkinsci).  For this reason we maintain the separate repositories, where we run OpenShift CI against incoming changes before publishing them to the "official" [https://github.com/jenkinsci](https://github.com/jenkinsci) repositories.
+A described above, we can employ our CI server and extended test framework for respositories in [https://github.com/openshift](https://github.com/openshift).  We cannot for [https://github.com/jenkinsci](https://github.com/jenkinsci).  For this reason we maintain the separate repositories, where we run OpenShift CI against incoming changes before publishing them to the "official" [https://github.com/jenkinsci](https://github.com/jenkinsci) repositories.
 
 ### Release cycle (when we get to the end of a release):
 
-* We can continue development of new features for the next release in the [https://github.com/openshift](https://github.com/openshift) repositories.  But if a new bug for the current release
+We can continue development of new features for the next release in the [https://github.com/openshift](https://github.com/openshift) repositories.  But if a new bug for the current release
 pops up in the interim, we can make the change in [https://github.com/jenkinsci](https://github.com/jenkinsci) first, then cherry-pick into [https://github.com/openshift](https://github.com/openshift) (employing
 our regression testing), and then when ready cut the new version of the plugin in [https://github.com/jenkinsci](https://github.com/jenkinsci).
 
 ### What version is a change really in:
 
-* Through various scenarios and human error, those "release commits" (where the version in the pom.xml is updated) sometimes have landed in [https://github.com/openshift](https://github.com/openshift) repositories after the fact, or out of order with
+Through various scenarios and human error, those "release commits" (where the version in the pom.xml is updated) sometimes have landed in [https://github.com/openshift](https://github.com/openshift) repositories after the fact, or out of order with
 how they landed in [https://github.com/jenkinsci](https://github.com/jenkinsci) repositories.  The [https://github.com/jenkinsci](https://github.com/jenkinsci) repositories are the *master* in this case.  The plugin version a change is in is expressed by the commit orders in the pom.xml release changes in the various [https://github.com/jenkinsci](https://github.com/jenkinsci) repositories.
 
 
@@ -495,9 +495,7 @@ modify the [text file](https://github.com/openshift/jenkins/blob/master/2/contri
 
 If the PR passes all tests and merges, the api.ci system will promote the jenkins images to quay.io for 4.x, and we have the separate jenkins job in the openshift ci jenkins server to push the 3.11 images to docker.io.
 
-The image build in particular is of interest when it comes to plugin versions within our openshift/jenkins image, and what we have to do in creating the RPM based images hosted on registy.redhat.io/registry.access.redhat.com that we provide subscription level support for.  The PR will have a link to the `ci/prow/images` job.  If you click that link, then the `artifacts` link, then the next `artifacts` link, then `build-logs`, you'll see gzipped output from each of the image builds.  Click the one for the main jenkins image.  If you search for the string `Installed plugins:` you'll find the complete list of every plugin that was installed.  Copy that output to clipboard and paste it into the PR that just merged.  See [https://github.com/openshift/jenkins/pull/829#issuecomment-477637521](https://github.com/openshift/jenkins/pull/829#issuecomment-477637521) as an example.
-
-You are now ready for the next step
+The image build from the PR in particular is of interest when it comes to plugin versions within our openshift/jenkins image, and what we have to do in creating the RPM based images hosted on registy.redhat.io/registry.access.redhat.com that we provide subscription level support for.  The PR will have a link to the `ci/prow/images` job.  If you click that link, then the `artifacts` link, then the next `artifacts` link, then `build-logs`, you'll see gzipped output from each of the image builds.  Click the one for the main jenkins image.  If you search for the string `Installed plugins:` you'll find the complete list of every plugin that was installed.  Copy that output to clipboard and paste it into the PR that just merged.  See [https://github.com/openshift/jenkins/pull/829#issuecomment-477637521](https://github.com/openshift/jenkins/pull/829#issuecomment-477637521) as an example.
 
 ### Step 2: updating OSBS/Brew for generating the officially supported images available with Red Hat subscriptions
 
@@ -505,14 +503,14 @@ First, some background:  for all Red Hat officially supported content, to ensure
 
 The team responsible for all this build infrastructure for OpenShift, the Automated Response Team or ART, not surprisingly has there own, separate, Jenkins instance that helps manage some of their dev flows.
 
-The have provided for us a Jenkins pipeline (fitting, I know) that facilitates the building of the plugin RPM and its injection into the Brew pipeline that ultimate results in an image getting built.  They have also provided an job for updating the version of Jenkins core we have installed.
+They have provided us a Jenkins pipeline (fitting, I know) that facilitates the building of the plugin RPM and its injection into the Brew pipeline that ultimate results in an image getting built.  They have also provided a pipeline for updating the version of Jenkins core we have installed.
 
-The URL for the jenkins pipeline to update the plugins RPM is [here](https://buildvm.openshift.eng.bos.redhat.com:8443/job/devex/job/devex%252Fjenkins-plugins/).  You need to be on the Red Hat internal network or VPN to access it.  And to execute the jobs, the ART needs to give you and ID / password.
+The URL for the jenkins pipeline to update the plugins RPM is [here](https://buildvm.openshift.eng.bos.redhat.com:8443/job/devex/job/devex%252Fjenkins-plugins/).  You need to be on the Red Hat internal network or VPN to access it.  And to execute the jobs, the ART needs to give you an ID / password.
 
 You generate a build supplying these parameters:
 * The jenkins core version to base off of (just supply what we are shipping with 3.11 or 4.x)
 * The "OCP_RELEASE" is the OpenShift release (OCP == OpenShift Container Platform) ... so either 3.11, 4.0, 4.1, etc.
-* The plugin list is the list you saved from the image build in the PR.  Remove the "Installed plugins" header, but include the <plugin name>:<plugin version> lines
+* The plugin list is the list you saved from the image build in the PR.  Remove the "Installed plugins" header, but include the `<plugin name>:<plugin version>` lines
 
 The job typically takes 10 to 15 minutes to succeed.  Flakes with Jenkins upstream when downloading plugins is the #1 barrier to success.  Just need to retry again until the Jenkins update center stabilizes.  Once in a while there is a dist git hiccup (dist git is the git server used by brew).  Again, just try again until it settles down.
 
