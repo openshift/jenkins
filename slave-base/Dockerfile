@@ -7,6 +7,8 @@ ENV HOME=/home/jenkins
 USER root
 # Install headless Java
 RUN yum install -y centos-release-scl-rh && \
+    #run yum update to avoid package version mismatch between i686 and other archs
+    yum -y update && \
     x86_EXTRA_RPMS=$(if [ "$(uname -m)" == "x86_64" ]; then echo -n java-1.8.0-openjdk-headless.i686 ; fi) && \
     INSTALL_PKGS="bc gettext git java-1.8.0-openjdk-headless lsof rsync tar unzip which zip bzip2" && \
     yum install -y --setopt=protected_multilib=false --setopt=tsflags=nodocs $INSTALL_PKGS $x86_EXTRA_RPMS && \
