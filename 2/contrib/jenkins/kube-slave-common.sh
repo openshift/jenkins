@@ -35,17 +35,17 @@ fi
 if [[ `grep Enterprise /etc/redhat-release` ]]; then
   versions=`oc version`
   echo "OpenShift client and server versions are ${versions}"
-  countForInPodCheck=`echo $versions | awk -F"v3" '{print NF-1}'`
+  countForInPodCheck=`echo $versions | grep -o "v3" | wc -l`
   # if 2 instance of 'v3', then we are running in a pre3.11 pod;
   # in the 3.11 image `oc`, the server version reporting only lists kubernetes 1.11
   if [ "${countForInPodCheck}" -eq "2" ]; then
     NODEJS_SLAVE=${NODEJS_SLAVE_IMAGE:-registry.access.redhat.com/openshift3/jenkins-agent-nodejs-8-rhel7:${JENKINS_SLAVE_IMAGE_TAG}}
     MAVEN_SLAVE=${MAVEN_SLAVE_IMAGE:-registry.access.redhat.com/openshift3/jenkins-agent-maven-35-rhel7:${JENKINS_SLAVE_IMAGE_TAG}}
   fi
-  countForV311Check=`echo $versions | awk -F"v3.11" '{print NF-1}'`
+  countForV311Check=`echo $versions | grep -o "v3.11" | wc -l`
   # the very latest `oc` from origin/release-3.11 does have two v3.11 lines;
   # reset back if the jenkins 3.11 image ever picks up this level of `oc`
-  if [ "${countForInPodCheck}" -eq "2" ]; then
+  if [ "${countForV311Check}" -eq "2" ]; then
     NODEJS_SLAVE=${NODEJS_SLAVE_IMAGE:-registry.redhat.io/openshift3/jenkins-agent-nodejs-8-rhel7:${JENKINS_SLAVE_IMAGE_TAG}}
     MAVEN_SLAVE=${MAVEN_SLAVE_IMAGE:-registry.redhat.io/openshift3/jenkins-agent-maven-35-rhel7:${JENKINS_SLAVE_IMAGE_TAG}}
   fi
