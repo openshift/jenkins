@@ -11,8 +11,6 @@ RUN curl https://raw.githubusercontent.com/cloudrouter/centos-repo/master/CentOS
     INSTALL_PKGS="bc gettext git java-1.8.0-openjdk-headless lsof rsync tar unzip which zip bzip2" && \
     DISABLES="--disablerepo=rhel-server-extras --disablerepo=rhel-server --disablerepo=rhel-fast-datapath --disablerepo=rhel-server-optional --disablerepo=rhel-server-ose --disablerepo=rhel-server-rhscl" && \
     yum $DISABLES install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
-    # have temporarily removed the validation for java to work around known problem fixed in fedora; jupierce and gmontero are working with
-    # the requisit folks to get that addressed ... will switch back to rpm -V $INSTALL_PKGS when that occurs
     rpm -V  $INSTALL_PKGS && \
     yum clean all && \
     mkdir -p /home/jenkins && \
