@@ -166,6 +166,10 @@ function force_copy_plugins() {
   fi 
 }
 
+# TODO remove after crio fix comes in
+HOME="/var/lib/jenkins"
+export HOME
+
 
 CONTAINER_MEMORY_IN_BYTES=$(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)
 CONTAINER_MEMORY_IN_MB=$((CONTAINER_MEMORY_IN_BYTES/2**20))

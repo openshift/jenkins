@@ -15,6 +15,10 @@ export HOME=${JENKINS_HOME}
 
 source /usr/local/bin/generate_container_user
 
+# TODO remove after crio fix comes in
+HOME="/var/lib/jenkins"
+export HOME
+
 CONTAINER_MEMORY_IN_BYTES=$(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)
 CONTAINER_MEMORY_IN_MB=$((CONTAINER_MEMORY_IN_BYTES/2**20))
 
