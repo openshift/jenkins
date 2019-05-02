@@ -16,6 +16,9 @@ function generate_passwd_file() {
 
   if [ x"$USER_ID" != x"0" -a x"$USER_ID" != x"997" ]; then
 
+    # strip out the value that CRIO injected.
+    grep -v $USER_ID:x:$USER_ID /etc/passwd > /tmp/passwd
+    mv /tmp/passwd /etc/passwd
     echo "default:x:${USER_ID}:${GROUP_ID}:Default Application User:${HOME}:/sbin/nologin" >> /etc/passwd
 
   fi
