@@ -7,7 +7,8 @@ ENV HOME=/home/jenkins
 USER root
 # Install headless Java
 RUN yum install -y centos-release-scl-rh && \
-    INSTALL_PKGS="bc gettext git java-1.8.0-openjdk-headless java-1.8.0-openjdk-headless.i686 lsof rsync tar unzip which zip" && \
+    curl https://copr.fedorainfracloud.org/coprs/alsadi/dumb-init/repo/epel-7/alsadi-dumb-init-epel-7.repo -o /etc/yum.repos.d/alsadi-dumb-init-epel-7.repo && \
+    INSTALL_PKGS="bc gettext git java-1.8.0-openjdk-headless java-1.8.0-openjdk-headless.i686 lsof rsync tar unzip which zip dumb-init" && \
     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
     rpm -V  $INSTALL_PKGS && \
     yum clean all && \
@@ -50,4 +51,4 @@ RUN yum install -y centos-release-scl-rh && \
 ADD contrib/bin/* /usr/local/bin/
 
 # Run the Jenkins JNLP client
-ENTRYPOINT ["/usr/local/bin/run-jnlp-client"]
+ENTRYPOINT ["/usr/bin/dumb-init", "--", "/usr/local/bin/run-jnlp-client"]
