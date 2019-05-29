@@ -37,6 +37,7 @@ lockable-resources:2.5
 # processed sec adv https://jenkins.io/security/advisory/2019-01-28/
 # processed sec adv https://jenkins.io/security/advisory/2019-03-06/
 # processed sec adv https://jenkins.io/security/advisory/2019-03-25/
+# processed sec adv https://jenkins.io/security/advisory/2019-05-21/
 #
 htmlpublisher:1.16
 mailer:1.21
@@ -47,6 +48,7 @@ parameterized-trigger:2.35.2
 pipeline-build-step:2.7
 pipeline-input-step:2.8
 script-security:1.56
+credentials:2.1.19 
 credentials-binding:1.15
 junit:1.26.1
 workflow-durable-task-step:2.18
