@@ -136,6 +136,10 @@
                   {
                     "name": "JNLP_SERVICE_NAME",
                     "value": "${JNLP_SERVICE_NAME}"
+                  },
+                  {
+                    "name": "JENKINS_UC_INSECURE",
+                    "value": "${JENKINS_UC_INSECURE}"
                   }
                 ],
                 "resources": {
@@ -292,6 +296,12 @@
       "displayName": "Jenkins ImageStreamTag",
       "description": "Name of the ImageStreamTag to be used for the Jenkins image.",
       "value": "jenkins:2"
+    },
+    {
+      "name": "JENKINS_UC_INSECURE",
+      "displayName": "Allows use of Jenkins Update Center repository with invalid SSL certificate",
+      "description": "Whether to allow use of a Jenkins Update Center that uses invalid certificate (self-signed, unknown CA). If any value other than 'false', certificate check is bypassed.",
+      "value": "false"
     }
   ]
 }
