@@ -300,7 +300,7 @@
     {
       "name": "JENKINS_UC_INSECURE",
       "displayName": "Allows use of Jenkins Update Center repository with invalid SSL certificate",
-      "description": "Whether to allow use of a Jenkins Update Center that uses invalid certificate (self-signed, unknown CA). If any value other than 'false', certificate check is bypassed.",
+      "description": "Whether to allow use of a Jenkins Update Center that uses invalid certificate (self-signed, unknown CA). If any value other than 'false', certificate check is bypassed. By default, certificate check is enforced.",
       "value": "false"
     }
   ]
