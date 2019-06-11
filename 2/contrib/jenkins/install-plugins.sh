@@ -191,11 +191,11 @@ function download() {
 }
 
 function doDownload() {
-    local plugin version url jpi
+    local plugin version url jpi curl_options
     plugin="$1"
     version="$2"
     jpi="$(getArchiveFilename "$plugin")"
-
+    curl_options=""
     # If plugin already exists and is the same version do not download
     if test -f "$jpi" && unzip -p "$jpi" META-INF/MANIFEST.MF | tr -d '\r' | grep "^Plugin-Version: ${version}$" > /dev/null; then
         echo "Using provided plugin: $plugin"
@@ -225,8 +225,15 @@ function doDownload() {
         url="$JENKINS_UC_DOWNLOAD/plugins/$plugin/$version/${plugin}.hpi"
     fi
 
+
+    JENKINS_UC_INSECURE=${JENKINS_UC_INSECURE:-"false"}
+    if [[ -n "$JENKINS_UC_INSECURE" && "$JENKINS_UC_INSECURE" != false ]]; then
+      curl_options="${curl_options} -k"
+      echo "Insecure flag has been set for URL: $url"
+    fi
+
     echo "Downloading plugin: $plugin from $url"
-    curl --connect-timeout "${CURL_CONNECTION_TIMEOUT:-20}" --retry "${CURL_RETRY:-5}" --retry-delay "${CURL_RETRY_DELAY:-0}" --retry-max-time "${CURL_RETRY_MAX_TIME:-60}" -s -f -L "$url" -o "$jpi"
+    curl $curl_options --connect-timeout "${CURL_CONNECTION_TIMEOUT:-20}" --retry "${CURL_RETRY:-5}" --retry-delay "${CURL_RETRY_DELAY:-0}" --retry-max-time "${CURL_RETRY_MAX_TIME:-60}" -s -f -L "$url" -o "$jpi"
     return $?
 }
 

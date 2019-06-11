@@ -157,6 +157,10 @@
                   {
                     "name": "ENABLE_FATAL_ERROR_LOG_FILE",
                     "value": "${ENABLE_FATAL_ERROR_LOG_FILE}"
+                  },
+                  {
+                    "name": "JENKINS_UC_INSECURE",
+                    "value": "${JENKINS_UC_INSECURE}"
                   }
                 ],
                 "resources": {
@@ -325,6 +329,12 @@
       "name": "ENABLE_FATAL_ERROR_LOG_FILE",
       "displayName": "Fatal Error Log File",
       "description": "When a fatal error occurs, an error log is created with information and the state obtained at the time of the fatal error.",
+      "value": "false"
+    },
+    {
+      "name": "JENKINS_UC_INSECURE",
+      "displayName": "Allows use of Jenkins Update Center repository with invalid SSL certificate",
+      "description": "Whether to allow use of a Jenkins Update Center that uses invalid certificate (self-signed, unknown CA). If any value other than 'false', certificate check is bypassed. By default, certificate check is enforced.",
       "value": "false"
     }
   ]
