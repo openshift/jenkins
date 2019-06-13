@@ -128,6 +128,17 @@ With any local builds, if for example you plan on submitting a PR to this reposi
 Be aware, no support in any way is provided for running images created from any of the `Dockerfile.localdev` files.  And in fact the images hosted on both quay.io and the Red Hat Container Catalog are based off the `Dockerfile.rhel7` files.
 
 
+Startup notes for the Jenkins core image
+---------------------------------
+
+When you run you startup the main Jenkins image in an OpenShift pod for the first time, it performs various set up actions, including:
+* Setting the JVM parameters for the actual start of the Jenkins JVM
+* Updating the /etc/passwd so that the random, non-root user ID employed works
+* Copies all the default configuration from the image to the appropriate locations under the Jenkins home directory (which maps to the image's volume mount)
+* Copies all the plugins to the appropriate locations under the Jenkins home directory
+
+By default, all copies to the Jenkins home directory are only done on the initial startup if a Persistent Volume is employed for the Jenkins deployment.  There are ways to override that behavior by environment variables (see the next section below).  But you can also recycle the PVCs during restarts of your Jenkins deployment if you update the image being used and want to reset the system that way.
+
 
 Environment variables
 ---------------------------------
@@ -364,6 +375,28 @@ related to developing, creating new versions, and ultimately updating the images
 
 * **Kubernetes Plugin**
 Though not originated out of the OpenShift organization, this plugin is invaluable in that it allows slaves to be dynamically provisioned on multiple Docker hosts using [Kubernetes](https://github.com/kubernetes/kubernetes). To learn how to use this plugin, see the [example](https://github.com/openshift/origin/tree/master/examples/jenkins/master-slave) available in the OpenShift Origin repository. For more details about this plugin, visit the [plugin](https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin) web site.
+
+Configuration files
+-------------------------------
+
+The layering and s2i build flows noted above for updating the list of plugins can also be used to update the configuration injected into the Jenkins deployment.  However, don't forget the note about copying of config data and Persistent Volumes in the [startup notes](#startup-notes-for-the-jenkins-core-image).
+
+A typical scenario employed by our users has been extending the Jenkins image to add groovy init scripts to customize your Jenkins installation.
+
+A quick recipe of how to do that via layering would be:
+
+* mkdir -p contrib/openshift/configuration/init.groovy.d
+* create a contrib/openshift/configuration/init.groovy.d/foo.groovy file with whatever groovy init steps you desire
+* create a Dockerfile with (adjusting the image ref as you see fit)
+
+```
+FROM registry.access.redhat.com/openshift3/jenkins-2-rhel7:v3.11
+COPY ./contrib/openshift /opt/openshift
+```
+
+And then update your Jenkins deployment to use the resulting image directly, or update the ImageStreamTag reference you Jenkins deployment is employing, with our new image.  During startup,
+the existing run script your new image inherits from this repositories Jenkins image will copy the groovy init script to the appropriate spot under the Jenkins home directory. 
+
 
 Usage
 ---------------------------------
