@@ -38,6 +38,7 @@ lockable-resources:2.5
 # processed sec adv https://jenkins.io/security/advisory/2019-03-25/
 # processed sec adv https://jenkins.io/security/advisory/2019-05-21/
 # processed sec adv https://jenkins.io/security/advisory/2019-05-31/
+# processed sec adv https://jenkins.io/security/advisory/2019-06-11/
 #
 htmlpublisher:1.16
 mailer:1.21
@@ -59,7 +60,7 @@ github:1.29.2
 github-branch-source:2.3.6
 workflow-cps:2.65
 pipeline-model-definition:1.3.4.1
-token-macro:2.6
+token-macro:2.8
 workflow-remote-loader:1.5
 
 # Legacy stuff
