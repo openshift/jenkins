@@ -503,14 +503,16 @@ First, some background:  for all Red Hat officially supported content, to ensure
 
 The team responsible for all this build infrastructure for OpenShift, the Automated Response Team or ART, not surprisingly has there own, separate, Jenkins instance that helps manage some of their dev flows.
 
-They have provided us a Jenkins pipeline (fitting, I know) that facilitates the building of the plugin RPM and its injection into the Brew pipeline that ultimate results in an image getting built.  They have also provided a pipeline for updating the version of Jenkins core we have installed.
+They have provided us a Jenkins pipeline (fitting, I know) that facilitates the building of the plugin RPM and its injection into the Brew pipeline that ultimate results in an image getting built.  They have also provided a pipeline for updating the version of Jenkins core we have installed.  The pipeline for updating the version of the Jenkins core in our image is at [https://github.com/openshift/aos-cd-jobs/tree/master/jobs/devex/jenkins-bump-version](https://github.com/openshift/aos-cd-jobs/tree/master/jobs/devex/jenkins-bump-version) and the pipeline for updating the set of plugins installed is at [https://github.com/openshift/aos-cd-jobs/tree/master/jobs/devex/jenkins-plugins](https://github.com/openshift/aos-cd-jobs/tree/master/jobs/devex/jenkins-plugins).
 
-The URL for the jenkins pipeline to update the plugins RPM is [here](https://buildvm.openshift.eng.bos.redhat.com:8443/job/devex/job/devex%252Fjenkins-plugins/).  You need to be on the Red Hat internal network or VPN to access it.  And to execute the jobs, the ART needs to give you an ID / password.
+Now, we *used* to be able to log onto their Jenkins server and initiate runs of those 2 pipelines, but towards the end of the 4.1 cycle, corporate processes and guidelines changed such that only members of the ART are allowed to access it.
 
-You generate a build supplying these parameters:
+So now, you need to open a Jira bug on the ART board at [https://jira.coreos.com/secure/RapidBoard.jspa?rapidView=85](https://jira.coreos.com/secure/RapidBoard.jspa?rapidView=85) to inform them of what is needed.  Supply these parameters:
 * The jenkins core version to base off of (just supply what we are shipping with 3.11 or 4.x)
 * The "OCP_RELEASE" is the OpenShift release (OCP == OpenShift Container Platform) ... so either 3.11, 4.0, 4.1, etc.
 * The plugin list is the list you saved from the image build in the PR.  Remove the "Installed plugins" header, but include the `<plugin name>:<plugin version>` lines
+
+An example of such a request is at [https://jira.coreos.com/browse/ART-673](https://jira.coreos.com/browse/ART-673).
 
 The job typically takes 10 to 15 minutes to succeed.  Flakes with Jenkins upstream when downloading plugins is the #1 barrier to success.  Just need to retry again until the Jenkins update center stabilizes.  Once in a while there is a dist git hiccup (dist git is the git server used by brew).  Again, just try again until it settles down.
 
