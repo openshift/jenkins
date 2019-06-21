@@ -102,10 +102,12 @@ Installation (OpenShift V4)
 ---------------------------------
 
 Starting with v4.0, the images are only available on quay.io for public community support. Their pull specs are:
-* quay.io/openshift/origin-jenkins:v4.0
-* quay.io/openshift/origin-jenkins-agent-nodejs:v4.0
-* quay.io/openshift/origin-jenkins-agent-maven:v4.0
-* quay.io/openshift/origin-jenkins-agent-base:v4.0
+* quay.io/openshift/origin-jenkins:<release tag>
+* quay.io/openshift/origin-jenkins-agent-nodejs:<release tag>
+* quay.io/openshift/origin-jenkins-agent-maven:<release tag>
+* quay.io/openshift/origin-jenkins-agent-base:<release tag>
+
+Visit quay.io to discover the set of tags for each image.  For example, for the core jenkins image, the tags are [here](https://quay.io/repository/openshift/origin-jenkins?tab=tags)
 
 The images are also still available at the Red Hat Container Catalog for customers with subscriptions,
 though with some changes in the naming.
@@ -114,10 +116,10 @@ As with the initial introduction in 3.11, given the [transitioning of the Red Ha
 The terms based registry, registry.redhat.io, which requires credentials for access, is the strategic direction, and
 will be the only location for RHEL8 based content when that is available.  The pull secret you obtain from try.openshift.com includes
 access to registry.redhat.io.  The image pull specs are:
-* registry.redhat.io/openshift4/ose-jenkins:v4.0
-* registry.redhat.io/openshift4/ose-jenkins-agent-nodejs:v4.0
-* registry.redhat.io/openshift4/ose-jenkins-agent-maven:v4.0
-* registry.redhat.io/openshift4/ose-jenkins-agent-base:v4.0
+* registry.redhat.io/openshift4/ose-jenkins:<release tag>
+* registry.redhat.io/openshift4/ose-jenkins-agent-nodejs:<release tag>
+* registry.redhat.io/openshift4/ose-jenkins-agent-maven:<release tag>
+* registry.redhat.io/openshift4/ose-jenkins-agent-base:<release tag>
 
 OpenShift v4 also removes the 32 bit JVM option.  Only 64 bit will be provided for all images.
 
@@ -126,6 +128,8 @@ The `Dockerfile.rhel7` variants still exists, but as part of the `CentOS` vs. `R
 With any local builds, if for example you plan on submitting a PR to this repository, you still build the same way as with OpenShift v3 with respect to the `make` invocations.  
 
 Be aware, no support in any way is provided for running images created from any of the `Dockerfile.localdev` files.  And in fact the images hosted on both quay.io and the Red Hat Container Catalog are based off the `Dockerfile.rhel7` files.
+
+And lastly, as part of 4.x cluster installs, the OpenShift Jenkins image version corresponding to the cluster version is part of the image payload for the install.  So the `jenkins` ImageStream in the `openshift` namespace will have image references that point to the image registry associated with your install instead of these public registries noted above.  There is also an ImageStream for each of the agent images in the `openshift` namespace in 4.x installs.
 
 
 Startup notes for the Jenkins core image
