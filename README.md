@@ -42,10 +42,10 @@ Choose either the CentOS7 or RHEL7 based image:
 *  **RHEL7 based image**
 
 You can access these images from the Red Hat Container Catalog. For OpenShift v3 see:
-    * https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-2-rhel7
-    * https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-slave-base-rhel7
-    * https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-agent-maven-35-rhel7
-    * https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-agent-nodejs-8-rhel7
+* https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-2-rhel7
+* https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-slave-base-rhel7
+* https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-agent-maven-35-rhel7
+* https://access.redhat.com/containers/#/registry.access.redhat.com/openshift3/jenkins-agent-nodejs-8-rhel7
 
 To build a RHEL7 based image, you need to run Docker build on a properly
 subscribed RHEL machine.
@@ -58,10 +58,10 @@ subscribed RHEL machine.
 
 Also note, as of 3.11, the RHEL images are hosted at registry.redhat.io as well.  This is the terms based
 registry and requires credentials for access.  See [Transitioning the Red Hat container registry](https://www.redhat.com/en/blog/transitioning-red-hat-container-registry) for details:
-    * registry.redhat.io/openshift3/jenkins-2-rhel7:v3.11
-    * registry.redhat.io/openshift3/jenkins-agent-nodejs-8-rhel7:v3.11
-    * registry.redhat.io/openshift3/jenkins-agent-maven-35-rhel7:v3.11
-    * registry.redhat.io/openshift3/jenkins-slave-base-rhel7:v3.11
+* registry.redhat.io/openshift3/jenkins-2-rhel7:v3.11
+* registry.redhat.io/openshift3/jenkins-agent-nodejs-8-rhel7:v3.11
+* registry.redhat.io/openshift3/jenkins-agent-maven-35-rhel7:v3.11
+* registry.redhat.io/openshift3/jenkins-slave-base-rhel7:v3.11
 
 The openshift cluster install for 3.11 will ensure that credentials are provided and subsequently available on the nodes
 in the cluster to facilitate image pulling.
@@ -399,7 +399,7 @@ COPY ./contrib/openshift /opt/openshift
 ```
 
 And then update your Jenkins deployment to use the resulting image directly, or update the ImageStreamTag reference you Jenkins deployment is employing, with our new image.  During startup,
-the existing run script your new image inherits from this repositories Jenkins image will copy the groovy init script to the appropriate spot under the Jenkins home directory. 
+the existing run script your new image inherits from this repositories Jenkins image will copy the groovy init script to the appropriate spot under the Jenkins home directory.
 
 
 Usage
