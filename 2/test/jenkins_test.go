@@ -134,9 +134,9 @@ var _ = Describe("Jenkins testing (v2)", func() {
 		Expect(resp.StatusCode).To(Equal(http.StatusNotFound))
 	}
 
-	It("should pass a smoke test in 64-bit mode", func() {
+	It("should pass a smoke test", func() {
 		By("starting Jenkins")
-		err := j.Start(imageName, []string{"OPENSHIFT_JENKINS_JVM_ARCH=x86_64"})
+		err := j.Start(imageName, []string{})
 		Expect(err).NotTo(HaveOccurred())
 
 		smokeTest("password", "invalidpassword", true, basePlugins, additionalPlugins)
@@ -145,24 +145,7 @@ var _ = Describe("Jenkins testing (v2)", func() {
 		err = dockercli.ContainerStopAndRemove(j.ID, docker.Duration(30*time.Second))
 		Expect(err).NotTo(HaveOccurred())
 
-		err = j.Start(imageName, []string{"OPENSHIFT_JENKINS_JVM_ARCH=x86_64", "JENKINS_PASSWORD=newpassword"})
-		Expect(err).NotTo(HaveOccurred())
-
-		smokeTest("newpassword", "password", false, basePlugins, additionalPlugins)
-	})
-
-	It("should pass a smoke test in 32-bit mode", func() {
-		By("starting Jenkins")
-		err := j.Start(imageName, []string{"OPENSHIFT_JENKINS_JVM_ARCH=i386"})
-		Expect(err).NotTo(HaveOccurred())
-
-		smokeTest("password", "invalidpassword", true, basePlugins, additionalPlugins)
-
-		By("restarting Jenkins with a new password")
-		err = dockercli.ContainerStopAndRemove(j.ID, docker.Duration(30*time.Second))
-		Expect(err).NotTo(HaveOccurred())
-
-		err = j.Start(imageName, []string{"OPENSHIFT_JENKINS_JVM_ARCH=i386", "JENKINS_PASSWORD=newpassword"})
+		err = j.Start(imageName, []string{"JENKINS_PASSWORD=newpassword"})
 		Expect(err).NotTo(HaveOccurred())
 
 		smokeTest("newpassword", "password", false, basePlugins, additionalPlugins)
@@ -248,8 +231,19 @@ var _ = Describe("Jenkins testing (v2)", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		By("checking resolved command line arguments")
-		code, _, err := dockercli.ContainerExec(j.ID, []string{"sh", "-c", `grep -qP "\x00-Dcontains space\x00-Dnospace\x00" /proc/$(pidof java)/cmdline`})
+		_, bytes, err := dockercli.ContainerExec(j.ID, []string{"find", "/proc", "-name", "cmdline"})
 		Expect(err).NotTo(HaveOccurred())
-		Expect(code).To(Equal(0))
+		output := string(bytes)
+		lines := strings.Split(output, "\n")
+		found := false
+		for _, line := range lines {
+			_, bytes, err = dockercli.ContainerExec(j.ID, []string{"cat", line})
+			cat := string(bytes)
+			if strings.Contains(cat, `-Dcontains space`) && strings.Contains(cat, `-Dnospace`) {
+				found = true
+				break
+			}
+		}
+		Expect(found).To(BeTrue())
 	})
 })
