@@ -2,7 +2,6 @@ package test
 
 import (
 	"os"
-	"strings"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
