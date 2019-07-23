@@ -15,8 +15,7 @@ ENV HOME=/home/jenkins
 
 USER root
 # Install headless Java
-RUN yum-config-manager --disable epel >/dev/null || : && \
-    INSTALL_PKGS="bc gettext git java-1.8.0-openjdk-headless lsof rsync tar unzip which zip bzip2 dumb-init" && \
+RUN INSTALL_PKGS="bc gettext git java-1.8.0-openjdk-headless lsof rsync tar unzip which zip bzip2 dumb-init" && \
     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
     rpm -V  $INSTALL_PKGS && \
     yum clean all && \
