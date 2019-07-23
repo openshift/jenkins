@@ -1,6 +1,6 @@
 FROM quay.io/openshift/origin-cli
 
-MAINTAINER Ben Parees <bparees@redhat.com>
+MAINTAINER Akram Ben Aissi <abenaiss@redhat.com>
 
 # Labels consumed by Red Hat build service
 LABEL com.redhat.component="jenkins-slave-base-rhel7-container" \

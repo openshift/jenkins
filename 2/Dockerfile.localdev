@@ -10,7 +10,7 @@ FROM quay.io/openshift/origin-cli
 # Environment:
 # * $JENKINS_PASSWORD - Password for the Jenkins 'admin' user.
 
-MAINTAINER Ben Parees <bparees@redhat.com>
+MAINTAINER Akram Ben Aissi <abenaiss@redhat.com>
 
 # Jenkins LTS packages from
 # https://pkg.jenkins.io/redhat-stable/

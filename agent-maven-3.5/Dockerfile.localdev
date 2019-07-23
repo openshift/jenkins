@@ -1,6 +1,6 @@
 FROM quay.io/openshift/origin-jenkins-agent-base:v4.0
 
-MAINTAINER Gabe Montero <gmontero@redhat.com>
+MAINTAINER Akram Ben Aissi <abenaiss@redhat.com>
 
 ENV MAVEN_VERSION=3.5 \
     GRADLE_VERSION=4.2.1 \

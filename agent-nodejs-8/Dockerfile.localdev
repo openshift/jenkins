@@ -1,6 +1,6 @@
 FROM quay.io/openshift/origin-jenkins-agent-base:v4.0
 
-MAINTAINER Gabe Montero <gmontero@redhat.com>
+MAINTAINER Akram Ben Aissi <abenaiss@redhat.com>
 
 ENV NODEJS_VERSION=8 \
     NPM_CONFIG_PREFIX=$HOME/.npm-global \
