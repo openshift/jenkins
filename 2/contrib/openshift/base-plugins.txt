@@ -50,7 +50,7 @@ pipeline-build-step:2.7
 pipeline-input-step:2.8
 script-security:1.56
 credentials:2.1.19 
-credentials-binding:1.15
+credentials-binding:1.19
 junit:1.26.1
 workflow-support:2.18
 git:3.9.3
