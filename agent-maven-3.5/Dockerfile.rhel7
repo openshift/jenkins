@@ -1,5 +1,5 @@
 FROM quay.io/openshift/origin-jenkins-agent-base:v4.0
-MAINTAINER Gabe Montero <gmontero@redhat.com>
+MAINTAINER Akram Ben Aissi <abenaiss@redhat.com>
 
 # Labels consumed by Red Hat build service
 LABEL com.redhat.component="jenkins-agent-maven-35-rhel7-container" \

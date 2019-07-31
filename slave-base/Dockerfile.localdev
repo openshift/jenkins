@@ -1,6 +1,6 @@
 FROM quay.io/openshift/origin-cli
 
-MAINTAINER Ben Parees <bparees@redhat.com>
+MAINTAINER Akram Ben Aissi <abenaiss@redhat.com>
 
 ENV HOME=/home/jenkins
 
