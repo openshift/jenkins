@@ -187,7 +187,8 @@ image_config_path="${image_config_dir}/config.xml"
 if [[ -z "${JAVA_TOOL_OPTIONS}" ]]; then
   # these options will automatically be picked up by any JVM process but can
   # be overridden on that process' command line.
-  JAVA_TOOL_OPTIONS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true"
+  # Container support is now integrated in Java 11, the +UseCGroupMemoryLimitForHeap option has been pruned
+  JAVA_TOOL_OPTIONS="-XX:+UnlockExperimentalVMOptions -Dsun.zip.disableMemoryMapping=true"
   export JAVA_TOOL_OPTIONS
 fi
 
