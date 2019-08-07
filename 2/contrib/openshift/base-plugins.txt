@@ -50,7 +50,7 @@ job-dsl:1.72
 parameterized-trigger:2.35.2
 pipeline-build-step:2.7
 pipeline-input-step:2.8
-script-security:1.56
+script-security:1.62
 credentials:2.1.19 
 credentials-binding:1.19
 junit:1.26.1
