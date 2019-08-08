@@ -91,3 +91,7 @@ blueocean:1.10.2
 # 2.5 now includes pipeline-model-definition (declaritive pipeline)
 # 2.4 brought in pipeline-milestone-step
 workflow-aggregator:2.6
+
+# Monitoring plugins
+metrics:4.0.2.5
+prometheus:2.0.0
