@@ -60,7 +60,7 @@ mercurial:2.3
 subversion:2.10.3
 github:1.29.2
 github-branch-source:2.3.6
-workflow-cps:2.65
+workflow-cps:2.73
 workflow-cps-global-lib:2.15
 pipeline-model-definition:1.3.4.1
 token-macro:2.8
