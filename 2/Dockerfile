@@ -37,7 +37,7 @@ RUN curl https://pkg.jenkins.io/redhat-stable/jenkins.repo -o /etc/yum.repos.d/j
     curl https://copr.fedorainfracloud.org/coprs/alsadi/dumb-init/repo/epel-7/alsadi-dumb-init-epel-7.repo -o /etc/yum.repos.d/alsadi-dumb-init-epel-7.repo && \
     #run yum update to avoid package version mismatch between i686 and other archs
     yum -y update && \
-    x86_EXTRA_RPMS=$(if [ "$(uname -m)" == "x86_64" ]; then echo -n java-1.8.0-openjdk.i686 java-1.8.0-openjdk-devel.i686 ; fi) && \
+    x86_EXTRA_RPMS=$(if [ "$(uname -m)" == "x86_64" ]; then echo -n java-11-openjdk.i686 java-11-openjdk-devel.i686 ; fi) && \
     INSTALL_PKGS="dejavu-sans-fonts rsync gettext git tar zip unzip openssl bzip2 dumb-init java-1.8.0-openjdk jenkins-2.176.2-1.1" && \
     yum -y --setopt=protected_multilib=false --setopt=tsflags=nodocs install $INSTALL_PKGS $x86_EXTRA_RPMS && \
     rpm -V  $INSTALL_PKGS $x86_EXTRA_RPMS && \
@@ -65,25 +65,16 @@ RUN /usr/local/bin/install-plugins.sh /opt/openshift/base-plugins.txt && \
     unlink /usr/bin/java && \
     unlink /usr/bin/jjs && \
     unlink /usr/bin/keytool && \
-    unlink /usr/bin/orbd && \
     unlink /usr/bin/pack200 && \
-    unlink /usr/bin/policytool && \
     unlink /usr/bin/rmid && \
     unlink /usr/bin/rmiregistry && \
-    unlink /usr/bin/servertool && \
-    unlink /usr/bin/tnameserv && \
     unlink /usr/bin/unpack200 && \
-    unlink /usr/lib/jvm-exports/jre && \
     unlink /usr/share/man/man1/java.1.gz && \
     unlink /usr/share/man/man1/jjs.1.gz && \
     unlink /usr/share/man/man1/keytool.1.gz && \
-    unlink /usr/share/man/man1/orbd.1.gz && \
     unlink /usr/share/man/man1/pack200.1.gz && \
-    unlink /usr/share/man/man1/policytool.1.gz && \
     unlink /usr/share/man/man1/rmid.1.gz && \
     unlink /usr/share/man/man1/rmiregistry.1.gz && \
-    unlink /usr/share/man/man1/servertool.1.gz && \
-    unlink /usr/share/man/man1/tnameserv.1.gz && \
     unlink /usr/share/man/man1/unpack200.1.gz && \
     chown -R 1001:0 /opt/openshift && \
     /usr/local/bin/fix-permissions /opt/openshift && \
