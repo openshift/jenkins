@@ -170,13 +170,20 @@ function force_copy_plugins() {
 CONTAINER_MEMORY_IN_BYTES=$(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)
 CONTAINER_MEMORY_IN_MB=$((CONTAINER_MEMORY_IN_BYTES/2**20))
 
+
+# As of OpenShift 4.3 and Java 8 deprecation, we will provide temporarily a way to switch
+# back to java 8 using the environment variable USE_JAVA_VERSION=java-1.8
+# The variable defaults to USE_JAVA_VERSION=java-11
+# Note: java-11 embedded container optimization by default. Using java-1.8 will disable them.
+export JAVA_VERSION=${USE_JAVA_VERSION:=java-11}
+
 if [[ "$(uname -m)" == "x86_64" ]]; then
-	alternatives --set java $(alternatives --display java | awk '/family.*x86_64/ { print $1; }')
-	alternatives --set javac $(alternatives --display javac | awk '/family.*x86_64/ { print $1; }')
+	alternatives --set java $(alternatives --display java | grep $JAVA_VERSION | awk '/family.*x86_64/ { print $1; }')
+	alternatives --set javac $(alternatives --display javac | grep $JAVA_VERSION | awk '/family.*x86_64/ { print $1; }')
 #set JVM for all other archs
 else
-  alternatives --set java $(alternatives --display java | awk '/family.*'$(uname -m)'/ { print $1; }')
-  alternatives --set javac $(alternatives --display javac | awk '/family.*'$(uname -m)'/ { print $1; }')
+  alternatives --set java $(alternatives --display java | grep $JAVA_VERSION | awk '/family.*'$(uname -m)'/ { print $1; }')
+  alternatives --set javac $(alternatives --display javac | grep $JAVA_VERSION | awk '/family.*'$(uname -m)'/ { print $1; }')
 fi
 
 echo "CONTAINER_MEMORY_IN_MB='${CONTAINER_MEMORY_IN_MB}', using $(readlink /etc/alternatives/java) and $(readlink /etc/alternatives/javac)"
@@ -184,11 +191,12 @@ echo "CONTAINER_MEMORY_IN_MB='${CONTAINER_MEMORY_IN_MB}', using $(readlink /etc/
 image_config_dir="/opt/openshift/configuration"
 image_config_path="${image_config_dir}/config.xml"
 
+# NOTE: The following default options are deprecated with java 11. We disable them for all, including java-1.8
 if [[ -z "${JAVA_TOOL_OPTIONS}" ]]; then
   # these options will automatically be picked up by any JVM process but can
   # be overridden on that process' command line.
   # Container support is now integrated in Java 11, the +UseCGroupMemoryLimitForHeap option has been pruned
-  JAVA_TOOL_OPTIONS="-XX:+UnlockExperimentalVMOptions -Dsun.zip.disableMemoryMapping=true"
+  # JAVA_TOOL_OPTIONS="-XX:+UnlockExperimentalVMOptions -Dsun.zip.disableMemoryMapping=true"
   export JAVA_TOOL_OPTIONS
 fi
 
