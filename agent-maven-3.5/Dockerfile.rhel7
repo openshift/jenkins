@@ -16,9 +16,9 @@ ENV MAVEN_VERSION=3.5 \
     PROMPT_COMMAND=". /usr/local/bin/scl_enable"
 
 # Install Maven
-RUN INSTALL_PKGS="java-1.8.0-openjdk-devel rh-maven35*" && \
+RUN INSTALL_PKGS="java-11-openjdk-devel rh-maven35*" && \
     yum install -y $INSTALL_PKGS && \
-    rpm -V  java-1.8.0-openjdk-devel rh-maven35 && \
+    rpm -V  java-11-openjdk-devel rh-maven35 && \
     yum clean all -y && \
     mkdir -p $HOME/.m2
 
