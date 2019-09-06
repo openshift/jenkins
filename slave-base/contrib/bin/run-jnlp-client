@@ -20,6 +20,13 @@ source /usr/local/bin/generate_container_user
 CONTAINER_MEMORY_IN_BYTES=$(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)
 CONTAINER_MEMORY_IN_MB=$((CONTAINER_MEMORY_IN_BYTES/2**20))
 
+# As of OpenShift 4.3 and Java 8 deprecation, we will provide temporarily a way to switch
+# back to java 8 using the environment variable USE_JAVA_VERSION=java-1.8
+# The variable defaults to USE_JAVA_VERSION=java-11
+# Note: java-11 embedded container optimization by default. Using java-1.8 will disable them.
+
+export JAVA_VERSION=${USE_JAVA_VERSION:=java-11}
+
 if [[ "$(uname -m)" == "x86_64" ]]; then
 	alternatives --set java $(alternatives --display java | grep $JAVA_VERSION | awk '/family.*x86_64/ { print $1; }')
 	alternatives --set javac $(alternatives --display javac | grep $JAVA_VERSION | awk '/family.*x86_64/ { print $1; }')
