@@ -11,12 +11,16 @@ LABEL com.redhat.component="jenkins-slave-base-rhel7-container" \
       io.k8s.description="The jenkins slave base image is intended to be built on top of, to add your own tools that your jenkins job needs. The slave base image includes all the jenkins logic to operate as a slave, so users just have to yum install any additional packages their specific jenkins job will need" \
       io.openshift.tags="openshift,jenkins,slave"
 
-ENV HOME=/home/jenkins
+ENV HOME=/home/jenkins \
+    PROMPT_COMMAND="./usr/local/bin/scl_enable"
+
 
 USER root
 # Install headless Java
-RUN INSTALL_PKGS="bc gettext git java-1.8.0-openjdk-headless lsof rsync tar unzip which zip bzip2 dumb-init" && \
-    yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
+RUN INSTALL_PKGS="bc gettext git java-11-openjdk java-11-openjdk-headless java-1.8.0-openjdk-headless lsof rsync tar unzip which zip bzip2 dumb-init" && \
+    DISABLES="--disablerepo=rhel-server-extras --disablerepo=rhel-server --disablerepo=rhel-fast-datapath --disablerepo=rhel-server-optional --disablerepo=rhel-server-ose --disablerepo=rhel-server-rhscl" && \
+    yum $DISABLES install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
+    yum $DIABLES install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
     rpm -V  $INSTALL_PKGS && \
     yum clean all && \
     mkdir -p /home/jenkins && \
@@ -34,25 +38,17 @@ RUN INSTALL_PKGS="bc gettext git java-1.8.0-openjdk-headless lsof rsync tar unzi
     unlink /usr/bin/java && \
     unlink /usr/bin/jjs && \
     unlink /usr/bin/keytool && \
-    unlink /usr/bin/orbd && \
     unlink /usr/bin/pack200 && \
-    unlink /usr/bin/policytool && \
     unlink /usr/bin/rmid && \
     unlink /usr/bin/rmiregistry && \
-    unlink /usr/bin/servertool && \
-    unlink /usr/bin/tnameserv && \
     unlink /usr/bin/unpack200 && \
     unlink /usr/lib/jvm-exports/jre && \
     unlink /usr/share/man/man1/java.1.gz && \
     unlink /usr/share/man/man1/jjs.1.gz && \
     unlink /usr/share/man/man1/keytool.1.gz && \
-    unlink /usr/share/man/man1/orbd.1.gz && \
     unlink /usr/share/man/man1/pack200.1.gz && \
-    unlink /usr/share/man/man1/policytool.1.gz && \
     unlink /usr/share/man/man1/rmid.1.gz && \
     unlink /usr/share/man/man1/rmiregistry.1.gz && \
-    unlink /usr/share/man/man1/servertool.1.gz && \
-    unlink /usr/share/man/man1/tnameserv.1.gz && \
     unlink /usr/share/man/man1/unpack200.1.gz
 
 # Copy the entrypoint
