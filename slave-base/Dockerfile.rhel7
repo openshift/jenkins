@@ -1,6 +1,20 @@
+##############################################
+# Stage 1 : Build go-init
+##############################################
+
+FROM openshift/origin-release:golang-1.12 AS go-init-builder
+
+RUN go get -v github.com/redhat-developer/go-init && go install github.com/redhat-developer/go-init
+
+##############################################
+# Stage 2 : Build slave-base with go-init
+##############################################
+
 FROM quay.io/openshift/origin-cli
 
 MAINTAINER Akram Ben Aissi <abenaiss@redhat.com>
+
+COPY --from=go-init-builder /go/bin/go-init /usr/bin/go-init
 
 # Labels consumed by Red Hat build service
 LABEL com.redhat.component="jenkins-slave-base-rhel7-container" \
@@ -11,16 +25,13 @@ LABEL com.redhat.component="jenkins-slave-base-rhel7-container" \
       io.k8s.description="The jenkins slave base image is intended to be built on top of, to add your own tools that your jenkins job needs. The slave base image includes all the jenkins logic to operate as a slave, so users just have to yum install any additional packages their specific jenkins job will need" \
       io.openshift.tags="openshift,jenkins,slave"
 
-ENV HOME=/home/jenkins \
-    PROMPT_COMMAND="./usr/local/bin/scl_enable"
+ENV HOME=/home/jenkins
 
-
+#DISABLES="--disablerepo=rhel-server-extras --disablerepo=rhel-server --disablerepo=rhel-fast-datapath --disablerepo=rhel-server-optional --disablerepo=rhel-server-ose --disablerepo=rhel-server-rhscl" && \
 USER root
 # Install headless Java
-RUN INSTALL_PKGS="bc gettext git java-11-openjdk java-11-openjdk-headless java-1.8.0-openjdk-headless lsof rsync tar unzip which zip bzip2 dumb-init" && \
-    DISABLES="--disablerepo=rhel-server-extras --disablerepo=rhel-server --disablerepo=rhel-fast-datapath --disablerepo=rhel-server-optional --disablerepo=rhel-server-ose --disablerepo=rhel-server-rhscl" && \
-    yum $DISABLES install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
-    yum $DIABLES install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
+RUN INSTALL_PKGS="bc gettext git java-11-openjdk java-11-openjdk-headless java-1.8.0-openjdk-headless lsof rsync tar unzip which zip bzip2" && \
+    yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
     rpm -V  $INSTALL_PKGS && \
     yum clean all && \
     mkdir -p /home/jenkins && \
@@ -55,4 +66,8 @@ RUN INSTALL_PKGS="bc gettext git java-11-openjdk java-11-openjdk-headless java-1
 ADD contrib/bin/* /usr/local/bin/
 
 # Run the Jenkins JNLP client
-ENTRYPOINT ["/usr/bin/dumb-init", "--", "/usr/local/bin/run-jnlp-client"]
+ENTRYPOINT ["/usr/bin/go-init", "-main", "/usr/local/bin/run-jnlp-client"]
+
+##############################################
+# End
+##############################################

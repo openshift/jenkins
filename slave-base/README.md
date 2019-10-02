@@ -1,9 +1,5 @@
-Maven Slave Image
+Slave Base Image
 ====================
 
-This repository contains Dockerfiles for a Jenkins Agent Docker image intended for 
+This repository contains Dockerfiles for a Jenkins Agent Base Docker image intended for 
 use with [OpenShift](https://github.com/openshift/origin)
-
-Maven Repository Support
----------------------------------
-This Maven agent image supports using a Maven Mirror/repository manager such as Sonatype Nexus via setting the MAVEN_MIRROR_URL environment variable on the slave pod
