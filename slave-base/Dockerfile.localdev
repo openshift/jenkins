@@ -1,10 +1,22 @@
+##############################################
+# Stage 1 : Build go-init
+##############################################
+
+FROM openshift/origin-release:golang-1.12 AS go-init-builder
+
+RUN go get -v github.com/redhat-developer/go-init && go install github.com/redhat-developer/go-init
+
+##############################################
+# Stage 2 : Build slave-base with go-init
+##############################################
+
 FROM quay.io/openshift/origin-cli
 
 MAINTAINER Akram Ben Aissi <abenaiss@redhat.com>
 
-ENV HOME=/home/jenkins \
-    PROMPT_COMMAND="./usr/local/bin/scl_enable"
+COPY --from=go-init-builder /go/bin/go-init /usr/bin/go-init
 
+ENV HOME=/home/jenkins
 
 USER root
 # Install headless Java
@@ -48,4 +60,8 @@ RUN curl https://copr.fedorainfracloud.org/coprs/alsadi/dumb-init/repo/epel-7/al
 ADD contrib/bin/* /usr/local/bin/
 
 # Run the Jenkins JNLP client
-ENTRYPOINT ["/usr/bin/dumb-init", "--", "/usr/local/bin/run-jnlp-client"]
+ENTRYPOINT ["/usr/bin/go-init", "-main", "/usr/local/bin/run-jnlp-client"]
+
+##############################################
+# End
+##############################################
