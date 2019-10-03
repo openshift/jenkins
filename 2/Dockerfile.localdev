@@ -39,10 +39,14 @@ RUN curl https://copr.fedorainfracloud.org/coprs/alsadi/dumb-init/repo/epel-7/al
     DISABLES="--disablerepo=rhel-server-extras --disablerepo=rhel-server --disablerepo=rhel-fast-datapath --disablerepo=rhel-server-optional --disablerepo=rhel-server-ose --disablerepo=rhel-server-rhscl" && \
     yum $DISABLES -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
     rpm -V  $INSTALL_PKGS && \
-    yum clean all  && \
-    localedef -f UTF-8 -i en_US en_US.UTF-8
+    yum $DISABLES clean all  && \
+    localedef -f UTF-8 -i en_US en_US.UTF-8 && \
+    mkdir -p /opt/openshift/configuration/{init.groovy.d,users} 
 
-COPY ./contrib/openshift /opt/openshift
+COPY ./contrib/openshift/* /opt/openshift/
+COPY ./contrib/openshift/configuration/* /opt/openshift/configuration
+COPY ./contrib/openshift/configuration/init.groovy.d/* /opt/openshift/configuration/init.groovy.d/
+COPY ./contrib/openshift/configuration/users/* /opt/openshift/configuration/users/
 COPY ./contrib/jenkins /usr/local/bin
 ADD ./contrib/s2i /usr/libexec/s2i
 ADD release.version /tmp/release.version

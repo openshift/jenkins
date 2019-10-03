@@ -14,7 +14,7 @@ VERSION=$2
 DOCKERFILE_PATH=""
 BASE_IMAGE_NAME="docker.io/openshift/jenkins"
 RHEL_BASE_IMAGE_NAME="registry.access.redhat.com/openshift3/jenkins"
-BUILD_WITH=podman
+BUILD_WITH=${USE_BUILT_TOOL:=docker}
 # Cleanup the temporary Dockerfile created by docker build with version
 trap "rm -f ${DOCKERFILE_PATH}.version" SIGINT SIGQUIT EXIT
 
