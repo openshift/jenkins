@@ -11,8 +11,12 @@ if [[ "${INSTALL_JENKINS_VIA_RPMS}" == "false" ]]; then
     if [ "$#" == "1" ]; then
         YUM_FLAGS="$1"
     fi
-    rm -fr /var/cache/yum/x86_64/7Server/*
-    rm -fr /var/cache/yum/x86_64/7Server/ # Clean yum cache otherwse, it will fail if --disablerepos are specified
+    YUM_CACHE=/var/cache/yum/x86_64/7Server/
+    if [ -d $YUM_CACHE ]; then 
+      ls -la /var/cache/yum/x86_64/7Server
+      rm -fr /var/cache/yum/x86_64/7Server/*
+      rm -fr /var/cache/yum/x86_64/7Server/ # Clean yum cache otherwse, it will fail if --disablerepos are specified
+    fi
     yum -y $YUM_FLAGS --setopt=tsflags=nodocs install jenkins-2.176.3-1.1
     rpm -V jenkins-2.176.3-1.1
     yum $YUM_FLAGS clean all

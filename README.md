@@ -53,12 +53,12 @@ subscribed RHEL machine.
     ```
     $ git clone https://github.com/openshift/jenkins.git
     $ cd jenkins
-    $ make build TARGET=rhel7 VERSION=2
+    $ make build TARGET=rhel7 VERSION=2 BUILT_COMMAND="docker build"
     ```
 You can also run the build using Podman. However, e2e tests does not run 
-with Podman.
+with Podman (which is the default).
    ```
-   $ make build TARGET=rhel7 VERSION=2 USE_BUILT_TOOL=podman
+   $ make build TARGET=rhel7 VERSION=2 BUILT_COMMAND="podman build"
    ```
 
 Also note, as of 3.11, the RHEL images are hosted at registry.redhat.io as well.  This is the terms based
