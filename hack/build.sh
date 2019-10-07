@@ -14,6 +14,7 @@ VERSION=$2
 DOCKERFILE_PATH=""
 BASE_IMAGE_NAME="docker.io/openshift/jenkins"
 RHEL_BASE_IMAGE_NAME="registry.access.redhat.com/openshift3/jenkins"
+BUILD_WITH=${BUILD_COMMAND:="docker build"} # other possible values: "podman build --no-cache" or "buildah bud" 
 
 # Cleanup the temporary Dockerfile created by docker build with version
 trap "rm -f ${DOCKERFILE_PATH}.version" SIGINT SIGQUIT EXIT
@@ -25,8 +26,14 @@ function docker_build_with_version {
   DOCKERFILE_PATH=$(perl -MCwd -e 'print Cwd::abs_path shift' $dockerfile)
   cp ${DOCKERFILE_PATH} "${DOCKERFILE_PATH}.version"
   git_version=$(git rev-parse --short HEAD)
+  echo "==============================================================================="
+  echo "| Building image:      "
+  echo "| $DOCKERFILE_PATH     "
+  echo "| for $OS              "
+  echo "| using \"$BUILD_WITH\""
+  echo "================================= START ======================================="
   echo "LABEL io.openshift.builder-version=\"${git_version}\"" >> "${dockerfile}.version"
-  docker build -t ${IMAGE_NAME} -f "${dockerfile}.version" .
+  ${BUILD_WITH} -t ${IMAGE_NAME} -f "${dockerfile}.version" .
   rm -f "${DOCKERFILE_PATH}.version"
 }
 

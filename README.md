@@ -56,6 +56,12 @@ subscribed RHEL machine.
     $ make build TARGET=rhel7 VERSION=2
     ```
 
+You can also run the build using Podman. However, e2e tests does not run  
+with Podman (which is the default).
+    ```
+    $ make build TARGET=rhel7 VERSION=2 BUILT_COMMAND="podman build"
+    ```
+
 Also note, as of 3.11, the RHEL images are hosted at registry.redhat.io as well.  This is the terms based
 registry and requires credentials for access.  See [Transitioning the Red Hat container registry](https://www.redhat.com/en/blog/transitioning-red-hat-container-registry) for details:
 * registry.redhat.io/openshift3/jenkins-2-rhel7:v3.11
