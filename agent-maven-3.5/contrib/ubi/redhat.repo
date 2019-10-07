@@ -1,0 +1,126 @@
+[ubi-7]
+name = Red Hat Universal Base Image 7 Server (RPMs)
+baseurl = https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi/server/7/7Server/$basearch/os
+enabled = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+gpgcheck = 1
+
+[ubi-7-server-debug-rpms]
+name = Red Hat Universal Base Image 7 Server (Debug RPMs)
+baseurl = https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi/server/7/7Server/$basearch/debug
+enabled = 0
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+gpgcheck = 1
+
+[ubi-7-server-source-rpms]
+name = Red Hat Universal Base Image 7 Server (Source RPMs)
+baseurl = https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi/server/7/7Server/$basearch/source/SRPMS
+enabled = 0
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+gpgcheck = 1
+
+[ubi-7-server-optional-rpms]
+name = Red Hat Universal Base Image 7 Server - Optional (RPMs)
+baseurl = https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi/server/7/7Server/$basearch/optional/os
+enabled = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+gpgcheck = 1
+
+[ubi-7-server-optional-debug-rpms]
+name = Red Hat Universal Base Image 7 Server - Optional (Debug RPMs)
+baseurl = https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi/server/7/7Server/$basearch/optional/debug
+enabled = 0
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+gpgcheck = 1
+
+[ubi-7-server-optional-source-rpms]
+name = Red Hat Universal Base Image 7 Server - Optional (Source RPMs)
+baseurl = https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi/server/7/7Server/$basearch/optional/source/SRPMS
+enabled = 0
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+gpgcheck = 1
+
+[ubi-7-server-extras-rpms]
+name = Red Hat Universal Base Image 7 Server - Extras (RPMs)
+baseurl = https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi/server/7/7Server/$basearch/extras/os
+enabled = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+gpgcheck = 1
+
+[ubi-7-server-extras-debug-rpms]
+name = Red Hat Universal Base Image 7 Server - Extras (Debug RPMs)
+baseurl = https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi/server/7/7Server/$basearch/extras/debug
+enabled = 0
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+gpgcheck = 1
+
+[ubi-7-server-extras-source-rpms]
+name = Red Hat Universal Base Image 7 Server - Extras (Source RPMs)
+baseurl = https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi/server/7/7Server/$basearch/extras/source/SRPMS
+enabled = 0
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+gpgcheck = 1
+
+[ubi-7-rhah]
+name = Red Hat Universal Base Image Atomic Host (RPMs)
+baseurl = https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi/atomic/7/7Server/$basearch/os
+enabled = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+gpgcheck = 1
+
+[ubi-7-rhah-debug]
+name = Red Hat Universal Base Image Atomic Host (Debug RPMs)
+baseurl = https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi/atomic/7/7Server/$basearch/debug
+enabled = 0
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+gpgcheck = 1
+
+[ubi-7-rhah-source]
+name = Red Hat Universal Base Image Atomic Host (Source RPMs)
+baseurl = https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi/atomic/7/7Server/$basearch/source/SRPMS
+enabled = 0
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+gpgcheck = 1
+
+[ubi-server-rhscl-7-rpms]
+name = Red Hat Software Collections RPMs for Red Hat Universal Base Image 7 Server
+baseurl = https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi/server/7/7Server/$basearch/rhscl/1/os
+enabled = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+gpgcheck = 1
+
+[ubi-server-rhscl-7-debug-rpms]
+name = Red Hat Software Collections Debug RPMs for Red Hat Universal Base Image 7 Server
+baseurl = https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi/server/7/7Server/$basearch/rhscl/1/debug
+enabled = 0
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+gpgcheck = 1
+
+[ubi-server-rhscl-7-source-rpms]
+name = Red Hat Software Collections Source RPMs for Red Hat Universal Base Image 7 Server
+baseurl = https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi/server/7/7Server/$basearch/rhscl/1/source/SRPMS
+enabled = 0
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+gpgcheck = 1
+
+[ubi-7-server-devtools-rpms]
+name = Red Hat Developer Tools RPMs for Red Hat Universal Base Image 7 Server
+baseurl = https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi/server/7/7Server/$basearch/devtools/1/os
+enabled = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+gpgcheck = 1
+
+[ubi-7-server-devtools-debug-rpms]
+name = Red Hat Developer Tools Debug RPMs for Red Hat Universal Base Image 7 Server
+baseurl = https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi/server/7/7Server/$basearch/devtools/1/debug
+enabled = 0
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+gpgcheck = 1
+
+[ubi-7-server-devtools-source-rpms]
+name = Red Hat Developer Tools Source RPMs for Red Hat Universal Base Image 7 Server
+baseurl = https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi/server/7/7Server/$basearch/devtools/1/source/SRPMS
+enabled = 0
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+gpgcheck = 1
+

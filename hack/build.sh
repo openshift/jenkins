@@ -15,6 +15,7 @@ DOCKERFILE_PATH=""
 BASE_IMAGE_NAME="docker.io/openshift/jenkins"
 RHEL_BASE_IMAGE_NAME="registry.access.redhat.com/openshift3/jenkins"
 BUILD_WITH=${BUILD_COMMAND:="docker build"} # other possible values: "docker build" or "podman build"
+
 # Cleanup the temporary Dockerfile created by docker build with version
 trap "rm -f ${DOCKERFILE_PATH}.version" SIGINT SIGQUIT EXIT
 
@@ -25,11 +26,28 @@ function docker_build_with_version {
   DOCKERFILE_PATH=$(perl -MCwd -e 'print Cwd::abs_path shift' $dockerfile)
   cp ${DOCKERFILE_PATH} "${DOCKERFILE_PATH}.version"
   git_version=$(git rev-parse --short HEAD)
+  echo "==============================================================================="
+  echo "| Building image:      "
+  echo "| $DOCKERFILE_PATH    "
+  echo "| for $OS              "
+  echo "| using \"$BUILD_WITH\""
+  echo "================================= START ======================================="
   echo "LABEL io.openshift.builder-version=\"${git_version}\"" >> "${dockerfile}.version"
   echo "Building image from directory: $PWD"
   # -v option with :z at the end performs SELinux relabeling so files in the local volume can be read by the container
-  ${BUILD_WITH} -v $PWD/contrib/ubi:/etc/yum.repos.d/:z -t ${IMAGE_NAME} -f "${dockerfile}.version" .
+  BUILD_VOLUMES=""
+  CONTRIB_YUM_D="$PWD/contrib/ubi"
+  if [[ $OS="rhel7" && -d "$CONTRIB_YUM_D" &&  $(ls -A "$CONTRIB_YUM_D")  ]]; then
+    TMP_YUM_REPO=$(mktemp -d)
+    cp -fr $PWD/contrib/ubi/* $TMP_YUM_REPO
+    BUILD_VOLUMES="-v $TMP_YUM_REPO:/etc/yum.repos.d/:z,ro" # mount the repo file by removing SELinux labels and set it to readonly
+    echo "Yum repo files copied to: $TMP_YUM_REPO" 
+  fi
+  echo "Build command is: ${BUILD_WITH} $BUILD_VOLUMES -t ${IMAGE_NAME} -f "${dockerfile}.version""
+  ${BUILD_WITH} $BUILD_VOLUMES -t ${IMAGE_NAME} -f "${dockerfile}.version" .
+  # ${BUILD_WITH} -t ${IMAGE_NAME} -f "${dockerfile}.version" .
   rm -f "${DOCKERFILE_PATH}.version"
+  echo ====================================== DONE ===================================  
 }
 
 # Versions are stored in subdirectories. You can specify VERSION variable
@@ -42,12 +60,12 @@ dirs=${VERSION:-$VERSIONS}
 # cheap to build it a second time.  The important thing
 # is we have to build it before building any other
 # slave image.
-for dir in ${dirs}; do
-  if [[ "$dir" =~ "slave" || "$dir" =~ "agent" ]]; then
-    dirs=( "slave-base ${dirs[@]}")
-    break
-  fi
-done
+#for dir in ${dirs}; do
+#  if [[ "$dir" =~ "slave" || "$dir" =~ "agent" ]]; then
+#    dirs=( "slave-base ${dirs[@]}")
+#    break
+#  fi
+#done
 
 if [ "$OS" == "rhel7" -o "$OS" == "rhel7-candidate" ]; then
   BASE_IMAGE_NAME=${RHEL_BASE_IMAGE_NAME}

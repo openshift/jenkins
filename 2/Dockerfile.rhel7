@@ -1,6 +1,16 @@
-FROM quay.io/openshift/origin-cli
+##############################################
+# Stage 1 : Build go-init
+##############################################
+FROM openshift/origin-release:golang-1.12 AS go-init-builder
+RUN go get -v github.com/redhat-developer/go-init && \
+    go install github.com/redhat-developer/go-init && \
+    cp /go/bin/go-init /usr/bin
 
-# COPY --from=registry.access.redhat.com/ubi7/ubi /etc/yum.repos.d/redhat.repo /etc/yum.repos.d/redhat.repo 
+##############################################
+# Stage 2 : Build slave-base with go-init
+##############################################
+
+FROM quay.io/openshift/origin-cli
 
 # Jenkins image for OpenShift
 #
