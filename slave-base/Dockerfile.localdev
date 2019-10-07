@@ -3,7 +3,6 @@
 ##############################################
 
 FROM openshift/origin-release:golang-1.12 AS go-init-builder
-
 RUN go get -v github.com/redhat-developer/go-init && go install github.com/redhat-developer/go-init
 
 ##############################################
@@ -11,9 +10,7 @@ RUN go get -v github.com/redhat-developer/go-init && go install github.com/redha
 ##############################################
 
 FROM quay.io/openshift/origin-cli
-
 MAINTAINER Akram Ben Aissi <abenaiss@redhat.com>
-
 COPY --from=go-init-builder /go/bin/go-init /usr/bin/go-init
 
 ENV HOME=/home/jenkins
