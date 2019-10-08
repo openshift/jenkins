@@ -1,17 +1,17 @@
 ##############################################
-# Stage 1 : Build go-init
-##############################################
-
-FROM openshift/origin-release:golang-1.12 AS go-init-builder
-RUN go get -v github.com/redhat-developer/go-init && go install github.com/redhat-developer/go-init
+ # Stage 1 : Build go-init
+ ##############################################
+ FROM openshift/origin-release:golang-1.12 AS go-init-builder
+ RUN go get -v github.com/redhat-developer/go-init && \
+     go install github.com/redhat-developer/go-init && \
+     cp /go/bin/go-init /usr/bin
 
 ##############################################
 # Stage 2 : Build slave-base with go-init
 ##############################################
-
 FROM quay.io/openshift/origin-cli
 MAINTAINER Akram Ben Aissi <abenaiss@redhat.com>
-COPY --from=go-init-builder /go/bin/go-init /usr/bin/go-init
+COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
 
 # Labels consumed by Red Hat build service
 LABEL com.redhat.component="jenkins-slave-base-rhel7-container" \

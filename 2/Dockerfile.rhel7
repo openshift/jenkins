@@ -1,4 +1,17 @@
+##############################################
+ # Stage 1 : Build go-init
+ ##############################################
+ FROM openshift/origin-release:golang-1.12 AS go-init-builder
+ RUN go get -v github.com/redhat-developer/go-init && \
+     go install github.com/redhat-developer/go-init && \
+     cp /go/bin/go-init /usr/bin
+
+##############################################
+# Stage 2 : Build slave-base with go-init
+##############################################
 FROM quay.io/openshift/origin-cli
+MAINTAINER Akram Ben Aissi <abenaiss@redhat.com>
+COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
 
 # Jenkins image for OpenShift
 #
@@ -46,7 +59,7 @@ EXPOSE 8080 50000
 # /usr/lib64/jenkins will subsequently get redirected to /usr/lib/jenkins; it is confirmed that the 3.7 jenkins RHEL images 
 # do *NOT* have a /usr/lib64/jenkins path
 RUN ln -s /usr/lib/jenkins /usr/lib64/jenkins && \
-    INSTALL_PKGS="dejavu-sans-fonts wget rsync gettext git tar zip unzip openssl bzip2 dumb-init  java-1.8.0-openjdk java-1.8.0-openjdk-devel" && \
+    INSTALL_PKGS="dejavu-sans-fonts wget rsync gettext git tar zip unzip openssl bzip2 java-11-openjdk java-11-openjdk-devel" && \
     yum install -y $INSTALL_PKGS && \
     rpm -V  $INSTALL_PKGS && \
     yum clean all  && \
@@ -91,5 +104,5 @@ RUN /usr/local/bin/install-jenkins-core-plugins.sh /opt/openshift/base-plugins.t
 VOLUME ["/var/lib/jenkins"]
 
 USER 1001
-ENTRYPOINT ["/usr/bin/dumb-init", "--"]
-CMD ["/usr/libexec/s2i/run"]
+ENTRYPOINT ["/usr/bin/go-init", "-main", "/usr/libexec/s2i/run"]
+

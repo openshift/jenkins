@@ -1,3 +1,7 @@
 2/Dockerfile.localdev.version
 agent-maven-3.5/Dockerfile.rhel7.version
+agent-maven-3.5/Dockerfile.localdev.version
+slave-base/Dockerfile.localdev.version
+slave-base/Dockerfile.rhel7.version
+
 
