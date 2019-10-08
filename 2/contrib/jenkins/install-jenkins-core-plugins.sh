@@ -17,12 +17,12 @@ if [[ "${INSTALL_JENKINS_VIA_RPMS}" == "false" ]]; then
       rm -fr /var/cache/yum/x86_64/7Server/*
       rm -fr /var/cache/yum/x86_64/7Server/ # Clean yum cache otherwise, it will fail if --disablerepos are specified
     fi
-    yum -y $YUM_FLAGS --setopt=tsflags=nodocs install jenkins-2.176.3-1.1
+    yum -y $YUM_FLAGS --setopt=tsflags=nodocs --disableplugin=subscription-manager install jenkins-2.176.3-1.1
     rpm -V jenkins-2.176.3-1.1
     yum $YUM_FLAGS clean all
     /usr/local/bin/install-plugins.sh $PLUGIN_LIST
 else
-    yum install -y jenkins-2.* jenkins-2-plugins
+    yum install -y --disableplugin=subscription-manager jenkins-2.* jenkins-2-plugins
     rpm -V jenkins-2.* jenkins-2-plugins
     yum clean all
     # Remove the base-plugins.txt file because it's only used for Centos

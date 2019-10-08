@@ -18,10 +18,10 @@ RUN curl https://raw.githubusercontent.com/cloudrouter/centos-repo/master/CentOS
     INSTALL_PKGS="make gcc-c++" && \
     DISABLES="--disablerepo=rhel-server-extras --disablerepo=rhel-server --disablerepo=rhel-fast-datapath --disablerepo=rhel-server-optional --disablerepo=rhel-server-ose --disablerepo=rhel-server-rhscl" && \
     ln -s /usr/lib/node_modules/nodemon/bin/nodemon.js /usr/bin/nodemon && \
-    yum $DISABLES install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
+    yum $DISABLES install -y --setopt=tsflags=nodocs --disableplugin=subscription-manager $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     curl -sL https://rpm.nodesource.com/setup_8.x | bash - && \
-    yum $DISABLES install -y --setopt=tsflags=nodocs nodejs && \
+    yum $DISABLES install -y --setopt=tsflags=nodocs --disableplugin=subscription-manager nodejs && \
     rpm -V nodejs && \
     yum clean all -y 
 
