@@ -1,4 +1,17 @@
+##############################################
+ # Stage 1 : Build go-init
+ ##############################################
+ FROM openshift/origin-release:golang-1.12 AS go-init-builder
+ RUN go get -v github.com/redhat-developer/go-init && \
+     go install github.com/redhat-developer/go-init && \
+     cp /go/bin/go-init /usr/bin
+
+##############################################
+# Stage 2 : Build slave-base with go-init
+##############################################
 FROM quay.io/openshift/origin-cli
+MAINTAINER Akram Ben Aissi <abenaiss@redhat.com>
+COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
 
 # Jenkins image for OpenShift
 #
@@ -9,8 +22,6 @@ FROM quay.io/openshift/origin-cli
 # * /var/jenkins_home
 # Environment:
 # * $JENKINS_PASSWORD - Password for the Jenkins 'admin' user.
-
-MAINTAINER Akram Ben Aissi <abenaiss@redhat.com>
 
 # Jenkins LTS packages from
 # https://pkg.jenkins.io/redhat-stable/
@@ -33,10 +44,9 @@ LABEL k8s.io.description="Jenkins is a continuous integration server" \
 # 8080 for main web interface, 50000 for slave agents
 EXPOSE 8080 50000
 
-RUN curl https://copr.fedorainfracloud.org/coprs/alsadi/dumb-init/repo/epel-7/alsadi-dumb-init-epel-7.repo -o /etc/yum.repos.d/alsadi-dumb-init-epel-7.repo && \
-    curl https://raw.githubusercontent.com/cloudrouter/centos-repo/master/CentOS-Base.repo -o /etc/yum.repos.d/CentOS-Base.repo && \
+RUN curl https://raw.githubusercontent.com/cloudrouter/centos-repo/master/CentOS-Base.repo -o /etc/yum.repos.d/CentOS-Base.repo && \
     curl http://mirror.centos.org/centos-7/7/os/x86_64/RPM-GPG-KEY-CentOS-7 -o /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 && \
-    INSTALL_PKGS="dejavu-sans-fonts rsync gettext git tar zip unzip openssl bzip2 dumb-init java-11-openjdk java-11-openjdk-devel" && \
+    INSTALL_PKGS="dejavu-sans-fonts rsync gettext git tar zip unzip openssl bzip2 java-11-openjdk java-11-openjdk-devel" && \
     DISABLES="--disablerepo=rhel-server-extras --disablerepo=rhel-server --disablerepo=rhel-fast-datapath --disablerepo=rhel-server-optional --disablerepo=rhel-server-ose --disablerepo=rhel-server-rhscl" && \
     yum $DISABLES -y --setopt=tsflags=nodocs --disableplugin=subscription-manager install $INSTALL_PKGS && \
     rpm -V  $INSTALL_PKGS && \
@@ -82,5 +92,4 @@ RUN /usr/local/bin/install-jenkins-core-plugins.sh /opt/openshift/base-plugins.t
 VOLUME ["/var/lib/jenkins"]
 
 USER 1001
-ENTRYPOINT ["/usr/bin/dumb-init", "--"]
-CMD ["/usr/libexec/s2i/run"]
+ENTRYPOINT ["/usr/bin/go-init", "-main", "/usr/libexec/s2i/run"]
