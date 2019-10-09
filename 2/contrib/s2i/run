@@ -166,6 +166,62 @@ function force_copy_plugins() {
   fi 
 }
 
+# extract the different element of an url into a JSON structure
+parse_url() {
+  # extract the protocol
+  proto="$(echo $1 | cut -f1 -d: )"
+  if [[ ! -z $proto ]] ; then
+    # remove the protocol
+    url="$(echo ${1/"$proto://"/})"
+    # extract the user (if any)
+    login="$(echo $url | grep @ | cut -d@ -f1)"
+    username="$(echo $login | cut -d: -f1)"
+    password="$(echo $login | cut -d: -f2)"
+    # extract the host
+    host_port="$(echo ${url/$login@/} | cut -d/ -f1) "
+    host="$(echo $host_port | cut -f1 -d:) "
+    
+    # by request - try to extract the port
+    port="$(echo $host_port | sed -e 's,^.*:,:,g' -e 's,.*:\([0-9]*\).*,\1,g' -e 's,[^0-9],,g')"
+    # extract the uri (if any)
+    resource="/$(echo $url | grep / | cut -d/ -f2-)"
+  fi
+  echo -n "{ \"uri\": \"$1\" , \"url\": \"$url\" , \"proto\": \"$proto\" , \"login\": \"$login\" ,"
+  echo  " \"username\": \"$username\" , \"password\": \"$password\" , \"host\": \"$host\" , \"port\": \"$port\" }"
+}
+
+# converts .google.fr,.google.com into *.google.fr|*.google.com
+convert_no_proxy() {
+  local urls
+  urls=$1
+  echo $urls | tr , \| | sed 's/\./\*\./' | sed 's/|\./,\*\./'
+}
+
+
+get_java_proxy_config() {
+  local config proto json username password
+  # -Dhttps.proxyHost=<your_proxy_host>
+  # -Dhttps.proxyPort=3128
+  # -Dhttps.proxyUser=your-proxy-user 
+  # -Dhttps.proxyPassword=your-proxy-password
+  # -Dhttp.nonProxyHosts="*.svc|*.svc.cluster.*|*.svc.cluster.local|172.30.*|kubernetes.default|172.30.0.1"
+  proto=$1
+  json=$2
+  config="-D$proto.proxyHost=$(echo $json | jq -r .host)  -D$proto.proxyPort=$(echo $json | jq -r .port) "
+  username=$(echo $json | jq -r .username )
+  if [ -n $username ]; then
+    config="$config -D$proto.proxyUser=$username"
+  fi
+  password=$(echo $json | jq -r .password )
+  if [ -n $password ]; then
+    config="$config -D$proto.proxyPassword=$password"
+  fi
+  if [ -n "$no_proxy" ]; then
+    config="$config -D$proto.nonProxyHosts=$(convert_no_proxy $no_proxy)"
+  fi
+  echo $config
+}
+
 
 CONTAINER_MEMORY_IN_BYTES=$(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)
 CONTAINER_MEMORY_IN_MB=$((CONTAINER_MEMORY_IN_BYTES/2**20))
@@ -468,6 +524,24 @@ if [[ -z "${JENKINS_JAVA_OPTIONS}" ]]; then
     # so the displayed-counters setting turns that off
     JENKINS_JAVA_OPTIONS="$JAVA_GC_OPTS $JAVA_INITIAL_HEAP_PARAM $JAVA_MAX_HEAP_PARAM $JAVA_CORE_LIMIT $JAVA_DIAGNOSTICS -Dfile.encoding=UTF8 -Djavamelody.displayed-counters=log,error $JENKINS_ACCESSLOG $FATAL_ERROR_OPTION"
 fi
+
+JAVA_HTTP_PROXY_OPTIONS=""
+if [ -n "$http_proxy" ]; then
+  json=$( parse_url $http_proxy )
+  proxy=$(get_java_proxy_config http "$json")
+  JAVA_HTTP_PROXY_OPTIONS="$JAVA_HTTP_PROXY_OPTIONS $proxy"
+fi
+if [ -n "$https_proxy" ]; then
+  json=$( parse_url $https_proxy )
+  proxy=$(get_java_proxy_config https "$json")
+  JAVA_HTTP_PROXY_OPTIONS="$JAVA_HTTP_PROXY_OPTIONS $proxy"
+fi
+if [ -n "$no_proxy" ]; then
+  proxy=$(get_java_no_proxy_configuration $no_proxy)
+  JAVA_HTTP_PROXY_OPTIONS="$JAVA_HTTP_PROXY_OPTIONS $proxy"
+fi
+
+JENKINS_JAVA_OPTIONS="$JENKINS_JAVA_OPTIONS $JAVA_HTTP_PROXY_OPTIONS"
 
 # Deal with embedded escaped spaces in JENKINS_JAVA_OVERRIDES.
 # JENKINS_JAVA_OVERRIDES='-Dfoo -Dbar' => append -Dfoo -Dbar to java invocation

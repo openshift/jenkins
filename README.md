@@ -59,7 +59,7 @@ subscribed RHEL machine.
 You can also run the build using Podman. However, e2e tests does not run  
 with Podman (which is the default).
     ```
-    $ make build TARGET=rhel7 VERSION=2 BUILT_COMMAND="podman build"
+    $ make build TARGET=rhel7 VERSION=2 BUILD_COMMAND="podman build"
     ```
 
 Also note, as of 3.11, the RHEL images are hosted at registry.redhat.io as well.  This is the terms based
