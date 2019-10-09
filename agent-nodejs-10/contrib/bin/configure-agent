@@ -42,17 +42,21 @@ get_npm_proxy_config(){
 }
 
 
-if [ -n "$http_proxy"]; then 
+if [ -n "$http_proxy" ]; then 
   json=$( parse_url $http_proxy )
   proxy=$(get_npm_proxy_config http "$json")
   npm -g config set proxy $proxy
 fi
 
-if [ -n "$https_proxy"]; then 
+if [ -n "$https_proxy" ]; then 
   json=$( parse_url $https_proxy )
   proxy=$(get_npm_proxy_config https "$json")
   npm -g config set https_proxy $proxy
 fi
+
+if [ -n "$no_proxy" ]; then 
+  npm -g config set noproxy $no_proxy 
+if
 
 if [ -n "$NPM_MIRROR_URL" ]; then
   npm -g config set registry "$NPM_MIRROR_URL"
