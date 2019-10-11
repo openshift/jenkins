@@ -536,10 +536,6 @@ if [ -n "$https_proxy" ]; then
   proxy=$(get_java_proxy_config https "$json")
   JAVA_HTTP_PROXY_OPTIONS="$JAVA_HTTP_PROXY_OPTIONS $proxy"
 fi
-if [ -n "$no_proxy" ]; then
-  proxy=$(get_java_no_proxy_configuration $no_proxy)
-  JAVA_HTTP_PROXY_OPTIONS="$JAVA_HTTP_PROXY_OPTIONS $proxy"
-fi
 
 JENKINS_JAVA_OPTIONS="$JENKINS_JAVA_OPTIONS $JAVA_HTTP_PROXY_OPTIONS"
 
