@@ -308,7 +308,7 @@ fi
 new_password_hash=`obfuscate_password ${JENKINS_PASSWORD:-password} $old_salt`
 
 # finish the move of the default logs dir, /var/log/jenkins, to the volume mount
-mkdir ${JENKINS_HOME}/logs
+mkdir -p ${JENKINS_HOME}/logs
 ln -sf ${JENKINS_HOME}/logs /var/log/jenkins
 
 # clean up any plugins in JENKINS_HOME/plugins which we previously linked, but
@@ -525,7 +525,7 @@ if [[ -z "${JENKINS_JAVA_OPTIONS}" ]]; then
     JENKINS_JAVA_OPTIONS="$JAVA_GC_OPTS $JAVA_INITIAL_HEAP_PARAM $JAVA_MAX_HEAP_PARAM $JAVA_CORE_LIMIT $JAVA_DIAGNOSTICS -Dfile.encoding=UTF8 -Djavamelody.displayed-counters=log,error $JENKINS_ACCESSLOG $FATAL_ERROR_OPTION"
 fi
 
-JAVA_HTTP_PROXY_OPTIONS=""
+JAVA_HTTP_PROXY_OPTIONS="-Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes="
 if [ -n "$http_proxy" ]; then
   json=$( parse_url $http_proxy )
   proxy=$(get_java_proxy_config http "$json")
