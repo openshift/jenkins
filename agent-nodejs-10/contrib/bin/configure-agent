@@ -56,7 +56,7 @@ fi
 
 if [ -n "$no_proxy" ]; then 
   npm -g config set noproxy $no_proxy 
-if
+fi
 
 if [ -n "$NPM_MIRROR_URL" ]; then
   npm -g config set registry "$NPM_MIRROR_URL"
