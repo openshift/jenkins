@@ -14,7 +14,9 @@ FROM quay.io/openshift/origin-cli
 MAINTAINER Akram Ben Aissi <abenaiss@redhat.com>
 COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
 
-ENV HOME=/home/jenkins
+ENV HOME=/home/jenkins \
+    LANG=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8
 
 USER root
 # Install headless Java

@@ -23,7 +23,9 @@ LABEL com.redhat.component="jenkins-slave-base-rhel7-container" \
       io.k8s.description="The jenkins slave base image is intended to be built on top of, to add your own tools that your jenkins job needs. The slave base image includes all the jenkins logic to operate as a slave, so users just have to yum install any additional packages their specific jenkins job will need" \
       io.openshift.tags="openshift,jenkins,slave"
 
-ENV HOME=/home/jenkins
+ENV HOME=/home/jenkins \
+    LANG=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8
 
 USER root
 # Install headless Java
