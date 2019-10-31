@@ -10,6 +10,23 @@
 default_version=$(cat /tmp/release.version)
 JENKINS_SLAVE_IMAGE_TAG=${JENKINS_SLAVE_IMAGE_TAG:-${default_version}}
 
+create_jenkins_location_configuration_xml() {
+  # Gets the jenkins URL only from the *first* route available in namespace service the service named $JENKINS_SERVICE_NAME
+  JENKINS_SCHEME="https://"
+  if [ $( oc get routes -o json | jq -c -r '.items[0].spec.tls')  == "null" ]; then
+    JENKINS_SCHEME="http://"
+  fi
+  JENKINS_URL="$JENKINS_SCHEME$(oc get routes -o json | jq -c -r '.items[0].spec | select (.to.name == env.JENKINS_SERVICE_NAME ) | .host ')"
+  echo "Using JENKINS_SERVICE_NAME=$JENKINS_SERVICE_NAME"
+  echo "Generating jenkins.model.JenkinsLocationConfiguration.xml using (${JENKINS_HOME}/jenkins.model.JenkinsLocationConfiguration.xml.tpl) ..."
+  export JENKINS_URL
+  echo "Jenkins URL set to: $JENKINS_URL in file: ${JENKINS_HOME}/jenkins.model.JenkinsLocationConfiguration.xml"
+  envsubst < "${JENKINS_HOME}/jenkins.model.JenkinsLocationConfiguration.xml.tpl" > "${JENKINS_HOME}/jenkins.model.JenkinsLocationConfiguration.xml"
+}
+
+create_jenkins_location_configuration_xml
+
+
 source /usr/local/bin/jenkins-common.sh
 source /usr/local/bin/kube-slave-common.sh
 
@@ -167,7 +184,7 @@ function force_copy_plugins() {
 }
 
 # extract the different element of an url into a JSON structure
-parse_url() {
+function parse_url() {
   # extract the protocol
   proto="$(echo $1 | cut -f1 -d: )"
   if [[ ! -z $proto ]] ; then
@@ -198,7 +215,7 @@ convert_no_proxy() {
 }
 
 
-get_java_proxy_config() {
+function get_java_proxy_config() {
   local config proto json username password
   # -Dhttps.proxyHost=<your_proxy_host>
   # -Dhttps.proxyPort=3128
