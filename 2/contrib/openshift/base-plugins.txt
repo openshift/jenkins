@@ -49,15 +49,14 @@ lockable-resources:2.5
 # processed sec adv https://jenkins.io/security/advisory/2019-10-01/#SECURITY-1590
 #
 
-htmlpublisher:1.21
-mailer:1.21
 config-file-provider:3.5
+htmlpublisher:1.21
 job-dsl:1.72
+mailer:1.21
 parameterized-trigger:2.35.2
 pipeline-build-step:2.7
 pipeline-input-step:2.8
 script-security:1.66
-
 
 credentials-binding:1.19
 junit:1.26.1
