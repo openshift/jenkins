@@ -539,7 +539,9 @@ fi
 if [[ -z "${JENKINS_JAVA_OPTIONS}" ]]; then
     # a discover was made upstream that if the monitor plugin is installed, it creates httpsession's via its filter, which impact the login plugin bearer token support,
     # so the displayed-counters setting turns that off
-    JENKINS_JAVA_OPTIONS="$JAVA_GC_OPTS $JAVA_INITIAL_HEAP_PARAM $JAVA_MAX_HEAP_PARAM $JAVA_CORE_LIMIT $JAVA_DIAGNOSTICS -Dfile.encoding=UTF8 -Djavamelody.displayed-counters=log,error $JENKINS_ACCESSLOG $FATAL_ERROR_OPTION"
+    JENKINS_JAVA_OPTIONS="$JAVA_GC_OPTS $JAVA_INITIAL_HEAP_PARAM $JAVA_MAX_HEAP_PARAM $JAVA_CORE_LIMIT $JAVA_DIAGNOSTICS "
+    JENKINS_JAVA_OPTIONS="$JENKINS_JAVA_OPTIONS -Dfile.encoding=UTF8 -Djavamelody.displayed-counters=log,error $JENKINS_ACCESSLOG $FATAL_ERROR_OPTION"
+    JENKINS_JAVA_OPTIONS="$JENKINS_JAVA_OPTIONS -Djava.util.logging.config.file=$JENKINS_HOME/logging.properties"
 fi
 
 JAVA_HTTP_PROXY_OPTIONS="-Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes="
