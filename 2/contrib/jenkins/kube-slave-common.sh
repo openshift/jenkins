@@ -88,6 +88,9 @@ function generate_kubernetes_config() {
           <label>maven</label>
           <serviceAccount>${oc_serviceaccount_name}</serviceAccount>
           <nodeSelector></nodeSelector>
+          <workspaceVolume class="org.csanchez.jenkins.plugins.kubernetes.volumes.workspace.EmptyDirWorkspaceVolume">
+            <memory>false</memory>
+          </workspaceVolume>
           <volumes/>
           <containers>
             <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
@@ -119,6 +122,9 @@ function generate_kubernetes_config() {
           <label>nodejs</label>
           <serviceAccount>${oc_serviceaccount_name}</serviceAccount>
           <nodeSelector></nodeSelector>
+          <workspaceVolume class="org.csanchez.jenkins.plugins.kubernetes.volumes.workspace.EmptyDirWorkspaceVolume">
+            <memory>false</memory>
+          </workspaceVolume>
           <volumes/>
           <containers>
             <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
