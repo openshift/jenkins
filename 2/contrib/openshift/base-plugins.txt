@@ -1,5 +1,8 @@
-openshift-login:1.0.19
+
+# OpenShift Plugins
+openshift-login:1.0.20
 openshift-client:1.0.32
+openshift-sync:1.0.41
 
 
 # kubernetes plugin - https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin
@@ -7,9 +10,6 @@ openshift-client:1.0.32
 # 1.12.0 fixed https://jenkins.io/security/advisory/2018-07-30/#SECURITY-1016
 # 1.12.8 fixed the https://issues.jenkins-ci.org/browse/JENKINS-53260 we introduced
 kubernetes:1.12.8
-
-# fabric8 openshift sync
-openshift-sync:1.0.41
 
 # we leverage this plugin in the openshift-client DSL groovy shim
 lockable-resources:2.5
