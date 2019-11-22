@@ -2,7 +2,7 @@
 # OpenShift Plugins
 openshift-login:1.0.20
 openshift-client:1.0.32
-openshift-sync:1.0.41
+openshift-sync:1.0.42
 
 
 # kubernetes plugin - https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin
