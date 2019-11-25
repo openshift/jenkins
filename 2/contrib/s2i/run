@@ -211,7 +211,7 @@ function parse_url() {
 convert_no_proxy() {
   local urls
   urls=$1
-  echo $urls | tr , \| | sed 's/\./\*\./' | sed 's/|\./,\*\./'
+  echo "kubernetes.default|"$( echo "$urls" | tr , \| | sed 's/\./\*\./' | sed 's/|\./|\*\./g' )
 }
 
 
