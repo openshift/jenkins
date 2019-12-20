@@ -21,11 +21,10 @@ create_jenkins_location_configuration_xml() {
   echo "Generating jenkins.model.JenkinsLocationConfiguration.xml using (${JENKINS_HOME}/jenkins.model.JenkinsLocationConfiguration.xml.tpl) ..."
   export JENKINS_URL
   echo "Jenkins URL set to: $JENKINS_URL in file: ${JENKINS_HOME}/jenkins.model.JenkinsLocationConfiguration.xml"
-  envsubst < "${JENKINS_HOME}/jenkins.model.JenkinsLocationConfiguration.xml.tpl" > "${JENKINS_HOME}/jenkins.model.JenkinsLocationConfiguration.xml"
+  envsubst < "${image_config_dir}/jenkins.model.JenkinsLocationConfiguration.xml.tpl" > "${JENKINS_HOME}/jenkins.model.JenkinsLocationConfiguration.xml"
 }
 
 create_jenkins_location_configuration_xml
-
 
 source /usr/local/bin/jenkins-common.sh
 source /usr/local/bin/kube-slave-common.sh
