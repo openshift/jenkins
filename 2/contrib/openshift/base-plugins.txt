@@ -1,6 +1,6 @@
 
 # OpenShift Plugins
-openshift-login:1.0.21
+openshift-login:1.0.22
 openshift-client:1.0.32
 openshift-sync:1.0.44
 
