@@ -10,7 +10,7 @@ openshift-sync:1.0.44
 # 1.12.0 fixed https://jenkins.io/security/advisory/2018-07-30/#SECURITY-1016
 # 1.12.8 fixed the https://issues.jenkins-ci.org/browse/JENKINS-53260 we introduced
 # 1.18.2 upgrade to support OpenJdk11
-kubernetes:1.18.2
+kubernetes:1.19.2
 credentials:2.2.0
 docker-commons:1.14
 pipeline-model-definition:1.3.7
