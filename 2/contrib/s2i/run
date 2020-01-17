@@ -313,10 +313,6 @@ if [[ "${CONTAINER_CORE_LIMIT}" ]]; then
   JAVA_CORE_LIMIT="-XX:ParallelGCThreads=${CONTAINER_CORE_LIMIT} -Djava.util.concurrent.ForkJoinPool.common.parallelism=${CONTAINER_CORE_LIMIT} -XX:CICompilerCount=2"
 fi
 
-# Since OpenShift runs this Docker image under random user ID, we have to assign
-# the 'jenkins' user name to this UID.
-generate_passwd_file
-
 mkdir /tmp/war
 unzip -q /usr/lib/jenkins/jenkins.war -d /tmp/war
 if [ -e ${JENKINS_HOME}/password ]; then

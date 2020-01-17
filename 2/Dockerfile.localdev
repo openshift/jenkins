@@ -39,7 +39,7 @@ LABEL k8s.io.description="Jenkins is a continuous integration server" \
       k8s.io.display-name="Jenkins 2" \
       openshift.io.expose-services="8080:http" \
       openshift.io.tags="jenkins,jenkins2,ci" \
-      io.jenkins.version="2.176.4" \
+      io.jenkins.version="2.204.1" \
       io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
 
 # 8080 for main web interface, 50000 for slave agents
@@ -62,7 +62,6 @@ ADD release.version /tmp/release.version
 
 RUN /usr/local/bin/install-jenkins-core-plugins.sh /opt/openshift/base-plugins.txt "--disablerepo=rhel-server-extras --disablerepo=rhel-server --disablerepo=rhel-fast-datapath --disablerepo=rhel-server-optional --disablerepo=rhel-server-ose --disablerepo=rhel-server-rhscl" && \
     rmdir /var/log/jenkins && \
-    chmod 664 /etc/passwd && \
     chmod -R 775 /etc/alternatives && \
     chmod -R 775 /var/lib/alternatives && \
     chmod -R 775 /usr/lib/jvm && \
