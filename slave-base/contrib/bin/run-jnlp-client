@@ -13,7 +13,7 @@ export JENKINS_HOME=/home/jenkins
 # Make sure the Java clients have valid $HOME directory set
 export HOME=${JENKINS_HOME}
 
-source /usr/local/bin/generate_container_user
+export JAVA_VERSION=${USE_JAVA_VERSION:=java-11}
 
 CONTAINER_MEMORY_IN_BYTES=$(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)
 CONTAINER_MEMORY_IN_MB=$((CONTAINER_MEMORY_IN_BYTES/2**20))
