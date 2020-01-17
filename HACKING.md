@@ -24,9 +24,7 @@ Be sure that you are logged-in with an OpenShift cluster or that KUBECONFIG envi
 ### Building on an OpenShift cluster
 
 ```
-current_branch=$( git rev-parse --abbrev-ref HEAD )
-oc new-build 
-oc patch bc jenkins --patch='{ "spec" : { "strategy" : { "dockerStrategy" : { "dockerfilePath" : "Dockerfile.localdev" }} , "source" : { "git" : { "ref" : "$current_branch"  }}}}}'
+oc new-build https://github.com/origin/jenkins.git#your-branch-name --context-dir=2/
 ```
 
 ### Deploying on an OpenShift Cluster
