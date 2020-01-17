@@ -4,8 +4,8 @@ MAINTAINER Akram Ben Aissi <abenaiss@redhat.com>
 
 # Labels consumed by Red Hat build service
 LABEL com.redhat.component="jenkins-agent-nodejs-10-rhel7-container" \
-      name="openshift3/jenkins-agent-nodejs-10-rhel7" \
-      version="3.6" \
+      name="openshift4/jenkins-agent-nodejs-10-rhel7" \
+      version="4.4" \
       architecture="x86_64" \
       io.k8s.display-name="Jenkins Agent Nodejs" \
       io.k8s.description="The jenkins agent nodejs image has the nodejs tools on top of the jenkins slave base image." \
