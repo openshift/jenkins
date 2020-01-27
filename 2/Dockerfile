@@ -1,3 +1,7 @@
+############################################################################################
+# Stage 1 : Build base for installation of Jenkins
+############################################################################################
+
 FROM quay.io/openshift/origin-cli:v3.11
 
 # Jenkins image for OpenShift
@@ -31,6 +35,10 @@ LABEL k8s.io.description="Jenkins is a continuous integration server" \
 # 8080 for main web interface, 50000 for slave agents
 EXPOSE 8080 50000
 
+############################################################################################
+# Stage 2 : Install necessary packages
+############################################################################################
+
 RUN curl https://pkg.jenkins.io/redhat-stable/jenkins.repo -o /etc/yum.repos.d/jenkins.repo && \
     rpm --import https://pkg.jenkins.io/redhat-stable/jenkins-ci.org.key && \
     yum install -y centos-release-scl-rh && \
@@ -48,6 +56,10 @@ COPY ./contrib/openshift /opt/openshift
 COPY ./contrib/jenkins /usr/local/bin
 ADD ./contrib/s2i /usr/libexec/s2i
 ADD release.version /tmp/release.version
+
+############################################################################################
+# Stage 3 : Overriding defaults for optimizing performance in a container 
+############################################################################################
 
 RUN /usr/local/bin/install-plugins.sh /opt/openshift/base-plugins.txt && \
     # need to create <plugin>.pinned files when upgrading "core" plugins like credentials or subversion that are bundled with the jenkins server
@@ -81,6 +93,10 @@ RUN /usr/local/bin/install-plugins.sh /opt/openshift/base-plugins.txt && \
     /usr/local/bin/fix-permissions /opt/openshift/configuration/init.groovy.d && \
     /usr/local/bin/fix-permissions /var/lib/jenkins && \
     /usr/local/bin/fix-permissions /var/log
+
+############################################################################################
+# Stage 4 : Set Storage and Start with dumb-init
+############################################################################################
 
 VOLUME ["/var/lib/jenkins"]
 
