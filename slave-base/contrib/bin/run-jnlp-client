@@ -15,7 +15,33 @@ export HOME=${JENKINS_HOME}
 
 export JAVA_VERSION=${USE_JAVA_VERSION:=java-11}
 
-CONTAINER_MEMORY_IN_BYTES=$(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)
+function linux_available_memory_bytes() {
+  local kbytes
+  kbytes=$(cat /proc/meminfo | grep MemAvailable | awk '{print $2}')
+  echo $((kbytes*(2**10)))
+}
+
+function container_max_memory_bytes() {
+  local limit
+  if [ -f /sys/fs/cgroup/memory/memory.limit_in_bytes ]; then
+    # cgroups v1
+    cat /sys/fs/cgroup/memory/memory.limit_in_bytes
+    return
+  fi
+  if [ -f /sys/fs/cgroup/memory.max ]; then
+    # cgroups v2
+    limit=$(cat /sys/fs/cgroup/memory.max)
+    if [ "${limit}" == 'max' ]; then
+      linux_available_memory_bytes
+      return
+    fi
+    echo $limit
+    return
+  fi
+  linux_available_memory_bytes
+}
+
+CONTAINER_MEMORY_IN_BYTES=$(container_max_memory_bytes)
 CONTAINER_MEMORY_IN_MB=$((CONTAINER_MEMORY_IN_BYTES/2**20))
 
 if [[ "$(uname -m)" == "x86_64" ]]; then
