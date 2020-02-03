@@ -169,7 +169,7 @@ if [[ $(echo "$@" | awk '{print NF}') -gt 1 ]]; then
   read -a JNLP_JAVA_OVERRIDES_ARRAY <<< "$JNLP_JAVA_OVERRIDES"
 
   set -x
-  cd ${JENKINS_DIR} && exec java $JNLP_JAVA_OPTIONS \
+  cd ${JENKINS_DIR} && exec java -Duser.home=${HOME} $JNLP_JAVA_OPTIONS \
                                  "${JNLP_JAVA_OVERRIDES_ARRAY[@]}" \
                                  -cp $JAR hudson.remoting.jnlp.Main \
                                  -headless $PARAMS "$@"
