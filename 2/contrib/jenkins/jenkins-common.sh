@@ -9,18 +9,6 @@ export AUTH_TOKEN=${KUBE_SA_DIR}/token
 export JENKINS_PASSWORD KUBERNETES_SERVICE_HOST KUBERNETES_SERVICE_PORT
 export ITEM_ROOTDIR="\${ITEM_ROOTDIR}" # Preserve this variable Jenkins has in config.xml
 
-# Generate passwd file based on current uid
-function generate_passwd_file() {
-  USER_ID=$(id -u)
-  GROUP_ID=$(id -g)
-
-  if [ x"$USER_ID" != x"0" -a x"$USER_ID" != x"997" ]; then
-
-    echo "default:x:${USER_ID}:${GROUP_ID}:Default Application User:${HOME}:/sbin/nologin" >> /etc/passwd
-
-  fi
-}
-
 # Takes a password and an optional salt value, outputs the hashed password.
 function obfuscate_password {
     local password="$1"
