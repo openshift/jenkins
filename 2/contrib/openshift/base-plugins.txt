@@ -1,8 +1,7 @@
-
 # OpenShift Plugins
-openshift-login:1.0.20
+openshift-login:1.0.22
 openshift-client:1.0.32
-openshift-sync:1.0.42
+openshift-sync:1.0.44
 
 
 # kubernetes plugin - https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin
@@ -58,6 +57,10 @@ pipeline-build-step:2.7
 pipeline-input-step:2.8
 script-security:1.66
 
+ant:1.10
+pam-auth:1.6
+git-client:3.0.0
+
 credentials-binding:1.19
 junit:1.26.1
 workflow-support:2.18
@@ -75,7 +78,7 @@ workflow-remote-loader:1.5
 mapdb-api:1.0.9.0
 
 matrix-project:1.14
-ssh-credentials:1.14
+ssh-credentials:1.17.2
 
 # Pipeline Utility Steps Plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Utility+Steps+Plugin
 pipeline-utility-steps:2.1.0

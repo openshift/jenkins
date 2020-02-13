@@ -43,13 +43,13 @@ LABEL io.k8s.description="Jenkins is a continuous integration server" \
       io.k8s.display-name="Jenkins 2" \
       io.openshift.tags="jenkins,jenkins2,ci" \
       io.openshift.expose-services="8080:http" \
-      io.jenkins.version="2.176.4" \
+      io.jenkins.version="2.204.1" \
       io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
 
 # Labels consumed by Red Hat build service
 LABEL com.redhat.component="openshift-jenkins-2-container" \
-      name="openshift3/jenkins-2-rhel7" \
-      version="4.0" \
+      name="openshift4/ose-jenkins" \
+      version="4.3" \
       architecture="x86_64"
 
 # 8080 for main web interface, 50000 for slave agents
@@ -73,7 +73,6 @@ ADD release.version /tmp/release.version
 
 RUN /usr/local/bin/install-jenkins-core-plugins.sh /opt/openshift/base-plugins.txt && \
     rmdir /var/log/jenkins && \
-    chmod 664 /etc/passwd && \
     chmod -R 775 /etc/alternatives && \
     chmod -R 775 /var/lib/alternatives && \
     chmod -R 775 /usr/lib/jvm && \
