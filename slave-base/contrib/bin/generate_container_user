@@ -1,9 +1,14 @@
 # Set current user in nss_wrapper
+# Generate passwd file based on current uid and use NSS_WRAPPER to set it
 USER_ID=$(id -u)
 GROUP_ID=$(id -g)
-
+grep -v -e ^default -e ^$USER_ID /etc/passwd > "$HOME/passwd"
 if [ x"$USER_ID" != x"0" ]; then
-
-    echo "default:x:${USER_ID}:${GROUP_ID}:Default Application User:${HOME}:/sbin/nologin" >> /etc/passwd
-
+  echo "default:x:${USER_ID}:${GROUP_ID}:Default Application User:${HOME}:/sbin/nologin" >> "$HOME/passwd"
 fi
+export LD_PRELOAD=libnss_wrapper.so
+export NSS_WRAPPER_PASSWD=${HOME}/passwd
+export NSS_WRAPPER_GROUP=/etc/group
+
+
+
