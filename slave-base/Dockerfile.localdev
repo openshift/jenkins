@@ -1,23 +1,37 @@
+##############################################
+# Stage 1 : Build go-init
+##############################################
+FROM openshift/origin-release:golang-1.12 AS go-init-builder
+WORKDIR  /go/src/github.com/openshift/jenkins
+COPY . .
+WORKDIR  /go/src/github.com/openshift/jenkins/go-init
+RUN go build . && cp go-init /usr/bin
+
+##############################################
+# Stage 2 : Build slave-base with go-init
+##############################################
 FROM quay.io/openshift/origin-cli
+MAINTAINER Akram Ben Aissi <abenaiss@redhat.com>
+COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
 
-MAINTAINER Ben Parees <bparees@redhat.com>
-
-ENV HOME=/home/jenkins
+ENV HOME=/home/jenkins \
+    LANG=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8
 
 USER root
 # Install headless Java
-RUN curl https://copr.fedorainfracloud.org/coprs/alsadi/dumb-init/repo/epel-7/alsadi-dumb-init-epel-7.repo -o /etc/yum.repos.d/alsadi-dumb-init-epel-7.repo && \
-    curl https://raw.githubusercontent.com/cloudrouter/centos-repo/master/CentOS-Base.repo -o /etc/yum.repos.d/CentOS-Base.repo && \
+RUN curl https://raw.githubusercontent.com/cloudrouter/centos-repo/master/CentOS-Base.repo -o /etc/yum.repos.d/CentOS-Base.repo && \
     curl http://mirror.centos.org/centos-7/7/os/x86_64/RPM-GPG-KEY-CentOS-7 -o /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 && \
-    INSTALL_PKGS="bc gettext git java-1.8.0-openjdk-headless lsof rsync tar unzip which zip bzip2" && \
+    INSTALL_PKGS="bc gettext git java-1.8.0-openjdk-headless lsof rsync tar unzip which zip bzip2 " && \
     DISABLES="--disablerepo=rhel-server-extras --disablerepo=rhel-server --disablerepo=rhel-fast-datapath --disablerepo=rhel-server-optional --disablerepo=rhel-server-ose --disablerepo=rhel-server-rhscl" && \
+    yum $DISABLES install -y --setopt=tsflags=nodocs --disableplugin=subscription-manager epel-release && \
     yum $DISABLES install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
     rpm -V  $INSTALL_PKGS && \
     yum clean all && \
     mkdir -p /home/jenkins && \
     chown -R 1001:0 /home/jenkins && \
-    chmod -R g+w /home/jenkins && \
     chmod 664 /etc/passwd && \
+    chmod -R g+w /home/jenkins && \
     chmod -R 775 /etc/alternatives && \
     chmod -R 775 /var/lib/alternatives && \
     chmod -R 775 /usr/lib/jvm && \
@@ -54,4 +68,5 @@ RUN curl https://copr.fedorainfracloud.org/coprs/alsadi/dumb-init/repo/epel-7/al
 ADD contrib/bin/* /usr/local/bin/
 
 # Run the Jenkins JNLP client
-ENTRYPOINT ["/usr/bin/dumb-init", "--", "/usr/local/bin/run-jnlp-client"]
+ENTRYPOINT ["/usr/bin/go-init", "-main", "/usr/local/bin/run-jnlp-client"]
+
