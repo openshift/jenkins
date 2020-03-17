@@ -17,7 +17,7 @@ docker-commons:1.16
 pipeline-model-definition:1.6.0
 pipeline-model-api:1.6.0
 
-# we leverage this plugin in the openshift-client DSL groovy shim
+# we leverage this plugin in the openshift-client DSL groovy shim (then isn't it a registered dep and shouldn't be listed here?)
 lockable-resources:2.5
 
 # explicitly pull in plugins previously pulled in by dependencies because of
@@ -49,6 +49,15 @@ lockable-resources:2.5
 # processed sec adv https://jenkins.io/security/advisory/2019-07-31/
 # processed sec adv https://jenkins.io/security/advisory/2019-08-28/
 # processed sec adv https://jenkins.io/security/advisory/2019-10-01/#SECURITY-1590
+# processed sec adv https://jenkins.io/security/advisory/2019-09-12/#SECURITY-1534
+# processed sec adv https://jenkins.io/security/advisory/2020-03-09/#SECURITY-1723
+# processed sec adv https://jenkins.io/security/advisory/2019-11-21/#SECURITY-1658
+# processed sec adv https://jenkins.io/security/advisory/2020-02-12/#SECURITY-1713
+# processed sec adv https://jenkins.io/security/advisory/2020-03-09/#SECURITY-1754
+# processed sec adv https://jenkins.io/security/advisory/2020-02-12/#SECURITY-1725
+# processed sec adv https://jenkins.io/security/advisory/2020-02-12/#SECURITY-1710
+# processed sec adv https://jenkins.io/security/advisory/2019-11-21/#SECURITY-1106
+#
 
 config-file-provider:3.5
 htmlpublisher:1.21
@@ -101,3 +110,28 @@ workflow-aggregator:2.6
 # Monitoring plugins
 metrics:4.0.2.5
 prometheus:2.0.0
+
+
+workflow-scm-step:2.10
+workflow-step-api:2.22
+
+workflow-multibranch:2.20
+workflow-job:2.29
+
+pipeline-stage-step:2.3
+pipeline-model-declarative-agent:1.1.1
+pipeline-graph-analysis:1.7
+pipeline-rest-api:2.10
+
+branch-api:2.0.20
+cloudbees-folder:6.9
+antisamy-markup-formatter:1.6
+apache-httpcomponents-client-4-api:4.5.10-2.0
+jsch:0.1.55.2
+display-url-api:2.3.2
+trilead-api:1.0.5
+jira:3.0.13
+
+plain-credentials:1.7
+
+blueocean-rest-impl:1.10.2
