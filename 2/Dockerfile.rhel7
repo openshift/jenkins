@@ -44,7 +44,7 @@ RUN yum-config-manager --disable epel >/dev/null || : && \
     #run yum update to avoid package version mismatch between i686 and other archs
     yum -y update && \
     x86_EXTRA_RPMS=$(if [ "$(uname -m)" == "x86_64" ]; then echo -n java-11-openjdk.i686 java-11-openjdk-devel.i686 ; fi) && \
-    INSTALL_PKGS="dejavu-sans-fonts wget rsync gettext git tar zip unzip openssl bzip2 dumb-init  java-11-openjdk java-11-openjdk-devel atomic-openshift-clients jenkins-2.204.2-1.1 jenkins-2-plugins nss_wrapper" && \
+    INSTALL_PKGS="dejavu-sans-fonts wget rsync gettext git tar zip unzip openssl bzip2 dumb-init  java-11-openjdk java-11-openjdk-devel atomic-openshift-clients jenkins-2.* jenkins-2-plugins nss_wrapper" && \
     yum --setopt=protected_multilib=false -y install $INSTALL_PKGS $x86_EXTRA_RPMS && \
     rpm -V  $INSTALL_PKGS $x86_EXTRA_RPMS && \
     yum clean all  && \
