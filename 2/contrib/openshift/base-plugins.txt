@@ -6,7 +6,7 @@ openshift-sync:1.0.44
 
 
 # fabric8 openshift sync
-openshift-pipeline:1.0.56
+openshift-pipeline:1.0.57
 
 
 # kubernetes plugin - https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin
