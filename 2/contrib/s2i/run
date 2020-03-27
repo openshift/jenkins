@@ -475,6 +475,7 @@ if [[ $# -lt 1 ]] || [[ "$1" == "--"* ]]; then
   set -x
   exec java $JENKINS_JAVA_OPTIONS -Duser.home=${HOME} \
             -Djavamelody.application-name=${JENKINS_SERVICE_NAME} \
+            -Dhudson.security.csrf.GlobalCrumbIssuerConfiguration.DISABLE_CSRF_PROTECTION=true \
             "${JENKINS_JAVA_OVERRIDES_ARRAY[@]}" \
             -jar /usr/lib/jenkins/jenkins.war $JENKINS_OPTS "$@"
 fi

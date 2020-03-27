@@ -1,7 +1,7 @@
 # OpenShift Plugins
 openshift-login:1.0.23
 openshift-client:1.0.32
-openshift-sync:1.0.44
+openshift-sync:1.0.45
 
 
 # kubernetes plugin - https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin
@@ -9,10 +9,12 @@ openshift-sync:1.0.44
 # 1.12.0 fixed https://jenkins.io/security/advisory/2018-07-30/#SECURITY-1016
 # 1.12.8 fixed the https://issues.jenkins-ci.org/browse/JENKINS-53260 we introduced
 # 1.18.2 upgrade to support OpenJdk11
-kubernetes:1.18.2
-credentials:2.2.0
-docker-commons:1.14
-pipeline-model-definition:1.3.7
+# 1.25.2 enhance http proxy handleing
+kubernetes:1.25.2
+credentials:2.3.5
+docker-commons:1.16
+pipeline-model-definition:1.6.0
+pipeline-model-api:1.6.0
 
 # we leverage this plugin in the openshift-client DSL groovy shim
 lockable-resources:2.5
@@ -46,42 +48,42 @@ lockable-resources:2.5
 # processed sec adv https://jenkins.io/security/advisory/2019-07-31/
 # processed sec adv https://jenkins.io/security/advisory/2019-08-28/
 # processed sec adv https://jenkins.io/security/advisory/2019-10-01/#SECURITY-1590
-#
 
 config-file-provider:3.5
 htmlpublisher:1.21
 job-dsl:1.72
-mailer:1.21
+mailer:1.30
 parameterized-trigger:2.35.2
-pipeline-build-step:2.7
-pipeline-input-step:2.8
-script-security:1.66
+pipeline-build-step:2.12
+pipeline-input-step:2.11
+script-security:1.71
+google-oauth-plugin:1.0.0
 
 ant:1.10
 pam-auth:1.6
-git-client:3.0.0
+git-client:3.2.1
 
 credentials-binding:1.19
 junit:1.26.1
 workflow-support:2.18
-git:3.9.3
+git:4.2.2
 mercurial:2.3
 subversion:2.10.3
 github:1.29.2
 github-branch-source:2.3.6
-workflow-cps:2.73
+workflow-cps:2.80
 workflow-cps-global-lib:2.15
-token-macro:2.8
+token-macro:2.12
 workflow-remote-loader:1.5
 
 # Legacy stuff
 mapdb-api:1.0.9.0
 
 matrix-project:1.14
-ssh-credentials:1.17.2
+ssh-credentials:1.18.1
 
 # Pipeline Utility Steps Plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Utility+Steps+Plugin
-pipeline-utility-steps:2.1.0
+pipeline-utility-steps:2.5.0
 
 # some plugins helpful for global shared libs were broken out of workflow aggregator
 pipeline-github-lib:1.0
@@ -93,9 +95,6 @@ matrix-auth:2.2
 # with k8s plugin
 blueocean:1.10.2
 
-# Pipeline plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Plugin
-# 2.5 now includes pipeline-model-definition (declaritive pipeline)
-# 2.4 brought in pipeline-milestone-step
 workflow-aggregator:2.6
 
 # Monitoring plugins
