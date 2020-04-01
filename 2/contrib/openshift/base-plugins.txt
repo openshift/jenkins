@@ -56,7 +56,7 @@ mailer:1.21
 parameterized-trigger:2.35.2
 pipeline-build-step:2.7
 pipeline-input-step:2.8
-script-security:1.66
+script-security:1.71
 
 ant:1.10
 pam-auth:1.6
@@ -65,21 +65,21 @@ git-client:3.0.0
 credentials-binding:1.19
 junit:1.26.1
 workflow-support:2.18
-git:3.9.3
+git:4.2.1
 mercurial:2.3
-subversion:2.10.3
+subversion:2.13.1
 github:1.29.2
 github-branch-source:2.3.6
-workflow-cps:2.73
+workflow-cps:2.79
 workflow-cps-global-lib:2.15
-token-macro:2.8
+token-macro:2.10
 workflow-remote-loader:1.5
 
 # Legacy stuff
 mapdb-api:1.0.9.0
 
 matrix-project:1.14
-ssh-credentials:1.17.2
+ssh-credentials:1.17.3
 
 # Pipeline Utility Steps Plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Utility+Steps+Plugin
 pipeline-utility-steps:2.1.0
