@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# extract the different element of an url into a JSON structure
+parse_url() {
+  # extract the protocol
+  proto="$(echo $1 | cut -f1 -d: )"
+  if [[ ! -z $proto ]] ; then
+    # remove the protocol
+    url="$(echo ${1/"$proto://"/})"
+    # extract the user (if any)
+    login="$(echo $url | grep @ | cut -d@ -f1)"
+    username="$(echo $login | cut -d: -f1)"
+    password="$(echo $login | cut -d: -f2)"
+    # extract the host
+    host_port="$(echo ${url/$login@/} | cut -d/ -f1) "
+    host="$(echo $host_port | cut -f1 -d:) "
+
+    # by request - try to extract the port
+    port="$(echo $host_port | sed -e 's,^.*:,:,g' -e 's,.*:\([0-9]*\).*,\1,g' -e 's,[^0-9],,g')"
+    # extract the uri (if any)
+    resource="/$(echo $url | grep / | cut -d/ -f2-)"
+  fi
+  echo -n "{ \"uri\": \"$1\" , \"url\": \"$url\" , \"proto\": \"$proto\" , \"login\": \"$login\" ,"
+  echo  " \"username\": \"$username\" , \"password\": \"$password\" , \"host\": \"$host\" , \"port\": \"$port\" }"
+}
+
+get_npm_proxy_config(){
+  local proto json
+  proto=$1
+  json=$2
+  username=$( echo $json | jq -r .username)
+  password=$( echo $json | jq -r .password)
+  host=$( echo $json | jq -r .host)
+  port=$( echo $json | jq -r .port)
+  proxy_url="$host:$port"
+
+  if [ -n "$username" -a -n "$password" ]; then
+    proxy_url="$proto://$username:$password@$proxy_url"
+  fi
+
+  echo $proxy_url
+}
+
+
+if [ -n "$http_proxy" ]; then 
+  json=$( parse_url $http_proxy )
+  proxy=$(get_npm_proxy_config http "$json")
+  npm -g config set proxy $proxy
+fi
+
+if [ -n "$https_proxy" ]; then 
+  json=$( parse_url $https_proxy )
+  proxy=$(get_npm_proxy_config https "$json")
+  npm -g config set https_proxy $proxy
+fi
+
+if [ -n "$no_proxy" ]; then 
+  npm -g config set noproxy $no_proxy 
+fi
+
+if [ -n "$NPM_MIRROR_URL" ]; then
+  npm -g config set registry "$NPM_MIRROR_URL"
+fi
