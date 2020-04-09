@@ -11,8 +11,8 @@ if [[ "${INSTALL_JENKINS_VIA_RPMS}" == "false" ]]; then
     if [ "$#" == "1" ]; then
         YUM_FLAGS="$1"
     fi
-    yum -y $YUM_FLAGS --setopt=tsflags=nodocs install jenkins-2.204.1-1.1
-    rpm -V jenkins-2.204.1-1.1
+    yum -y $YUM_FLAGS --setopt=tsflags=nodocs install jenkins-2.222.1
+    rpm -V jenkins-2.222.1
     yum clean all
     /usr/local/bin/install-plugins.sh $PLUGIN_LIST
 else
