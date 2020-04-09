@@ -16,7 +16,7 @@ ENV JENKINS_VERSION=2 \
     HOME=/var/lib/jenkins \
     JENKINS_HOME=/var/lib/jenkins \
     JENKINS_UC=https://updates.jenkins.io \
-    OPENSHIFT_JENKINS_IMAGE_VERSION=4.0 \
+    OPENSHIFT_JENKINS_IMAGE_VERSION=4.2 \
     LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
     INSTALL_JENKINS_VIA_RPMS=false
@@ -29,13 +29,13 @@ LABEL io.k8s.description="Jenkins is a continuous integration server" \
       io.k8s.display-name="Jenkins 2" \
       io.openshift.tags="jenkins,jenkins2,ci" \
       io.openshift.expose-services="8080:http" \
-      io.jenkins.version="2.204.1" \
+      io.jenkins.version="2.222.1" \
       io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
 
 # Labels consumed by Red Hat build service
 LABEL com.redhat.component="openshift-jenkins-2-container" \
       name="openshift4/ose-jenkins" \
-      version="4.3" \
+      version="4.2" \
       architecture="x86_64"
 
 # 8080 for main web interface, 50000 for slave agents
@@ -46,7 +46,7 @@ EXPOSE 8080 50000
 # /usr/lib64/jenkins will subsequently get redirected to /usr/lib/jenkins; it is confirmed that the 3.7 jenkins RHEL images 
 # do *NOT* have a /usr/lib64/jenkins path
 RUN ln -s /usr/lib/jenkins /usr/lib64/jenkins && \
-    INSTALL_PKGS="dejavu-sans-fonts wget rsync gettext git tar zip unzip openssl bzip2 dumb-init  java-1.8.0-openjdk java-1.8.0-openjdk-devel" && \
+    INSTALL_PKGS="dejavu-sans-fonts wget rsync gettext git tar zip unzip openssl bzip2 dumb-init java-11-openjdk java-11-openjdk-devel " && \
     yum install -y $INSTALL_PKGS && \
     rpm -V  $INSTALL_PKGS && \
     yum clean all  && \
