@@ -1,3 +1,5 @@
+component: "Jenkins"
+
 reviewers:
 - akram
 - waveywaves
