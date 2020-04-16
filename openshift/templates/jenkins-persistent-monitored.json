@@ -5,10 +5,10 @@
     "name": "jenkins-persistent-monitored",
     "annotations": {
       "openshift.io/display-name": "Jenkins",
-      "description": "Jenkins service, with persistent storage.\n\nNOTE: You must have persistent volumes available in your cluster to use this template.",
+      "description": "Jenkins service, with persistent storage. \n\n To run this template extra RBAC permissions need to be provideed to the use to be able to create the ServiceMonitor Custom Resource managed by the prometheus-operator. \n\nNOTE: You must have persistent volumes available in your cluster to use this template.",
       "iconClass": "icon-jenkins",
       "tags": "instant-app,jenkins",
-      "openshift.io/long-description": "This template deploys a Jenkins server capable of managing OpenShift Pipeline builds and supporting OpenShift-based oauth login.",
+      "openshift.io/long-description": "This template deploys a Jenkins server capable of managing OpenShift Pipeline builds and supporting OpenShift-based oauth login and Prometheus monitoring. DISCLAIMER: User needs to have RBAC Permissions to create the Service Monitor.",
       "openshift.io/provider-display-name": "Red Hat, Inc.",
       "openshift.io/documentation-url": "https://docs.okd.io/latest/using_images/other_images/jenkins.html",
       "openshift.io/support-url": "https://access.redhat.com"
