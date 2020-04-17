@@ -6,7 +6,7 @@ ENV HOME=/home/jenkins
 
 USER root
 # Install headless Java
-RUN yum install -y centos-release-scl-rh && \
+RUN yum install -y centos-release-scl-rh epel-release && \
     curl https://copr.fedorainfracloud.org/coprs/alsadi/dumb-init/repo/epel-7/alsadi-dumb-init-epel-7.repo -o /etc/yum.repos.d/alsadi-dumb-init-epel-7.repo && \
     #run yum update to avoid package version mismatch between i686 and other archs
     yum -y update && \
