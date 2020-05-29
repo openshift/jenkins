@@ -1,6 +1,6 @@
 FROM registry.access.redhat.com/openshift3/jenkins-slave-base-rhel7:v3.11
 
-MAINTAINER Gabe Montero <gmontero@redhat.com>
+MAINTAINER OpenShift Developer Services <jenkins+openshift-dev-services@redhat.com>
 
 # Labels consumed by Red Hat build service
 LABEL com.redhat.component="jenkins-agent-nodejs-8-rhel7-container" \

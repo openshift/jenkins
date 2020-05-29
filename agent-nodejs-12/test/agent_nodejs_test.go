@@ -13,7 +13,7 @@ import (
 
 func Test(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Maven Slave Suite")
+	RunSpecs(t, "NodeJS Agent Suite")
 }
 
 var dockercli *docker.Client
@@ -26,11 +26,11 @@ var _ = BeforeSuite(func() {
 
 	imageName = os.Getenv("IMAGE_NAME")
 	if imageName == "" {
-		imageName = "openshift/jenkins-slave-maven-centos7-candidate"
+		imageName = "vbobade/openshift-jenkins-base-agent"
 	}
 })
 
-var _ = Describe("Maven Slave testing", func() {
+var _ = Describe("NodeJS agent testing", func() {
 	var id string
 
 	AfterEach(func() {
@@ -68,7 +68,7 @@ var _ = Describe("Maven Slave testing", func() {
 		Expect(code).To(Equal(0))
 	})
 
-	It("should contain a runnable mvn", func() {
+	It("should contain a runnable npm", func() {
 		// the default entrypoint for the image assumes if you supply more than
 		// one arg, you are trying to invoke the slave logic, so we have to
 		// override the entrypoint to run complicated commands for testing.
@@ -77,7 +77,7 @@ var _ = Describe("Maven Slave testing", func() {
 		id, err = dockercli.ContainerCreate(
 			&container.Config{
 				Image:      imageName,
-				Entrypoint: []string{"/bin/bash", "-c", "mvn --version"},
+				Entrypoint: []string{"/bin/bash", "-c", "npm --version"},
 				Tty:        true,
 			},
 			nil)
@@ -91,13 +91,7 @@ var _ = Describe("Maven Slave testing", func() {
 		Expect(code).To(Equal(0))
 	})
 
-	// disabled since this fails on ci.openshift's push_jenkins_image job,
-	// even though it passes locally
-	/*It("should contain a runnable gradle", func() {
-		if strings.Contains(imageName, "rhel") {
-			Skip("n/a on RHEL image")
-		}
-
+	It("should contain a runnable node", func() {
 		// the default entrypoint for the image assumes if you supply more than
 		// one arg, you are trying to invoke the slave logic, so we have to
 		// override the entrypoint to run complicated commands for testing.
@@ -106,7 +100,7 @@ var _ = Describe("Maven Slave testing", func() {
 		id, err = dockercli.ContainerCreate(
 			&container.Config{
 				Image:      imageName,
-				Entrypoint: []string{"/bin/bash", "-c", "gradle --version"},
+				Entrypoint: []string{"/bin/bash", "-c", "node --version"},
 				Tty:        true,
 			},
 			nil)
@@ -118,5 +112,5 @@ var _ = Describe("Maven Slave testing", func() {
 		code, err := dockercli.ContainerWait(id)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(code).To(Equal(0))
-	})*/
+	})
 })

@@ -2,15 +2,15 @@ FROM registry.access.redhat.com/openshift3/jenkins-slave-base-rhel7:v3.11
 MAINTAINER OpenShift Developer Services <jenkins+openshift-dev-services@redhat.com>
 
 # Labels consumed by Red Hat build service
-LABEL com.redhat.component="jenkins-agent-nodejs-10-rhel7-container" \
-      name="openshift4/jenkins-agent-nodejs-10-rhel7" \
+LABEL com.redhat.component="jenkins-agent-nodejs-12-rhel7-container" \
+      name="openshift3/jenkins-agent-nodejs-12-rhel7" \
       version="3.11" \
       architecture="x86_64" \
-      io.k8s.display-name="Jenkins Agent Nodejs for nodejs10" \
+      io.k8s.display-name="Jenkins Agent Nodejs for nodejs12" \
       io.k8s.description="The jenkins agent nodejs image has the nodejs tools on top of the jenkins slave base image." \
       io.openshift.tags="openshift,jenkins,agent,nodejs"
 
-ENV NODEJS_VERSION=10 \
+ENV NODEJS_VERSION=12 \
     NPM_CONFIG_PREFIX=$HOME/.npm-global \
     PATH=$HOME/node_modules/.bin/:$HOME/.npm-global/bin/:$PATH \
     BASH_ENV=/usr/local/bin/scl_enable \

@@ -1,6 +1,6 @@
 FROM registry.access.redhat.com/openshift3/ose-cli:v3.11
 
-MAINTAINER Ben Parees <bparees@redhat.com>
+MAINTAINER OpenShift Developer Services <jenkins+openshift-dev-services@redhat.com>
 
 # Labels consumed by Red Hat build service
 LABEL com.redhat.component="jenkins-slave-base-rhel7-container" \
@@ -18,8 +18,8 @@ USER root
 RUN yum-config-manager --disable epel >/dev/null || : && \
     #run yum update to avoid package version mismatch between i686 and other archs
     yum -y update && \
-    x86_EXTRA_RPMS=$(if [ "$(uname -m)" == "x86_64" ]; then echo -n java-1.8.0-openjdk-headless.i686 ; fi) && \
-    INSTALL_PKGS="bc gettext git java-1.8.0-openjdk-headless lsof rsync tar unzip which zip bzip2 dumb-init nss_wrapper jq" && \
+    x86_EXTRA_RPMS=$(if [ "$(uname -m)" == "x86_64" ]; then echo -n java-11-openjdk-headless.i686 ; fi) && \
+    INSTALL_PKGS="bc gettext git java-11-openjdk-headless lsof rsync tar unzip which zip bzip2 dumb-init nss_wrapper jq" && \
     yum install -y --setopt=protected_multilib=false --setopt=tsflags=nodocs $INSTALL_PKGS $x86_EXTRA_RPMS && \
     rpm -V  $INSTALL_PKGS $x86_EXTRA_RPMS && \
     yum clean all && \

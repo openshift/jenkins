@@ -1,6 +1,6 @@
 FROM registry.access.redhat.com/openshift3/jenkins-slave-base-rhel7:v3.11
 
-MAINTAINER Gabe Montero <gmontero@redhat.com>
+MAINTAINER OpenShift Developer Services <jenkins+openshift-dev-services@redhat.com>
 
 # Labels consumed by Red Hat build service
 LABEL com.redhat.component="jenkins-agent-maven-35-rhel7-container" \
@@ -21,10 +21,10 @@ ENV MAVEN_VERSION=3.5 \
 RUN yum-config-manager --enable rhel-server-rhscl-7-rpms && \
     yum-config-manager --enable rhel-server-rhscl-8-rpms && \
     yum-config-manager --disable epel >/dev/null || : && \
-    INSTALL_PKGS="java-1.8.0-openjdk-devel rh-maven35*" && \
-    x86_EXTRA_RPMS=$(if [ "$(uname -m)" == "x86_64" ]; then echo -n java-1.8.0-openjdk-devel.i686 ; fi) && \
+    INSTALL_PKGS="java-11-openjdk-devel rh-maven35*" && \
+    x86_EXTRA_RPMS=$(if [ "$(uname -m)" == "x86_64" ]; then echo -n java-11-openjdk-devel.i686 ; fi) && \
     yum install -y --setopt=protected_multilib=false $INSTALL_PKGS $x86_EXTRA_RPMS && \
-    rpm -V  java-1.8.0-openjdk-devel rh-maven35 $x86_EXTRA_RPMS && \
+    rpm -V  java-11-openjdk-devel rh-maven35 $x86_EXTRA_RPMS && \
     yum clean all -y && \
     mkdir -p $HOME/.m2
 
