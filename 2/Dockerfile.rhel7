@@ -35,7 +35,9 @@ LABEL com.redhat.component="openshift-jenkins-2-container" \
 # 8080 for main web interface, 50000 for slave agents
 EXPOSE 8080 50000
 
-RUN yum-config-manager --disable epel >/dev/null || : && \
+RUN yum-config-manager --disable rhel-7-server-htb-rpms  > /dev/null && \
+    yum-config-manager --enable rhel-server-rhscl-7-rpms > /dev/null &&  \
+    yum-config-manager --enable rhel-7-server-ose-3.11-rpms > /dev/null &&  \
     yum-config-manager --enable rhel-7-server-ose-onlineint-rpms || : && \
     # for backward compatibility with pre-3.6 installs leveraging a PV, where rpm installs went to /usr/lib64/jenkins, we are
     # establishing a symbolic link for that guy as well, so that existing plugins in JENKINS_HOME/plugins pointing to /usr/lib64/jenkins
@@ -44,7 +46,7 @@ RUN yum-config-manager --disable epel >/dev/null || : && \
     #run yum update to avoid package version mismatch between i686 and other archs
     yum -y update && \
     x86_EXTRA_RPMS=$(if [ "$(uname -m)" == "x86_64" ]; then echo -n java-11-openjdk.i686 java-11-openjdk-devel.i686 ; fi) && \
-    INSTALL_PKGS="dejavu-sans-fonts wget rsync gettext git tar zip unzip openssl bzip2 dumb-init  java-11-openjdk java-11-openjdk-devel atomic-openshift-clients jenkins-2.* jenkins-2-plugins nss_wrapper" && \
+    INSTALL_PKGS="dejavu-sans-fonts wget rsync gettext git tar zip unzip openssl bzip2 java-11-openjdk java-11-openjdk-devel atomic-openshift-clients jenkins-2.* jenkins-2-plugins nss_wrapper dumb-init" && \
     yum --setopt=protected_multilib=false -y install $INSTALL_PKGS $x86_EXTRA_RPMS && \
     rpm -V  $INSTALL_PKGS $x86_EXTRA_RPMS && \
     yum clean all  && \

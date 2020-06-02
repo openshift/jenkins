@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# extract the different element of an url into a JSON structure
+# extract the different element of an url into a key=value structure
 parse_url() {
   # extract the protocol
   proto="$(echo $1 | cut -f1 -d: )"
@@ -20,18 +20,24 @@ parse_url() {
     # extract the uri (if any)
     resource="/$(echo $url | grep / | cut -d/ -f2-)"
   fi
-  echo -n "{ \"uri\": \"$1\" , \"url\": \"$url\" , \"proto\": \"$proto\" , \"login\": \"$login\" ,"
-  echo  " \"username\": \"$username\" , \"password\": \"$password\" , \"host\": \"$host\" , \"port\": \"$port\" }"
+  echo uri=$1
+  echo url=$url
+  echo proto=$proto
+  echo login=$login
+  echo username=$username
+  echo password=$password
+  echo host=$host
+  echo port=$port
 }
 
 get_npm_proxy_config(){
-  local proto json
+  local proto data
   proto=$1
-  json=$2
-  username=$( echo $json | jq -r .username)
-  password=$( echo $json | jq -r .password)
-  host=$( echo $json | jq -r .host)
-  port=$( echo $json | jq -r .port)
+  data=$2
+  username=$( echo "$data" | grep username | cut -d= -f2- )
+  password=$( echo "$data" | grep password | cut -d= -f2- )
+  host=$(     echo "$data" | grep host     | cut -d= -f2- )
+  port=$(     echo "$data" | grep port     | cut -d= -f2- ) 
   proxy_url="$host:$port"
 
   if [ -n "$username" -a -n "$password" ]; then
@@ -43,14 +49,14 @@ get_npm_proxy_config(){
 
 
 if [ -n "$http_proxy" ]; then 
-  json=$( parse_url $http_proxy )
-  proxy=$(get_npm_proxy_config http "$json")
+  data=$( parse_url $http_proxy )
+  proxy=$(get_npm_proxy_config http "$data")
   npm -g config set proxy $proxy
 fi
 
 if [ -n "$https_proxy" ]; then 
-  json=$( parse_url $https_proxy )
-  proxy=$(get_npm_proxy_config https "$json")
+  data=$( parse_url $https_proxy )
+  proxy=$(get_npm_proxy_config https "$data")
   npm -g config set https_proxy $proxy
 fi
 
