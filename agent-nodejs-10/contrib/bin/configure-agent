@@ -1,0 +1,69 @@
+#!/bin/bash
+
+# extract the different element of an url into a key=value structure
+parse_url() {
+  # extract the protocol
+  proto="$(echo $1 | cut -f1 -d: )"
+  if [[ ! -z $proto ]] ; then
+    # remove the protocol
+    url="$(echo ${1/"$proto://"/})"
+    # extract the user (if any)
+    login="$(echo $url | grep @ | cut -d@ -f1)"
+    username="$(echo $login | cut -d: -f1)"
+    password="$(echo $login | cut -d: -f2)"
+    # extract the host
+    host_port="$(echo ${url/$login@/} | cut -d/ -f1) "
+    host="$(echo $host_port | cut -f1 -d:) "
+
+    # by request - try to extract the port
+    port="$(echo $host_port | sed -e 's,^.*:,:,g' -e 's,.*:\([0-9]*\).*,\1,g' -e 's,[^0-9],,g')"
+    # extract the uri (if any)
+    resource="/$(echo $url | grep / | cut -d/ -f2-)"
+  fi
+  echo uri=$1
+  echo url=$url
+  echo proto=$proto
+  echo login=$login
+  echo username=$username
+  echo password=$password
+  echo host=$host
+  echo port=$port
+}
+
+get_npm_proxy_config(){
+  local proto data
+  proto=$1
+  data=$2
+  username=$( echo "$data" | grep username | cut -d= -f2- )
+  password=$( echo "$data" | grep password | cut -d= -f2- )
+  host=$(     echo "$data" | grep host     | cut -d= -f2- )
+  port=$(     echo "$data" | grep port     | cut -d= -f2- ) 
+  proxy_url="$host:$port"
+
+  if [ -n "$username" -a -n "$password" ]; then
+    proxy_url="$proto://$username:$password@$proxy_url"
+  fi
+
+  echo $proxy_url
+}
+
+
+if [ -n "$http_proxy" ]; then 
+  data=$( parse_url $http_proxy )
+  proxy=$(get_npm_proxy_config http "$data")
+  npm -g config set proxy $proxy
+fi
+
+if [ -n "$https_proxy" ]; then 
+  data=$( parse_url $https_proxy )
+  proxy=$(get_npm_proxy_config https "$data")
+  npm -g config set https_proxy $proxy
+fi
+
+if [ -n "$no_proxy" ]; then 
+  npm -g config set noproxy $no_proxy 
+fi
+
+if [ -n "$NPM_MIRROR_URL" ]; then
+  npm -g config set registry "$NPM_MIRROR_URL"
+fi

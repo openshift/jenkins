@@ -13,7 +13,7 @@ import (
 
 func Test(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "NodeJS Slave Suite")
+	RunSpecs(t, "NodeJS Agent Suite")
 }
 
 var dockercli *docker.Client
@@ -26,11 +26,11 @@ var _ = BeforeSuite(func() {
 
 	imageName = os.Getenv("IMAGE_NAME")
 	if imageName == "" {
-		imageName = "openshift/jenkins-slave-nodejs-centos7-candidate"
+		imageName = "vbobade/openshift-jenkins-base-agent"
 	}
 })
 
-var _ = Describe("NodeJS slave testing", func() {
+var _ = Describe("NodeJS agent testing", func() {
 	var id string
 
 	AfterEach(func() {

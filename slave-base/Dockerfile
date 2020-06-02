@@ -1,17 +1,17 @@
 FROM quay.io/openshift/origin-cli:v3.11
 
-MAINTAINER Ben Parees <bparees@redhat.com>
+MAINTAINER OpenShift Developer Services <jenkins+openshift-dev-services@redhat.com>
 
 ENV HOME=/home/jenkins
 
 USER root
 # Install headless Java
-RUN yum install -y centos-release-scl-rh && \
+RUN yum install -y centos-release-scl-rh epel-release && \
     curl https://copr.fedorainfracloud.org/coprs/alsadi/dumb-init/repo/epel-7/alsadi-dumb-init-epel-7.repo -o /etc/yum.repos.d/alsadi-dumb-init-epel-7.repo && \
     #run yum update to avoid package version mismatch between i686 and other archs
     yum -y update && \
-    x86_EXTRA_RPMS=$(if [ "$(uname -m)" == "x86_64" ]; then echo -n java-1.8.0-openjdk-headless.i686 java-11-openjdk-headless.i686; fi) && \
-    INSTALL_PKGS="bc gettext git java-1.8.0-openjdk-headless java-11-openjdk-headless lsof rsync tar unzip which zip bzip2 dumb-init nss_wrapper" && \
+    x86_EXTRA_RPMS=$(if [ "$(uname -m)" == "x86_64" ]; then echo -n java-11-openjdk-headless.i686 ; fi) && \
+    INSTALL_PKGS="bc gettext git java-11-openjdk-headless lsof rsync tar unzip which zip bzip2 dumb-init nss_wrapper" && \
     yum install -y --setopt=protected_multilib=false --setopt=tsflags=nodocs $INSTALL_PKGS $x86_EXTRA_RPMS && \
     # have temporarily removed the validation for java to work around known problem fixed in fedora; jupierce and gmontero are working with
     # the requisit folks to get that addressed ... will switch back to rpm -V $INSTALL_PKGS when that occurs
@@ -26,31 +26,21 @@ RUN yum install -y centos-release-scl-rh && \
     chmod 775 /usr/bin && \
     chmod 775 /usr/lib/jvm-exports && \
     chmod 775 /usr/share/man/man1 && \
-    chmod 775 /var/lib/origin && \    
+    chmod 775 /var/lib/origin && \
     unlink /usr/bin/java && \
     unlink /usr/bin/jjs && \
     unlink /usr/bin/keytool && \
-    unlink /usr/bin/orbd && \
     unlink /usr/bin/pack200 && \
-    unlink /usr/bin/policytool && \
     unlink /usr/bin/rmid && \
     unlink /usr/bin/rmiregistry && \
-    unlink /usr/bin/servertool && \
-    unlink /usr/bin/tnameserv && \
     unlink /usr/bin/unpack200 && \
-    unlink /usr/lib/jvm-exports/jre && \
     unlink /usr/share/man/man1/java.1.gz && \
     unlink /usr/share/man/man1/jjs.1.gz && \
     unlink /usr/share/man/man1/keytool.1.gz && \
-    unlink /usr/share/man/man1/orbd.1.gz && \
     unlink /usr/share/man/man1/pack200.1.gz && \
-    unlink /usr/share/man/man1/policytool.1.gz && \
     unlink /usr/share/man/man1/rmid.1.gz && \
     unlink /usr/share/man/man1/rmiregistry.1.gz && \
-    unlink /usr/share/man/man1/servertool.1.gz && \
-    unlink /usr/share/man/man1/tnameserv.1.gz && \
     unlink /usr/share/man/man1/unpack200.1.gz
-
 # Copy the entrypoint
 ADD contrib/bin/* /usr/local/bin/
 
