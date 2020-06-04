@@ -3,12 +3,13 @@ MAINTAINER OpenShift Developer Services <jenkins+openshift-dev-services@redhat.c
 
 # Labels consumed by Red Hat build service
 LABEL com.redhat.component="jenkins-agent-nodejs-10-rhel7-container" \
-      name="openshift4/jenkins-agent-nodejs-10-rhel7" \
+      name="openshift3/jenkins-agent-nodejs-10-rhel7" \
       version="3.11" \
       architecture="x86_64" \
       io.k8s.display-name="Jenkins Agent Nodejs for nodejs10" \
       io.k8s.description="The jenkins agent nodejs image has the nodejs tools on top of the jenkins slave base image." \
-      io.openshift.tags="openshift,jenkins,agent,nodejs"
+      io.openshift.tags="openshift,jenkins,agent,nodejs" \
+      maintainer="openshift-dev-services+jenkins@redhat.com"
 
 ENV NODEJS_VERSION=10 \
     NPM_CONFIG_PREFIX=$HOME/.npm-global \
