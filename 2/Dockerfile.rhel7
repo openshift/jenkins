@@ -11,7 +11,7 @@ RUN go build . && cp go-init /usr/bin
 # Stage 2 : Build slave-base with go-init
 ##############################################
 FROM quay.io/openshift/origin-cli
-MAINTAINER Akram Ben Aissi <abenaiss@redhat.com>
+MAINTAINER OpenShift Developer Services <openshift-dev-services+jenkins@redhat.com>
 COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
 
 # Jenkins image for OpenShift
@@ -24,7 +24,7 @@ COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
 # Environment:
 # * $JENKINS_PASSWORD - Password for the Jenkins 'admin' user.
 
-MAINTAINER Akram Ben Aissi <abenaiss@redhat.com>
+MAINTAINER OpenShift Developer Services <openshift-dev-services+jenkins@redhat.com>
 
 ENV JENKINS_VERSION=2 \
     HOME=/var/lib/jenkins \
@@ -44,13 +44,13 @@ LABEL io.k8s.description="Jenkins is a continuous integration server" \
       io.openshift.tags="jenkins,jenkins2,ci" \
       io.openshift.expose-services="8080:http" \
       io.jenkins.version="2.222.1" \
-      io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
+      io.openshift.s2i.scripts-url=image:///usr/libexec/s2i 
 
 # Labels consumed by Red Hat build service
 LABEL com.redhat.component="openshift-jenkins-2-container" \
-      name="openshift3/jenkins-2-rhel7" \
-      version="4.0" \
-      architecture="x86_64"
+      name="openshift4/jenkins-2-rhel7" \
+      architecture="x86_64 \
+      maintainer="openshift-dev-services+jenkins@redhat.com""
 
 # 8080 for main web interface, 50000 for slave agents
 EXPOSE 8080 50000
