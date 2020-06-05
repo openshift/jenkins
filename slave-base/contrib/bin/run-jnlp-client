@@ -115,7 +115,7 @@ if [[ $(echo "$@" | awk '{print NF}') -gt 1 ]]; then
   if [[ -z "${JAVA_TOOL_OPTIONS}" ]]; then
     # these options will automatically be picked up by any JVM process but can
     # be overridden on that process' command line.
-    JAVA_TOOL_OPTIONS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true"
+    # JAVA_TOOL_OPTIONS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true"
     export JAVA_TOOL_OPTIONS
   fi
 
