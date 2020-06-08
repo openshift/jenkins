@@ -75,6 +75,25 @@ function generate_administrative_monitors_config() {
   echo ""
 }
 
+function create_jenkins_proxy_xml() {
+
+  if [ ! -f "${image_config_dir}/proxy.yaml" ]; then
+    if [ -f "${image_config_dir}/proxy.yaml.tpl" ]; then
+      if [ -n "$http_proxy" ]; then
+        json=$( parse_url $http_proxy )
+        export PROXY_HOST=$( echo $json | jq -r .host)
+        export PROXY_PORT=$( echo $json | jq -r .port)
+        export PROXY_USER=$( echo $json | jq -r .username)
+        export PROXY_PASSWORD=$( echo $json | jq -r .password)
+        if [ -n "$no_proxy" ]; then
+          export NO_PROXY=$(convert_no_proxy $no_proxy)
+        fi
+      fi 
+      envsubst < "${image_config_dir}/proxy.yaml.tpl" > "${image_config_dir}/proxy.yaml"
+    fi
+  fi
+}
+
 function create_jenkins_credentials_xml() {
   if [ ! -f "${image_config_dir}/credentials.xml" ]; then
     if [ -f "${image_config_dir}/credentials.xml.tpl" ]; then
@@ -93,14 +112,20 @@ function create_jenkins_config_from_templates() {
   find ${image_config_dir} -type f -name "*.tpl" -print0 | while IFS= read -r -d '' template_path; do
     local target_path=${template_path%.tpl}
     if [[ ! -f "${target_path}" ]]; then
-      if [[ "${target_path}" == "${image_config_path}" ]]; then
-        create_jenkins_config_xml
-      elif [[ "${target_path}" == "${image_config_dir}/credentials.xml" ]]; then
-        create_jenkins_credentials_xml
-      else
-        # Allow usage of environment variables in templated files, e.g. ${DOLLAR}MY_VAR is replaced by $MY_VAR
-        DOLLAR='$' envsubst < "${template_path}" > "${target_path}"
-      fi
+      case "${target_path}" in
+        "${image_config_path}")
+          create_jenkins_config_xml
+          ;;
+        "${image_config_dir}/credentials.xml")
+          create_jenkins_credentials_xml
+          ;;
+        "${image_config_dir}/proxy.yaml")
+          ;;
+        *)
+          # Allow usage of environment variables in templated files, e.g. ${DOLLAR}MY_VAR is replaced by $MY_VAR
+          DOLLAR='$' envsubst < "${template_path}" > "${target_path}"
+          ;;
+      esac
     fi
   done
 }
