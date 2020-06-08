@@ -73,7 +73,7 @@ if [ -n "$https_proxy" ]; then
  xml="$xml $proxy"
 fi
 if [ -n "$xml" ]; then
-  sed -i "s|<!-- ### configured http proxy ### -->|$xml|" $HOME/.m2/settings.xml
+  sed -i "s&<!-- ### configured http proxy ### -->&$xml&" $HOME/.m2/settings.xml
 fi
 
 
@@ -83,7 +83,7 @@ if [ -n "$MAVEN_MIRROR_URL" ]; then
     <url>$MAVEN_MIRROR_URL</url>\
     <mirrorOf>external:*</mirrorOf>\
   </mirror>"
-  sed -i "s|<!-- ### configured mirrors ### -->|$xml|" $HOME/.m2/settings.xml
+  sed -i "s&<!-- ### configured mirrors ### -->&$xml&" $HOME/.m2/settings.xml
 fi
 
 CONTAINER_MEMORY_IN_BYTES=$(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)
