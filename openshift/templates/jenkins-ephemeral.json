@@ -42,6 +42,16 @@
       }
     },
     {
+      "kind": "ConfigMap",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "${JENKINS_SERVICE_NAME}-trusted-ca-bundle",
+        "labels": {
+          "config.openshift.io/inject-trusted-cabundle": "true"
+        }
+      }
+    },
+    {
       "kind": "DeploymentConfig",
       "apiVersion": "v1",
       "metadata": {
@@ -151,6 +161,10 @@
                   {
                     "name": "${JENKINS_SERVICE_NAME}-data",
                     "mountPath": "/var/lib/jenkins"
+                  },
+                  {
+                    "name": "${JENKINS_SERVICE_NAME}-trusted-ca-bundle",
+                    "mountPath": "/etc/pki/ca-trust/source/anchors"
                   }
                 ],
                 "terminationMessagePath": "/dev/termination-log",
@@ -167,6 +181,13 @@
                 "name": "${JENKINS_SERVICE_NAME}-data",
                 "emptyDir": {
                   "medium": ""
+                }
+              },
+              {
+                "name": "${JENKINS_SERVICE_NAME}-trusted-ca-bundle",
+                "configMap": {
+                  "name": "${JENKINS_SERVICE_NAME}-trusted-ca-bundle",
+                  "optional": true
                 }
               }
             ],

@@ -267,6 +267,14 @@ if [[ -z "${JAVA_TOOL_OPTIONS}" ]]; then
   export JAVA_TOOL_OPTIONS
 fi
 
+# update system java keystore with custom ca bundle from jenkins-trust-ca-bundle configmap
+# ca bundle is injected by network operator via the configmap jenkins-trusted-ca-bundle
+# see certificate-injection-using-operators_configuring-a-custom-pki in the documentation
+system_ca_bundle_crt="/etc/pki/ca-trust/source/anchors/ca-bundle.crt"
+if [ -f "${system_ca_bundle_crt}" ]; then
+  /usr/bin/p11-kit extract --format=java-cacerts --filter=ca-anchors --overwrite --purpose server-auth ${JENKINS_HOME}/ca-anchors-keystore
+fi
+
 # assume k8s/docker memory limit was set if memory.limit_in_bytes < 1TiB
 if [[ "${CONTAINER_MEMORY_IN_BYTES}" -lt $((2**40)) ]]; then
   # set this JVM's -Xmx and -Xms if not set already (not propagated to any
@@ -276,7 +284,7 @@ if [[ "${CONTAINER_MEMORY_IN_BYTES}" -lt $((2**40)) ]]; then
   # uncapped; -Xms unspecified (JVM default is 1/64 of -Xmx).
 
   if [[ -z "$CONTAINER_HEAP_PERCENT" ]]; then
-      CONTAINER_HEAP_PERCENT=0.50
+    CONTAINER_HEAP_PERCENT=0.50
   fi
 
   CONTAINER_HEAP_MAX=$(echo "${CONTAINER_MEMORY_IN_MB} ${CONTAINER_HEAP_PERCENT}" | awk '{ printf "%d", $1 * $2 }')
@@ -540,6 +548,10 @@ if [[ -z "${JENKINS_JAVA_OPTIONS}" ]]; then
     JENKINS_JAVA_OPTIONS="$JAVA_GC_OPTS $JAVA_INITIAL_HEAP_PARAM $JAVA_MAX_HEAP_PARAM $JAVA_CORE_LIMIT $JAVA_DIAGNOSTICS "
     JENKINS_JAVA_OPTIONS="$JENKINS_JAVA_OPTIONS -Dfile.encoding=UTF8 -Djavamelody.displayed-counters=log,error $JENKINS_ACCESSLOG $FATAL_ERROR_OPTION"
     JENKINS_JAVA_OPTIONS="$JENKINS_JAVA_OPTIONS -Djava.util.logging.config.file=$JENKINS_HOME/logging.properties"
+    # Add default truststore if custom ca is loaded under ${JENKINS_HOME}/ca-anchors-keystore
+    if [ -f "${JENKINS_HOME}/ca-anchors-keystore" ]; then
+      JENKINS_JAVA_OPTIONS="$JENKINS_JAVA_OPTIONS -Djavax.net.ssl.trustStore=${JENKINS_HOME}/ca-anchors-keystore"
+    fi
 fi
 
 JAVA_HTTP_PROXY_OPTIONS="-Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes="
