@@ -1,0 +1,193 @@
+#!/bin/bash
+#
+# This script will launch the JNLP remoting client that Jenkins master server
+# will use for the auto-discovery of this slave.
+#
+
+# The directory that Jenkins will execute the builds and store cache files.
+# The directory has to be writeable for the user that the container is running
+# under.
+
+export JENKINS_HOME=/home/jenkins
+
+# Make sure the Java clients have valid $HOME directory set
+export HOME=${JENKINS_HOME}
+
+source /usr/local/bin/generate_container_user
+
+CONTAINER_MEMORY_IN_BYTES=$(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)
+CONTAINER_MEMORY_IN_MB=$((CONTAINER_MEMORY_IN_BYTES/2**20))
+
+
+# java version is by default set to java-11. If a regression is faced, we must inject 
+# the USE_JAVA_VERSION=java-1.8.0 into the container agent so, the agent can use it
+#export JAVA_VERSION=${USE_JAVA_VERSION:=java-11}
+#export JAVAC_VERSION=${USE_JAVAC_VERSION:=java-11}
+
+export JAVA_VERSION=${USE_JAVA_VERSION:=java-1.8.0}
+export JAVAC_VERSION=${USE_JAVAC_VERSION:=java-1.8.0}
+
+# multi-arch check ... if x86_64, pick between 32 and 64 bit 
+if [[ "$(uname -m)" == "x86_64" ]]; then
+    # Set the JVM architecture used.  Follow OPENSHIFT_JENKINS_JVM_ARCH if set.  If
+    # not, use 32 bit JVM for space efficiency if container size < 2GiB
+    if [[ "${OPENSHIFT_JENKINS_JVM_ARCH}" == "x86_64" || \
+        ( "${OPENSHIFT_JENKINS_JVM_ARCH}" == "" && "${CONTAINER_MEMORY_IN_MB}" -ge 2048 ) ]]; then
+      alternatives --set java $(alternatives --display java | grep $JAVA_VERSION | awk '/family.*x86_64/ { print $1; }')
+      alternatives --set javac $(alternatives --display javac | grep $JAVAC_VERSION | awk '/family.*x86_64/ { print $1; }')
+    else
+      alternatives --set java $(alternatives --display java | grep $JAVA_VERSION | awk '/family.*i386/ { print $1; }')
+      alternatives --set javac $(alternatives --display javac | grep $JAVAC_VERSION | awk '/family.*i386/ { print $1; }')
+      export MALLOC_ARENA_MAX=${MALLOC_ARENA_MAX:-1}
+    fi
+#set JVM for all other archs
+else
+        alternatives --set java $(alternatives --display java | grep $JAVA_VERSION | awk '/family.*'$(uname -m)'/ { print $1; }')
+        alternatives --set javac $(alternatives --display javac | grep $JAVAC_VERSION | awk '/family.*'$(uname -m)'/ { print $1; }')
+fi
+
+echo "OPENSHIFT_JENKINS_JVM_ARCH='${OPENSHIFT_JENKINS_JVM_ARCH}', CONTAINER_MEMORY_IN_MB='${CONTAINER_MEMORY_IN_MB}', using $(readlink /etc/alternatives/java)"
+
+if [[ -z "${SKIP_NO_PROXY_DEFAULT}" ]]; then
+  # we do not want jenkins svc or jenkins-jnlp svc
+  # communication going through a http proxy
+  # env vars to consider:
+  # - no_proxy and NO_PROXY; case of string varies tool to tool
+  # - JENKINS_URL and JENKINS_TUNNEL comes from k8s plugin
+  # based on how our master image configures the cloud, but we need to strip the host / port
+  jenkins_http_host=`echo $JENKINS_URL | sed 's#https://##' | sed 's#http://##' | cut -f1 -d":"`
+  jnlp_http_host=`echo $JENKINS_TUNNEL | sed 's#https://##' | sed 's#http://##' | cut -f1 -d":"`
+  # check if set to avoid having a comma as the last char
+  if [[ -z "${no_proxy}" ]]; then
+     export no_proxy=$jenkins_http_host,$jnlp_http_host
+  else
+    export no_proxy=$jenkins_http_host,$jnlp_http_host,$no_proxy
+  fi
+  if [[ -z "${NO_PROXY}" ]]; then
+     export NO_PROXY=$jenkins_http_host,$jnlp_http_host
+  else
+    export NO_PROXY=$jenkins_http_host,$jnlp_http_host,$NO_PROXY
+  fi
+fi
+
+# Configure the slave image
+source /usr/local/bin/configure-slave
+source /usr/local/bin/configure-agent
+
+set -e
+
+# As of version 1.6.0 of the Jenkins Kubernetes plugin,
+# args are no longer passed to jnlp container if not present in containerTemplate
+# See https://github.com/jenkinsci/kubernetes-plugin/pull/315
+# In this case, we use JENKINS_SECRET and JENKINS_NAME for launcher arguments
+# This is made worse if using Declarative pipeline and specifying yaml for the podTemplate
+# In this case, ${computer.*} is not resolvable.
+
+# If no args are given, we examine env vars and add to arg list.
+if [[ $# -eq 0 ]]; then
+  if [ ! -z "$JENKINS_SECRET" ]; then
+    set -- "${@}" "$JENKINS_SECRET"
+  fi
+  if [ ! -z "$JENKINS_NAME" ]; then
+    set -- "${@}" "$JENKINS_NAME"
+  fi
+fi
+
+# if `docker run` has 2 or more arguments the user is passing jenkins launcher arguments
+if [[ $(echo "$@" | awk '{print NF}') -gt 1 ]]; then
+  JAR="${JENKINS_HOME}/remoting.jar"
+  PARAMS=""
+
+  # if -url is not provided try env vars
+  if [[ "$@" != *"-url "* ]]; then
+    if [ ! -z "$JENKINS_URL" ]; then
+      PARAMS="$PARAMS -url $JENKINS_URL"
+    elif [ ! -z "$JENKINS_SERVICE_HOST" ] && [ ! -z "$JENKINS_SERVICE_PORT" ]; then
+      PARAMS="$PARAMS -url http://$JENKINS_SERVICE_HOST:$JENKINS_SERVICE_PORT"
+    fi
+  fi
+
+  echo "Downloading ${JENKINS_URL}/jnlpJars/remoting.jar ..."
+  curl -sS ${JENKINS_URL}/jnlpJars/remoting.jar -o ${JAR}
+
+  # if -tunnel is not provided try env vars
+  if [[ "$@" != *"-tunnel "* ]]; then
+    if [ ! -z "$JENKINS_TUNNEL" ]; then
+      PARAMS="$PARAMS -tunnel $JENKINS_TUNNEL"
+    elif [ ! -z "$JENKINS_SLAVE_SERVICE_HOST" ] && [ ! -z "$JENKINS_SLAVE_SERVICE_PORT" ]; then
+      PARAMS="$PARAMS -tunnel $JENKINS_SLAVE_SERVICE_HOST:$JENKINS_SLAVE_SERVICE_PORT"
+    fi
+  fi
+
+  if [[ -z "${JAVA_TOOL_OPTIONS}" ]]; then
+    # these options will automatically be picked up by any JVM process but can
+    # be overridden on that process' command line.
+    # JAVA_TOOL_OPTIONS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true"
+    export JAVA_TOOL_OPTIONS
+  fi
+
+  # assume k8s/docker memory limit was set if memory.limit_in_bytes < 1TiB
+  if [[ "${CONTAINER_MEMORY_IN_BYTES}" -lt $((2**40)) ]]; then
+    # set this JVM's -Xmx and -Xms if not set already (not propagated to any
+    # child JVMs).  -Xmx can be calculated as a percentage, capped to a maximum,
+    # or specified straight.  -Xms can be calculated as a percentage or
+    # specified straight.  For the JNLP slave by default we specify -Xmx of 50%,
+    # uncapped; -Xms unspecified (JVM default is 1/64 of -Xmx).
+
+    if [[ -z "$CONTAINER_HEAP_PERCENT" ]]; then
+        CONTAINER_HEAP_PERCENT=0.50
+    fi
+
+    CONTAINER_HEAP_MAX=$(echo "${CONTAINER_MEMORY_IN_MB} ${CONTAINER_HEAP_PERCENT}" | awk '{ printf "%d", $1 * $2 }')
+    if [[ $JNLP_MAX_HEAP_UPPER_BOUND_MB && $CONTAINER_HEAP_MAX -gt $JNLP_MAX_HEAP_UPPER_BOUND_MB ]]; then
+      CONTAINER_HEAP_MAX=$JNLP_MAX_HEAP_UPPER_BOUND_MB
+    fi
+    if [[ -z "$JAVA_MAX_HEAP_PARAM" ]]; then
+      JAVA_MAX_HEAP_PARAM="-Xmx${CONTAINER_HEAP_MAX}m"
+    fi
+
+    if [[ "$CONTAINER_INITIAL_PERCENT" ]]; then
+      CONTAINER_INITIAL_HEAP=$(echo "${CONTAINER_HEAP_MAX} ${CONTAINER_INITIAL_PERCENT}" | awk '{ printf "%d", $1 * $2 }')
+      if [[ -z "$JAVA_INITIAL_HEAP_PARAM" ]]; then
+        JAVA_INITIAL_HEAP_PARAM="-Xms${CONTAINER_INITIAL_HEAP}m"
+      fi
+    fi
+  fi
+
+  if [[ -z "$JAVA_GC_OPTS" ]]; then
+    # See https://developers.redhat.com/blog/2014/07/22/dude-wheres-my-paas-memory-tuning-javas-footprint-in-openshift-part-2/ .
+    # The values are aggressively set with the intention of relaxing GC CPU time
+    # restrictions to enable it to free as much as possible, as well as
+    # encouraging the GC to free unused heap memory back to the OS.
+    JAVA_GC_OPTS="-XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90"
+  fi
+
+  if [[ "${USE_JAVA_DIAGNOSTICS}" || "${JAVA_DIAGNOSTICS}" ]]; then
+    echo "Warning: USE_JAVA_DIAGNOSTICS and JAVA_DIAGNOSTICS are legacy and may be removed in a future version of this script."
+  fi
+
+  if [[ "${USE_JAVA_DIAGNOSTICS}" ]]; then
+    JAVA_DIAGNOSTICS="-XX:NativeMemoryTracking=summary -XX:+PrintGC -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+UnlockDiagnosticVMOptions"
+  fi
+
+  if [[ "${CONTAINER_CORE_LIMIT}" ]]; then
+    JAVA_CORE_LIMIT="-XX:ParallelGCThreads=${CONTAINER_CORE_LIMIT} -Djava.util.concurrent.ForkJoinPool.common.parallelism=${CONTAINER_CORE_LIMIT} -XX:CICompilerCount=2"
+  fi
+
+  if [[ -z "${JNLP_JAVA_OPTIONS}" ]]; then
+    JNLP_JAVA_OPTIONS="$JAVA_GC_OPTS $JAVA_INITIAL_HEAP_PARAM $JAVA_MAX_HEAP_PARAM $JAVA_CORE_LIMIT $JAVA_DIAGNOSTICS"
+  fi
+
+  # Deal with embedded escaped spaces in JNLP_JAVA_OVERRIDES.
+  # JNLP_JAVA_OVERRIDES='-Dfoo -Dbar' => append -Dfoo -Dbar to java invocation
+  # JNLP_JAVA_OVERRIDES='-Dfoo\ bar' => append '-Dfoo bar' to java invocation
+  read -a JNLP_JAVA_OVERRIDES_ARRAY <<< "$JNLP_JAVA_OVERRIDES"
+
+  set -x
+  cd ${JENKINS_DIR} && exec java $JNLP_JAVA_OPTIONS \
+                                 "${JNLP_JAVA_OVERRIDES_ARRAY[@]}" \
+                                 -cp $JAR hudson.remoting.jnlp.Main \
+                                 -headless $PARAMS "$@"
+fi
+
+exec "$@"

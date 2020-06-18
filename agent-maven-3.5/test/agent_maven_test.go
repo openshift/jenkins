@@ -90,29 +90,4 @@ var _ = Describe("Maven Agent testing", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(code).To(Equal(0))
 	})
-
-	// disabled since this fails on ci.openshift's push_jenkins_image job,
-	// even though it passes locally
-	/*It("should contain a runnable gradle", func() {
-		if strings.Contains(imageName, "rhel") {
-			Skip("n/a on RHEL image")
-		}
-
-		var err error
-		id, err = dockercli.ContainerCreate(
-			&container.Config{
-				Image:      imageName,
-				Cmd: []string{"gradle"},
-				Tty:        true,
-			},
-			nil)
-		Expect(err).NotTo(HaveOccurred())
-
-		err = dockercli.ContainerStart(id)
-		Expect(err).NotTo(HaveOccurred())
-
-		code, err := dockercli.ContainerWait(id)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(code).To(Equal(0))
-	})*/
 })
