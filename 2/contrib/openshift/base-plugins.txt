@@ -67,7 +67,7 @@ google-oauth-plugin:1.0.0
 ant:1.10
 pam-auth:1.6
 
-credentials-binding:1.19
+credentials-binding:1.23
 
 junit:1.26.1
 workflow-durable-task-step:2.35
