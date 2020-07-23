@@ -79,7 +79,7 @@ workflow-remote-loader:1.5
 # Legacy stuff
 mapdb-api:1.0.9.0
 
-matrix-project:1.14
+matrix-project:1.17
 ssh-credentials:1.18.1
 
 # Pipeline Utility Steps Plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Utility+Steps+Plugin
