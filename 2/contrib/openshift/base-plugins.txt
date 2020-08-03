@@ -65,7 +65,7 @@ pam-auth:1.6
 git-client:3.2.1
 
 credentials-binding:1.23
-junit:1.26.1
+junit:1.30
 workflow-support:2.18
 git:4.2.2
 mercurial:2.3
