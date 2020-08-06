@@ -1,18 +1,30 @@
-##############################################
+###################################################
 # Stage 1 : Build go-init
-##############################################
-FROM openshift/origin-release:golang-1.12 AS go-init-builder
+###################################################
+FROM openshift/origin-release:golang-1.14 AS go-init-builder
 WORKDIR  /go/src/github.com/openshift/jenkins
 COPY . .
 WORKDIR  /go/src/github.com/openshift/jenkins/go-init
 RUN go build . && cp go-init /usr/bin
 
-##############################################
-# Stage 2 : Build slave-base with go-init
-##############################################
-FROM quay.io/openshift/origin-cli:4.2
-MAINTAINER Akram Ben Aissi <abenaiss@redhat.com>
+###################################################
+# Stage 2 : Build oc
+###################################################
+FROM openshift/origin-release:golang-1.14 AS oc-builder
+RUN mkdir -p /go/src/github.com/openshift/oc && git clone https://github.com/openshift/oc /go/src/github.com/openshift/oc
+WORKDIR /go/src/github.com/openshift/oc
+COPY . .
+RUN make build --warn-undefined-variables
+
+###################################################
+# Stage 3 : Build slave-base with go-init and oc
+###################################################
+FROM registry.access.redhat.com/ubi8/ubi
+MAINTAINER Openshift Jenkins Team <openshift-jenkins-team@redhat.com>
 COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
+COPY --from=oc-builder /go/src/github.com/openshift/oc/oc /usr/bin/
+
+RUN for i in kubectl openshift-deploy openshift-docker-build openshift-sti-build openshift-git-clone openshift-manage-dockerfile openshift-extract-image-content openshift-recycle; do ln -sf /usr/bin/oc /usr/bin/$i; done
 
 ENV HOME=/home/jenkins \
     LANG=en_US.UTF-8 \
@@ -35,7 +47,6 @@ RUN curl http://mirror.centos.org/centos-7/7/os/x86_64/RPM-GPG-KEY-CentOS-7 -o /
     chmod -R 775 /var/lib/alternatives && \
     chmod -R 775 /usr/lib/jvm && \
     chmod 775 /usr/bin && \
-    chmod 775 /usr/lib/jvm-exports && \
     chmod 775 /usr/share/man/man1 && \
     mkdir -p /var/lib/origin && \
     chmod 775 /var/lib/origin && \    
@@ -46,7 +57,6 @@ RUN curl http://mirror.centos.org/centos-7/7/os/x86_64/RPM-GPG-KEY-CentOS-7 -o /
     unlink /usr/bin/rmid && \
     unlink /usr/bin/rmiregistry && \
     unlink /usr/bin/unpack200 && \
-    unlink /usr/lib/jvm-exports/jre && \
     unlink /usr/share/man/man1/java.1.gz && \
     unlink /usr/share/man/man1/jjs.1.gz && \
     unlink /usr/share/man/man1/keytool.1.gz && \
