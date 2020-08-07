@@ -7,12 +7,24 @@ COPY . .
 WORKDIR  /go/src/github.com/openshift/jenkins/go-init
 RUN go build . && cp go-init /usr/bin
 
-##############################################
-# Stage 2 : Build slave-base with go-init
-##############################################
-FROM quay.io/openshift/origin-cli:4.2
+###################################################
+# Stage 2 : Build oc
+###################################################
+FROM openshift/origin-release:golang-1.14 AS oc-builder
+RUN mkdir -p /go/src/github.com/openshift/oc && git clone https://github.com/openshift/oc /go/src/github.com/openshift/oc
+WORKDIR /go/src/github.com/openshift/oc
+COPY . .
+RUN make build --warn-undefined-variables
+
+###################################################
+# Stage 3 : Build slave-base with go-init and oc
+###################################################
+FROM registry.access.redhat.com/ubi8/ubi
 MAINTAINER Akram Ben Aissi <abenaiss@redhat.com>
 COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
+COPY --from=oc-builder /go/src/github.com/openshift/oc/oc /usr/bin/
+
+RUN for i in kubectl openshift-deploy openshift-docker-build openshift-sti-build openshift-git-clone openshift-manage-dockerfile openshift-extract-image-content openshift-recycle; do ln -sf /usr/bin/oc /usr/bin/$i; done
 
 # Jenkins image for OpenShift
 #
@@ -47,8 +59,8 @@ EXPOSE 8080 50000
 
 
 COPY contrib/openshift/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo
-RUN curl http://mirror.centos.org/centos-7/7/os/x86_64/RPM-GPG-KEY-CentOS-7 -o /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 && \
-    INSTALL_PKGS="dejavu-sans-fonts rsync gettext git tar zip unzip openssl bzip2 java-11-openjdk java-11-openjdk-devel java-1.8.0-openjdk java-1.8.0-openjdk-devel jq" && \
+RUN curl https://www.centos.org/keys/RPM-GPG-KEY-CentOS-Official -o /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-8 && \
+    INSTALL_PKGS="dejavu-sans-fonts rsync gettext git tar zip unzip openssl bzip2 java-11-openjdk java-11-openjdk-devel java-1.8.0-openjdk java-1.8.0-openjdk-devel jq glibc-locale-source glibc-langpack-en" && \
     DISABLES="--disablerepo=rhel-server-extras --disablerepo=rhel-server --disablerepo=rhel-fast-datapath --disablerepo=rhel-server-optional --disablerepo=rhel-server-ose --disablerepo=rhel-server-rhscl" && \
     yum $DISABLES -y --setopt=tsflags=nodocs --disableplugin=subscription-manager install epel-release && \
     yum $DISABLES -y --setopt=tsflags=nodocs --disableplugin=subscription-manager install $INSTALL_PKGS && \
@@ -67,7 +79,6 @@ RUN /usr/local/bin/install-jenkins-core-plugins.sh /opt/openshift/base-plugins.t
     chmod -R 775 /var/lib/alternatives && \
     chmod -R 775 /usr/lib/jvm && \
     chmod 775 /usr/bin && \
-    chmod 775 /usr/lib/jvm-exports && \
     chmod 775 /usr/share/man/man1 && \
     mkdir -p /var/lib/origin && \
     chmod 775 /var/lib/origin && \
