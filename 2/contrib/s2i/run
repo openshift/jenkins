@@ -120,6 +120,7 @@ function create_jenkins_config_from_templates() {
           create_jenkins_credentials_xml
           ;;
         "${image_config_dir}/proxy.yaml")
+          create_jenkins_proxy_xml
           ;;
         *)
           # Allow usage of environment variables in templated files, e.g. ${DOLLAR}MY_VAR is replaced by $MY_VAR
