@@ -26,7 +26,6 @@ RUN yum-config-manager --enable rhel-server-rhscl-7-rpms > /dev/null && \
     yum deplist rh-maven35 && \
     x86_EXTRA_RPMS=$(if [ "$(uname -m)" == "x86_64" ]; then echo -n java-11-openjdk-headless.i686 java-1.8.0-openjdk-devel.i686; fi) && \
     yum install -y --setopt=protected_multilib=false --setopt=tsflags=nodocs $INSTALL_PKGS $x86_EXTRA_RPMS --exclude=rh-maven35-xpp3-javadoc && \
-    rpm -qa | grep java-1.8 | xargs rpm -e --nodeps && \
     yum clean all -y && \
     mkdir -p $HOME/.m2
 # When bash is started non-interactively, to run a shell script, for example it
