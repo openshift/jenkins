@@ -72,6 +72,7 @@ credentials-binding:1.23
 junit:1.26.1
 workflow-durable-task-step:2.35
 workflow-support:2.18
+workflow-scm-step:2.11
 git:4.2.2
 git-client:3.2.1
 
