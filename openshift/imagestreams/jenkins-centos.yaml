@@ -11,11 +11,11 @@ spec:
       openshift.io/display-name: Jenkins (Latest)
       openshift.io/provider-display-name: Red Hat, Inc.
       description: |-
-        Provides a Jenkins server on RHEL 7. For more information about using this container image, including OpenShift considerations, see https://github.com/openshift/jenkins/blob/master/README.md.
+        Provides a Jenkins server on CentOS. For more information about using this container image, including OpenShift considerations, see https://github.com/openshift/jenkins/blob/master/README.md.
 
         WARNING: By selecting this tag, your application will automatically update to use the latest version of Jenkins available on OpenShift, including major versions updates.
       iconClass: icon-jenkins
-      tags: jenkins,ppc64le
+      tags: jenkins
     from:
       kind: ImageStreamTag
       name: '2'
@@ -25,14 +25,15 @@ spec:
     annotations:
       openshift.io/display-name: Jenkins 2.X
       openshift.io/provider-display-name: Red Hat, Inc.
-      description: Provides a Jenkins 2.X server on RHEL 7. For more information about
-        using this container image, including OpenShift considerations, see https://github.com/openshift/jenkins/blob/master/README.md.
+      description: Provides a Jenkins v2.x server on CentOS. For more information
+        about using this container image, including OpenShift considerations, see
+        https://github.com/openshift/jenkins/blob/master/README.md.
       iconClass: icon-jenkins
-      tags: jenkins,ppc64le
+      tags: jenkins
       version: 2.x
     from:
       kind: DockerImage
-      name: registry.redhat.io/openshift3/jenkins-2-rhel7:v4.0
+      name: quay.io/openshift/origin-jenkins:v4.0
     referencePolicy:
       type: Local
 
