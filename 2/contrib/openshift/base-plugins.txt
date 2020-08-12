@@ -103,6 +103,8 @@ matrix-auth:2.6.2
 # aside from general upgrade, needed to bump blueocean to reconcile shared dependency
 # with k8s plugin
 blueocean:1.10.2
+jira:3.0.17
+
 
 # Pipeline plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Plugin
 # 2.5 now includes pipeline-model-definition (declaritive pipeline)
