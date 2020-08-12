@@ -69,7 +69,7 @@ pam-auth:1.6
 
 credentials-binding:1.23
 
-junit:1.26.1
+junit:1.30
 workflow-durable-task-step:2.35
 workflow-support:2.18
 workflow-scm-step:2.11
@@ -88,7 +88,7 @@ workflow-remote-loader:1.5
 # Legacy stuff
 mapdb-api:1.0.9.0
 
-matrix-project:1.14
+matrix-project:1.17
 ssh-credentials:1.18.1
 
 # Pipeline Utility Steps Plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Utility+Steps+Plugin
@@ -99,7 +99,7 @@ pipeline-github-lib:1.0
 github-organization-folder:1.6
 
 # Jenkins v2 specific
-matrix-auth:2.2
+matrix-auth:2.6.2
 # aside from general upgrade, needed to bump blueocean to reconcile shared dependency
 # with k8s plugin
 blueocean:1.10.2
