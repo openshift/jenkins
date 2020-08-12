@@ -11,7 +11,7 @@ spec:
       openshift.io/display-name: Jenkins (Latest)
       openshift.io/provider-display-name: Red Hat, Inc.
       description: |-
-        Provides a Jenkins server on CentOS 7. For more information about using this container image, including OpenShift considerations, see https://github.com/openshift/jenkins/blob/master/README.md.
+        Provides a Jenkins server on CentOS. For more information about using this container image, including OpenShift considerations, see https://github.com/openshift/jenkins/blob/master/README.md.
 
         WARNING: By selecting this tag, your application will automatically update to use the latest version of Jenkins available on OpenShift, including major versions updates.
       iconClass: icon-jenkins
@@ -25,7 +25,7 @@ spec:
     annotations:
       openshift.io/display-name: Jenkins 2.X
       openshift.io/provider-display-name: Red Hat, Inc.
-      description: Provides a Jenkins v2.x server on CentOS 7. For more information
+      description: Provides a Jenkins v2.x server on CentOS. For more information
         about using this container image, including OpenShift considerations, see
         https://github.com/openshift/jenkins/blob/master/README.md.
       iconClass: icon-jenkins
