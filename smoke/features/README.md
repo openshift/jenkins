@@ -19,6 +19,7 @@
 pip install -r smoke/features/requirements.txt
 
 ### Use this behave command to run the smoke/features behave code
+export <kubeconfig>
 behave ./smoke/features
 
 ### Logs are generated in a separate file as shown above in the tree
