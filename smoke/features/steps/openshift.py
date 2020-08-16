@@ -3,8 +3,6 @@ import time
 from pyshould import should
 from smoke.features.steps.command import Command
 
-nodejs_app = "https://github.com/pmacik/nodejs-rest-http-crud"
-
 
 class Openshift(object):
     def __init__(self):
@@ -83,45 +81,6 @@ class Openshift(object):
         if exit_status == 0:
             return output
         return None
-
-    def create_catalog_source(self, name, catalog_image):
-        catalog_source = self.catalog_source_yaml_template.format(name=name, catalog_image=catalog_image)
-        return self.oc_apply(catalog_source)
-
-    def get_current_csv(self, package_name, catalog, channel):
-        cmd = f'oc get packagemanifests -o json | jq -r \'.items[] \
-            | select(.metadata.name=="{package_name}") \
-            | select(.status.catalogSource=="{catalog}").status.channels[] \
-            | select(.name=="{channel}").currentCSV\''
-        current_csv, exit_code = self.cmd.run(cmd)
-
-        if current_csv is None:
-            return current_csv
-
-        current_csv = current_csv.strip("\n")
-        if current_csv == "" or exit_code != 0:
-            current_csv = None
-        return current_csv
-
-    def create_operator_subscription(self, package_name, operator_source_name, channel):
-        operator_subscription = self.operator_subscription_yaml_template.format(
-            name=package_name, operator_source_name=operator_source_name,
-            channel=channel, csv_version=self.get_current_csv(package_name, operator_source_name, channel))
-        return self.oc_apply(operator_subscription)
-
-    def wait_for_package_manifest(self, package_name, operator_source_name, operator_channel, interval=5, timeout=120):
-        current_csv = self.get_current_csv(package_name, operator_source_name, operator_channel)
-        start = 0
-        if current_csv is not None:
-            return True
-        else:
-            while ((start + interval) <= timeout):
-                current_csv = self.get_current_csv(package_name, operator_source_name, operator_channel)
-                if current_csv is not None:
-                    return True
-                time.sleep(interval)
-                start += interval
-        return False
 
     def get_configmap(self, namespace):
         output, exit_code = self.cmd.run(f'oc get cm -n {namespace}')

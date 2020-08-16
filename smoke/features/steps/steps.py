@@ -157,7 +157,7 @@ def verifyPodStatus(context):
         podStatus[i.metadata.name] = i.status.phase
     for pod in podStatus.keys():
         status = podStatus[pod]
-        if 'comp' in status:
+        if 'Running' in status:
             logger.info("still checking pod status")
             logger.info(pod)
             logger.info(podStatus[pod])
