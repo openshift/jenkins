@@ -22,7 +22,7 @@ def get_filename_datetime():
 
 # Get full path for writing.
 file_name = get_filename_datetime()
-path = "./smoke/logs" + file_name
+path = "./smoke/logs-" + file_name
 
 logging.basicConfig(filename=path, format='%(asctime)s: %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 logger = logging.getLogger()
