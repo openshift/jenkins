@@ -68,7 +68,7 @@ junit:1.26.1
 workflow-support:2.18
 git:4.2.2
 mercurial:2.3
-subversion:2.10.3
+subversion:2.13.1
 github:1.29.2
 github-branch-source:2.3.6
 workflow-cps:2.80
