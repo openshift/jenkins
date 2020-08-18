@@ -88,8 +88,10 @@ function create_jenkins_proxy_xml() {
         if [ -n "$no_proxy" ]; then
           export NO_PROXY=$(convert_no_proxy $no_proxy)
         fi
-      fi 
-      envsubst < "${image_config_dir}/proxy.yaml.tpl" > "${image_config_dir}/proxy.yaml"
+        envsubst < "${image_config_dir}/proxy.yaml.tpl" > "${image_config_dir}/proxy.yaml"
+      fi
+      # create an empty proxy.yaml file anyway because it is configured in the template
+      touch ${image_config_dir}/proxy.yaml
     fi
   fi
 }
