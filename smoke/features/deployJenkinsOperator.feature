@@ -14,3 +14,10 @@ Feature: Deploy Jenkins Operator
         And service "jenkins-jnlp" created
         And service "jenkins" created
         Then The operator pod and deployment pod must be runnning
+
+    Scenario: Deploy sample application on openshift
+        Given The jenkins pod is up and runnning
+        When The user enters new-app command with sample-pipeline
+        Then Trigger the build using oc start-build
+        Then nodejs-mongodb-example pod must come up
+        And route nodejs-mongodb-example must be created and be accessible

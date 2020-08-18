@@ -92,6 +92,22 @@ class Openshift(object):
         if exit_status == 0:
             return output
         return None
+    
+    def new_app_from_file(self,file_url,namespace):
+        cmd = f'oc new-app -f {file_url} -n {namespace}'
+        output, exit_status = self.cmd.run(cmd)
+        print(f"starting: {output}, {exit_status}")
+        if exit_status == 0:
+            return output
+        return None
+
+    def start_build(self,buildconfig,namespace):
+        cmd = f'oc start-build {buildconfig} -n {namespace}'
+        output, exit_status = self.cmd.run(cmd)
+        print(f"starting: {output}, {exit_status}")
+        if exit_status == 0:
+            return output
+        return None
 
     def get_configmap(self, namespace):
         output, exit_code = self.cmd.run(f'oc get cm -n {namespace}')

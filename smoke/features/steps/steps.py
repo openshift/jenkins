@@ -4,6 +4,7 @@
 # ----------------------------------------------------------------------------
 import time
 import logging
+import urllib3
 from datetime import date
 from behave import given, then, when
 from pyshould import should
@@ -34,6 +35,7 @@ logger.setLevel(logging.INFO)
 project_name = 'jenkins-test'
 oc = Openshift()
 deploy_pod = "jenkins-1-deploy"
+samplebclst = ['sample-pipeline','nodejs-mongodb-example']
 samplepipeline = "https://raw.githubusercontent.com/openshift/origin/master/examples/jenkins/pipeline/samplepipeline.yaml"
 mavenpipeline = "https://raw.githubusercontent.com/openshift/origin/master/examples/jenkins/pipeline/maven-pipeline.yaml"
 nodejspipeline = "https://github.com/akram/scrum-planner.git"
@@ -150,8 +152,8 @@ def checkSVC(context):
 
 @then(u'The operator pod and deployment pod must be runnning')
 def verifyPodStatus(context):
-    context.v1 = v1
     podStatus = {}
+    context.v1 = v1
     time.sleep(300)
     pods = v1.list_namespaced_pod(project_name)
     for i in pods.items:
@@ -173,3 +175,104 @@ def verifyPodStatus(context):
         else:
             logger.critical("Pod is not ready->")
             raise AssertionError
+
+
+@given(u'The jenkins pod is up and runnning')
+def checkJenkins(context):
+    time.sleep(30)
+    podStatus = {}
+    status = ""
+    pods = v1.list_namespaced_pod(project_name)
+    for i in pods.items:
+        logger.info("Getting pod list")
+        logger.info(i.status.pod_ip)
+        logger.info(i.metadata.name)
+        logger.info(i.status.phase)
+        podStatus[i.metadata.name] = i.status.phase
+    for pod in podStatus.keys():
+        status = podStatus[pod]
+        if 'Running' in status:
+            logger.info("still checking pod status")
+            logger.info(pod)
+            logger.info(podStatus[pod])
+        elif 'Succeeded' in status:
+            logger.info("checking pod status")
+            logger.info(pod)
+            logger.info(podStatus[pod])
+        else:
+            logger.critical("Pod is not ready->")
+            raise AssertionError
+
+
+@when(u'The user enters new-app command with sample-pipeline')
+def createPipeline(context):
+    # bclst = ['sample-pipeline','nodejs-mongodb-example']
+    res = oc.new_app_from_file(samplepipeline,project_name)
+    for item, value in enumerate(samplebclst):
+        if 'sample-pipeline' in oc.search_resource_in_namespace('bc',value, project_name):
+            logger.info('Buildconfig sample-pipeline created')
+        elif 'nodejs-mongodb-example' in oc.search_resource_in_namespace('bc',value,project_name):
+            logger.info('Buildconfig nodejs-mongodb-example created')
+        else:
+            logger.error("----> Something went wrong with createPipeline")
+            raise AssertionError
+    logger.info(res)
+
+
+@then(u'Trigger the build using oc start-build')
+def startbuild(context):
+    for item,value in enumerate(samplebclst):
+        res = oc.start_build(value,project_name)
+        if not value in res:
+            raise AssertionError
+        else:
+            logger.info(res)
+
+
+@then(u'nodejs-mongodb-example pod must come up')
+def check_app_pod(context):
+    time.sleep(120)
+    podStatus = {}
+    podSet = set()
+    bcdcSet = set()
+    pods = v1.list_namespaced_pod(project_name)
+    for i in pods.items:
+        podStatus[i.metadata.name] = i.status.phase
+        podSet.add(i.metadata.name)
+    
+    for items in podSet:
+        if 'build' in items:
+           bcdcSet.add(items)
+        elif 'deploy' in items:
+            bcdcSet.add(items)
+
+    app_pods = podSet.difference(bcdcSet)
+    for items in app_pods:
+        logger.info('Getting pods')
+        logger.info(items)
+    
+    for items in app_pods:
+        for pod in podStatus.keys():
+            status = podStatus[items]
+            if not 'Running' in status:
+                raise AssertionError
+    logger.info('---> App pods are ready')
+
+@then(u'route nodejs-mongodb-example must be created and be accessible')
+def connectApp(context):
+    logger.info('Getting application route/url')
+    app_name = 'nodejs-mongodb-example'
+    time.sleep(30)
+    route = oc.get_route_host(app_name,project_name)
+    url = 'http://'+str(route)
+    logger.info('--->App url:')
+    logger.info(url)
+    http = urllib3.PoolManager()
+    res = http.request('GET', url)
+    connection_status = res.status
+    if connection_status == 200:
+        logger.info('---> Application is accessible via the route')
+        logger.info(url)
+    else:
+        raise Exception
+    
