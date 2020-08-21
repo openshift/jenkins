@@ -57,7 +57,7 @@ mailer:1.30
 parameterized-trigger:2.35.2
 pipeline-build-step:2.12
 pipeline-input-step:2.11
-script-security:1.71
+script-security:1.73
 google-oauth-plugin:1.0.0
 
 ant:1.10
