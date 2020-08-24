@@ -1,4 +1,4 @@
-FROM quay.io/openshift/origin-jenkins-agent-base:v4.0
+FROM registry.svc.ci.openshift.org/ocp/4.6:jenkins-agent-base
 
 MAINTAINER OpenShift Developer Services <openshift-dev-services+jenkins@redhat.com>
 
