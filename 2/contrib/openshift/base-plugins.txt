@@ -63,7 +63,7 @@ ant:1.10
 pam-auth:1.6
 git-client:3.2.1
 
-credentials-binding:1.19
+credentials-binding:1.23
 junit:1.26.1
 workflow-support:2.18
 git:4.2.2
