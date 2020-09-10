@@ -37,7 +37,7 @@
         },
         "from": {
           "kind": "DockerImage",
-          "name": "registry.redhat.io/openshift4/ose-jenkins-agent-nodejs:v4.0"
+          "name": "registry.redhat.io/openshift4/ose-jenkins-agent-nodejs-12-rhel8:v4.6"
         },
         "referencePolicy": {
           "type": "Local"
