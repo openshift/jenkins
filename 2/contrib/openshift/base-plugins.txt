@@ -1,6 +1,6 @@
 
 # OpenShift Plugins
-openshift-login:1.0.23
+openshift-login:1.0.26
 openshift-client:1.0.32
 openshift-sync:1.0.45
 
@@ -52,7 +52,7 @@ lockable-resources:2.5
 
 config-file-provider:3.5
 htmlpublisher:1.21
-job-dsl:1.72
+job-dsl:1.77
 mailer:1.30
 parameterized-trigger:2.35.2
 pipeline-build-step:2.12
