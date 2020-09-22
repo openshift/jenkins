@@ -94,7 +94,7 @@ github-organization-folder:1.6
 matrix-auth:2.6.2
 # aside from general upgrade, needed to bump blueocean to reconcile shared dependency
 # with k8s plugin
-blueocean:1.23.2
+blueocean:1.23.3
 jira:3.0.17
 
 workflow-aggregator:2.6
