@@ -52,7 +52,7 @@ lockable-resources:2.5
 
 config-file-provider:3.5
 htmlpublisher:1.21
-job-dsl:1.72
+job-dsl:1.76
 mailer:1.32.1
 parameterized-trigger:2.35.2
 pipeline-build-step:2.12
