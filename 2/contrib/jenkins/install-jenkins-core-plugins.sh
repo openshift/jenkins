@@ -5,15 +5,21 @@ set -o pipefail
 if [[ "${INSTALL_JENKINS_VIA_RPMS}" == "false" ]]; then
     curl https://pkg.jenkins.io/redhat-stable/jenkins.repo -o /etc/yum.repos.d/jenkins.repo
     rpm --import https://pkg.jenkins.io/redhat-stable/jenkins-ci.org.key
+    rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
     PLUGIN_LIST="$1"
     YUM_FLAGS=" "
     shift
     if [ "$#" == "1" ]; then
         YUM_FLAGS="$1"
     fi
-    yum -y $YUM_FLAGS --setopt=tsflags=nodocs install jenkins-2.222.1
-    rpm -V jenkins-2.222.1
-    yum clean all
+    YUM_CACHE=/var/cache/yum/x86_64/7Server/
+    if [ -d $YUM_CACHE ]; then 
+      rm -fr /var/cache/yum/x86_64/7Server/*
+      rm -fr /var/cache/yum/x86_64/7Server/ # Clean yum cache otherwise, it will fail if --disablerepos are specified
+    fi
+    yum -y $YUM_FLAGS --setopt=tsflags=nodocs --disableplugin=subscription-manager install jenkins-2.235.5
+    rpm -V jenkins-2.235.5
+    yum $YUM_FLAGS clean all
     /usr/local/bin/install-plugins.sh $PLUGIN_LIST
 else
     yum install -y jenkins-2.* jenkins-2-plugins
