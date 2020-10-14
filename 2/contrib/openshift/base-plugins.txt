@@ -1,6 +1,6 @@
 
 # OpenShift Plugins
-openshift-login:1.0.23
+openshift-login:1.0.26
 openshift-client:1.0.32
 openshift-sync:1.0.45
 
@@ -52,7 +52,7 @@ lockable-resources:2.5
 
 config-file-provider:3.5
 htmlpublisher:1.21
-job-dsl:1.72
+job-dsl:1.77
 mailer:1.30
 parameterized-trigger:2.35.2
 pipeline-build-step:2.12
@@ -64,8 +64,8 @@ ant:1.10
 pam-auth:1.6
 git-client:3.2.1
 
-credentials-binding:1.19
-junit:1.26.1
+credentials-binding:1.23
+junit:1.30
 workflow-support:2.18
 git:4.2.2
 mercurial:2.3
@@ -80,7 +80,7 @@ workflow-remote-loader:1.5
 # Legacy stuff
 mapdb-api:1.0.9.0
 
-matrix-project:1.14
+matrix-project:1.17
 ssh-credentials:1.18.1
 
 # Pipeline Utility Steps Plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Utility+Steps+Plugin
@@ -91,7 +91,7 @@ pipeline-github-lib:1.0
 github-organization-folder:1.6
 
 # Jenkins v2 specific
-matrix-auth:2.2
+matrix-auth:2.6.2
 # aside from general upgrade, needed to bump blueocean to reconcile shared dependency
 # with k8s plugin
 blueocean:1.10.2
@@ -101,3 +101,5 @@ workflow-aggregator:2.6
 # Monitoring plugins
 metrics:4.0.2.5
 prometheus:2.0.0
+
+groovy:2.2
