@@ -1,105 +1,49 @@
 
-# OpenShift Plugins
-openshift-login:1.0.26
-openshift-client:1.0.32
-openshift-sync:1.0.45
-
-
-# kubernetes plugin - https://wiki.jenkins-ci.org/display/JENKINS/Kubernetes+Plugin
-# 1.7.1 fixed https://jenkins.io/security/advisory/2018-06-04/#SECURITY-883
-# 1.12.0 fixed https://jenkins.io/security/advisory/2018-07-30/#SECURITY-1016
-# 1.12.8 fixed the https://issues.jenkins-ci.org/browse/JENKINS-53260 we introduced
-# 1.18.2 upgrade to support OpenJdk11
-# 1.25.2 enhance http proxy handleing
-kubernetes:1.25.2
+ant:1.10
+blueocean:1.23.3
+config-file-provider:3.5
+configuration-as-code:1.41
+credentials-binding:1.23
 credentials:2.3.5
 docker-commons:1.16
-pipeline-model-definition:1.6.0
-pipeline-model-api:1.6.0
-
-# we leverage this plugin in the openshift-client DSL groovy shim
-lockable-resources:2.5
-
-# explicitly pull in plugins previously pulled in by dependencies because of
-# security advisories  ...exclude plugins from
-# advisories that were not previously pulled in by what is listed above
-# also, as the plugins above raise their dependency levels for these plugins let's see about removing
-# items from the list below
-#
-# 
-# processed sec adv https://jenkins.io/blog/2017/07/10/security-advisory/
-# processed sec adv https://jenkins.io/security/advisory/2017-08-07/
-# processed sec adv https://jenkins.io/security/advisory/2018-01-22/
-# processed sec adv https://jenkins.io/security/advisory/2018-02-05/
-# processed sec adv https://jenkins.io/security/advisory/2018-02-14/
-# processed sec adv https://jenkins.io/security/advisory/2018-02-26/
-# processed sec adv https://jenkins.io/security/advisory/2018-03-26/
-# processed sec adv https://jenkins.io/security/advisory/2018-04-16/
-# processed sec adv https://jenkins.io/security/advisory/2018-06-04/
-# processed sec adv https://jenkins.io/security/advisory/2018-06-25/
-# processed sec adv https://jenkins.io/security/advisory/2018-09-25/
-# processed sec adv https://jenkins.io/security/advisory/2018-10-29/
-# processed sec adv https://jenkins.io/security/advisory/2019-01-08/
-# processed sec adv https://jenkins.io/security/advisory/2019-01-28/
-# processed sec adv https://jenkins.io/security/advisory/2019-03-06/
-# processed sec adv https://jenkins.io/security/advisory/2019-03-25/
-# processed sec adv https://jenkins.io/security/advisory/2019-05-21/
-# processed sec adv https://jenkins.io/security/advisory/2019-05-31/
-# processed sec adv https://jenkins.io/security/advisory/2019-06-11/
-# processed sec adv https://jenkins.io/security/advisory/2019-07-31/
-# processed sec adv https://jenkins.io/security/advisory/2019-08-28/
-# processed sec adv https://jenkins.io/security/advisory/2019-10-01/#SECURITY-1590
-
-config-file-provider:3.5
+git-client:3.2.1
+git:4.2.2
+github-branch-source:2.9.1
+github-organization-folder:1.6
+github:1.31.0
+google-oauth-plugin:1.0.0
+groovy:2.2
 htmlpublisher:1.21
+jira:3.0.17
 job-dsl:1.77
-mailer:1.30
+junit:1.30
+kubernetes:1.25.2
+lockable-resources:2.10
+mailer:1.32.1
+mapdb-api:1.0.9.0
+matrix-auth:2.6.2
+matrix-project:1.17
+mercurial:2.3
+metrics:4.0.2.5
+openshift-client:1.0.34
+openshift-login:1.0.26
+openshift-sync:1.0.45
+pam-auth:1.6
 parameterized-trigger:2.35.2
 pipeline-build-step:2.12
-pipeline-input-step:2.11
-script-security:1.73
-google-oauth-plugin:1.0.0
-
-ant:1.10
-pam-auth:1.6
-git-client:3.2.1
-
-credentials-binding:1.23
-junit:1.30
-workflow-support:2.18
-git:4.2.2
-mercurial:2.3
-subversion:2.10.3
-github:1.29.2
-github-branch-source:2.3.6
-workflow-cps:2.80
-workflow-cps-global-lib:2.15
-token-macro:2.12
-workflow-remote-loader:1.5
-
-# Legacy stuff
-mapdb-api:1.0.9.0
-
-matrix-project:1.17
-ssh-credentials:1.18.1
-
-# Pipeline Utility Steps Plugin - https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Utility+Steps+Plugin
-pipeline-utility-steps:2.5.0
-
-# some plugins helpful for global shared libs were broken out of workflow aggregator
 pipeline-github-lib:1.0
-github-organization-folder:1.6
-
-# Jenkins v2 specific
-matrix-auth:2.6.2
-# aside from general upgrade, needed to bump blueocean to reconcile shared dependency
-# with k8s plugin
-blueocean:1.10.2
-
-workflow-aggregator:2.6
-
-# Monitoring plugins
-metrics:4.0.2.5
+pipeline-input-step:2.11
+pipeline-model-api:1.6.0
+pipeline-model-definition:1.6.0
+pipeline-utility-steps:2.5.0
 prometheus:2.0.0
-
-groovy:2.2
+script-security:1.75
+snakeyaml-api:1.26.4
+ssh-credentials:1.18.1
+subversion:2.13.1
+token-macro:2.12
+workflow-aggregator:2.6
+workflow-cps-global-lib:2.15
+workflow-cps:2.80
+workflow-remote-loader:1.5
+workflow-support:3.5
