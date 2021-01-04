@@ -11,7 +11,7 @@ openshift-pipeline:1.0.57
 # 1.7.1 fixed https://jenkins.io/security/advisory/2018-06-04/#SECURITY-883
 # 1.12.0 fixed https://jenkins.io/security/advisory/2018-07-30/#SECURITY-1016
 # 1.12.8 fixed the https://issues.jenkins-ci.org/browse/JENKINS-53260 we introduced
-kubernetes:1.25.2
+kubernetes:1.27.4
 credentials:2.3.5
 docker-commons:1.16
 pipeline-model-definition:1.6.0
@@ -44,7 +44,7 @@ workflow-scm-step:2.11
 git:4.2.2
 git-client:3.2.1
 
-mercurial:2.3
+mercurial:2.12
 subversion:2.13.1
 github:1.29.2
 github-branch-source:2.3.6
@@ -80,3 +80,4 @@ jira:3.0.17
 workflow-aggregator:2.6
 
 snakeyaml-api:1.26.4
+bouncycastle-api:2.18
