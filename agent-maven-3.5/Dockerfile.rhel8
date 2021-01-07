@@ -10,7 +10,7 @@ LABEL com.redhat.component="jenkins-agent-maven-35-rhel7-container" \
       io.openshift.tags="openshift,jenkins,agent,maven" \
       maintainer="openshift-dev-services+jenkins@redhat.com"
 
-ENV MAVEN_VERSION=3.5 \
+ENV MAVEN_VERSION=3.6 \
     LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
     MAVEN_OPTS="-Duser.home=$HOME"
