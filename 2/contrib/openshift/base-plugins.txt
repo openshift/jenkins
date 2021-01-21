@@ -4,6 +4,8 @@ blueocean:1.23.3
 bouncycastle-api:2.18
 config-file-provider:3.5
 configuration-as-code:1.41
+configuration-as-code-groovy:1.1
+configuration-as-code-support:1.19
 credentials-binding:1.23
 credentials:2.3.13
 docker-commons:1.16
