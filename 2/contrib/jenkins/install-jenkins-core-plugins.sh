@@ -18,8 +18,8 @@ if [[ "${INSTALL_JENKINS_VIA_RPMS}" == "false" ]]; then
       rm -fr /var/cache/yum/x86_64/7Server/*
       rm -fr /var/cache/yum/x86_64/7Server/ # Clean yum cache otherwise, it will fail if --disablerepos are specified
     fi
-    yum -y $YUM_FLAGS --setopt=tsflags=nodocs --disableplugin=subscription-manager install jenkins-2.235.5
-    rpm -V jenkins-2.235.5
+    yum -y $YUM_FLAGS --setopt=tsflags=nodocs --disableplugin=subscription-manager install jenkins-2.263.3
+    rpm -V jenkins-2.263.3
     yum $YUM_FLAGS clean all
     /usr/local/bin/install-plugins.sh $PLUGIN_LIST
 else
