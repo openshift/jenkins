@@ -4,7 +4,7 @@
   "metadata": {
     "name": "jenkins-ephemeral-monitored",
     "annotations": {
-      "openshift.io/display-name": "Jenkins (Ephemeral)",
+      "openshift.io/display-name": "Jenkins Monitored (Ephemeral)",
       "description": "Jenkins service, without persistent storage. \n\n To run this template extra RBAC permissions need to be provideed to the use to be able to create the ServiceMonitor Custom Resource managed by the prometheus-operator. \n\nWARNING: Any data stored will be lost upon pod destruction. Only use this template for testing.",
       "iconClass": "icon-jenkins",
       "tags": "instant-app,jenkins",
