@@ -1,0 +1,14 @@
+if (System.env.containsKey('MAVEN_MIRROR_URL')) {
+  allprojects {
+      buildscript {
+          repositories {
+              mavenLocal()
+              maven { url System.env.MAVEN_MIRROR_URL }
+          }
+      }
+      repositories {
+          mavenLocal()
+          maven { url System.env.MAVEN_MIRROR_URL }
+      }
+  }
+}
