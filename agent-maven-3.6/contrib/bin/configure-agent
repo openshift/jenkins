@@ -1,0 +1,31 @@
+#!/bin/bash
+
+if [ -n "$MAVEN_MIRROR_URL" ]; then
+  xml="    <mirror>\
+    <id>mirror.default</id>\
+    <url>$MAVEN_MIRROR_URL</url>\
+    <mirrorOf>external:*</mirrorOf>\
+  </mirror>"
+  sed -i "s|<!-- ### configured mirrors ### -->|$xml|" $HOME/.m2/settings.xml
+fi
+
+CONTAINER_MEMORY_IN_BYTES=$(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)
+CONTAINER_MEMORY_IN_MB=$((CONTAINER_MEMORY_IN_BYTES/2**20))
+
+# javaC version is by default set to java-11. If a regression is faced, we must inject
+# the USE_JAVAC_VERSION=java-1.8.0 into the container agent so, the agent can use it
+export JAVAC_VERSION=${USE_JAVAC_VERSION:=java-11}
+
+# multi-arch check ... if not x86_64, leave alone
+if [[ "$(uname -m)" == "x86_64" ]]; then
+    # Set the JVM architecture used.  Follow OPENSHIFT_JENKINS_JVM_ARCH if set.  If
+    # not, use 32 bit JVM for space efficiency if container size < 2GiB
+    if [[ "${OPENSHIFT_JENKINS_JVM_ARCH}" == "x86_64" || \
+          ( "${OPENSHIFT_JENKINS_JVM_ARCH}" == "" && "${CONTAINER_MEMORY_IN_MB}" -ge 2048 ) ]]; then
+        alternatives --set javac $(alternatives --display javac | grep $JAVAC_VERSION | awk '/family.*x86_64/ { print $1; }')
+    else
+        alternatives --set javac $(alternatives --display javac | grep $JAVAC_VERSION | awk '/family.*i386/ { print $1; }')
+    fi
+fi
+
+echo "OPENSHIFT_JENKINS_JVM_ARCH='${OPENSHIFT_JENKINS_JVM_ARCH}', CONTAINER_MEMORY_IN_MB='${CONTAINER_MEMORY_IN_MB}', using $(readlink /etc/alternatives/javac)"

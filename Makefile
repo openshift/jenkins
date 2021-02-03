@@ -8,7 +8,7 @@
 # version (at least that is the initial goal).  This naming system
 # can be revisited in the future if we decide we need either jenkins
 # or <platform> version numbers in the names.
-VERSIONS="2 slave-base agent-maven-3.5 agent-nodejs-8 agent-nodejs-10 agent-nodejs-12"
+VERSIONS="2 slave-base agent-maven-3.5 agent-nodejs-8 agent-nodejs-10 agent-nodejs-12 agent-maven-3.6"
 
 ifeq ($(TARGET),rhel7)
 	OS := rhel7
