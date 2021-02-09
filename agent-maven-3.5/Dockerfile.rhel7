@@ -10,21 +10,24 @@ LABEL com.redhat.component="jenkins-agent-maven-35-rhel7-container" \
       io.k8s.description="The jenkins agent maven image has the maven tools on top of the jenkins slave base image." \
       io.openshift.tags="openshift,jenkins,agent,maven"
 
-ENV MAVEN_VERSION=3.5 \
+ENV MAVEN_VERSION=3.6 \
     BASH_ENV=/usr/local/bin/scl_enable \
     ENV=/usr/local/bin/scl_enable \
     PROMPT_COMMAND=". /usr/local/bin/scl_enable" \
     LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
-    MAVEN_OPTS="-Duser.home=$HOME"
+    MAVEN_OPTS="-Duser.home=$HOME" \
+    INSTALL_PKGS="java-11-openjdk-devel java-1.8.0-openjdk-devel rh-maven36*" \
+    DISABLES="--disablerepo=rhel-server-extras --disablerepo=rhel-server --disablerepo=rhel-fast-datapath --disablerepo=rhel-server-optional --disablerepo=rhel-server-ose --disablerepo=rhel-server-rhscl" \
+    DISABLEPLUGIN="--disableplugin=subscription-manager"
 # TODO: Remove MAVEN_OPTS env once cri-o pushes the $HOME variable in /etc/passwd
 
 # Install Maven
-RUN INSTALL_PKGS="java-11-openjdk-devel java-1.8.0-openjdk-devel rh-maven35*" && \
-    yum install -y $INSTALL_PKGS && \
-    rpm -V  java-11-openjdk-devel java-1.8.0-openjdk-devel rh-maven35 && \
-    yum clean all -y && \
-    mkdir -p $HOME/.m2
+RUN cat /etc/yum.repos.d/*
+RUN yum $DISABLEPLUGIN install -y $INSTALL_PKGS
+RUN rpm -V  java-11-openjdk-devel java-1.8.0-openjdk-devel rh-maven36
+RUN yum clean all -y && \
+RUN mkdir -p $HOME/.m2
 
 # When bash is started non-interactively, to run a shell script, for example it
 # looks for this variable and source the content of this file. This will enable
