@@ -1,7 +1,7 @@
 ##############################################
 # Stage 1 : Build go-init
 ##############################################
-FROM openshift/origin-release:golang-1.12 AS go-init-builder
+FROM registry.ci.openshift.org/ocp/builder:rhel-8-golang-1.15-openshift-4.4 AS go-init-builder
 WORKDIR  /go/src/github.com/openshift/jenkins
 COPY . .
 WORKDIR  /go/src/github.com/openshift/jenkins/go-init
@@ -10,8 +10,8 @@ RUN go build . && cp go-init /usr/bin
 ##############################################
 # Stage 2 : Build slave-base with go-init
 ##############################################
-FROM quay.io/openshift/origin-cli
-MAINTAINER Akram Ben Aissi <abenaiss@redhat.com>
+FROM registry.ci.openshift.org/ocp/4.4:cli
+MAINTAINER OpenShift Developer Services <openshift-dev-services+jenkins@redhat.com>
 COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
 
 # Jenkins image for OpenShift
@@ -19,13 +19,13 @@ COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
 # This image provides a Jenkins server, primarily intended for integration with
 # OpenShift v3.
 #
-# Volumes:
+# Volumes: 
 # * /var/jenkins_home
 # Environment:
 # * $JENKINS_PASSWORD - Password for the Jenkins 'admin' user.
 
-# Jenkins LTS packages from
-# https://pkg.jenkins.io/redhat-stable/
+MAINTAINER OpenShift Developer Services <openshift-dev-services+jenkins@redhat.com>
+
 ENV JENKINS_VERSION=2 \
     HOME=/var/lib/jenkins \
     JENKINS_HOME=/var/lib/jenkins \
@@ -34,23 +34,34 @@ ENV JENKINS_VERSION=2 \
     LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
     INSTALL_JENKINS_VIA_RPMS=false
+# openshift/ocp-build-data will change INSTALL_JENKINS_VIA_RPMS to true
+# so that the osbs/brew builds will install via RPMs; when this runs 
+# in api.ci, it will employ the old centos style, download the plugins and
+# redhat-stable core RPM for download
 
-LABEL k8s.io.description="Jenkins is a continuous integration server" \
-      k8s.io.display-name="Jenkins 2" \
-      openshift.io.expose-services="8080:http" \
-      openshift.io.tags="jenkins,jenkins2,ci" \
+LABEL io.k8s.description="Jenkins is a continuous integration server" \
+      io.k8s.display-name="Jenkins 2" \
+      io.openshift.tags="jenkins,jenkins2,ci" \
+      io.openshift.expose-services="8080:http" \
       io.jenkins.version="2.263.3" \
-      io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
+      io.openshift.s2i.scripts-url=image:///usr/libexec/s2i 
+
+# Labels consumed by Red Hat build service
+LABEL com.redhat.component="openshift-jenkins-2-container" \
+      name="openshift4/jenkins-2-rhel7" \
+      architecture="x86_64 \
+      maintainer="openshift-dev-services+jenkins@redhat.com""
 
 # 8080 for main web interface, 50000 for slave agents
 EXPOSE 8080 50000
 
-RUN curl https://raw.githubusercontent.com/cloudrouter/centos-repo/master/CentOS-Base.repo -o /etc/yum.repos.d/CentOS-Base.repo && \
-    curl http://mirror.centos.org/centos-7/7/os/x86_64/RPM-GPG-KEY-CentOS-7 -o /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 && \
-    INSTALL_PKGS="dejavu-sans-fonts rsync gettext git tar zip unzip openssl bzip2 java-11-openjdk java-11-openjdk-devel java-1.8.0-openjdk java-1.8.0-openjdk-devel jq" && \
-    DISABLES="--disablerepo=rhel-server-extras --disablerepo=rhel-server --disablerepo=rhel-fast-datapath --disablerepo=rhel-server-optional --disablerepo=rhel-server-ose --disablerepo=rhel-server-rhscl" && \
-    yum $DISABLES -y --setopt=tsflags=nodocs --disableplugin=subscription-manager install epel-release && \
-    yum $DISABLES -y --setopt=tsflags=nodocs --disableplugin=subscription-manager install $INSTALL_PKGS && \
+# for backward compatibility with pre-3.6 installs leveraging a PV, where rpm installs went to /usr/lib64/jenkins, we are
+# establishing a symbolic link for that guy as well, so that existing plugins in JENKINS_HOME/plugins pointing to 
+# /usr/lib64/jenkins will subsequently get redirected to /usr/lib/jenkins; it is confirmed that the 3.7 jenkins RHEL images 
+# do *NOT* have a /usr/lib64/jenkins path
+RUN ln -s /usr/lib/jenkins /usr/lib64/jenkins && \
+    INSTALL_PKGS="dejavu-sans-fonts wget rsync gettext git tar zip unzip openssl bzip2 java-11-openjdk java-11-openjdk-devel java-1.8.0-openjdk java-1.8.0-openjdk-devel jq glibc-locale-source" && \
+    yum install -y $INSTALL_PKGS && \
     rpm -V  $INSTALL_PKGS && \
     yum clean all  && \
     localedef -f UTF-8 -i en_US en_US.UTF-8
@@ -60,13 +71,12 @@ COPY ./contrib/jenkins /usr/local/bin
 ADD ./contrib/s2i /usr/libexec/s2i
 ADD release.version /tmp/release.version
 
-RUN /usr/local/bin/install-jenkins-core-plugins.sh /opt/openshift/base-plugins.txt "--disablerepo=rhel-server-extras --disablerepo=rhel-server --disablerepo=rhel-fast-datapath  --disablerepo=rhel-server-optional --disablerepo=rhel-server-ose --disablerepo=rhel-server-rhscl" && \
+RUN /usr/local/bin/install-jenkins-core-plugins.sh /opt/openshift/base-plugins.txt && \
     rmdir /var/log/jenkins && \
     chmod -R 775 /etc/alternatives && \
     chmod -R 775 /var/lib/alternatives && \
     chmod -R 775 /usr/lib/jvm && \
     chmod 775 /usr/bin && \
-    chmod 775 /usr/lib/jvm-exports && \
     chmod 775 /usr/share/man/man1 && \
     mkdir -p /var/lib/origin && \
     chmod 775 /var/lib/origin && \
@@ -94,3 +104,4 @@ VOLUME ["/var/lib/jenkins"]
 
 USER 1001
 ENTRYPOINT ["/usr/bin/go-init", "-main", "/usr/libexec/s2i/run"]
+
