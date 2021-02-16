@@ -1,4 +1,18 @@
-FROM quay.io/openshift/origin-cli:v3.11
+##############################################
+# Stage 1 : Build go-init
+##############################################
+FROM openshift/origin-release:golang-1.12 AS go-init-builder
+WORKDIR  /go/src/github.com/openshift/jenkins
+COPY . .
+WORKDIR  /go/src/github.com/openshift/jenkins/go-init
+RUN go build . && cp go-init /usr/bin
+
+##############################################
+# Stage 2 : Build slave-base with go-init
+##############################################
+FROM quay.io/openshift/origin-cli
+MAINTAINER Akram Ben Aissi <abenaiss@redhat.com>
+COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
 
 # Jenkins image for OpenShift
 #
@@ -10,37 +24,34 @@ FROM quay.io/openshift/origin-cli:v3.11
 # Environment:
 # * $JENKINS_PASSWORD - Password for the Jenkins 'admin' user.
 
-MAINTAINER OpenShift Developer Services <jenkins+openshift-dev-services@redhat.com>
-
 # Jenkins LTS packages from
 # https://pkg.jenkins.io/redhat-stable/
 ENV JENKINS_VERSION=2 \
     HOME=/var/lib/jenkins \
     JENKINS_HOME=/var/lib/jenkins \
     JENKINS_UC=https://updates.jenkins.io \
-    OPENSHIFT_JENKINS_IMAGE_VERSION=3.11 \
+    OPENSHIFT_JENKINS_IMAGE_VERSION=4.4 \
     LANG=en_US.UTF-8 \
-    LC_ALL=en_US.UTF-8
+    LC_ALL=en_US.UTF-8 \
+    INSTALL_JENKINS_VIA_RPMS=false
 
 LABEL k8s.io.description="Jenkins is a continuous integration server" \
       k8s.io.display-name="Jenkins 2" \
       openshift.io.expose-services="8080:http" \
       openshift.io.tags="jenkins,jenkins2,ci" \
+      io.jenkins.version="2.263.3" \
       io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
 
 # 8080 for main web interface, 50000 for slave agents
 EXPOSE 8080 50000
 
-RUN curl https://pkg.jenkins.io/redhat-stable/jenkins.repo -o /etc/yum.repos.d/jenkins.repo && \
-    rpm --import https://pkg.jenkins.io/redhat/jenkins.io.key && \
-    yum install -y centos-release-scl-rh epel-release && \
-    curl https://copr.fedorainfracloud.org/coprs/alsadi/dumb-init/repo/epel-7/alsadi-dumb-init-epel-7.repo -o /etc/yum.repos.d/alsadi-dumb-init-epel-7.repo && \
-    #run yum update to avoid package version mismatch between i686 and other archs
-    yum -y update && \
-    x86_EXTRA_RPMS=$(if [ "$(uname -m)" == "x86_64" ]; then echo -n java-11-openjdk.i686 java-11-openjdk-devel.i686 ; fi) && \
-    INSTALL_PKGS="dejavu-sans-fonts rsync gettext git tar zip unzip openssl bzip2 dumb-init java-11-openjdk java-11-openjdk-devel jenkins-2.263.3-1.1 nss_wrapper" && \
-    yum -y --setopt=protected_multilib=false --setopt=tsflags=nodocs install $INSTALL_PKGS $x86_EXTRA_RPMS && \
-    rpm -V  $INSTALL_PKGS $x86_EXTRA_RPMS && \
+RUN curl https://raw.githubusercontent.com/cloudrouter/centos-repo/master/CentOS-Base.repo -o /etc/yum.repos.d/CentOS-Base.repo && \
+    curl http://mirror.centos.org/centos-7/7/os/x86_64/RPM-GPG-KEY-CentOS-7 -o /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 && \
+    INSTALL_PKGS="dejavu-sans-fonts rsync gettext git tar zip unzip openssl bzip2 java-11-openjdk java-11-openjdk-devel java-1.8.0-openjdk java-1.8.0-openjdk-devel jq" && \
+    DISABLES="--disablerepo=rhel-server-extras --disablerepo=rhel-server --disablerepo=rhel-fast-datapath --disablerepo=rhel-server-optional --disablerepo=rhel-server-ose --disablerepo=rhel-server-rhscl" && \
+    yum $DISABLES -y --setopt=tsflags=nodocs --disableplugin=subscription-manager install epel-release && \
+    yum $DISABLES -y --setopt=tsflags=nodocs --disableplugin=subscription-manager install $INSTALL_PKGS && \
+    rpm -V  $INSTALL_PKGS && \
     yum clean all  && \
     localedef -f UTF-8 -i en_US en_US.UTF-8
 
@@ -49,10 +60,7 @@ COPY ./contrib/jenkins /usr/local/bin
 ADD ./contrib/s2i /usr/libexec/s2i
 ADD release.version /tmp/release.version
 
-RUN /usr/local/bin/install-plugins.sh /opt/openshift/base-plugins.txt && \
-    # need to create <plugin>.pinned files when upgrading "core" plugins like credentials or subversion that are bundled with the jenkins server
-    # Currently jenkins v2 does not embed any plugins, but for reference:
-    # touch /opt/openshift/plugins/credentials.jpi.pinned && \
+RUN /usr/local/bin/install-jenkins-core-plugins.sh /opt/openshift/base-plugins.txt "--disablerepo=rhel-server-extras --disablerepo=rhel-server --disablerepo=rhel-fast-datapath  --disablerepo=rhel-server-optional --disablerepo=rhel-server-ose --disablerepo=rhel-server-rhscl" && \
     rmdir /var/log/jenkins && \
     chmod -R 775 /etc/alternatives && \
     chmod -R 775 /var/lib/alternatives && \
@@ -60,6 +68,7 @@ RUN /usr/local/bin/install-plugins.sh /opt/openshift/base-plugins.txt && \
     chmod 775 /usr/bin && \
     chmod 775 /usr/lib/jvm-exports && \
     chmod 775 /usr/share/man/man1 && \
+    mkdir -p /var/lib/origin && \
     chmod 775 /var/lib/origin && \
     unlink /usr/bin/java && \
     unlink /usr/bin/jjs && \
@@ -84,5 +93,4 @@ RUN /usr/local/bin/install-plugins.sh /opt/openshift/base-plugins.txt && \
 VOLUME ["/var/lib/jenkins"]
 
 USER 1001
-ENTRYPOINT ["/usr/bin/dumb-init", "--"]
-CMD ["/usr/libexec/s2i/run"]
+ENTRYPOINT ["/usr/bin/go-init", "-main", "/usr/libexec/s2i/run"]
