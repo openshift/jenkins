@@ -29,7 +29,7 @@ mercurial:2.12
 metrics:4.0.2.6
 openshift-client:1.0.34
 openshift-login:1.0.26
-openshift-sync:1.0.45
+openshift-sync:1.0.46
 pam-auth:1.6
 parameterized-trigger:2.36
 pipeline-build-step:2.12
