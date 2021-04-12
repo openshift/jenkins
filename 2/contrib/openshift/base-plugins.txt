@@ -23,7 +23,7 @@ kubernetes-client-api:4.13.2-1
 lockable-resources:2.10
 mailer:1.32.1
 mapdb-api:1.0.9.0
-matrix-auth:2.6.2
+matrix-auth:2.6.6
 matrix-project:1.18
 mercurial:2.12
 metrics:4.0.2.6
