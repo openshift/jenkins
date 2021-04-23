@@ -1,11 +1,11 @@
 ##############################################
 # Stage 1 : Build go-init
 ##############################################
-FROM registry.ci.openshift.org/ocp/builder:rhel-8-golang-1.15-openshift-4.8 AS go-init-builder
+FROM registry.ci.openshift.org/ocp/builder:rhel-8-golang-1.16-openshift-4.8 AS go-init-builder
 WORKDIR  /go/src/github.com/openshift/jenkins
 COPY . .
 WORKDIR  /go/src/github.com/openshift/jenkins/go-init
-RUN go build . && cp go-init /usr/bin
+RUN GO111MODULE=off go build . && cp go-init /usr/bin
 
 ##############################################
 # Stage 2 : Build slave-base with go-init
