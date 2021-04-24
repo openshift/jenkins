@@ -8,10 +8,10 @@ ENV MAVEN_VERSION=3.6.3 \
     PROMPT_COMMAND=". /usr/local/bin/scl_enable" \
     LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
-    MAVEN_OPTS="-Duser.home=$HOME"
-    M2_HOME="/opt/maven"
-    MAVEN_HOME="/opt/maven"
-    PATH="${M2_HOME}/bin:${PATH}" 
+    MAVEN_OPTS="-Duser.home=$HOME" \
+    M2_HOME="/opt/maven" \
+    MAVEN_HOME="/opt/maven" \
+    PATH="${M2_HOME}/bin:${PATH}"
 # TODO: Remove MAVEN_OPTS env once cri-o pushes the $HOME variable in /etc/passwd
 
 # Install OpenJDK
