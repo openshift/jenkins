@@ -252,16 +252,17 @@ function get_java_proxy_config() {
   proto=$1
   json=$2
   config="-D$proto.proxyHost=$(echo $json | jq -r .host)  -D$proto.proxyPort=$(echo $json | jq -r .port) "
+  config="$config -D$proto.proxy=http://$(echo $json | jq -r .host | sed -e 's/[[:space:]]//g'):$(echo $json | jq -r .port)"
   username=$(echo $json | jq -r .username )
   if [ -n $username ]; then
-    config="$config -D$proto.proxyUser=$username"
+    config="$config -D$proto.proxyUser=$username -Dproxy.username=$username"
   fi
   password=$(echo $json | jq -r .password )
   if [ -n $password ]; then
-    config="$config -D$proto.proxyPassword=$password"
+    config="$config -D$proto.proxyPassword=$password -Dproxy.password=$password"
   fi
   if [ -n "$no_proxy" ]; then
-    config="$config -D$proto.nonProxyHosts=$(convert_no_proxy $no_proxy)"
+    config="$config -D$proto.nonProxyHosts=$(convert_no_proxy $no_proxy) -Dno.proxy=$no_proxy"
   fi
   echo $config
 }
