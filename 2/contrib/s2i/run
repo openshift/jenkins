@@ -96,20 +96,6 @@ function create_jenkins_proxy_xml() {
   fi
 }
 
-function create_jenkins_credentials_xml() {
-  if [ ! -f "${image_config_dir}/credentials.xml" ]; then
-    if [ -f "${image_config_dir}/credentials.xml.tpl" ]; then
-      if [ ! -z "${KUBERNETES_CONFIG}" ]; then
-        echo "Generating kubernetes-plugin credentials (${JENKINS_HOME}/credentials.xml.tpl) ..."
-        export KUBERNETES_CREDENTIALS=$(generate_kubernetes_credentials)
-      fi
-      # Fix the envsubst trying to substitute the $Hash inside credentials.xml
-      export Hash="\$Hash"
-      envsubst < "${image_config_dir}/credentials.xml.tpl" > "${image_config_dir}/credentials.xml"
-    fi
-  fi
-}
-
 function create_jenkins_config_from_templates() {
   find ${image_config_dir} -type f -name "*.tpl" -print0 | while IFS= read -r -d '' template_path; do
     local target_path=${template_path%.tpl}
@@ -117,9 +103,6 @@ function create_jenkins_config_from_templates() {
       case "${target_path}" in
         "${image_config_path}")
           create_jenkins_config_xml
-          ;;
-        "${image_config_dir}/credentials.xml")
-          create_jenkins_credentials_xml
           ;;
         "${image_config_dir}/proxy.yaml")
           create_jenkins_proxy_xml

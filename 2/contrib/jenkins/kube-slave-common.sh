@@ -150,27 +150,8 @@ function generate_kubernetes_config() {
       <namespace>${PROJECT_NAME}</namespace>
       <jenkinsUrl>http://${JENKINS_SERVICE_HOST}:${JENKINS_SERVICE_PORT}</jenkinsUrl>
       <jenkinsTunnel>${JNLP_HOST}:${JNLP_PORT}</jenkinsTunnel>
-      <credentialsId>1a12dfa4-7fc5-47a7-aa17-cc56572a41c7</credentialsId>
       <containerCap>100</containerCap>
       <retentionTimeout>5</retentionTimeout>
     </org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud>
-    "
-}
-
-# generate_kubernetes_credentials generates the credentials entry for the
-# kubernetes service account.
-function generate_kubernetes_credentials() {
-  echo "<entry>
-      <com.cloudbees.plugins.credentials.domains.Domain>
-        <specifications/>
-      </com.cloudbees.plugins.credentials.domains.Domain>
-      <java.util.concurrent.CopyOnWriteArrayList>
-        <org.csanchez.jenkins.plugins.kubernetes.ServiceAccountCredential plugin=\"kubernetes@0.4.1\">
-          <scope>GLOBAL</scope>
-          <id>1a12dfa4-7fc5-47a7-aa17-cc56572a41c7</id>
-          <description></description>
-        </org.csanchez.jenkins.plugins.kubernetes.ServiceAccountCredential>
-      </java.util.concurrent.CopyOnWriteArrayList>
-    </entry>
     "
 }
