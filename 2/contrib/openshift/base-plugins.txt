@@ -6,7 +6,7 @@ config-file-provider:3.7.1
 configuration-as-code:1.41
 configuration-as-code-groovy:1.1
 credentials-binding:1.23
-credentials:2.3.15
+credentials:2.3.19
 cloudbees-folder:6.15
 docker-commons:1.16
 git-client:3.2.1
