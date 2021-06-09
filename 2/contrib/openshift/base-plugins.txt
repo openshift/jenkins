@@ -1,8 +1,9 @@
 
 ant:1.11
 blueocean:1.24.4
+blueocean-display-url:2.4.1
 bouncycastle-api:2.18
-config-file-provider:3.5
+config-file-provider:3.7.1
 configuration-as-code:1.41
 configuration-as-code-groovy:1.1
 credentials-binding:1.23
