@@ -1,4 +1,3 @@
-
 ant:1.11
 blueocean:1.24.4
 bouncycastle-api:2.18
@@ -19,7 +18,6 @@ jira:3.0.17
 job-dsl:1.77
 junit:1.30
 kubernetes:1.29.0
-kubernetes-client-api:4.13.3-1
 lockable-resources:2.10
 mailer:1.32.1
 mapdb-api:1.0.9.0
