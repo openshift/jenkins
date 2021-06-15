@@ -10,7 +10,7 @@ cloudbees-folder:6.15
 docker-commons:1.16
 git-client:3.2.1
 git:4.5.2
-github:1.33.0
+github:1.33.1
 google-oauth-plugin:1.0.0
 groovy:2.2
 htmlpublisher:1.21
