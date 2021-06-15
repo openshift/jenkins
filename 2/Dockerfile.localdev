@@ -30,7 +30,7 @@ ENV JENKINS_VERSION=2 \
     HOME=/var/lib/jenkins \
     JENKINS_HOME=/var/lib/jenkins \
     JENKINS_UC=https://updates.jenkins.io \
-    OPENSHIFT_JENKINS_IMAGE_VERSION=4.6 \
+    OPENSHIFT_JENKINS_IMAGE_VERSION=4.9 \
     LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
     INSTALL_JENKINS_VIA_RPMS=false
@@ -39,7 +39,7 @@ LABEL k8s.io.description="Jenkins is a continuous integration server" \
       k8s.io.display-name="Jenkins 2" \
       openshift.io.expose-services="8080:http" \
       openshift.io.tags="jenkins,jenkins2,ci" \
-      io.jenkins.version="2.277.3" \
+      io.jenkins.version="2.289.1" \
       io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
 
 # 8080 for main web interface, 50000 for slave agents
