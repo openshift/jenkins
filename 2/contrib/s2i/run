@@ -35,7 +35,8 @@ function update_admin_password() {
   # get random admin dir
   ADMIN_DIR=`ls /var/lib/jenkins/users | grep admin`
   ls ${JENKINS_HOME}/users/${ADMIN_DIR}
-  sed -i "s,<passwordHash>.*</passwordHash>,<passwordHash>$new_password_hash</passwordHash>,g" "${JENKINS_HOME}/users/${ADMIN_DIR}/config.xml"
+  new_password_hash=$(obfuscate_password ${JENKINS_PASSWORD:-password})
+  sed -i "s,<passwordHash>.*</passwordHash>,<passwordHash>#jbcrypt:$new_password_hash</passwordHash>,g" "${JENKINS_HOME}/users/${ADMIN_DIR}/config.xml"
   echo $new_password_hash > ${JENKINS_HOME}/password
 }
 
@@ -354,10 +355,6 @@ fi
 
 mkdir /tmp/war
 unzip -q /usr/lib/jenkins/jenkins.war -d /tmp/war
-if [ -e ${JENKINS_HOME}/password ]; then
-  old_salt=$(cat ${JENKINS_HOME}/password | sed 's/:.*//')
-fi
-new_password_hash=`obfuscate_password ${JENKINS_PASSWORD:-password} $old_salt`
 
 # finish the move of the default logs dir, /var/log/jenkins, to the volume mount
 mkdir -p ${JENKINS_HOME}/logs
@@ -530,7 +527,8 @@ if [ -e ${JENKINS_HOME}/password ]; then
   # the jenkins ui, so we only want to do this if the env variable has been explicitly modified from
   # the original value.
   old_password_hash=`cat ${JENKINS_HOME}/password`
-if [ $old_password_hash != $new_password_hash ]; then
+  password_changed=$(has_password_changed ${JENKINS_PASSWORD:-password} ${old_password_hash} )
+  if [ "$password_changed" != "" ]; then
     echo "Detected password environment variable change, updating Jenkins configuration ..."
     update_admin_password
   fi
