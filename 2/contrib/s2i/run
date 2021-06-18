@@ -428,12 +428,8 @@ if [ -e ${JENKINS_HOME}/password ]; then
   # the jenkins ui, so we only want to do this if the env variable has been explicitly modified from
   # the original value.
   old_password_hash=`cat ${JENKINS_HOME}/password`
-<<<<<<< HEAD
-  if [ $old_password_hash != $new_password_hash ]; then
-=======
   password_changed=$(has_password_changed ${JENKINS_PASSWORD:-password} ${old_password_hash} )
   if [ "$password_changed" != "" ]; then
->>>>>>> 2fed2dd... Remove dependency to acegi-security in favor of jbcrypt (because acegi was remove from jenkins 2.277.x
     echo "Detected password environment variable change, updating Jenkins configuration ..."
     update_admin_password
   fi
