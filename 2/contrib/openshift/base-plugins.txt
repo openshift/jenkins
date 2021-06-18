@@ -45,7 +45,7 @@ subversion:2.13.2
 token-macro:2.13
 workflow-aggregator:2.6
 workflow-cps-global-lib:2.15
-workflow-cps:2.87
+workflow-cps:2.92
 workflow-multibranch:2.22
 workflow-remote-loader:1.5
 workflow-support:3.6
