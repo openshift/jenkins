@@ -107,7 +107,7 @@ function generate_kubernetes_config() {
           <idleMinutes>0</idleMinutes>
           <label>maven</label>
           <serviceAccount>${oc_serviceaccount_name}</serviceAccount>
-          <nodeSelector></nodeSelector>
+          <nodeSelector>beta.kubernetes.io/os=linux</nodeSelector>
           <volumes/>
           <containers>
             <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
@@ -138,7 +138,7 @@ function generate_kubernetes_config() {
           <idleMinutes>0</idleMinutes>
           <label>nodejs</label>
           <serviceAccount>${oc_serviceaccount_name}</serviceAccount>
-          <nodeSelector></nodeSelector>
+          <nodeSelector>beta.kubernetes.io/os=linux</nodeSelector>
           <volumes/>
           <containers>
             <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
