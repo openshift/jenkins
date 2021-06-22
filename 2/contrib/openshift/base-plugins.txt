@@ -17,8 +17,7 @@ htmlpublisher:1.21
 jira:3.0.17
 job-dsl:1.77
 junit:1.30
-kubernetes:1.29.7
-kubernetes-client-api:4.13.3-1
+kubernetes:1.30.0
 lockable-resources:2.10
 mapdb-api:1.0.9.0
 matrix-auth:2.6.6
@@ -27,7 +26,7 @@ mercurial:2.12
 metrics:4.0.2.6
 openshift-client:1.0.35
 openshift-login:1.0.26
-openshift-sync:1.0.46
+openshift-sync:1.0.48
 pam-auth:1.6
 prometheus:2.0.0
 snakeyaml-api:1.27.0
