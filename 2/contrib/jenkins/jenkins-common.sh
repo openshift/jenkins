@@ -24,10 +24,22 @@ function generate_passwd_file() {
 function obfuscate_password {
     local password="$1"
     local salt="$2"
-    local acegi_security_path=`find /tmp/war/WEB-INF/lib/ -name acegi-security-*.jar`
-    local commons_codec_path=`find /tmp/war/WEB-INF/lib/ -name commons-codec-*.jar`
-
+    #local acegi_security_path=`find /tmp/war/WEB-INF/lib/ -name acegi-security-*.jar`
+    #local commons_codec_path=`find /tmp/war/WEB-INF/lib/ -name commons-codec-*.jar`
+    local jbcrypt_path=`find /tmp/war/WEB-INF/lib/ -name jbcrypt-*.jar`
     # source for password-encoder.jar is inside the jar.
     # acegi-security-1.0.7.jar is inside the jenkins war.
-    java -classpath "${acegi_security_path}:${commons_codec_path}:/opt/openshift/password-encoder.jar" com.redhat.openshift.PasswordEncoder $password $salt
+#    java -classpath "${acegi_security_path}:${commons_codec_path}:/opt/openshift/password-encoder.jar" com.redhat.openshift.PasswordEncoder $password $salt
+     java -classpath "${jbcrypt_path}:/opt/openshift/password-encoder.jar" com.redhat.openshift.PasswordEncoder $password $salt
 }
+
+# Returns 0 if password matches 1 otherwise
+function has_password_changed {
+    local password="$1"
+    local password_hash="$2"
+    local jbcrypt_path=`find /tmp/war/WEB-INF/lib/ -name jbcrypt-*.jar`
+    # source for password-encoder.jar is inside the jar.
+     java -classpath "${jbcrypt_path}:/opt/openshift/password-encoder.jar" com.redhat.openshift.PasswordChecker $password $password_hash
+}
+
+
