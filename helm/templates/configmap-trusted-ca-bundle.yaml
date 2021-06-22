@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    config.openshift.io/inject-trusted-cabundle: "true"
+    {{- include "openshift-jenkins.labels" . | nindent 4 }}
+  name: {{ include "openshift-jenkins.fullname" . }}-trusted-ca-bundle

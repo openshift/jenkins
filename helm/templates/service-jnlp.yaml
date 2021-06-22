@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "openshift-jenkins.fullname" . }}-jnlp
+  labels:
+    {{- include "openshift-jenkins.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.servicejnlp.type }}
+  ports:
+    - port: {{ .Values.servicejnlp.port }}
+      targetPort: {{ .Values.servicejnlp.targetPort }}
+      protocol: TCP
+      name: {{ .Values.servicejnlp.name }}
+  selector:
+    {{- include "openshift-jenkins.selectorLabels" . | nindent 4 }}
