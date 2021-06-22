@@ -10,22 +10,6 @@
 default_version=$(cat /tmp/release.version)
 JENKINS_SLAVE_IMAGE_TAG=${JENKINS_SLAVE_IMAGE_TAG:-${default_version}}
 
-create_jenkins_location_configuration_xml() {
-  # Gets the jenkins URL only from the *first* route available in namespace service the service named $JENKINS_SERVICE_NAME
-  JENKINS_SCHEME="https://"
-  if [ $( oc get routes -o json | jq -c -r '.items[0].spec.tls')  == "null" ]; then
-    JENKINS_SCHEME="http://"
-  fi
-  JENKINS_URL="$JENKINS_SCHEME$(oc get routes -o json | jq -c -r '.items[0].spec | select (.to.name == env.JENKINS_SERVICE_NAME ) | .host ')/"
-  echo "Using JENKINS_SERVICE_NAME=$JENKINS_SERVICE_NAME"
-  echo "Generating jenkins.model.JenkinsLocationConfiguration.xml using (${JENKINS_HOME}/jenkins.model.JenkinsLocationConfiguration.xml.tpl) ..."
-  export JENKINS_URL
-  echo "Jenkins URL set to: $JENKINS_URL in file: ${JENKINS_HOME}/jenkins.model.JenkinsLocationConfiguration.xml"
-  envsubst < "${image_config_dir}/jenkins.model.JenkinsLocationConfiguration.xml.tpl" > "${JENKINS_HOME}/jenkins.model.JenkinsLocationConfiguration.xml"
-}
-
-create_jenkins_location_configuration_xml
-
 source /usr/local/bin/jenkins-common.sh
 source /usr/local/bin/kube-slave-common.sh
 
@@ -97,6 +81,20 @@ function create_jenkins_proxy_xml() {
   fi
 }
 
+function create_jenkins_credentials_xml() {
+  if [ ! -f "${image_config_dir}/credentials.xml" ]; then
+    if [ -f "${image_config_dir}/credentials.xml.tpl" ]; then
+      if [ ! -z "${KUBERNETES_CONFIG}" ]; then
+        echo "Generating kubernetes-plugin credentials (${JENKINS_HOME}/credentials.xml.tpl) ..."
+        export KUBERNETES_CREDENTIALS=$(generate_kubernetes_credentials)
+      fi
+      # Fix the envsubst trying to substitute the $Hash inside credentials.xml
+      export Hash="\$Hash"
+      envsubst < "${image_config_dir}/credentials.xml.tpl" > "${image_config_dir}/credentials.xml"
+    fi
+  fi
+}
+
 function create_jenkins_config_from_templates() {
   find ${image_config_dir} -type f -name "*.tpl" -print0 | while IFS= read -r -d '' template_path; do
     local target_path=${template_path%.tpl}
@@ -104,6 +102,9 @@ function create_jenkins_config_from_templates() {
       case "${target_path}" in
         "${image_config_path}")
           create_jenkins_config_xml
+          ;;
+        "${image_config_dir}/credentials.xml")
+          create_jenkins_credentials_xml
           ;;
         "${image_config_dir}/proxy.yaml")
           create_jenkins_proxy_xml
@@ -281,8 +282,6 @@ CONTAINER_MEMORY_IN_BYTES=$(container_max_memory_bytes)
 CONTAINER_MEMORY_IN_MB=$((CONTAINER_MEMORY_IN_BYTES/2**20))
 
 export JAVA_VERSION=${USE_JAVA_VERSION:=java-11}
-
-export JAVA_VERSION=${USE_JAVA_VERSION:=java-11} | grep $JAVA_VERSION |
 if [[ "$(uname -m)" == "x86_64" ]]; then
 	alternatives --set java $(alternatives --display java | grep $JAVA_VERSION | awk '/family.*x86_64/ { print $1; }')
 	alternatives --set javac $(alternatives --display javac | grep $JAVA_VERSION | awk '/family.*x86_64/ { print $1; }')
@@ -567,8 +566,23 @@ shopt -u nocasematch
 ## Since the pod name changes everytime there is a deployment, any trending data is lost over
 ## re-deployments. We force the application name to allow for historical data collection.
 ##
-JENKINS_SERVICE_NAME=${JENKINS_SERVICE_NAME:-JENKINS}
-JENKINS_SERVICE_NAME=`echo ${JENKINS_SERVICE_NAME} | tr '[a-z]' '[A-Z]' | tr '-' '_'`
+JENKINS_SERVICE_NAME=${JENKINS_SERVICE_NAME:-jenkins}
+JENKINS_SERVICE_NAME=`echo ${JENKINS_SERVICE_NAME} | tr '[A-Z]' '[a-z]' | tr '_' '-'`
+create_jenkins_location_configuration_xml() {
+  # Gets the jenkins URL only from the *first* route available in namespace service the service named $JENKINS_SERVICE_NAME
+  JENKINS_SCHEME="https://"
+  if [ $( oc get routes -o json | jq -c -r '.items[0].spec.tls')  == "null" ]; then
+    JENKINS_SCHEME="http://"
+  fi
+  JENKINS_URL="$JENKINS_SCHEME$(oc get routes -o json | jq -c -r '.items[0].spec | select (.to.name == env.JENKINS_SERVICE_NAME ) | .host ')"
+  echo "Using JENKINS_SERVICE_NAME=$JENKINS_SERVICE_NAME"
+  echo "Generating jenkins.model.JenkinsLocationConfiguration.xml using (${JENKINS_HOME}/jenkins.model.JenkinsLocationConfiguration.xml.tpl) ..."
+  export JENKINS_URL
+  echo "Jenkins URL set to: $JENKINS_URL in file: ${JENKINS_HOME}/jenkins.model.JenkinsLocationConfiguration.xml"
+  envsubst < "${image_config_dir}/jenkins.model.JenkinsLocationConfiguration.xml.tpl" > "${JENKINS_HOME}/jenkins.model.JenkinsLocationConfiguration.xml"
+}
+
+create_jenkins_location_configuration_xml
 
 FATAL_ERROR_OPTION=""
 
