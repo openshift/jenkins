@@ -1,4 +1,4 @@
-# Testing the template based install of jenkins on openshift
+## Testing the template based install of jenkins on openshift
 
 ### The smoke test written using behave framework for python has the below tree structure
 <pre><font color="#0000FF"><b>smoke</b></font>
@@ -22,9 +22,11 @@
 
 
 ### Run the smoke test
-export <kubeconfig>
-make smoke
 
-### Test results are xunit files generated for each feature and stored in out dir post test run is complete 
+<pre>- oc login to/the/openshift/cluster -u username -p password --kubeconfig=kubeconfig
+- export KUBECONFIG=kubeconfig
+- make smoke</pre>
 
-
+### Test results 
+<pre>- The test results are JUnit files generated for each feature & are collected in out dir post test run is complete
+</pre>
