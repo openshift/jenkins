@@ -23,3 +23,8 @@ build:
 .PHONY: test
 test:
 	VERSIONS=$(VERSIONS) TAG_ON_SUCCESS=$(TAG_ON_SUCCESS) TEST_MODE=true hack/build.sh $(OS) $(VERSION)
+
+.PHONY: smoke
+smoke:
+	@echo "Testing the jenkins template based install on openshift"
+	@./scripts/test-jenkins-template-install.sh

@@ -19,7 +19,7 @@ before_scenario(context, scenario), after_scenario(context, scenario)
 '''
 
 def before_scenario(_context, _scenario):
-    print("Getting OC status before {} scenario".format(_scenario))
+    print("\nGetting OC status before {} scenario".format(_scenario))
     code, output = subprocess.getstatusoutput('oc get project default')
     print("[CODE] {}".format(code))
     print("[CMD] {}".format(output))

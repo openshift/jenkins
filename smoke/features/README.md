@@ -1,27 +1,30 @@
-# How to execute the script
+# Testing the template based install of jenkins on openshift
 
 ### The smoke test written using behave framework for python has the below tree structure
- <pre><font color="#0087FF">.</font>
-├── <font color="#0087FF">features</font>
-│   ├── deployJenkinsOperator.feature
+<pre><font color="#0000FF"><b>smoke</b></font>
+├── <font color="#0000FF"><b>features</b></font>
 │   ├── environment.py
+│   ├── jenkins-ephemeral.feature
+│   ├── maven-agent.feature
+│   ├── nodejs-agent.feature
+│   ├── plugins.feature
 │   ├── README.md
-│   ├── requirements.txt
-│   └── <font color="#0087FF">steps</font>
+│   └── <font color="#0000FF"><b>steps</b></font>
 │       ├── command.py
 │       ├── openshift.py
+│       ├── plugins.py
 │       ├── project.py
 │       └── steps.py
-└── logs2020-08-16.txt</pre>
+├── requirements.txt
+└── <font color="#0000FF"><b>samples</b></font>
+    ├── maven_pipeline.yaml
+    └── nodejs_pipeline.yaml</pre>
 
 
-### Install python dependencies
-pip install -r smoke/features/requirements.txt
-
-### Use this behave command to run the smoke/features behave code
+### Run the smoke test
 export <kubeconfig>
-behave ./smoke/features
+make smoke
 
-### Logs are generated in a separate file as shown above in the tree
-Example - Log file for test run on 16-AUG-2020 will be named as logs2020-08-16.txt & all the test log for the entire day will be appended to the same log file for the day and so on based on the date new log file will be created.
+### Test results are xunit files generated for each feature and stored in out dir post test run is complete 
+
 
