@@ -1,5 +1,0 @@
-behave
-pyshould
-requests
-kubernetes
-urllib3

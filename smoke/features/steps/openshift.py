@@ -8,7 +8,6 @@ import re
 import time
 from pyshould import should
 from smoke.features.steps.command import Command
-
 '''
 Openshift class provides the blueprint that we need to
 interact with the openshift resources 
@@ -31,7 +30,7 @@ class Openshift(object):
     def search_item_in_lst(self, lst, search_pattern):
         lst_arr = lst.split(" ")
         for item in lst_arr:
-            if re.fullmatch(search_pattern, item) is not None:
+            if re.match(search_pattern, item) is not None:
                 print(f"item matched {item}")
                 return item
         print("Given item not matched from the list of pods")
@@ -80,13 +79,31 @@ class Openshift(object):
         if exit_status == 0:
             return output
         return None
+    
+    def new_app(self, template_name, namespace):
+        cmd = f'oc new-app {template_name} -n {namespace}'
+        output, exit_status = self.cmd.run(cmd)
+        print(f"starting: {output}, {exit_status}")
+        if exit_status == 0:
+            return output
+        return None
 
     def oc_apply(self, yaml):
         (output, exit_code) = self.cmd.run("oc apply -f -", yaml)
         return output
+    
+    def oc_create_from_yaml(self, yaml):
+        cmd = f'oc create -f {yaml}'
+        output, exit_status = self.cmd.run(cmd)
+        print(f"starting: {output}, {exit_status}")
+        if exit_status == 0:
+            return output
+        return None
 
-    def new_app(self, template_name, namespace):
-        cmd = f'oc new-app {template_name} -n {namespace}'
+
+    def new_app_with_params(self, template_name, paramsfile):
+        # oc new-app ruby-helloworld-sample --param-file=helloworld.params
+        cmd = f'oc new-app {template_name} --param-file={paramsfile}'
         output, exit_status = self.cmd.run(cmd)
         print(f"starting: {output}, {exit_status}")
         if exit_status == 0:
@@ -194,3 +211,25 @@ class Openshift(object):
                     time.sleep(5)
         exit_code | should.be_equal_to(0).desc(f'Exit code should be 0:\n OUTPUT:\n{output}')
         return output.rstrip("\n")
+    
+    def exec_container_in_pod(self, container_name, pod_name, container_cmd):
+        cmd = f'oc exec {pod_name} -c {container_name} {container_cmd}'
+        output, exit_status = self.cmd.run(cmd)
+        print(f"Inside the {pod_name} container {container_name}: {output}, {exit_status}")
+        if exit_status == 0:
+            return output
+        return None
+    
+    def oc_process_template(self,file_path):
+        cmd = f'oc process -f {file_path}|oc create -f -'
+        output, exit_status = self.cmd.run(cmd)
+        print(f"Proccesing {file_path} template with : {output}")
+        if exit_status == 0:
+            return output
+        return None
+
+
+    
+            
+        
+
