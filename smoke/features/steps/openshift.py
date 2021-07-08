@@ -228,6 +228,18 @@ class Openshift(object):
             return output
         return None
 
+    def delete(self,resource_type: str,resource: str, namespace: str):
+        '''
+        Delete resources in a specific namespace
+        '''
+        cmd = f'oc delete {resource_type} {resource} -n {namespace}'
+        output, exit_status = self.cmd.run(cmd)
+        print(f"{output}")
+        if exit_status == 0:
+            return output
+        return None
+
+
 
     
             
