@@ -5,8 +5,12 @@
 ├── <font color="#0000FF"><b>features</b></font>
 │   ├── environment.py
 │   ├── jenkins-ephemeral.feature
-│   ├── maven-agent.feature
-│   ├── nodejs-agent.feature
+│   ├── jenkins-maven-agent.feature
+│   ├── jenkins-nodejs-agent.feature
+│   ├── jenkins-teardown-ephemeral.feature
+│   ├── persistent-jenkins.feature
+│   ├── persistent-maven-agent.feature
+│   ├── persistent-nodejs-agent.feature
 │   ├── plugins.feature
 │   ├── README.md
 │   └── <font color="#0000FF"><b>steps</b></font>
@@ -18,7 +22,8 @@
 ├── requirements.txt
 └── <font color="#0000FF"><b>samples</b></font>
     ├── maven_pipeline.yaml
-    └── nodejs_pipeline.yaml</pre>
+    └── nodejs_pipeline.yaml
+</pre>
 
 
 ### Run the smoke test
