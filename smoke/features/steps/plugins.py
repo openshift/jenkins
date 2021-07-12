@@ -15,7 +15,7 @@ class Plugins:
     #     podPlugins = {}
     #     with open(filepath, 'r') as reader:
     #         for plugin in reader.readlines():
-    #             key, value = 
+    #             # key, value = 
 
 p = Plugins()
 core_plugins_path = "./2/contrib/openshift/base-plugins.txt"

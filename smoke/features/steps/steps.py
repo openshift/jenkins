@@ -31,7 +31,7 @@ config.load_kube_config()
 v1 = client.CoreV1Api()
 oc = Openshift()
 podStatus = {}
-
+buildconfigs = {'sample-pipeline':'1','openshift-jee-sample':'1'}
 # Parse the base plugins from the file and store them in a dictonary with key=plugin-name & value=plugin-version
 
 baseplugins = './2/contrib/openshift/base-plugins.txt'
@@ -169,16 +169,6 @@ def checkSVC(context):
 
 @then(u'We check for deployment pod status to be "Completed"')
 def deploymentPodStatus(context):
-    pods = oc.get_pod_lst(current_project)
-    global  jenkins_master_pod
-
-    # convert the pods name into list of pods
-    podList = list(pods.split(" "))
-    for pod in podList:
-        if pod == deploy_pod:
-            podList.remove(pod)
-        elif 'jenkins-1-' in pod and deploy_pod not in pod:
-            jenkins_master_pod = pod
     time.sleep(90)
     print("Getting deployment pod status")
     deploy_pod_status = oc.get_resource_info_by_jsonpath('pods',deploy_pod,current_project,json_path='{.status.phase}')
@@ -188,7 +178,10 @@ def deploymentPodStatus(context):
 
 @then(u'We check for jenkins master pod status to be "Ready"')
 def jenkinsMasterPodStatus(context):
+    global jenkins_master_pod
+    jenkins_master_pod = oc.getmasterpod(current_project)
     print('---------Getting default jenkins pod name---------')
+    time.sleep(30)
     print(jenkins_master_pod)
     containerState = oc.get_resource_info_by_jsonpath('pods',jenkins_master_pod,current_project,json_path='{.status.containerStatuses[*].ready}')
     if 'false' in containerState:
@@ -454,11 +447,40 @@ def del_pods(context):
             buildpods.append(i.metadata.name)
     for pod in buildpods:
         res = oc.delete('pod',pod,current_project)
+        print("Deleting: ",res)
+
+@then(u'We rsh into the master pod and check the jobs count')
+def getjobcount(context):
+    for jobnames,_ in buildconfigs.items():
+        exec_command = 'cat /var/lib/jenkins/jobs/'+current_project+'/jobs/'+current_project+'-'+jobnames+'/nextBuildNumber'
+        count = oc.exec_in_pod(jenkins_master_pod,exec_command)
+        buildconfigs[jobnames] = str(count)
+    print(buildconfigs)
+
+@when(u'We delete the jenkins master pod')
+def deletemaster(context):
+    master_pod = oc.getmasterpod(current_project)
+    res = oc.delete("pods",master_pod,current_project)
+    if res == None:
+        raise AssertionError
+
+@then(u'We rsh into the master pod & Compare if the data persist or is lost upon pod restart')
+def comparejobs(context):
+    for jobnames,_ in buildconfigs.items():
+        master_pod = oc.getmasterpod(current_project)
+        exec_command = 'cat /var/lib/jenkins/jobs/'+current_project+'/jobs/'+current_project+'-'+jobnames+'/nextBuildNumber'
+        count = oc.exec_in_pod(master_pod,exec_command)
+        buildconfigs[jobnames] = str(count)
+    
+    for jobnames, _ in buildconfigs.items():
+        if(buildconfigs[jobnames] == '1'):
+            print("Data doesnt persist")
+            raise AssertionError
+    print(buildconfigs)
 
 @when(u'We rsh into the master pod')
 def step_impl(context):
     pass
-
 
 @then(u'We compare the plugins version inside the master pod with the plugins listed in plugins.txt')
 def step_impl(context):
