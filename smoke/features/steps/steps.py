@@ -31,7 +31,7 @@ config.load_kube_config()
 v1 = client.CoreV1Api()
 oc = Openshift()
 podStatus = {}
-
+buildconfigs = {'sample-pipeline':'1','openshift-jee-sample':'1'}
 # Parse the base plugins from the file and store them in a dictonary with key=plugin-name & value=plugin-version
 
 baseplugins = './2/contrib/openshift/base-plugins.txt'
@@ -169,17 +169,7 @@ def checkSVC(context):
 
 @then(u'We check for deployment pod status to be "Completed"')
 def deploymentPodStatus(context):
-    pods = oc.get_pod_lst(current_project)
-    global  jenkins_master_pod
-
-    # convert the pods name into list of pods
-    podList = list(pods.split(" "))
-    for pod in podList:
-        if pod == deploy_pod:
-            podList.remove(pod)
-        elif 'jenkins-1-' in pod and deploy_pod not in pod:
-            jenkins_master_pod = pod
-    time.sleep(90)
+    time.sleep(120)
     print("Getting deployment pod status")
     deploy_pod_status = oc.get_resource_info_by_jsonpath('pods',deploy_pod,current_project,json_path='{.status.phase}')
     if not 'Succeeded' in deploy_pod_status:
@@ -188,6 +178,9 @@ def deploymentPodStatus(context):
 
 @then(u'We check for jenkins master pod status to be "Ready"')
 def jenkinsMasterPodStatus(context):
+    global jenkins_master_pod
+    jenkins_master_pod = ""
+    jenkins_master_pod = getmasterpod(current_project)
     print('---------Getting default jenkins pod name---------')
     print(jenkins_master_pod)
     containerState = oc.get_resource_info_by_jsonpath('pods',jenkins_master_pod,current_project,json_path='{.status.containerStatuses[*].ready}')
@@ -242,34 +235,23 @@ def startbuild(context):
     triggerbuild('sample-pipeline',current_project)
 
 
-@then(u'nodejs-postgresql-example pod must come up')
-def check_app_pod(context):
-    time.sleep(180)
-    podStatus = {}
-    podSet = set()
-    bcdcSet = set()
-    pods = v1.list_namespaced_pod(current_project)
-    for i in pods.items:
-        podStatus[i.metadata.name] = i.status.phase
-        podSet.add(i.metadata.name)
-    
-    for items in podSet:
-        if 'build' in items:
-           bcdcSet.add(items)
-        elif 'deploy' in items:
-            bcdcSet.add(items)
+@then(u'verify the build status of "nodejs-postgresql-example-1" build is Complete')
+def verifynodejsBuildStatus(context):
+    time.sleep(300)
+    buildState = oc.get_resource_info_by_jsonpath('build','nodejs-postgresql-example-1',current_project,json_path='{.status.phase}')
+    if not 'Complete' in buildState:
+        raise AssertionError
+    else:
+        print("Build nodejs-postgresql-example-1 status:{buildState}")
 
-    app_pods = podSet.difference(bcdcSet)
-    for items in app_pods:
-        print('Getting pods')
-        print(items)
-    
-    for items in app_pods:
-        for pod in podStatus.keys():
-            status = podStatus[items]
-            if not 'Running' in status:
-                raise AssertionError
-    print('---> App pods are ready')
+@then(u'verify the build status of "nodejs-postgresql-example-2" build is Complete')
+def verifynodejsBuildBStatus(context):
+    buildState = oc.get_resource_info_by_jsonpath('build','nodejs-postgresql-example-2',current_project,json_path='{.status.phase}')
+    if not 'Complete' in buildState:
+        raise AssertionError
+    else:
+        print("Build nodejs-postgresql-example-2 status:{buildState}")
+
 
 @then(u'route nodejs-postgresql-example must be created and be accessible')
 def connectApp(context):
@@ -280,11 +262,12 @@ def connectApp(context):
     print('--->App url:')
     print(url)
     http = urllib3.PoolManager()
-    res = http.request('GET', url)
+    res = http.request_encode_url('GET',url)
     connection_status = res.status
     if connection_status == 200:
         print('---> Application is accessible via the route')
         print(url)
+        http.clear()
     else:
         raise Exception
 
@@ -297,8 +280,8 @@ def createMavenTemplate(context):
 def verifyImageStream(context):
     if not 'openshift-jee-sample' in oc.search_resource_in_namespace('imagestream','openshift-jee-sample', current_project):
         raise AssertionError
-    # elif not 'wildfly' in oc.search_resource_in_namespace('imagestream','wildfly', current_project):
-    #     raise AssertionError
+    elif not 'wildfly' in oc.search_resource_in_namespace('imagestream','wildfly', current_project):
+        raise AssertionError
     else:
         res = oc.get_resource_lst('imagestream',current_project)
         print(res)
@@ -363,7 +346,6 @@ def verifyJenkinsBuildStatus(context):
 
 @then(u'verify the JaveEE application is accessible via route openshift-jee-sample')
 def pingApp(context):
-    time.sleep(30)
     print('Getting application route/url')
     app_name = 'openshift-jee-sample'
     route = oc.get_route_host(app_name,current_project)
@@ -371,11 +353,12 @@ def pingApp(context):
     print('--->App url:')
     print(url)
     http = urllib3.PoolManager()
-    res = http.request('GET', url)
+    res = http.request_encode_url('GET',url)
     connection_status = res.status
     if connection_status == 200:
         print('---> Application is accessible via the route')
         print(url)
+        http.clear()
     else:
         raise Exception
 
@@ -454,11 +437,52 @@ def del_pods(context):
             buildpods.append(i.metadata.name)
     for pod in buildpods:
         res = oc.delete('pod',pod,current_project)
+        print("Deleting: ",res)
+
+@then(u'We rsh into the master pod and check the jobs count')
+def getjobcount(context):
+    for jobnames,_ in buildconfigs.items():
+        exec_command = 'cat /var/lib/jenkins/jobs/'+current_project+'/jobs/'+current_project+'-'+jobnames+'/nextBuildNumber'
+        count = oc.exec_in_pod(jenkins_master_pod,exec_command)
+        buildconfigs[jobnames] = str(count)
+    print(buildconfigs)
+
+@when(u'We delete the jenkins master pod')
+def deletemaster(context):
+    master_pod = getmasterpod(current_project)
+    res = oc.delete("pods",master_pod,current_project)
+    time.sleep(60)
+    if res == None:
+        raise AssertionError
+
+@then(u'We rsh into the master pod & Compare if the data persist or is lost upon pod restart')
+def comparejobs(context):
+    for jobnames,_ in buildconfigs.items():
+        master_pod = getmasterpod(current_project)
+        exec_command = 'cat /var/lib/jenkins/jobs/'+current_project+'/jobs/'+current_project+'-'+jobnames+'/nextBuildNumber'
+        count = oc.exec_in_pod(master_pod,exec_command)
+        buildconfigs[jobnames] = str(count)
+    
+    for jobnames, _ in buildconfigs.items():
+        if(buildconfigs[jobnames] == '1'):
+            print("Data doesnt persist")
+            raise AssertionError
+    print(buildconfigs)
+
+
+def getmasterpod(namespace: str)-> str:
+    '''
+    returns the jenkins master pod name
+    '''
+    pods = v1.list_namespaced_pod(current_project)
+    for i in pods.items:
+        if 'jenkins-1-deploy' not in i.metadata.name and 'jenkins-1' in i.metadata.name:
+            master_pod = i.metadata.name
+    return str(master_pod)
 
 @when(u'We rsh into the master pod')
 def step_impl(context):
     pass
-
 
 @then(u'We compare the plugins version inside the master pod with the plugins listed in plugins.txt')
 def step_impl(context):

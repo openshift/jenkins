@@ -220,6 +220,14 @@ class Openshift(object):
             return output
         return None
     
+    def exec_in_pod(self, pod_name, container_cmd):
+        cmd = f'oc exec {pod_name} -- {container_cmd}'
+        output, exit_status = self.cmd.run(cmd)
+        print(f"Inside the {pod_name}: {output}, {exit_status}")
+        if exit_status == 0:
+            return output
+        return None
+    
     def oc_process_template(self,file_path):
         cmd = f'oc process -f {file_path}|oc create -f -'
         output, exit_status = self.cmd.run(cmd)
@@ -238,6 +246,22 @@ class Openshift(object):
         if exit_status == 0:
             return output
         return None
+
+    def getmasterpod(self,namespace: str)-> str:
+        '''
+        returns the jenkins master pod name
+        '''
+        deploy_pod = 'jenkins-1-deploy'
+        master_pod = ''
+        pods = self.get_pod_lst(namespace)
+        podList = list(pods.split(" "))
+        for pod in podList:
+            if pod == deploy_pod:
+                podList.remove(pod)
+            elif 'jenkins-1-' in pod and deploy_pod not in pod:
+                master_pod = pod
+        return master_pod
+
 
 
 
