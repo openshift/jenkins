@@ -11,5 +11,6 @@ Feature: Testing jenkins agent nodejs image
     Given The jenkins pod is up and runnning
     When The user enters new-app command with nodejs_template
     Then Trigger the build using oc start-build
-    Then nodejs-postgresql-example pod must come up
+    Then verify the build status of "nodejs-postgresql-example-1" build is Complete
+    Then verify the build status of "nodejs-postgresql-example-2" build is Complete
     And route nodejs-postgresql-example must be created and be accessible
