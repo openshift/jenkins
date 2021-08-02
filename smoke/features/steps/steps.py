@@ -32,6 +32,7 @@ v1 = client.CoreV1Api()
 oc = Openshift()
 podStatus = {}
 buildconfigs = {'sample-pipeline':'1','openshift-jee-sample':'1'}
+builds = {}
 # Parse the base plugins from the file and store them in a dictonary with key=plugin-name & value=plugin-version
 
 baseplugins = './2/contrib/openshift/base-plugins.txt'
@@ -40,7 +41,7 @@ plugins = p.getPlugins(baseplugins)
 
 
 def triggerbuild(buildconfig,namespace):
-    print('Triggering build: {buildconfig}')
+    print('Triggering build:',buildconfig)
     res = oc.start_build(buildconfig,namespace)
     print(res)
 
@@ -487,3 +488,55 @@ def step_impl(context):
 @then(u'We compare the plugins version inside the master pod with the plugins listed in plugins.txt')
 def step_impl(context):
     pass
+
+@when(u'We Trigger multiple builds using oc start-build openshift-jee-sample')
+def multiplebuilds(context):
+    global builds
+    count = 1
+    ## creating a dictionary of builds that keeps a track of {buildname: build_status}
+         # This will be used to check the build reconcilation
+    while(count <= 5):
+        triggerbuild('openshift-jee-sample',current_project)
+        build_name ='openshift-jee-sample-' + str(count)
+        builds[build_name] = None
+        count+=1
+    
+@when(u'We slace down the pod count in the replication controller to "0" from "1"')
+def podscaling(context):
+    rc_name = 'jenkins-1'
+    oc.scaleReplicas(current_project,0,rc_name)
+    replicas = oc.get_resource_info_by_jsonpath("dc","jenkins",current_project,json_path='{.status.availableReplicas}')
+    if not '0' in replicas:
+        raise AssertionError
+    else:
+        print('There are ',replicas,' running pods of jenkins')
+    
+@then(u'We delete some builds')
+def deletebuilds(context):
+    global builds
+    rm_build = ['openshift-jee-sample-2','openshift-jee-sample-4']
+    for build_name in builds.keys():
+        builds[build_name] = oc.get_resource_info_by_jsonpath("build",build_name,current_project,json_path='{.status.phase}')
+    print("------------Fetching all builds and build status------------")
+    print(builds)
+    print("------------Deleting a few  builds------------")
+    for items in rm_build:
+        res = oc.delete("build",items,current_project)
+        print(res)
+        builds.pop(items)
+    print("------------Fetching all builds and build status------------")
+    print(builds)
+    # This sleep is used to give time for the jenkins master pod to be back
+    time.sleep(60)
+
+
+@then(u'verify sync plugin is able to reconcile the build state and delete the job runs associated with the builds we deleted')
+def verifybuildSync(context):
+    time.sleep(360)
+    for build_name in builds.keys():
+        builds[build_name] = oc.get_resource_info_by_jsonpath("build",build_name,current_project,json_path='{.status.phase}')
+        if not "Complete" in builds[build_name]:
+            print(build_name,':',builds[build_name])
+            raise AssertionError
+        else:
+            print(build_name,':',builds[build_name])

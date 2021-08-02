@@ -4,7 +4,7 @@ from smoke.features.steps.command import Command
 
 
 class Project():
-    def __init__(self, name='jenkins-test'):
+    def __init__(self, name=''):
         self.name = name
         self.cmd = Command()
 
