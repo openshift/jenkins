@@ -101,6 +101,12 @@ if [[ $# -eq 0 ]]; then
   if [ ! -z "$JENKINS_NAME" ]; then
     set -- "${@}" "$JENKINS_NAME"
   fi
+  
+  # If Kubernetes plugin is configured to use WebSocket, add the -webSocket flag to the arguments
+  if [ ! -z "$JENKINS_WEB_SOCKET" ]; then
+    set -- "${@}" "-webSocket"
+  fi
+
 fi
 
 # if `docker run` has 2 or more arguments the user is passing jenkins launcher arguments
