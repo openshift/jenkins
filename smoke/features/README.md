@@ -1,7 +1,6 @@
 ## Testing the template based install of jenkins on openshift
 
 ### The smoke test written using behave framework for python has the below tree structure
-<pre><font color="#0000FF"><b>smoke</b></font>
 ├── <font color="#0000FF"><b>features</b></font>
 │   ├── environment.py
 │   ├── jenkins-ephemeral.feature
@@ -25,9 +24,7 @@
     └── nodejs_pipeline.yaml
 </pre>
 
-
-### Run the smoke test
-
+### Run the smoke test<pre><font color="#0000FF"><b>smoke</b></font>
 <pre>- oc login to/the/openshift/cluster -u username -p password --kubeconfig=kubeconfig
 - export KUBECONFIG=kubeconfig
 - make smoke</pre>

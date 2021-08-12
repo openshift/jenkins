@@ -261,6 +261,21 @@ class Openshift(object):
             elif 'jenkins-1-' in pod and deploy_pod not in pod:
                 master_pod = pod
         return master_pod
+    
+    def scaleReplicas(self, namespace: str, replicas: int, rep_controller: str):
+        '''
+        Scales up or down the pod count that ensures that a specified number of replicas of a pod are running at all times.\n
+        namespace -> project name\n
+        replicas -> desried count of the pod running all times.\n
+        rep_controller -> replication controller name\n
+        e.g: oc scale --replicas=2 rc/jenkins-1
+        '''
+        cmd = f'oc scale --replicas={replicas} rc/{rep_controller} -n {namespace}'
+        output, exit_status = self.cmd.run(cmd)
+        print(f"{output}")
+        if exit_status == 0:
+            return output
+        return None
 
 
 
