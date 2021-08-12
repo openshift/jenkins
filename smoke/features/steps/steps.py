@@ -41,7 +41,7 @@ plugins = p.getPlugins(baseplugins)
 
 
 def triggerbuild(buildconfig,namespace):
-    print('Triggering build:',buildconfig)
+    print('Triggering build: ',buildconfig)
     res = oc.start_build(buildconfig,namespace)
     print(res)
 
@@ -501,7 +501,7 @@ def multiplebuilds(context):
         builds[build_name] = None
         count+=1
     
-@when(u'We slace down the pod count in the replication controller to "0" from "1"')
+@when(u'We scale down the pod count in the replication controller to "0" from "1"')
 def podscaling(context):
     rc_name = 'jenkins-1'
     oc.scaleReplicas(current_project,0,rc_name)
