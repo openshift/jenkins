@@ -26,7 +26,7 @@ mercurial:2.12
 metrics:4.0.2.6
 openshift-client:1.0.35
 openshift-login:1.0.26
-openshift-sync:1.0.49
+openshift-sync:1.0.50
 pam-auth:1.6
 prometheus:2.0.0
 snakeyaml-api:1.27.0
