@@ -21,7 +21,7 @@ RUN INSTALL_PKGS="java-11-openjdk-devel java-1.8.0-openjdk-devel rh-maven36*" &&
     mkdir -p $HOME/.m2 
 
 # Install Maven 3.6.3
-RUN wget https://www-us.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz -P /tmp && \
+RUN wget https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz -P /tmp && \
     tar xf /tmp/apache-maven-3.6.3-bin.tar.gz -C /opt && \
     ln -s /opt/apache-maven-3.6.3 /opt/maven
 
