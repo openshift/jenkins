@@ -9,7 +9,7 @@ credentials:2.5
 cloudbees-folder:6.16
 docker-commons:1.17
 git-client:3.9.0
-git:4.8.2
+git:4.8.3
 github:1.34.0
 google-oauth-plugin:1.0.6
 groovy:2.4
