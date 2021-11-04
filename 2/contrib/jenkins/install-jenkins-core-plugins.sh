@@ -18,8 +18,12 @@ if [[ "${INSTALL_JENKINS_VIA_RPMS}" == "false" ]]; then
       rm -fr /var/cache/yum/x86_64/7Server/*
       rm -fr /var/cache/yum/x86_64/7Server/ # Clean yum cache otherwise, it will fail if --disablerepos are specified
     fi
-    yum -y $YUM_FLAGS --setopt=tsflags=nodocs --disableplugin=subscription-manager install jenkins-2.289.2
-    rpm -V jenkins-2.289.2
+    # Since the recent LTS jenkins update we need to install the 'daemonize' package
+    # which is only available in EPEL, so enable it here
+    yum -y --setopt=tsflags=nodocs --disableplugin=subscription-manager install \
+	    https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+    yum -y $YUM_FLAGS --setopt=tsflags=nodocs --disableplugin=subscription-manager install jenkins-2.303.3
+    rpm -V jenkins-2.303.3
     yum $YUM_FLAGS clean all
     /usr/local/bin/install-plugins.sh $PLUGIN_LIST
 else
