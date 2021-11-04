@@ -32,5 +32,5 @@ prometheus:2.0.10
 snakeyaml-api:1.29.1
 script-security:1.78
 ssh-credentials:1.19
-subversion:2.14.4
+subversion:2.15.1
 token-macro:266.v44a80cf277fd
