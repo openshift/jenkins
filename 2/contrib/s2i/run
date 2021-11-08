@@ -17,11 +17,12 @@ shopt -s dotglob
 
 function update_admin_password() {
   # get random admin dir
-  ADMIN_DIR=`ls /var/lib/jenkins/users | grep admin`
-  ls ${JENKINS_HOME}/users/${ADMIN_DIR}
+  ADMIN_DIR=`ls /var/lib/jenkins/users | grep ^admin_` # Use strictly user admin (not kubeadmin or another)
   new_password_hash=$(obfuscate_password ${JENKINS_PASSWORD:-password})
+  echo "Updating password hash in $ADMIN_DIR for user admin"
   sed -i "s,<passwordHash>.*</passwordHash>,<passwordHash>#jbcrypt:$new_password_hash</passwordHash>,g" "${JENKINS_HOME}/users/${ADMIN_DIR}/config.xml"
   echo $new_password_hash > ${JENKINS_HOME}/password
+  echo "Password hash susccesfully updated"
 }
 
 function create_jenkins_config_xml() {
@@ -533,8 +534,9 @@ if [ -e ${JENKINS_HOME}/password ]; then
   # we don't want to just blindly do this on startup because the user might change their password via
   # the jenkins ui, so we only want to do this if the env variable has been explicitly modified from
   # the original value.
-  old_password_hash=`cat ${JENKINS_HOME}/password`
-  password_changed=$(has_password_changed ${JENKINS_PASSWORD:-password} ${old_password_hash} )
+  old_password_hash=$(head -1 ${JENKINS_HOME}/password )
+  default_password_hash='$2a$10$Ueyz5nnKl/AnQuD75rulE.Z7nVHnzsfgWCwOajccw3xnDt9OBkSc2'
+  password_changed=$(has_password_changed ${JENKINS_PASSWORD:-password} ${old_password_hash:-${default_password_hash}} )
   if [ "$password_changed" != "" ]; then
     echo "Detected password environment variable change, updating Jenkins configuration ..."
     update_admin_password
