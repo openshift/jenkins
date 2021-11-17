@@ -574,7 +574,7 @@ create_jenkins_location_configuration_xml() {
   if [ $( oc get routes -o json | jq -c -r '.items[0].spec.tls')  == "null" ]; then
     JENKINS_SCHEME="http://"
   fi
-  JENKINS_URL="$JENKINS_SCHEME$(oc get routes -o json | jq -c -r '.items[0].spec | select (.to.name == env.JENKINS_SERVICE_NAME ) | .host ')"
+  JENKINS_URL="$JENKINS_SCHEME$(oc get routes -o json | jq -c -r '.items[] | select (.spec.to.name == env.JENKINS_SERVICE_NAME ) | .spec.host ' | head -n 1)"
   echo "Using JENKINS_SERVICE_NAME=$JENKINS_SERVICE_NAME"
   echo "Generating jenkins.model.JenkinsLocationConfiguration.xml using (${JENKINS_HOME}/jenkins.model.JenkinsLocationConfiguration.xml.tpl) ..."
   export JENKINS_URL
