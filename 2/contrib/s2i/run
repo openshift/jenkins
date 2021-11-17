@@ -479,7 +479,6 @@ if [ ! -e ${JENKINS_HOME}/configured ]; then
   install_plugins
 
   echo "Creating initial Jenkins 'admin' user ..."
-  
   update_admin_password
   
   touch ${JENKINS_HOME}/configured
@@ -575,7 +574,7 @@ create_jenkins_location_configuration_xml() {
   JENKINS_SCHEME="https://"
   if [ $( oc get routes -o json | jq -c -r '.items[0].spec.tls')  == "null" ]; then
     JENKINS_SCHEME="http://"
-  fi
+    fi
   JENKINS_URL="$JENKINS_SCHEME$(oc get routes -o json | jq -c -r '.items[] | select (.spec.to.name == env.JENKINS_SERVICE_NAME ) | .spec.host ' | head -n 1)"
   echo "Using JENKINS_SERVICE_NAME=$JENKINS_SERVICE_NAME"
   echo "Generating jenkins.model.JenkinsLocationConfiguration.xml using (${JENKINS_HOME}/jenkins.model.JenkinsLocationConfiguration.xml.tpl) ..."
@@ -585,6 +584,28 @@ create_jenkins_location_configuration_xml() {
 }
 
 create_jenkins_location_configuration_xml
+
+# xmlstarlet does not support xml version=1.1 as used by jenkins config.xml; redirecting stderr to /dev/null does the trick
+if [ "${OPENSHIFT_ENABLE_OAUTH}" == "false" ]; then
+  echo "OpenShift OAuth disabled: Using Jenkins built-in user database"
+  xmlstarlet edit -L --update '//hudson/securityRealm' --value '' "${JENKINS_HOME}/config.xml"  2>/dev/null
+  xmlstarlet edit -L --delete '//hudson/securityRealm/@plugin' "${JENKINS_HOME}/config.xml"  2>/dev/null
+  xmlstarlet edit -L --update '//hudson/securityRealm/@class' --value 'hudson.security.HudsonPrivateSecurityRealm' "${JENKINS_HOME}/config.xml" 2>/dev/null
+else
+  echo "OpenShift OAuth enabled: true"
+  # if OAUTH is enabled and the current realm is Jenkins local Database, we delete the realm, so the openshift plugins auto configures
+  if xmlstarlet select -t -c  "/hudson/securityRealm[@class='hudson.security.HudsonPrivateSecurityRealm']" 2> /dev/null > /dev/null; then
+    xmlstarlet edit -L --delete '//hudson/securityRealm' "${JENKINS_HOME}/config.xml"  2>/dev/null
+  fi
+  # In case openshift login plugin is set as a provider but without the defaulted values, we remove it to enforce plugin re-configuration
+  # TODO replace with an || statement but by improving readability
+  if xmlstarlet select -t -c  "/hudson/securityRealm[starts-with(@plugin,'openshift-login')][@class='org.openshift.jenkins.plugins.openshiftlogin.OpenShiftOAuth2SecurityRealm']" \
+           "${JENKINS_HOME}/config.xml"  2> /dev/null > /dev/null  && \
+     ! xmlstarlet select -t  -c  "/hudson/securityRealm/defaultedServiceAccountDirectory" "${JENKINS_HOME}/config.xml" 2> /dev/null > /dev/null; then
+    echo "OpenShift OAuth enabled and provider incorrectly set: Resetting openshift login provider"
+    xmlstarlet edit -L --delete '//hudson/securityRealm' "${JENKINS_HOME}/config.xml"  2>/dev/null
+  fi
+fi
 
 FATAL_ERROR_OPTION=""
 
