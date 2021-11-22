@@ -42,7 +42,7 @@ prometheus:2.0.0
 script-security:1.75
 snakeyaml-api:1.27.0
 ssh-credentials:1.18.1
-subversion:2.13.2
+subversion:2.15.1
 token-macro:2.13
 workflow-aggregator:2.6
 workflow-cps-global-lib:2.15
