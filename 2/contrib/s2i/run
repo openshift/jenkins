@@ -17,10 +17,12 @@ shopt -s dotglob
 
 function update_admin_password() {
   # get random admin dir
-  ADMIN_DIR=`ls /var/lib/jenkins/users | grep ^admin_` # Use strictly user admin (not kubeadmin or another)
+  ADMIN_DIR=$(ls /var/lib/jenkins/users | grep ^admin | head -1) # Use strictly user admin (not kubeadmin or another)
   new_password_hash=$(obfuscate_password ${JENKINS_PASSWORD:-password})
   echo "Updating password hash in $ADMIN_DIR for user admin"
-  sed -i "s,<passwordHash>.*</passwordHash>,<passwordHash>#jbcrypt:$new_password_hash</passwordHash>,g" "${JENKINS_HOME}/users/${ADMIN_DIR}/config.xml"
+  password_hash_xpath="//user/properties/hudson.security.HudsonPrivateSecurityRealm_-Details/passwordHash"
+  password_hash_jbcrypt="#jbcrypt:$new_password_hash"
+  xmlstarlet edit -L --update "$password_hash_xpath" --value "$password_hash_jbcrypt" "${JENKINS_HOME}/users/${ADMIN_DIR}/config.xml"
   echo $new_password_hash > ${JENKINS_HOME}/password
   echo "Password hash susccesfully updated"
 }
