@@ -1,4 +1,3 @@
-
 ant:1.11
 blueocean:1.24.4
 bouncycastle-api:2.18
@@ -21,7 +20,7 @@ junit:1.30
 kubernetes:1.29.7
 kubernetes-client-api:4.13.3-1
 lockable-resources:2.10
-mailer:1.32.1
+mailer:1.34
 mapdb-api:1.0.9.0
 matrix-auth:2.6.6
 matrix-project:1.18
@@ -32,7 +31,7 @@ openshift-login:1.0.26
 openshift-pipeline:1.0.57
 openshift-sync:1.0.46
 pam-auth:1.6
-parameterized-trigger:2.36
+parameterized-trigger:2.39
 pipeline-build-step:2.12
 pipeline-github-lib:1.0
 pipeline-input-step:2.11
@@ -47,7 +46,6 @@ subversion:2.15.1
 token-macro:2.13
 workflow-aggregator:2.6
 workflow-cps-global-lib:2.15
-workflow-cps:2.87
+workflow-cps:2.90
 workflow-multibranch:2.22
 workflow-remote-loader:1.5
-workflow-support:3.6
