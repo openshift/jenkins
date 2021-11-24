@@ -79,8 +79,6 @@ var _ = Describe("Jenkins testing (v2)", func() {
 		"git",
 		"git-server",
 		"git-client",
-		"handlebars",
-		"momentjs",
 		"plain-credentials",
 		"scm-api",
 		"script-security",

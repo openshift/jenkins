@@ -28,3 +28,9 @@ test:
 smoke:
 	@echo "Testing the jenkins template based install on openshift"
 	@./scripts/test-jenkins-template-install.sh
+
+.PHONY: e2e
+e2e:
+	@echo "Starting e2e tests from 2/test directory"
+	@echo "IMAGE_NAME set in environment variable with value: $(IMAGE_NAME)"
+	@cd 2/test && go test
