@@ -103,8 +103,10 @@ if [[ $# -eq 0 ]]; then
   fi
   
   # If Kubernetes plugin is configured to use WebSocket, add the -webSocket flag to the arguments
-  if [ ! -z "$JENKINS_WEB_SOCKET" ]; then
-    set -- "${@}" "-webSocket"
+  if [[ "$@" != *"-webSocket"* ]]; then
+    if [ ! -z "$JENKINS_WEB_SOCKET" ]; then
+      set -- "${@}" "-webSocket"
+    fi
   fi
 
 fi
