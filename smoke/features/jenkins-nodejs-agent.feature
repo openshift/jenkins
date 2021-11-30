@@ -13,4 +13,5 @@ Feature: Testing jenkins agent nodejs image
     Then Trigger the build using oc start-build
     Then verify the build status of "nodejs-postgresql-example-1" build is Complete
     Then verify the build status of "nodejs-postgresql-example-2" build is Complete
+    Then We check for deployment pod status to be "Completed"
     And route nodejs-postgresql-example must be created and be accessible

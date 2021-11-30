@@ -16,6 +16,6 @@ Feature: Testing jenkins agent maven image
       And verify service/openshift-jee-sample is created
       And verify route.route.openshift.io/openshift-jee-sample is created
       Then Trigger the build using oc start-build openshift-jee-sample
-      Then verify the build status of openshift-jee-sample-docker build is Complete
-      And verify the build status of openshift-jee-sample-1 is Complete
+      Then verify the build status of openshift-jee-sample-1 is Complete
+      And verify the build status of openshift-jee-sample-docker build is Complete
       And verify the JaveEE application is accessible via route openshift-jee-sample

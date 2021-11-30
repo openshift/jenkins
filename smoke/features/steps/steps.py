@@ -12,16 +12,12 @@ from smoke.features.steps.openshift import Openshift
 from smoke.features.steps.project import Project
 from smoke.features.steps.plugins import Plugins
 
-
-
 # Test results file path
 scripts_dir = os.getenv('OUTPUT_DIR')
 
 # Path to pipeline job to test agent images
 maven_template ='./smoke/samples/maven_pipeline.yaml'
 nodejs_template = './smoke/samples/nodejs_pipeline.yaml'
-
-
 
 # variables needed to get the resource status
 deploy_pod = "jenkins-1-deploy"
@@ -38,7 +34,6 @@ builds = {}
 baseplugins = './2/contrib/openshift/base-plugins.txt'
 p = Plugins()
 plugins = p.getPlugins(baseplugins)
-
 
 def triggerbuild(buildconfig,namespace):
     print('Triggering build: ',buildconfig)
@@ -60,6 +55,11 @@ def given_project_is_used(context, project_name):
     print("Project {} is created!!!".format(project_name))
     context.project = project
 
+
+def before_feature(context, feature):
+    if scenario.name != None and "TEST_NAMESPACE" in scenario.name:
+        print("Scenario using env namespace subtitution found: {0}, env: {}".format(scenario.name, os.getenv("TEST_NAMESPACE"))
+        scenario.name = txt.replace("TEST_NAMESPACE", os.getenv("TEST_NAMESPACE"))
 
 # STEP
 @given(u'Project [{project_env}] is used')
@@ -170,11 +170,7 @@ def checkSVC(context):
 
 @then(u'We check for deployment pod status to be "Completed"')
 def deploymentPodStatus(context):
-    time.sleep(120)
-    print("Getting deployment pod status")
-    deploy_pod_status = oc.get_resource_info_by_jsonpath('pods',deploy_pod,current_project,json_path='{.status.phase}')
-    if not 'Succeeded' in deploy_pod_status:
-        raise AssertionError
+    verify_status('pod', deploy_pod, poll_interval_seconds=2, max_retries=60, expected_status='Succeeded')
 
 
 @then(u'We check for jenkins master pod status to be "Ready"')
@@ -184,11 +180,11 @@ def jenkinsMasterPodStatus(context):
     jenkins_master_pod = getmasterpod(current_project)
     print('---------Getting default jenkins pod name---------')
     print(jenkins_master_pod)
-    containerState = oc.get_resource_info_by_jsonpath('pods',jenkins_master_pod,current_project,json_path='{.status.containerStatuses[*].ready}')
-    if 'false' in containerState:
+    container_status = oc.get_resource_info_by_jsonpath('pods',jenkins_master_pod,current_project,json_path='{.status.containerStatuses[*].ready}')
+    if 'false' in container_status:
         raise AssertionError
     else:
-         print(containerState)
+         print(container_status)
 
 @then(u'persistentvolumeclaim "jenkins" created')
 def verify_pvc(context):
@@ -202,11 +198,8 @@ def verify_pvc(context):
 @then(u'we check the pvc status is "Bound"')
 def pvc_status(context):
     print('---------Getting pvc status---------')
-    pvcState = oc.get_resource_info_by_jsonpath('pvc','jenkins',current_project,json_path='{.status.phase}')
-    if 'Bound' in pvcState:
-        print(pvcState)
-    else:
-        raise AssertionError
+    verify_status('pvc', 'jenkins', poll_interval_seconds=1, max_retries=10, expected_status='Bound')
+
 
 @given(u'The jenkins pod is up and runnning')
 def checkJenkins(context):
@@ -222,11 +215,14 @@ def persistentTemplate(context):
 @when(u'The user enters new-app command with nodejs_template')
 def createPipeline(context):
     res = oc.new_app_from_file(nodejs_template,current_project)
+    if(res == None):
+        print("Error while installing nodejs using persistent nodejs_template")
+        raise AssertionError
     time.sleep(30)
     if 'sample-pipeline' in oc.search_resource_in_namespace('bc','sample', current_project):
         print('Buildconfig sample-pipeline created')
     elif 'nodejs-postgresql-example' in oc.search_resource_in_namespace('bc','postgersql',current_project):
-        print('Buildconfig nodejs-postgersql-example created')
+        print('Buildconfig nodejs-postgresql-example created')
     else:
         raise AssertionError
     print(res)
@@ -238,26 +234,21 @@ def startbuild(context):
 
 @then(u'verify the build status of "nodejs-postgresql-example-1" build is Complete')
 def verifynodejsBuildStatus(context):
-    time.sleep(300)
-    buildState = oc.get_resource_info_by_jsonpath('build','nodejs-postgresql-example-1',current_project,json_path='{.status.phase}')
-    if not 'Complete' in buildState:
-        raise AssertionError
-    else:
-        print("Build nodejs-postgresql-example-1 status:{buildState}")
+    verify_status('build', 'nodejs-postgresql-example-1', 5, 60, 'Complete')
+
 
 @then(u'verify the build status of "nodejs-postgresql-example-2" build is Complete')
 def verifynodejsBuildBStatus(context):
-    buildState = oc.get_resource_info_by_jsonpath('build','nodejs-postgresql-example-2',current_project,json_path='{.status.phase}')
-    if not 'Complete' in buildState:
-        raise AssertionError
-    else:
-        print("Build nodejs-postgresql-example-2 status:{buildState}")
+    # give a little bit of time for the build to be created
+    time.sleep(60)
+    verify_status('build', 'nodejs-postgresql-example-2', 5, 60, 'Complete')
 
 
 @then(u'route nodejs-postgresql-example must be created and be accessible')
 def connectApp(context):
     print('Getting application route/url')
     app_name = 'nodejs-postgresql-example'
+    verify_status('route', 'nodejs-postgresql-example', 2, 10, 'True', json_path='{.status.ingress[*].conditions[*].status}')
     route = oc.get_route_host(app_name,current_project)
     url = 'http://'+str(route)
     print('--->App url:')
@@ -265,12 +256,21 @@ def connectApp(context):
     http = urllib3.PoolManager()
     res = http.request_encode_url('GET',url)
     connection_status = res.status
-    if connection_status == 200:
-        print('---> Application is accessible via the route')
-        print(url)
-        http.clear()
-    else:
-        raise Exception
+    count = 1
+    while(count <= 30):
+        res = http.request_encode_url('GET',url)
+        connection_status = res.status
+        if connection_status == 200:
+            print('---> Application is accessible via the route')
+            print(url)
+            http.clear()
+            break
+        else:
+            time.sleep(2)
+            count+=1
+            print("Url: {0}, return code: {1}, res: {2}".format(url,connection_status, res))
+    if connection_status != 200:
+        raise AssertionError
 
 @when(u'The user create objects from the sample maven template by processing the template and piping the output to oc create')
 def createMavenTemplate(context):
@@ -324,26 +324,29 @@ def verifyRoute(context):
 @then(u'Trigger the build using oc start-build openshift-jee-sample')
 def startBuild(context):
     triggerbuild('openshift-jee-sample',current_project)
-    time.sleep(300)
-
 
 @then(u'verify the build status of openshift-jee-sample-docker build is Complete')
 def verifyDockerBuildStatus(context):
-    buildState = oc.get_resource_info_by_jsonpath('build','openshift-jee-sample-docker-1',current_project,json_path='{.status.phase}')
-    if not 'Complete' in buildState:
-        raise AssertionError
-    else:
-        print("Build openshift-jee-sample-docker-1 status:{buildState}")
-    
+    verify_status('build', 'openshift-jee-sample-docker-1', 2, 10, 'Complete', '{.status.phase}')
+
 
 @then(u'verify the build status of openshift-jee-sample-1 is Complete')
 def verifyJenkinsBuildStatus(context):
-    buildState = oc.get_resource_info_by_jsonpath('build','openshift-jee-sample-1',current_project,json_path='{.status.phase}')
-    if not 'Complete' in buildState:
-        raise AssertionError
-    else:
-        print("Build openshift-jee-sample-1-deploy status:{buildState}")
+    verify_status('build', 'openshift-jee-sample-1', 2, 100, 'Complete', '{.status.phase}')
 
+
+def verify_status(object_type, object_name, poll_interval_seconds, max_retries, expected_status,json_path='{.status.phase}'):
+    count = 1
+    print("Getting {object_type} status for {object_name}")
+    while(count <= max_retries):
+        status = oc.get_resource_info_by_jsonpath(object_type,object_name,current_project,json_path)
+        if expected_status in status:
+            break
+        time.sleep(poll_interval_seconds)
+        count+=1
+    print("{object_type} {object_name} status:{status}")
+    if not expected_status in status:
+        raise AssertionError
 
 @then(u'verify the JaveEE application is accessible via route openshift-jee-sample')
 def pingApp(context):
@@ -404,7 +407,6 @@ def del_svc(context):
     if res == None:
         raise AssertionError
 
-
 @then(u'delete service "jenkins-jnlp"')
 def del_svc_jnlp(context):
     res = oc.delete("service","jenkins-jnlp",current_project)
@@ -439,6 +441,18 @@ def del_pods(context):
     for pod in buildpods:
         res = oc.delete('pod',pod,current_project)
         print("Deleting: ",res)
+
+@then(u'delete all remaining test resources')
+def del_all_remaining_test_resources(context):
+    #    oc delete all,rolebindings.authorization.openshift.io,bc,cm,is,pvc,sa,secret -l app=jenkins-ephemeral
+    #    oc delete all,rolebindings.authorization.openshift.io,bc,cm,is,pvc,sa,secret -l app=jenkins-persistent
+    #    oc delete all,rolebindings.authorization.openshift.io,bc,cm,is,pvc,sa,secret -l app=openshift-jee-sample
+    #    oc delete all,rolebindings.authorization.openshift.io,bc,cm,is,pvc,sa,secret -l app=jenkins-pipeline-example
+    delete_command = "all,rolebindings.authorization.openshift.io,bc,cm,is,pvc,sa,secret"
+    oc.delete(delete_command,"-l app=jenkins-ephemeral",current_project)
+    oc.delete(delete_command,"-l app=jenkins-persistent",current_project)
+    oc.delete(delete_command,"-l app=openshift-jee-sample",current_project)
+    oc.delete(delete_command,"-l app=jenkins-pipeline-example",current_project)
 
 @then(u'We rsh into the master pod and check the jobs count')
 def getjobcount(context):
@@ -535,7 +549,7 @@ def verifybuildSync(context):
     time.sleep(360)
     for build_name in builds.keys():
         builds[build_name] = oc.get_resource_info_by_jsonpath("build",build_name,current_project,json_path='{.status.phase}')
-        if not "Complete" in builds[build_name]:
+        if not "Complete" or "New" in builds[build_name]:
             print(build_name,':',builds[build_name])
             raise AssertionError
         else:
