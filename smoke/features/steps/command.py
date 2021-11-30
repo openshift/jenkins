@@ -2,7 +2,6 @@ import subprocess
 import time
 import os
 
-
 class Command(object):
     path = ""
     env = {}
@@ -52,3 +51,8 @@ class Command(object):
             start += interval
         print("ERROR: Time out while waiting for status message.")
         return False, cmd_output, exit_code
+
+    def run_wait_for(self, resource_type, resource_name, wait_for="condition=Available", timeout_seconds=180):
+        cmd = "oc  wait --for={} --timeout={}s {} {}".format(wait_for, timeout_seconds, resource_type, resource_name)
+        output, exit_code = self.run(cmd)
+        return output, exit_code

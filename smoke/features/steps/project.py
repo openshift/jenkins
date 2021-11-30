@@ -1,8 +1,6 @@
 import re
 
 from smoke.features.steps.command import Command
-
-
 class Project():
     def __init__(self, name=''):
         self.name = name
@@ -32,4 +30,3 @@ class Project():
         else:
             print(f"Unexpected project creating output: '{create_project_output}'")
         return False
-        
