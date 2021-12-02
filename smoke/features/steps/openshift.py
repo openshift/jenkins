@@ -6,8 +6,11 @@ functionalities to check the resources.
 
 import re
 import time
+
+from kubernetes import client, config
 from pyshould import should
 from smoke.features.steps.command import Command
+
 '''
 Openshift class provides the blueprint that we need to
 interact with the openshift resources 
@@ -173,6 +176,20 @@ class Openshift(object):
         exit_code | should.be_equal_to(0)
         return deployment_status
 
+    def check_for_deployment_config_status(self, dc_name, namespace, wait_for="condition=Available"):
+        output, exit_code = self.cmd.run_wait_for('dc', 'jenkins', wait_for, timeout_seconds=300)
+        if exit_code != 0:
+            print(output)
+        return output, exit_code
+
+    def set_env_for_deployment_config(self, name, namespace, key, value):
+        env_cmd = f'oc -n {namespace} set env dc/{name} {key}={value}'
+        print( "oc set command: {}".format(env_cmd))
+        output, exit_code = self.cmd.run(env_cmd)
+        exit_code | should.be_equal_to(0)
+        time.sleep(3)
+        return  output, exit_code
+
     def get_deployment_env_info(self, name, namespace):
         env_cmd = f'oc get deploy {name} -n {namespace} -o "jsonpath={{.spec.template.spec.containers[0].env}}"'
         env, exit_code = self.cmd.run(env_cmd)
@@ -247,20 +264,15 @@ class Openshift(object):
             return output
         return None
 
-    def getmasterpod(self,namespace: str)-> str:
+    def getmasterpod(self, namespace: str)-> str:
         '''
         returns the jenkins master pod name
         '''
-        deploy_pod = 'jenkins-1-deploy'
-        master_pod = ''
-        pods = self.get_pod_lst(namespace)
-        podList = list(pods.split(" "))
-        for pod in podList:
-            if pod == deploy_pod:
-                podList.remove(pod)
-            elif 'jenkins-1-' in pod and deploy_pod not in pod:
-                master_pod = pod
-        return master_pod
+        v1 = client.CoreV1Api()
+        pods = v1.list_namespaced_pod(namespace, label_selector='deploymentconfig=jenkins')
+        if len(pods.items) > 1:
+            raise AssertionError
+        return pods.items[0].metadata.name
     
     def scaleReplicas(self, namespace: str, replicas: int, rep_controller: str):
         '''
