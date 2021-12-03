@@ -31,6 +31,10 @@ export JNLP_PORT=${JNLP_PORT:-50000}
 export NODEJS_SLAVE=${NODEJS_SLAVE_IMAGE:-image-registry.openshift-image-registry.svc:5000/openshift/jenkins-agent-nodejs:latest}
 export MAVEN_SLAVE=${MAVEN_SLAVE_IMAGE:-image-registry.openshift-image-registry.svc:5000/openshift/jenkins-agent-maven:latest}
 
+export AGENT_BASE=${AGENT_BASE_IMAGE:-image-registry.openshift-image-registry.svc:5000/openshift/jenkins-agent-base:latest}
+export JAVA_BUILDER=${JAVA_BUILDER_IMAGE:-image-registry.openshift-image-registry.svc:5000/openshift/java:latest}
+export NODEJS_BUILDER=${NODEJS_BUILDER_IMAGE:-image-registry.openshift-image-registry.svc:5000/openshift/nodejs:latest}
+
 JENKINS_SERVICE_NAME=${JENKINS_SERVICE_NAME:-JENKINS}
 JENKINS_SERVICE_NAME=`echo ${JENKINS_SERVICE_NAME} | tr '[a-z]' '[A-Z]' | tr '-' '_'`
 
@@ -130,6 +134,98 @@ function generate_kubernetes_config() {
               <command></command>
               <args>\${computer.jnlpmac} \${computer.name}</args>
               <ttyEnabled>false</ttyEnabled>
+              <resourceRequestCpu></resourceRequestCpu>
+              <resourceRequestMemory></resourceRequestMemory>
+              <resourceLimitCpu></resourceLimitCpu>
+              <resourceLimitMemory></resourceLimitMemory>
+              <envVars/>
+            </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+          </containers>
+          <envVars/>
+          <annotations/>
+          <imagePullSecrets/>
+          <nodeProperties/>
+        </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+        <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+          <inheritFrom></inheritFrom>
+          <name>java-builder</name>
+          <instanceCap>2147483647</instanceCap>
+          <idleMinutes>0</idleMinutes>
+          <label>java-builder</label>
+          <serviceAccount>${oc_serviceaccount_name}</serviceAccount>
+          <nodeSelector></nodeSelector>
+          <volumes/>
+          <containers>
+            <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+              <name>jnlp</name>
+              <image>${AGENT_BASE}</image>
+              <privileged>false</privileged>
+              <alwaysPullImage>true</alwaysPullImage>
+              <workingDir>/home/jenkins/agent</workingDir>
+              <command></command>
+              <args>\$(JENKINS_SECRET) \$(JENKINS_NAME)</args>
+              <ttyEnabled>false</ttyEnabled>
+              <resourceRequestCpu></resourceRequestCpu>
+              <resourceRequestMemory></resourceRequestMemory>
+              <resourceLimitCpu></resourceLimitCpu>
+              <resourceLimitMemory></resourceLimitMemory>
+              <envVars/>
+            </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+            <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+              <name>java</name>
+              <image>${JAVA_BUILDER}</image>
+              <privileged>false</privileged>
+              <alwaysPullImage>true</alwaysPullImage>
+              <workingDir>/home/jenkins/agent</workingDir>
+              <command>cat</command>
+              <args></args>
+              <ttyEnabled>true</ttyEnabled>
+              <resourceRequestCpu></resourceRequestCpu>
+              <resourceRequestMemory></resourceRequestMemory>
+              <resourceLimitCpu></resourceLimitCpu>
+              <resourceLimitMemory></resourceLimitMemory>
+              <envVars/>
+            </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+          </containers>
+          <envVars/>
+          <annotations/>
+          <imagePullSecrets/>
+          <nodeProperties/>
+        </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+        <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+          <inheritFrom></inheritFrom>
+          <name>nodejs-builder</name>
+          <instanceCap>2147483647</instanceCap>
+          <idleMinutes>0</idleMinutes>
+          <label>nodejs-builder</label>
+          <serviceAccount>${oc_serviceaccount_name}</serviceAccount>
+          <nodeSelector></nodeSelector>
+          <volumes/>
+          <containers>
+            <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+              <name>jnlp</name>
+              <image>${AGENT_BASE}</image>
+              <privileged>false</privileged>
+              <alwaysPullImage>true</alwaysPullImage>
+              <workingDir>/home/jenkins/agent</workingDir>
+              <command></command>
+              <args>\$(JENKINS_SECRET) \$(JENKINS_NAME)</args>
+              <ttyEnabled>false</ttyEnabled>
+              <resourceRequestCpu></resourceRequestCpu>
+              <resourceRequestMemory></resourceRequestMemory>
+              <resourceLimitCpu></resourceLimitCpu>
+              <resourceLimitMemory></resourceLimitMemory>
+              <envVars/>
+            </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+            <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+              <name>nodejs</name>
+              <image>${NODEJS_BUILDER}</image>
+              <privileged>false</privileged>
+              <alwaysPullImage>true</alwaysPullImage>
+              <workingDir>/home/jenkins/agent</workingDir>
+              <command>cat</command>
+              <args></args>
+              <ttyEnabled>true</ttyEnabled>
               <resourceRequestCpu></resourceRequestCpu>
               <resourceRequestMemory></resourceRequestMemory>
               <resourceLimitCpu></resourceLimitCpu>
