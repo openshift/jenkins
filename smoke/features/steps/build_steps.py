@@ -199,13 +199,6 @@ def comparejobs(context):
             raise AssertionError
     print(buildconfigs)
 
-@when(u'We rsh into the master pod')
-def step_impl(context):
-    pass
-
-@then(u'We compare the plugins version inside the master pod with the plugins listed in plugins.txt')
-def step_impl(context):
-    pass
 
 @when(u'We Trigger multiple builds using oc start-build openshift-jee-sample')
 def trigger_builds(context, max_builds=5):
