@@ -1,4 +1,4 @@
-apiVersion: v1
+apiVersion: template.openshift.io/v1
 kind: Template
 metadata:
   name: maven-pipeline
@@ -31,7 +31,7 @@ parameters:
   name: GENERIC_WEBHOOK_SECRET
   required: true
 objects:
-- apiVersion: v1
+- apiVersion: image.openshift.io/v1
   kind: ImageStream
   metadata:
     labels:
@@ -40,7 +40,7 @@ objects:
   spec: {}
   status:
     dockerImageRepository: ""
-- apiVersion: v1
+- apiVersion: image.openshift.io/v1
   kind: ImageStream
   metadata:
     name: wildfly
@@ -61,7 +61,7 @@ objects:
         kind: ImageStreamTag
         name: "10.1"
       name: latest
-- apiVersion: v1
+- apiVersion: build.openshift.io/v1
   kind: BuildConfig
   metadata:
     annotations:
@@ -151,7 +151,7 @@ objects:
     - generic:
         secret: "${GENERIC_WEBHOOK_SECRET}"
       type: Generic
-- apiVersion: v1
+- apiVersion: build.openshift.io/v1
   kind: BuildConfig
   metadata:
     labels:
@@ -180,7 +180,7 @@ objects:
           name: wildfly:latest
       type: Docker
     triggers: []
-- apiVersion: v1
+- apiVersion: apps.openshift.io/v1
   kind: DeploymentConfig
   metadata:
     labels:
@@ -271,7 +271,7 @@ objects:
     type: ClusterIP
   status:
     loadBalancer: {}
-- apiVersion: v1
+- apiVersion: route.openshift.io/v1
   kind: Route
   metadata:
     name: ${APP_NAME}
