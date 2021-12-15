@@ -58,6 +58,8 @@ RUN curl http://mirror.centos.org/centos-7/7/os/x86_64/RPM-GPG-KEY-CentOS-7 -o /
 
 COPY ./contrib/openshift /opt/openshift
 COPY ./contrib/jenkins /usr/local/bin
+RUN mkdir -p /opt/openshift/plugins
+COPY ./jpi /opt/openshift/plugins
 ADD ./contrib/s2i /usr/libexec/s2i
 ADD release.version /tmp/release.version
 

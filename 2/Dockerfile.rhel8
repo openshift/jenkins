@@ -102,5 +102,8 @@ RUN /usr/local/bin/install-jenkins-core-plugins.sh /opt/openshift/base-plugins.t
 
 VOLUME ["/var/lib/jenkins"]
 
+COPY ./jpi /opt/openshift/plugins
+COPY ./jpi /var/lib/jenkins/plugins/
+
 USER 1001
 ENTRYPOINT ["/usr/bin/go-init", "-main", "/usr/libexec/s2i/run"]
