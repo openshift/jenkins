@@ -8,7 +8,7 @@ configuration-as-code-groovy:1.1
 credentials-binding:1.23
 credentials:2.3.15
 cloudbees-folder:6.15
-docker-commons:1.16
+docker-commons:1.18
 git-client:3.2.1
 git:4.5.2
 github:1.33.0
