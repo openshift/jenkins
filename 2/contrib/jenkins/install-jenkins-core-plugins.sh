@@ -22,8 +22,8 @@ if [[ "${INSTALL_JENKINS_VIA_RPMS}" == "false" ]]; then
     # which is only available in EPEL, so enable it here
     yum -y --setopt=tsflags=nodocs --disableplugin=subscription-manager install \
 	    https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-    yum -y $YUM_FLAGS --setopt=tsflags=nodocs --disableplugin=subscription-manager install jenkins-2.303.3
-    rpm -V jenkins-2.303.3
+    yum -y $YUM_FLAGS --setopt=tsflags=nodocs --disableplugin=subscription-manager install jenkins-2.319.2
+    rpm -V jenkins-2.319.2
     yum $YUM_FLAGS clean all
     /usr/local/bin/install-plugins.sh $PLUGIN_LIST
 else
