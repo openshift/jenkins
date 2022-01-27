@@ -147,8 +147,9 @@ copy_reference_file() {
 
 REF_DIR=${REF:-/opt/openshift/plugins}
 FAILED="$REF_DIR/failed-plugins.txt"
-
-JENKINS_WAR=/usr/lib/jenkins/jenkins.war
+BUNDLE_PLUGINS=${BUNDLE_PLUGINS:-/opt/openshift/plugins/bundle-plugins.txt}
+JENKINS_WAR=${JENKINS_WAR:-/usr/lib/jenkins/jenkins.war}
+JENKINS_UC=${JENKINS_UC:-https://updates.jenkins.io}
 
 INCREMENTAL_BUILD_ARTIFACTS_DIR="/tmp/artifacts"
 
@@ -329,6 +330,10 @@ function resolveDependencies() {
 }
 
 function bundledPlugins() {
+    echo "Checking JENKINS_WAR=$JENKINS_WAR"
+    if [ ! -f $JENKINS_WAR ]; then
+	curl -L -C - -o $JENKINS_WAR https://get.jenkins.io/war-stable/latest/jenkins.war
+    fi
     if [ -f $JENKINS_WAR ]
     then
         TEMP_PLUGIN_DIR=/tmp/plugintemp.$$
@@ -359,15 +364,17 @@ function versionFromPlugin() {
 }
 
 function installedPlugins() {
+    echo "# Generated file: To generate this file run 'make plugins-list' before pushing your changes" > $BUNDLE_PLUGINS
     for f in "$REF_DIR"/*.jpi; do
         echo "$(basename "$f" | sed -e 's/\.jpi//'):$(get_plugin_version "$f")"
+        echo "$(basename "$f" | sed -e 's/\.jpi//'):$(get_plugin_version "$f")" >> $BUNDLE_PLUGINS
     done
 }
 
 function jenkinsMajorMinorVersion() {
     if [[ -f "$JENKINS_WAR" ]]; then
         local version major minor
-        version="$(/etc/alternatives/java -jar $JENKINS_WAR --version)"
+        version="$(java -jar $JENKINS_WAR --version)"
         major="$(echo "$version" | cut -d '.' -f 1)"
         minor="$(echo "$version" | cut -d '.' -f 2)"
         echo "$major.$minor"
@@ -397,9 +404,10 @@ main() {
         mkdir "$(getLockFile "${plugin%%:*}")"
     done
 
-    echo -e "\nAnalyzing war..."
+    echo -e "\nAnalyzing war: $JENKINS_WAR"
     bundledPlugins="$(bundledPlugins)"
-    
+    echo -e "\nAnalyzing war ... done" 
+
     # Check if there's a version-specific update center, which is the case for LTS versions
     jenkinsVersion="$(jenkinsMajorMinorVersion)"
     if curl -fsL -o /dev/null "$JENKINS_UC/$jenkinsVersion"; then
