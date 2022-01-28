@@ -1,12 +1,13 @@
 ant:1.11
 blueocean:1.24.8
 config-file-provider:3.8.1
-configuration-as-code:1.52
+configuration-as-code:1.55.1
 configuration-as-code-groovy:1.1
-credentials-binding:1.27
+credentials-binding:1.27.1
+cloudbees-bitbucket-branch-source:746.v350d2781c184
 cloudbees-folder:6.16
 docker-commons:1.18
-git-client:3.9.0
+git-client:3.10.0
 github:1.34.0
 google-oauth-plugin:1.0.6
 groovy:2.4
@@ -17,9 +18,9 @@ junit:1.52
 lockable-resources:2.11
 mapdb-api:1.0.9.0
 matrix-auth:2.6.8
-matrix-project:1.19
+matrix-project:1.20
 mercurial:2.15
-metrics:4.0.2.8
+metrics:4.0.2.8.1
 openshift-client:1.0.35
 openshift-login:1.0.27
 openshift-sync:1.0.53
@@ -29,4 +30,4 @@ snakeyaml-api:1.29.1
 script-security:1.78
 ssh-credentials:1.19
 subversion:2.15.1
-token-macro:266.v44a80cf277fd
+token-macro:267.vcdaea6462991
