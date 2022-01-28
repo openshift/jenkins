@@ -21,7 +21,7 @@ matrix-project:1.19
 mercurial:2.15
 metrics:4.0.2.8
 openshift-client:1.0.35
-openshift-login:1.0.26
+openshift-login:1.0.27
 openshift-sync:1.0.53
 pam-auth:1.6
 prometheus:2.0.10
