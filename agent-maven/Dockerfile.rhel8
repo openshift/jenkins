@@ -1,4 +1,4 @@
-FROM registry.ci.openshift.org/ocp/4.10:jenkins-agent-base
+FROM registry.ci.openshift.org/ocp/4.11:jenkins-agent-base
 MAINTAINER OpenShift Developer Services <openshift-dev-services+jenkins@redhat.com>
 
 # Labels consumed by Red Hat build service
