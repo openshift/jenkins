@@ -128,6 +128,14 @@ class Openshift(object):
         if exit_status == 0:
             return output
         return None
+    
+    def new_build(self,build_ref):
+        cmd = f'oc new-build {build_ref}'
+        output, exit_status = self.cmd.run(cmd)
+        print(f"starting: {output}, {exit_status}")
+        if exit_status == 0:
+            return output
+        return None
 
     def get_configmap(self, namespace):
         output, exit_code = self.cmd.run(f'oc get cm -n {namespace}')
@@ -210,6 +218,19 @@ class Openshift(object):
                 while exit_code != 0 and attempts > 0:
                     output, exit_code = self.cmd.run(
                         f'oc get {resource_type} {name} -n {namespace} -o "jsonpath={json_path}"')
+                    attempts -= 1
+                    time.sleep(5)
+        exit_code | should.be_equal_to(0).desc(f'Exit code should be 0:\n OUTPUT:\n{output}')
+        return output
+    
+    def get_resources_info_by_jsonpath(self, resource_type, namespace, json_path, wait=False):
+        output, exit_code = self.cmd.run(f'oc get {resource_type} -n {namespace} -o "jsonpath={json_path}"')
+        if exit_code != 0:
+            if wait:
+                attempts = 5
+                while exit_code != 0 and attempts > 0:
+                    output, exit_code = self.cmd.run(
+                        f'oc get {resource_type} -n {namespace} -o "jsonpath={json_path}"')
                     attempts -= 1
                     time.sleep(5)
         exit_code | should.be_equal_to(0).desc(f'Exit code should be 0:\n OUTPUT:\n{output}')

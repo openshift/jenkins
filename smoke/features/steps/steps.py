@@ -18,6 +18,8 @@ from smoke.features.steps.project import Project
 
 # Test results file path
 scripts_dir = os.getenv('OUTPUT_DIR')
+java_builder = './smoke/samples/java-builder-cm.yaml'
+nodejs_builder = './smoke/samples/nodejs-builder-cm.yaml'
 
 # variables needed to get the resource status
 deploy_pod = "jenkins-1-deploy"
@@ -27,11 +29,7 @@ current_project = ''
 config.load_kube_config()
 oc = Openshift()
 podStatus = {}
-# Parse the base plugins from the file and store them in a dictonary with key=plugin-name & value=plugin-version
-
-baseplugins = './2/contrib/openshift/base-plugins.txt'
-p = Plugins()
-plugins = p.getPlugins(baseplugins)
+podtemplate_build_ref = 'https://github.com/akram/pipes.git\#container-nodes'
 
 # STEP
 @given(u'Project "{project_name}" is used')
@@ -134,7 +132,7 @@ def checkSVC(context):
     try:
         res = oc.get_service(current_project)
         if not 'jenkins' in res:
-            raise AssertionError("service acoount creation failed")
+            raise AssertionError("service account creation failed")
         item = oc.search_resource_in_namespace('svc', 'jenkins', current_project)
         print(f'service {item} created')
     except AssertionError:
@@ -154,3 +152,64 @@ def jenkinsMasterPodStatus(context):
 @given(u'The jenkins pod is up and runnning')
 def checkJenkins(context):
     jenkinsMasterPodStatus(context)
+@then(u'we configure custom agents as Kubernetes pod template by creating configmap using "smoke/samples/java-builder-cm.yaml" and "smoke/samples/nodejs-builder-cm.yaml"')
+def configure_pod_templates(context):
+    print("Initiazing java pod template")
+    res = oc.oc_create_from_yaml(java_builder)
+    if(res == None):
+        print("Error while creating java-builder pod template")
+        raise AssertionError
+    else:
+        print("Initiazing nodejs pod template")
+        nodejs_res = oc.oc_create_from_yaml(nodejs_builder)
+        if(nodejs_res == None):
+            print("Error while creating nodejs-builder pod template")
+            raise AssertionError
+@then(u'we check configmap "jenkins-agent-java-builder" and "jenkins-agent-nodejs" should be created')
+def verify_configmap(context):
+    current_project = context.current_project
+    if not 'jenkins-agent-java-builder' in oc.search_resource_in_namespace('configmap','jenkins-agent-java-builder',current_project):
+        raise AssertionError
+    elif not 'jenkins-agent-nodejs' in oc.search_resource_in_namespace('configmap','jenkins-agent-nodejs',current_project):
+        raise AssertionError
+@when(u'the user creates a new build refering to "https://github.com/akram/pipes.git\#container-nodes"')
+def trigger_new_build(context):
+    res = oc.new_build(podtemplate_build_ref)
+    time.sleep(30)
+    if res == None:
+        raise AssertionError
+@then(u'buildconfig.build.openshift.io "pipes" should be created')
+def search_buildconfig(context):
+    current_project = context.current_project
+    item = oc.search_resource_in_namespace('buildconfig', 'pipes', current_project)
+    if item is None:
+        raise AssertionError
+    else:
+        print(f'buildconfig {item} found')
+    
+@then(u'we check for "java-builder" agent node and "nodejs-builder" agent node are created')
+def check_pods(context):
+    current_project = context.current_project
+    time.sleep(75)
+    '''This sleep is needed as the jenkinspipeline takes time to build and it takes time for the java-builder agent node to comeup'''
+    java_builder_pod = oc.search_resource_in_namespace('pods','java-builder-template',current_project)
+    if java_builder_pod is None:
+        raise AssertionError
+    else:
+        time.sleep(45)
+        '''This sleep is needed as the jenkinspipeline takes time to build and it takes time for the nodejs agent node to comeup'''
+        nodejs_pod = oc.search_resource_in_namespace('pods','nodejs-builder-template',current_project)
+        if nodejs_pod is None:
+            raise AssertionError
+        else:
+            print(nodejs_pod)
+
+@then(u'The build pipes-1 should be in "Complete" state')
+def check_build_status(context):
+    current_project = context.current_project
+    time.sleep(30)
+    current_phase = oc.get_resource_info_by_jsonpath('build','pipes-1',current_project,'.status.phase',wait=True)
+    if 'Failed' in current_phase:
+        raise AssertionError
+    else:
+        print('Pipes-1 current phase is ', current_phase)

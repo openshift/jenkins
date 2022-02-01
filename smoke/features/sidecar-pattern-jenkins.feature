@@ -14,11 +14,9 @@ Feature: Use sidecar pattern for Jenkins pod templates
     Given The jenkins pod is up and runnning
     Then we configure custom agents as Kubernetes pod template by creating configmap using "smoke/samples/java-builder-cm.yaml" and "smoke/samples/nodejs-builder-cm.yaml"
     And we check configmap "jenkins-agent-java-builder" and "jenkins-agent-nodejs" should be created
-    When the user creates a new build refering to "https://github.com/akram/pipes.git#pod-templates"
+    When the user creates a new build refering to "https://github.com/akram/pipes.git\#container-nodes"
     Then buildconfig.build.openshift.io "pipes" should be created
-    And build pipes-1 should be in "Running" state
-    Then we wait for "java-builder-template" pod to have state as Ready[2/2]
-    And wait for "nodejs-builder-template" pod to have state as Ready[2/2]
+    Then we check for "java-builder" agent node and "nodejs-builder" agent node are created
     And The build pipes-1 should be in "Complete" state
 
     
