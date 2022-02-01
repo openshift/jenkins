@@ -40,8 +40,7 @@ Here are a few of those links for reference:
 Our plugins are constructed such that if they are running in an OpenShift pod, they can determine how to connect to the 
 associated OpenShift master automatically, and no configuration of the plugin from the Jenkins console is needed.
 
-If you choose to run an external Jenkins server and you would like to test interaction with an OpenShift master, you will need to manually configure the plugin.  See each plugin's README or the OpenShift documentation
-for the specifics.
+If you choose to run an external Jenkins server and you would like to test interaction with an OpenShift master, you will need to manually configure the plugin.  See each plugin's README or the OpenShift documentation for the specifics.
 
 An example flow when running in an OpenShift pod:
 
@@ -49,6 +48,10 @@ An example flow when running in an OpenShift pod:
     ```
     git clone https://github.com/openshift/<plugin in question>-plugin.git
     ```
+1. Enable the provided git hooks: see https://github.com/openshift/jenkins/blob/master/README.md#plugin-installation-for-centos7-v4.10+
+   ```
+   git config core.hooksPath .githooks/
+   ```
 1. In the root of the local repository, run maven 
     ```
     cd <plugin in question>-plugin
@@ -62,6 +65,8 @@ An example flow when running in an OpenShift pod:
 1. Find the <plugin name>.hpi built in the previous steps.
 1. Submit the file.
 1. Check that Jenkins should be restarted.
+
+
 
 ### Additional options for updating the plugin in Jenkins (when running in OpenShift)
 
