@@ -330,9 +330,11 @@ function resolveDependencies() {
 }
 
 function bundledPlugins() {
-    echo "Checking JENKINS_WAR=$JENKINS_WAR"
+    echo "Checking JENKINS_WAR=$JENKINS_WAR" > /dev/stderr
     if [ ! -f $JENKINS_WAR ]; then
-	curl -L -C - -o $JENKINS_WAR https://get.jenkins.io/war-stable/latest/jenkins.war
+        jenkins_version=$(cat $PWD/2/contrib/openshift/jenkins-version.txt )
+        echo "Jenkins version: ${jenkins_version}" > /dev/stderr
+	curl -L -C - -o $JENKINS_WAR https://get.jenkins.io/war-stable/$jenkins_version/jenkins.war
     fi
     if [ -f $JENKINS_WAR ]
     then
