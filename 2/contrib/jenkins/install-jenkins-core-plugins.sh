@@ -2,6 +2,9 @@
 
 set -o pipefail
 
+
+jenkins_version=$(cat /opt/openshift/jenkins-version.txt)
+echo "Jenkins version: ${jenkins_version}"
 if [[ "${INSTALL_JENKINS_VIA_RPMS}" == "false" ]]; then
     curl https://pkg.jenkins.io/redhat-stable/jenkins.repo -o /etc/yum.repos.d/jenkins.repo
     rpm --import https://pkg.jenkins.io/redhat-stable/jenkins-ci.org.key
@@ -21,9 +24,9 @@ if [[ "${INSTALL_JENKINS_VIA_RPMS}" == "false" ]]; then
     # Since the recent LTS jenkins update we need to install the 'daemonize' package
     # which is only available in EPEL, so enable it here
     yum -y --setopt=tsflags=nodocs --disableplugin=subscription-manager install \
-	    https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-    yum -y $YUM_FLAGS --setopt=tsflags=nodocs --disableplugin=subscription-manager install jenkins-2.319.2
-    rpm -V jenkins-2.319.2
+	    https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    yum -y $YUM_FLAGS --setopt=tsflags=nodocs --disableplugin=subscription-manager install jenkins-${jenkins_version}
+    rpm -V jenkins-${jenkins_version}
     yum $YUM_FLAGS clean all
     /usr/local/bin/install-plugins.sh $PLUGIN_LIST
 else

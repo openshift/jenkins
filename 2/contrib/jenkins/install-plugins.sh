@@ -329,6 +329,12 @@ function resolveDependencies() {
 }
 
 function bundledPlugins() {
+    echo "Checking JENKINS_WAR=$JENKINS_WAR" > /dev/stderr
+    if [ ! -f $JENKINS_WAR ]; then
+        jenkins_version=$(cat $PWD/2/contrib/openshift/jenkins-version.txt )
+        echo "Jenkins version: ${jenkins_version}" > /dev/stderr
+	curl -L -C - -o $JENKINS_WAR https://get.jenkins.io/war-stable/$jenkins_version/jenkins.war
+    fi
     if [ -f $JENKINS_WAR ]
     then
         TEMP_PLUGIN_DIR=/tmp/plugintemp.$$
