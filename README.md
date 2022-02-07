@@ -260,14 +260,28 @@ For v3, the file is processed by the following call in the [CentOS7 Dockerfile](
 /usr/local/bin/install-plugins.sh /opt/openshift/base-plugins.txt
 ```
 
-In v4. that call has been moved to [this script](2/contrib/jenkins/install-jenkins-core-plugins.sh), which is called from
-both `Dockerfile.localdev` and `Dockerfile.rhel7`.
+#### Plugin installation for CentOS7 V4
+In v4, that call has been moved to [this script](2/contrib/jenkins/install-jenkins-core-plugins.sh), which is called from
+both `Dockerfile.localdev`, `Dockerfile.rhel7` and `Dockerfile.rhel8`.
 
 Where both [base-plugins.txt](2/contrib/openshift/base-plugins.txt) and [install-plugins.sh](2/contrib/jenkins/install-plugins.sh)
 are copied into the image prior to that invocation.
 
 The running of `install-plugins.sh` will download the files listed in `base-plugins.txt`, and then open each plugin's manifest
 and download any needed dependencies listed, including upgrading any previously installed dependencies as needed.
+
+#### Plugin installation for CentOS7 V4.10+
+Starting from `release-4.10`, the `base-plugins.txt` file is instead used to generate `bundle-plugins.txt` which is the comprehensive
+list of plugins used by the Jenkins image. To generate this list, developers must run `make plugins-list` prior to commit `base-plugins.txt`. 
+A git hook is provided to enforce that `bundle-plugins.txt` is always newer than `base-plugins.txt` on every commit attempt. And `openshift-ci`
+also runs the `make plugins-list` to be sure that the locally generated list of plugins does not change between the developer commit and the 
+ci run.
+The `bundle-plugins.txt` becomes then the source of truth for the ran, tested and verified plugins list. This file is intended to be used by 
+anyone who wants to build a Jenkins Image with the exact same set of plugins. Hence, this file is used by the Red Hat internal release 
+team (ART) and does not alter the existing release process, except that instead of getting the list of plugins from a succesful build, we now get it 
+from a predefined, pre-test and historized file written to the code repository.
+
+
 
 To update the version of a plugin or add a new plugin, construct a PR for this repository that updates `base-plugins.txt` appropriately.
 Administrators for this repository will make sure necessary tests are run and merge the PR when things are ready.

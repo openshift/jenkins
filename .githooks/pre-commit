@@ -1,0 +1,22 @@
+#!/bin/bash
+
+BASE_PLUGINS_FILE=2/contrib/openshift/base-plugins.txt
+BUNDLE_PLUGINS_FILE=2/contrib/openshift/bundle-plugins.txt
+
+if [[ $BASE_PLUGINS_FILE -nt $BUNDLE_PLUGINS_FILE ]]
+then
+  echo "ERROR: $BUNDLE_PLUGINS_FILE file must be regenerated using 'make plugins-list'"
+  echo "ERROR: commit aborted: see $0"
+  echo "ERROR: to force commit by ingoring pre-commit hook run: 'git commit --no-verify' "
+  exit 1
+fi
+
+# if the $BASE_PLUGINS_FILE is only commit but user forgot to add the $BUNDLE_PLUGINS_FILE, then, we fail
+if ( git diff --cached --name-only | grep $BASE_PLUGINS_FILE )  ; then
+  if ( git diff --cached --name-only | grep -v $BUNDLE_PLUGINS_FILE |  grep -v $BASE_PLUGINS_FILE )  ; then 
+    echo "ERROR: $BASE_PLUGINS_FILE is being commited without $BUNDLE_PLUGINS_FILE"
+    echo "ERROR: You need to add $BUNDLE_PLUGINS_FILE to the current commit."
+    exit 2
+  fi
+fi
+
