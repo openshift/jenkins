@@ -86,6 +86,7 @@ pipeline-model-extensions:1.9.3
 pipeline-rest-api:2.15
 pipeline-stage-step:2.5
 pipeline-stage-tags-metadata:1.8.4
+pipeline-utility-steps:2.12.0
 plain-credentials:1.7
 plugin-util-api:2.4.0
 popper-api:1.16.1-2
@@ -104,10 +105,10 @@ variant:1.4
 workflow-api:2.47
 workflow-basic-steps:2.20
 workflow-cps-global-lib:2.17
-workflow-cps:2.94
+workflow-cps:2648.va9433432b33c
 workflow-durable-task-step:2.35
 workflow-job:2.41
 workflow-multibranch:2.26
 workflow-scm-step:2.13
-workflow-step-api:2.24
+workflow-step-api:622.vb_8e7c15b_c95a_
 workflow-support:3.8
