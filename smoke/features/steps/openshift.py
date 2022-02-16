@@ -128,6 +128,14 @@ class Openshift(object):
         if exit_status == 0:
             return output
         return None
+    
+    def new_build(self,build_ref):
+        cmd = f'oc new-build {build_ref}'
+        output, exit_status = self.cmd.run(cmd)
+        print(f"starting: {output}, {exit_status}")
+        if exit_status == 0:
+            return output
+        return None
 
     def get_configmap(self, namespace):
         output, exit_code = self.cmd.run(f'oc get cm -n {namespace}')
@@ -172,12 +180,12 @@ class Openshift(object):
     def check_for_deployment_status(self, deployment_name, namespace, wait_for_status="True"):
         deployment_status_cmd = f'oc get deployment {deployment_name} -n {namespace} -o "jsonpath={{' \
                                 f'.status.conditions[*].status}}" '
-        deployment_status, exit_code = self.cmd.run_wait_for_status(deployment_status_cmd, wait_for_status, 5, 300)
+        deployment_status, exit_code = self.cmd.run_wait_for_status(deployment_status_cmd, wait_for_status, 5, 600)
         exit_code | should.be_equal_to(0)
         return deployment_status
 
     def check_for_deployment_config_status(self, dc_name, namespace, wait_for="condition=Available"):
-        output, exit_code = self.cmd.run_wait_for('dc', 'jenkins', wait_for, timeout_seconds=300)
+        output, exit_code = self.cmd.run_wait_for('dc', 'jenkins', wait_for, timeout_seconds=600)
         if exit_code != 0:
             print(output)
         return output, exit_code

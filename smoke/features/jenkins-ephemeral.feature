@@ -18,12 +18,14 @@ Feature: Deploy Jenkins on openshift using template based install
     Scenario: Create jenkins  using ephemeral template
         Given we have a openshift cluster
         When User enters oc new-app jenkins-ephemeral command
-        Then route.route.openshift.io "jenkins" created
-        And  configmap "jenkins-trusted-ca-bundle" created
-        And  deploymentconfig.apps.openshift.io "jenkins" created
-        And  serviceaccount "jenkins" created
-        And rolebinding.authorization.openshift.io "jenkins_edit" created
-        And service "jenkins-jnlp" created
-        And service "jenkins" created
+        Then we check that the resources are created
+        | resource         | resource_name             |
+        | route            | jenkins                   |
+        | configmap        | jenkins-trusted-ca-bundle |
+        | deploymentconfig | jenkins                   |
+        | serviceaccount   | jenkins                   |
+        | rolebinding      | jenkins_edit              |
+        | service          | jenkins-jnlp              |
+        | service          | jenkins                   |
         Then We check for deployment pod status to be "Completed"
         And We check for jenkins master pod status to be "Ready"
