@@ -180,12 +180,12 @@ class Openshift(object):
     def check_for_deployment_status(self, deployment_name, namespace, wait_for_status="True"):
         deployment_status_cmd = f'oc get deployment {deployment_name} -n {namespace} -o "jsonpath={{' \
                                 f'.status.conditions[*].status}}" '
-        deployment_status, exit_code = self.cmd.run_wait_for_status(deployment_status_cmd, wait_for_status, 5, 300)
+        deployment_status, exit_code = self.cmd.run_wait_for_status(deployment_status_cmd, wait_for_status, 5, 600)
         exit_code | should.be_equal_to(0)
         return deployment_status
 
     def check_for_deployment_config_status(self, dc_name, namespace, wait_for="condition=Available"):
-        output, exit_code = self.cmd.run_wait_for('dc', 'jenkins', wait_for, timeout_seconds=300)
+        output, exit_code = self.cmd.run_wait_for('dc', 'jenkins', wait_for, timeout_seconds=600)
         if exit_code != 0:
             print(output)
         return output, exit_code
@@ -218,19 +218,6 @@ class Openshift(object):
                 while exit_code != 0 and attempts > 0:
                     output, exit_code = self.cmd.run(
                         f'oc get {resource_type} {name} -n {namespace} -o "jsonpath={json_path}"')
-                    attempts -= 1
-                    time.sleep(5)
-        exit_code | should.be_equal_to(0).desc(f'Exit code should be 0:\n OUTPUT:\n{output}')
-        return output
-    
-    def get_resources_info_by_jsonpath(self, resource_type, namespace, json_path, wait=False):
-        output, exit_code = self.cmd.run(f'oc get {resource_type} -n {namespace} -o "jsonpath={json_path}"')
-        if exit_code != 0:
-            if wait:
-                attempts = 5
-                while exit_code != 0 and attempts > 0:
-                    output, exit_code = self.cmd.run(
-                        f'oc get {resource_type} -n {namespace} -o "jsonpath={json_path}"')
                     attempts -= 1
                     time.sleep(5)
         exit_code | should.be_equal_to(0).desc(f'Exit code should be 0:\n OUTPUT:\n{output}')

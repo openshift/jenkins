@@ -9,8 +9,19 @@ Feature: Testing jenkins agent nodejs image
 
   Scenario: Deploy sample application on openshift
     Given The jenkins pod is up and runnning
-    When The user enters new-app command with nodejs_template
-    Then Trigger the build using oc start-build
+    When The user create objects from the "smoke/samples/nodejs_pipeline.yaml" template by processing the template and piping the output to oc create
+    Then we check that the resources are created
+      | resource         | resource_name             |
+      | buildconfig      | sample-pipeline           |
+      | secret           | nodejs-postgresql-example |
+      | service          | nodejs-postgresql-example |
+      | route            | nodejs-postgresql-example |
+      | imagestream      | nodejs-postgresql-example |
+      | buildconfig      | nodejs-postgresql-example |
+      | deploymentconfig | nodejs-postgresql-example |
+      | service          | postgresql                |
+      | deploymentconfig | postgresql                |
+    Then Trigger the build using "oc start-build sample-pipeline"
+    And verify the build status of "sample-pipeline-1" build is Complete
     Then verify the build status of "nodejs-postgresql-example-1" build is Complete
-    Then verify the build status of "nodejs-postgresql-example-2" build is Complete
     And route nodejs-postgresql-example must be created and be accessible
