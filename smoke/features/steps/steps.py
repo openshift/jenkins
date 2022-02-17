@@ -10,7 +10,6 @@ from behave import given, then, when
 from kubernetes import config
 from pyshould import should
 from smoke.features.steps.openshift import Openshift
-from smoke.features.steps.plugins import Plugins
 from smoke.features.steps.project import Project
 from build_steps import verify_status
 # Test results file path
