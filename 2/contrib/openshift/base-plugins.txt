@@ -28,7 +28,7 @@ pam-auth:1.6
 pipeline-utility-steps:2.12.0
 prometheus:2.0.10
 scm-api:2.6.5
-script-security:1.78
+script-security:1131.v8b_b_5eda_c328e
 snakeyaml-api:1.29.1
 ssh-credentials:1.19
 subversion:2.15.1
