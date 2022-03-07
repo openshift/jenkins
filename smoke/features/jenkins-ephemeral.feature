@@ -15,7 +15,8 @@ Feature: Deploy Jenkins on openshift using template based install
     #     And delete all deploymentconfig
     #     And delete all remaining test resources
 
-    Scenario: Create jenkins  using ephemeral template
+    @automated @customer-scenario
+    Scenario: Create jenkins  using ephemeral template : JKNS-02-TC01
         Given we have a openshift cluster
         When User enters oc new-app jenkins-ephemeral command
         Then we check that the resources are created

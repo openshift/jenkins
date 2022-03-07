@@ -10,7 +10,8 @@ Feature: Use sidecar pattern for Jenkins pod templates
     Background:
     Given Project [TEST_NAMESPACE] is used
 
-    Scenario: Trigger a build that verifies the new pod templates can successfully execute a JenkinsPipeline build.
+    @automated @customer-scenario
+    Scenario: Trigger a build that verifies the new pod templates can successfully execute a JenkinsPipeline build. : JKNS-10-TC01
     Given The jenkins pod is up and runnning
     Then we configure custom agents as Kubernetes pod template by creating configmap using "smoke/samples/java-builder-cm.yaml" and "smoke/samples/nodejs-builder-cm.yaml"
     When the user creates a new build refering to "https://github.com/akram/pipes.git\#container-nodes"
