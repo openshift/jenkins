@@ -5,15 +5,15 @@ Feature: Deploy Jenkins on openshift using template based install
 
     Background:
     Given Project [TEST_NAMESPACE] is used
-    Then we delete deploymentconfig.apps.openshift.io "jenkins"
-        And  we delete route.route.openshift.io "jenkins"
-        And  delete configmap "jenkins-trusted-ca-bundle"
-        And  delete serviceaccount "jenkins"
-        And  delete rolebinding.authorization.openshift.io "jenkins_edit"
-        And  delete service "jenkins-jnlp"
-        And  delete service "jenkins"
-        And delete all deploymentconfig
-        And delete all remaining test resources
+    # Then we delete deploymentconfig.apps.openshift.io "jenkins"
+    #     And  we delete route.route.openshift.io "jenkins"
+    #     And  delete configmap "jenkins-trusted-ca-bundle"
+    #     And  delete serviceaccount "jenkins"
+    #     And  delete rolebinding.authorization.openshift.io "jenkins_edit"
+    #     And  delete service "jenkins-jnlp"
+    #     And  delete service "jenkins"
+    #     And delete all deploymentconfig
+    #     And delete all remaining test resources
 
     Scenario: Create jenkins  using ephemeral template
         Given we have a openshift cluster
