@@ -25,6 +25,7 @@ openshift-client:1.0.37
 openshift-login:1.0.27
 openshift-sync:1.0.53
 pam-auth:1.6
+pipeline-build-step:2.16
 pipeline-utility-steps:2.12.0
 prometheus:2.0.10
 scm-api:2.6.5
@@ -34,5 +35,7 @@ ssh-credentials:1.19
 subversion:2.15.1
 token-macro:267.vcdaea6462991
 workflow-api:2.47
-workflow-cps:2648.va9433432b33c
+workflow-cps:2660.vb_c0412dc4e6d
+workflow-cps-global-lib:564.ve62a_4eb_b_e039
+workflow-multibranch:711.vdfef37cda_816
 workflow-step-api:622.vb_8e7c15b_c95a_
