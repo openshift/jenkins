@@ -72,7 +72,7 @@ oauth-credentials:0.4
 okhttp-api:3.12.12.2
 openshift-client:1.0.35
 openshift-login:1.0.26
-openshift-sync:1.0.52
+openshift-sync:1.0.53
 pam-auth:1.6
 pipeline-build-step:2.14
 pipeline-graph-analysis:1.10
