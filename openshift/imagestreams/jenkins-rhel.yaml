@@ -11,9 +11,23 @@ spec:
       openshift.io/display-name: Jenkins (Latest)
       openshift.io/provider-display-name: Red Hat, Inc.
       description: |-
-        Provides a Jenkins server on RHEL. For more information about using this container image, including OpenShift considerations, see https://github.com/openshift/jenkins/blob/master/README.md.
+        Provides a Jenkins server from registry.redhat.io. For more information about using this container image, including OpenShift considerations, see https://github.com/openshift/jenkins/blob/master/README.md.
 
         WARNING: By selecting this tag, your application will automatically update to use the latest version of Jenkins available on OpenShift, including major versions updates.
+      iconClass: icon-jenkins
+      tags: jenkins
+    from:
+      kind: ImageStreamTag
+      name: '2'
+    referencePolicy:
+      type: Local
+  - name: ocp-upgrade-redeploy
+    annotations:
+      openshift.io/display-name: Jenkins (Latest)
+      openshift.io/provider-display-name: Red Hat, Inc.
+      description: Provides a Jenkins 2.X server from registry.redhat.io. For more information about
+        using this container image, including OpenShift considerations, see https://github.com/openshift/jenkins/blob/master/README.md.
+        This tag will will redeploy the Jenkins DeploymentConfig on an upgrade in OCP versions if the Jenkins image reference has changed.
       iconClass: icon-jenkins
       tags: jenkins
     from:
@@ -25,14 +39,51 @@ spec:
     annotations:
       openshift.io/display-name: Jenkins 2.X
       openshift.io/provider-display-name: Red Hat, Inc.
-      description: Provides a Jenkins 2.X server on RHEL. For more information about
+      description: Provides a Jenkins 2.X server from registry.redhat.io. For more information about
         using this container image, including OpenShift considerations, see https://github.com/openshift/jenkins/blob/master/README.md.
+        This tag will will redeploy the Jenkins DeploymentConfig on an upgrade in OCP versions if the Jenkins image reference has changed.
       iconClass: icon-jenkins
       tags: jenkins
       version: 2.x
     from:
       kind: DockerImage
-      name: registry.redhat.io/openshift4/ose-jenkins:v4.0
+      name: registry.redhat.io/openshift4/ose-jenkins:v4.10.0-202203141248.p0.g10e9ee3.assembly.stream
+    referencePolicy:
+      type: Local
+  - name: 'user-maintained-upgrade-redeploy'
+    annotations:
+      openshift.io/display-name: Jenkins 2.X
+      openshift.io/provider-display-name: Red Hat, Inc.
+      description: Provides a Jenkins 2.X server from registry.redhat.io. For more information about
+        using this container image, including OpenShift considerations, see https://github.com/openshift/jenkins/blob/master/README.md.
+        This tag will will redeploy the Jenkins DeploymentConfig on an upgrade in OCP versions if the Jenkins image reference has changed.
+        A user must invoke 'oc import-image jenkins:user-maintained-upgrade-redeploy -n openshift' in order for the ImageStream controller
+        to pull the latest digest for the image tag, and if a new digest exists, any running Jenkins DeploymentConfig will redeploy.
+      iconClass: icon-jenkins
+      tags: jenkins
+      version: 2.x
+    from:
+      kind: DockerImage
+      name: registry.redhat.io/openshift4/ose-jenkins:v4.10
+    referencePolicy:
+      type: Local
+  - name: 'scheduled-upgrade-redeploy'
+    annotations:
+      openshift.io/display-name: Jenkins 2.X
+      openshift.io/provider-display-name: Red Hat, Inc.
+      description: Provides a Jenkins 2.X server from registry.redhat.io. For more information about
+        using this container image, including OpenShift considerations, see https://github.com/openshift/jenkins/blob/master/README.md.
+        This tag will will redeploy the Jenkins DeploymentConfig on an upgrade in OCP versions if the Jenkins image reference has changed.
+        OpenShift will periodically check to ensure that the latest digest for this image tag is imported. If an update occurs, any running
+        Jenkins DeploymentConfig will redeploy.
+      iconClass: icon-jenkins
+      tags: jenkins
+      version: 2.x
+    from:
+      kind: DockerImage
+      name: registry.redhat.io/openshift4/ose-jenkins:v4.10
+    importPolicy:
+      scheduled: true
     referencePolicy:
       type: Local
 

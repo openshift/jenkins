@@ -21,6 +21,20 @@ spec:
       name: '2'
     referencePolicy:
       type: Local
+  - name: ocp-upgrade-redeploy
+    annotations:
+      openshift.io/display-name: Jenkins (Latest)
+      openshift.io/provider-display-name: Red Hat, Inc.
+      description: Provides a Jenkins 2.X server from quay.io. For more information about
+        using this container image, including OpenShift considerations, see https://github.com/openshift/jenkins/blob/master/README.md.
+        This tag will will redeploy the Jenkins DeploymentConfig on an upgrade in OCP versions if the Jenkins image reference has changed.
+      iconClass: icon-jenkins
+      tags: jenkins
+    from:
+      kind: ImageStreamTag
+      name: '2'
+    referencePolicy:
+      type: Local
   - name: '2'
     annotations:
       openshift.io/display-name: Jenkins 2.X
@@ -33,7 +47,42 @@ spec:
       version: 2.x
     from:
       kind: DockerImage
-      name: quay.io/openshift/origin-jenkins:v4.0
+      name: quay.io/openshift/origin-jenkins@sha256:1c74f4727908c9455aafb0b0ebfecfd9dddc30b3383a81c3eb834aeddc784cbd
+    referencePolicy:
+      type: Local
+  - name: 'user-maintained-upgrade-redeploy'
+    annotations:
+      openshift.io/display-name: Jenkins 2.X
+      openshift.io/provider-display-name: Red Hat, Inc.
+      description: Provides a Jenkins 2.X server from quay.io. For more information about
+        using this container image, including OpenShift considerations, see https://github.com/openshift/jenkins/blob/master/README.md.
+        This tag will will redeploy the Jenkins DeploymentConfig on an upgrade in OKD versions if the Jenkins image reference has changed.
+        A user must invoke 'oc import-image jenkins:user-maintained-upgrade-redeploy -n openshift' in order for the ImageStream controller
+        to pull the latest digest for the image tag, and if a new digest exists, any running Jenkins DeploymentConfig will redeploy.
+      iconClass: icon-jenkins
+      tags: jenkins
+      version: 2.x
+    from:
+      kind: DockerImage
+      name: quay.io/openshift/origin-jenkins:4.11
+    referencePolicy:
+      type: Local
+  - name: 'scheduled-upgrade-redeploy'
+    annotations:
+      openshift.io/display-name: Jenkins 2.X
+      openshift.io/provider-display-name: Red Hat, Inc.
+      description: Provides a Jenkins 2.X server from quay.io. For more information about
+        using this container image, including OpenShift considerations, see https://github.com/openshift/jenkins/blob/master/README.md.
+        OpenShift will periodically check to ensure that the latest digest for this image tag is imported. If an update occurs, any running
+        Jenkins DeploymentConfig will redeploy.
+      iconClass: icon-jenkins
+      tags: jenkins
+      version: 2.x
+    from:
+      kind: DockerImage
+      name: quay.io/openshift/origin-jenkins:4.11
+    importPolicy:
+      scheduled: true
     referencePolicy:
       type: Local
 
