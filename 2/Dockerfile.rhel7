@@ -2,6 +2,7 @@
 # Stage 1 : Build go-init
 ##############################################
 FROM openshift/origin-release:golang-1.12 AS go-init-builder
+ARG jenkins_version=latest
 WORKDIR  /go/src/github.com/openshift/jenkins
 COPY . .
 WORKDIR  /go/src/github.com/openshift/jenkins/go-init
@@ -11,6 +12,7 @@ RUN go build . && cp go-init /usr/bin
 # Stage 2 : Build slave-base with go-init
 ##############################################
 FROM quay.io/openshift/origin-cli
+ARG jenkins_version=latest
 MAINTAINER OpenShift Developer Services <openshift-dev-services+jenkins@redhat.com>
 COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
 
@@ -43,7 +45,7 @@ LABEL io.k8s.description="Jenkins is a continuous integration server" \
       io.k8s.display-name="Jenkins 2" \
       io.openshift.tags="jenkins,jenkins2,ci" \
       io.openshift.expose-services="8080:http" \
-      io.jenkins.version="2.319.2" \
+      io.jenkins.version="${jenkins_version}" \
       io.openshift.s2i.scripts-url=image:///usr/libexec/s2i 
 
 # Labels consumed by Red Hat build service
@@ -71,7 +73,7 @@ COPY ./contrib/jenkins /usr/local/bin
 ADD ./contrib/s2i /usr/libexec/s2i
 ADD release.version /tmp/release.version
 
-RUN /usr/local/bin/install-jenkins-core-plugins.sh /opt/openshift/base-plugins.txt && \
+RUN /usr/local/bin/install-jenkins-core-plugins.sh /opt/openshift/bundle-plugins.txt && \
     rmdir /var/log/jenkins && \
     chmod -R 775 /etc/alternatives && \
     chmod -R 775 /var/lib/alternatives && \
