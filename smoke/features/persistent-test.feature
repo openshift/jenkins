@@ -6,7 +6,8 @@ Feature: Upon jenkins master pod deletion/destruction the data(jobs) persist whe
     Background:
     Given Project [TEST_NAMESPACE] is used
 
-    Scenario: Test persistence of jenkins while using persistent template
+    @automated @customer-scenario
+    Scenario: Test persistence of jenkins while using persistent template : JKNS-09-TC01
       Given The jenkins pod is up and runnning
       Then We rsh into the master pod and check the jobs count
       When We delete the jenkins master pod
