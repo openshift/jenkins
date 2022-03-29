@@ -193,8 +193,12 @@ if [[ $(echo "$@" | awk '{print NF}') -gt 1 ]]; then
     JAVA_CORE_LIMIT="-XX:ParallelGCThreads=${CONTAINER_CORE_LIMIT} -Djava.util.concurrent.ForkJoinPool.common.parallelism=${CONTAINER_CORE_LIMIT} -XX:CICompilerCount=2"
   fi
 
+  if [[ -z "${JAVA_FIPS_OPTIONS}" ]]; then
+    JAVA_FIPS_OPTIONS="-Dcom.redhat.fips=false"
+  fi
+
   if [[ -z "${JNLP_JAVA_OPTIONS}" ]]; then
-    JNLP_JAVA_OPTIONS="$JAVA_GC_OPTS $JAVA_INITIAL_HEAP_PARAM $JAVA_MAX_HEAP_PARAM $JAVA_CORE_LIMIT $JAVA_DIAGNOSTICS"
+    JNLP_JAVA_OPTIONS="$JAVA_FIPS_OPTIONS $JAVA_GC_OPTS $JAVA_INITIAL_HEAP_PARAM $JAVA_MAX_HEAP_PARAM $JAVA_CORE_LIMIT $JAVA_DIAGNOSTICS"
   fi
 
   # Deal with embedded escaped spaces in JNLP_JAVA_OVERRIDES.
