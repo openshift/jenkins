@@ -367,10 +367,12 @@ function versionFromPlugin() {
 
 function installedPlugins() {
     echo "# Generated file: To generate this file run 'make plugins-list' before pushing your changes" > $BUNDLE_PLUGINS
+    temp_bundle=$(mktemp)
     for f in "$REF_DIR"/*.jpi; do
         echo "$(basename "$f" | sed -e 's/\.jpi//'):$(get_plugin_version "$f")"
-        echo "$(basename "$f" | sed -e 's/\.jpi//'):$(get_plugin_version "$f")" >> $BUNDLE_PLUGINS
+        echo "$(basename "$f" | sed -e 's/\.jpi//'):$(get_plugin_version "$f")" >> $temp_bundle
     done
+    sort -u $temp_bundle >> $BUNDLE_PLUGINS
 }
 
 function jenkinsMajorMinorVersion() {
