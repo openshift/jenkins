@@ -5,7 +5,7 @@ config-file-provider:3.7.1
 configuration-as-code:1.41
 configuration-as-code-groovy:1.1
 credentials-binding:1.23
-credentials:2.3.19
+credentials:2.6.1.1
 cloudbees-folder:6.15
 docker-commons:1.18
 git-client:3.2.1
@@ -42,7 +42,7 @@ prometheus:2.0.10
 script-security:1.78
 snakeyaml-api:1.29.1
 ssh-credentials:1.19
-subversion:2.15.1
+subversion:2.15.4
 token-macro:267.vcdaea6462991
 workflow-aggregator:2.6
 workflow-api:2.47
