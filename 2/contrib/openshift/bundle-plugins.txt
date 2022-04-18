@@ -33,7 +33,7 @@ cloudbees-folder:6.16
 config-file-provider:3.8.1
 configuration-as-code:1.55.1
 configuration-as-code-groovy:1.1
-credentials:2.6.1
+credentials:2.6.1.1
 credentials-binding:1.27.1
 display-url-api:2.3.5
 docker-commons:1.18
@@ -55,7 +55,7 @@ jackson2-api:2.13.1-242.v1a45bad25ceb
 javax-activation-api:1.2.0-2
 javax-mail-api:1.6.2-2
 jenkins-design-language:1.24.8
-jira:3.5
+jira:3.7.1
 job-dsl:1.77
 jquery3-api:3.6.0-1
 jsch:0.1.55.2
@@ -99,14 +99,14 @@ sse-gateway:1.24
 ssh-credentials:1.19
 sshd:3.0.4
 structs:308.v852b473a2b8c
-subversion:2.15.1
+subversion:2.15.4
 token-macro:267.vcdaea6462991
 trilead-api:1.0.13
 variant:1.4
 workflow-api:2.47
 workflow-basic-steps:2.20
 workflow-cps:2660.vb_c0412dc4e6d
-workflow-cps-global-lib:564.ve62a_4eb_b_e039
+workflow-cps-global-lib:566.vd0a_a_3334a_555
 workflow-durable-task-step:2.35
 workflow-job:2.41
 workflow-multibranch:711.vdfef37cda_816
