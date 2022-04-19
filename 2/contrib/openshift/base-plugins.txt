@@ -8,6 +8,7 @@ configuration-as-code:1.55.1
 credentials:2.6.1.1
 credentials-binding:1.27.1
 docker-commons:1.18
+favorite:2.4.1
 git-client:3.10.0
 github:1.34.0
 google-oauth-plugin:1.0.6
@@ -26,6 +27,7 @@ openshift-client:1.0.37
 openshift-login:1.0.27
 openshift-sync:1.0.53
 pam-auth:1.6
+parameterized-trigger:2.43.1
 pipeline-build-step:2.16
 pipeline-utility-steps:2.12.0
 prometheus:2.0.10
