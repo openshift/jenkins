@@ -372,7 +372,7 @@ function installedPlugins() {
         echo "$(basename "$f" | sed -e 's/\.jpi//'):$(get_plugin_version "$f")"
         echo "$(basename "$f" | sed -e 's/\.jpi//'):$(get_plugin_version "$f")" >> $temp_bundle
     done
-    sort -u $temp_bundle >> $BUNDLE_PLUGINS
+    sort -d $temp_bundle >> $BUNDLE_PLUGINS
 }
 
 function jenkinsMajorMinorVersion() {
