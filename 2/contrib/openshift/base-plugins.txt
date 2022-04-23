@@ -6,7 +6,7 @@ config-file-provider:3.7.1
 configuration-as-code:1.41
 configuration-as-code-groovy:1.1
 credentials-binding:1.23
-credentials:2.3.15
+credentials:2.6.1.1
 cloudbees-folder:6.15
 docker-commons:1.18
 git-client:3.2.1
@@ -15,7 +15,7 @@ github:1.33.0
 google-oauth-plugin:1.0.0
 groovy:2.2
 htmlpublisher:1.21
-jira:3.0.17
+jira:3.7.1
 job-dsl:1.77
 junit:1.30
 kubernetes:1.29.0
@@ -31,7 +31,7 @@ openshift-client:1.0.34
 openshift-login:1.0.26
 openshift-sync:1.0.46
 pam-auth:1.6
-parameterized-trigger:2.36
+parameterized-trigger:2.43.1
 pipeline-github-lib:1.0
 pipeline-input-step:2.11
 pipeline-model-api:1.7.2
@@ -45,10 +45,10 @@ prometheus:2.0.10
 snakeyaml-api:1.29.1
 script-security:1.78
 ssh-credentials:1.19
-subversion:2.15.1
+subversion:2.15.4
 token-macro:267.vcdaea6462991
 workflow-api:2.47
 workflow-cps:2660.vb_c0412dc4e6d
-workflow-cps-global-lib:564.ve62a_4eb_b_e039
+workflow-cps-global-lib:566.vd0a_a_3334a_555
 workflow-multibranch:711.vdfef37cda_816
 workflow-step-api:622.vb_8e7c15b_c95a_
