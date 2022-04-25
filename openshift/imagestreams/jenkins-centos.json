@@ -55,7 +55,7 @@
         },
         "from": {
           "kind": "DockerImage",
-          "name": "quay.io/openshift/origin-jenkins@sha256:1c74f4727908c9455aafb0b0ebfecfd9dddc30b3383a81c3eb834aeddc784cbd"
+          "name": "quay.io/openshift/origin-jenkins:latest"
         },
         "referencePolicy": {
           "type": "Local"
