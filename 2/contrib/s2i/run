@@ -576,7 +576,11 @@ if [ -n "$https_proxy" ]; then
   JAVA_HTTP_PROXY_OPTIONS="$JAVA_HTTP_PROXY_OPTIONS $proxy"
 fi
 
-JENKINS_JAVA_OPTIONS="$JENKINS_JAVA_OPTIONS $JAVA_HTTP_PROXY_OPTIONS"
+if [[ -z "${JAVA_FIPS_OPTIONS}" ]]; then
+  JAVA_FIPS_OPTIONS="-Dcom.redhat.fips=false"
+fi
+
+JENKINS_JAVA_OPTIONS="$JENKINS_JAVA_OPTIONS $JAVA_FIPS_OPTIONS $JAVA_HTTP_PROXY_OPTIONS"
 
 # Deal with embedded escaped spaces in JENKINS_JAVA_OVERRIDES.
 # JENKINS_JAVA_OVERRIDES='-Dfoo -Dbar' => append -Dfoo -Dbar to java invocation
