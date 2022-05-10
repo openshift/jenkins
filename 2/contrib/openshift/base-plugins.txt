@@ -11,7 +11,7 @@ docker-commons:1.18
 git-client:3.2.1
 git:4.7.2
 github:1.33.1
-google-oauth-plugin:1.0.0
+google-oauth-plugin:1.33.3
 groovy:2.2
 htmlpublisher:1.21
 jira:3.0.17
