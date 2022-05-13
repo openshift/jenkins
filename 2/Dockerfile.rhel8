@@ -1,7 +1,7 @@
 ##############################################
 # Stage 1 : Build go-init
 ##############################################
-FROM registry.ci.openshift.org/ocp/builder:rhel-8-golang-1.17-openshift-4.11 AS go-init-builder
+FROM registry.ci.openshift.org/ocp/builder:rhel-8-golang-1.18-openshift-4.11 AS go-init-builder
 ARG jenkins_version=latest
 WORKDIR  /go/src/github.com/openshift/jenkins
 COPY . .
