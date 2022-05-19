@@ -76,11 +76,11 @@ def startBuild(context):
 
 @then(u'verify the build status of openshift-jee-sample-docker build is Complete')
 def verifyDockerBuildStatus(context):
-    verify_status(context.current_project, 'build', 'openshift-jee-sample-docker-1', 2, 10, 'Complete', '{.status.phase}')
+    verify_status(context.current_project, 'build', 'openshift-jee-sample-docker-1', 10, 900, 'Complete', '{.status.phase}')
 
 @then(u'verify the build status of openshift-jee-sample-1 is Complete')
 def verifyJenkinsBuildStatus(context):
-    verify_status(context.current_project, 'build', 'openshift-jee-sample-1', 2, 100, 'Complete', '{.status.phase}')
+    verify_status(context.current_project, 'build', 'openshift-jee-sample-1', 10, 900, 'Complete', '{.status.phase}')
 
 @then(u'We check for deployment pod status to be "Completed"')
 def deploymentPodStatus(context):
@@ -194,7 +194,7 @@ def delete_builds(context):
 
 
 @then(u'verify sync plugin is able to reconcile the build state and delete the job runs associated with the builds we deleted')
-def ensure_all_builds_get_completed(context, poll_interval=10, max_retries=40):
+def ensure_all_builds_get_completed(context, poll_interval=10, max_retries=60):
     retries = 0
     while( retries < max_retries):
         time.sleep(poll_interval)

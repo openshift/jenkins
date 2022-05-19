@@ -63,6 +63,18 @@ def del_alldc(context):
     res = oc.delete("deploymentconfig","--all",context.current_project)
     if res == None:
         raise AssertionError
+@then(u'delete all services')
+def del_allsvc(context):
+    res = oc.delete("service","--all",context.current_project)
+    if res == None:
+        raise AssertionError
+
+@then(u'delete all imagestream')
+def del_all_is(context):
+    res = oc.delete("is","--all",context.current_project)
+    if res == None:
+        raise AssertionError
+
 
 @then(u'delete all remaining test resources')
 @given(u'cleared from all test resources')
