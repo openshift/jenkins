@@ -486,3 +486,4 @@ you can omit this parameter.**
 ## PR testing for this repository
 
 As with the plugins focused on OpenShift integration, see [the contribution guide](CONTRIBUTING_TO_OPENSHIFT_JENKINS_IMAGE_AND_PLUGINS.md).
+test PR
