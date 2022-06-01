@@ -1,4 +1,4 @@
-#! /bin/bash -eu
+#!/bin/bash -eu
 #
 # Originally copied from https://github.com/jenkinsci/docker
 # You can set JENKINS_UC to change the default URL to Jenkins update center
