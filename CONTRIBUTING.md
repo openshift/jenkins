@@ -255,19 +255,29 @@ With both those removed, we no longer needed a special template under `ci-operat
 
 You will also notice the use of `Dockerfile.rhel7` vs. `Dockerfile` for the `dockerfile_path`.  This stems from the [move in 4.x to the UBI](https://github.com/openshift/jenkins#installation-openshift-v4) and the end of CentOS based content for OpenShift.
 
-The extended tests defined in [OpenShift origin](https://github.com/openshift/origin) were also reworked in 4.x.  The use of Ginkgo focuses were moved to only within the test executables, and can no longer be specified from the command line.  "Test suites" were defined for the most prominent focuses, including one for Jenkins called `openshift/jenkins-e2e`.  This simplification, along with other rework, makes it easier to run the extended tests against existing clusters (including ones you stand up for your development ... more on that later).  The tests defined for jenkins repo PRs are the specific jenkins e2e's, as well as the generic OpenShift conformance regression bucket:
+The extended tests defined in [OpenShift origin](https://github.com/openshift/origin) were also reworked in 4.x.  The use of Ginkgo focuses were moved to only within the test executables, and can no longer be specified from the command line.  "Test suites" were defined for the most prominent focuses, including one for Jenkins called `openshift/jenkins-e2e`.  This simplification, along with other rework, makes it easier to run the extended tests against existing clusters (including ones you stand up for your development ... more on that later).  
+The tests defined for jenkins  are as of 4.10 a "meets min" validation that JenkinsPipelineStrategy builds work.  And they are only invoked if you run `e2e-aws-jenkins` in openshift/origin PRs or openshift/cluster-samples-operator PRs.  The more precise jenkins e2e's centering on the plugins are now defined in the sync and client plugins respectively (and are "controller like" vs. ginkgo).
+The generic OpenShift conformance regression bucket is also still included:
 
 ```
 tests:
-- as: e2e-aws
-  commands: TEST_SUITE=openshift/conformance/parallel run-tests
-  openshift_installer:
+- as: e2e-aws-jenkins-sync-plugin
+  skip_if_only_changed: ^docs/|\.md$|^(?:.*/)?(?:\.gitignore|OWNERS|PROJECT|LICENSE)$
+  steps:
     cluster_profile: aws
-- as: e2e-aws-jenkins
-  commands: TEST_SUITE=openshift/jenkins-e2e run-tests
-  openshift_installer:
-cluster_profile: aws
+    test:
+    - ref: jenkins-sync-plugin-e2e
+    workflow: ipi-aws
+- as: e2e-aws-jenkins-client-plugin
+  skip_if_only_changed: ^docs/|\.md$|^(?:.*/)?(?:\.gitignore|OWNERS|PROJECT|LICENSE)$
+  steps:
+    cluster_profile: aws
+    test:
+    - ref: jenkins-client-plugin-tests
+    workflow: ipi-aws
 ```
+
+Those jenkins plugin e2e's are also used in their respective repos' PRs.  The are defined in the [CI Step Registry](https://github.com/openshift/release/tree/master/ci-operator/step-registry/jenkins)
 
 Moving on to the `ci-operator/jobs` data, not as different from 3.11 as the `ci-operator/config`, [the presubmits](https://github.com/openshift/release/blob/master/ci-operator/jobs/openshift/jenkins/openshift-jenkins-master-presubmits.yaml) are the ci-operator and Prow related definitions for the `e2e-aws` and `e2e-aws-jenkins` test jobs noted above, as well as the job to build the images.  Each can be re-run via `/test e2e-aws`, `/test e2e-aws-jenkins`, or `/test images`.
 
@@ -348,6 +358,15 @@ The use of the generic conformance regression bucket is omitted for plugin testi
 The `ci-operator/jobs` files are very similar to the ones for the jenkins image itself for 4.x, in the Prow jobs they define, etc.  For reference here are the locations of the [client plugin](https://github.com/openshift/release/tree/master/ci-operator/jobs/openshift/jenkins-client-plugin), [login plugin](https://github.com/openshift/release/tree/master/ci-operator/jobs/openshift/jenkins-openshift-login-plugin), and [sync plugin](https://github.com/openshift/release/tree/master/ci-operator/jobs/openshift/jenkins-sync-plugin).
 
 ### Extended tests
+
+##### 4.11 and later
+
+- [meets min jenkins pipeline strategy verification in openshift/origin, only for openshift/origin and openshift/cluster-samples-operator jobs](https://github.com/openshift/origin/blob/master/test/extended/builds/pipeline_origin_bld.go)
+- [client plugin tests](https://github.com/openshift/jenkins-client-plugin/tree/master/test/e2e)
+- [sync plugin tests](https://github.com/openshift/jenkins-sync-plugin/tree/master/test/e2e)
+- login plugin uses the sync plugin tests, as it always fetches logs using the login plugin's command line with oauth token flow
+
+##### 4.19 and earlier
 
 First, the extended tests in [OpenShift Origin](https://github.com/openshift/origin) that we've made some references to ... where are the Jenkins ones specifically?  There are two golang files:
 * The [reduced jenkins e2e suite](https://github.com/openshift/origin/blob/master/test/extended/builds/pipeline_origin_bld.go) run in the OpenShift Build's regression bucket
@@ -502,7 +521,25 @@ If the PR passes all tests and merges, the api.ci system will promote the jenkin
 
 The image build from the PR in particular is of interest when it comes to plugin versions within our openshift/jenkins image, and what we have to do in creating the RPM based images hosted on registy.redhat.io/registry.access.redhat.com that we provide subscription level support for.  The PR will have a link to the `ci/prow/images` job.  If you click that link, then the `artifacts` link, then the next `artifacts` link, then `build-logs`, you'll see gzipped output from each of the image builds.  Click the one for the main jenkins image.  If you search for the string `Installed plugins:` you'll find the complete list of every plugin that was installed.  Copy that output to clipboard and paste it into the PR that just merged.  See [https://github.com/openshift/jenkins/pull/829#issuecomment-477637521](https://github.com/openshift/jenkins/pull/829#issuecomment-477637521) as an example.
 
-### Step 2: updating OSBS/Brew for generating the officially supported images available with Red Hat subscriptions
+### Step 2 (4.11 and later)
+
+The jenkins images got removed from the OCP install payload in 4.11, and we now use the CPaaS Images Akram created for us.  A net of all this is that the OCP samples operator no longer modifies the jenkins related ImageStreams with 
+the image ref from the install payload.  Jenkins is now treated like any other sample.  With that though:
+- we no longer have to submit ART requests after our openshift/jenkins PRs merge
+- we do need to update our (ImageStreams)[https://github.com/openshift/jenkins/tree/master/openshift/imagestreams] with new image refs
+
+Moving out of the payload, we also were able to create more than one ImageStreamTag, so we can now support some of the upgrade options customers have asked for in the past:
+- still upgrade when OCP upgrades (we use a precise SHA image ref for this)
+- use the OCP ImageStream scheduled import feature, so the ImageStream controllers periodically access registry.redhat.io if updates have been made
+- use a constant Image ref for the ImageStreamTag, so that unless we change that ref in someway, the ImageStream update made by samples operator on an upgrade should no change the ImageStreamTag's image ref, and hence the Image Change Controller should 
+not rollout a new Jenkins Deployment.  The customer than can control when Jenkins is redeployed by doing an 'oc import-image' for the jenkins ImageStream
+
+Once the Jenkins ImageStreams in the repo are updated, wait for the "Automatic importer job update" commit in [OpenShift Library](https://github.com/openshift/library/commits/master) that pulls in our changes.
+
+After that, open a [samples operator](https://github.com/openshift/cluster-samples-operator) PR that follows [this process](https://github.com/openshift/cluster-samples-operator#update-the-content-in-this-repository-from-httpsgithubcomopenshiftlibrary) for
+updating the samples content for jenkins.  NOTE: that script will pull in all the samples updates.  If you only want to pull in jenkins, edit the git commits to undo those changes.  NOTE: be sure the run the optional `e2e-aws-jenkins` test job as a sanity check.
+
+### Step 2 (4.10 and earlier): updating OSBS/Brew for generating the officially supported images available with Red Hat subscriptions
 
 First, some background:  for all Red Hat officially supported content, to ensure protection from outside hackers, all content is built in a quarantined system with no access to the external Internet.  As such, we have to inject all content into OpenShift's Brew server (see links like [https://pagure.io/koji/](https://pagure.io/koji/)  and [https://osbs.readthedocs.io/en/latest/](https://osbs.readthedocs.io/en/latest/) if you are interested in the details/histories of this infrastructure), which is then scrubbed before official builds are run with it.  The injection is specifically the creation of an RPM which contains all the plugin binaries.
 
