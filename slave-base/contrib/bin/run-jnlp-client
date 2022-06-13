@@ -125,8 +125,10 @@ if [[ $(echo "$@" | awk '{print NF}') -gt 1 ]]; then
     fi
   fi
 
-  echo "Downloading ${JENKINS_URL}/jnlpJars/remoting.jar ..."
-  curl -sS ${JENKINS_URL}/jnlpJars/remoting.jar -o ${JAR}
+  # Avoid double slashes in URL
+  # ${string%%substring} Deletes longest match of $substring from back of $string.
+  echo "Downloading ${JENKINS_URL%%/}/jnlpJars/remoting.jar ..."
+  curl -sS ${JENKINS_URL%%/}/jnlpJars/remoting.jar -o ${JAR}
 
   # if -tunnel is not provided try env vars
   if [[ "$@" != *"-tunnel "* ]]; then
