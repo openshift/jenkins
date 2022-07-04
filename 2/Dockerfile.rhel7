@@ -43,7 +43,7 @@ LABEL io.k8s.description="Jenkins is a continuous integration server" \
       io.k8s.display-name="Jenkins 2" \
       io.openshift.tags="jenkins,jenkins2,ci" \
       io.openshift.expose-services="8080:http" \
-      io.jenkins.version="2.319.3" \
+      io.jenkins.version="2.346.1" \
       io.openshift.s2i.scripts-url=image:///usr/libexec/s2i 
 
 # Labels consumed by Red Hat build service
@@ -77,7 +77,6 @@ RUN /usr/local/bin/install-jenkins-core-plugins.sh /opt/openshift/base-plugins.t
     chmod -R 775 /var/lib/alternatives && \
     chmod -R 775 /usr/lib/jvm && \
     chmod 775 /usr/bin && \
-    chmod 775 /usr/lib/jvm-exports && \
     chmod 775 /usr/share/man/man1 && \
     mkdir -p /var/lib/origin && \
     chmod 775 /var/lib/origin && \
