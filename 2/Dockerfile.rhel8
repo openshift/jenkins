@@ -6,7 +6,7 @@ ARG jenkins_version=latest
 WORKDIR  /go/src/github.com/openshift/jenkins
 COPY . .
 WORKDIR  /go/src/github.com/openshift/jenkins/go-init
-RUN GO111MODULE=off go build . && cp go-init /usr/bin
+RUN GO111MODULE=off go build -o /tmp/go-init main.go
 
 ##############################################
 # Stage 2 : Build slave-base with go-init
@@ -14,7 +14,7 @@ RUN GO111MODULE=off go build . && cp go-init /usr/bin
 FROM registry.ci.openshift.org/ocp/4.10:cli
 ARG jenkins_version=latest
 MAINTAINER OpenShift Developer Services <openshift-dev-services+jenkins@redhat.com>
-COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
+COPY --from=go-init-builder /tmp/go-init /usr/bin/go-init
 
 # Jenkins image for OpenShift
 #
@@ -95,10 +95,10 @@ RUN /usr/local/bin/install-jenkins-core-plugins.sh /opt/openshift/bundle-plugins
     unlink /usr/share/man/man1/pack200.1.gz && \
     unlink /usr/share/man/man1/rmid.1.gz && \
     unlink /usr/share/man/man1/rmiregistry.1.gz && \
-    unlink /usr/share/man/man1/unpack200.1.gz && \
-    chown -R 1001:0 /opt/openshift && \
-    /usr/local/bin/fix-permissions /opt/openshift && \
-    /usr/local/bin/fix-permissions /opt/openshift/configuration/init.groovy.d && \
+    unlink /usr/share/man/man1/unpack200.1.gz 
+RUN     chown -R 1001:0 /opt/openshift 
+RUN    /usr/local/bin/fix-permissions /opt/openshift
+RUN    /usr/local/bin/fix-permissions /opt/openshift/configuration/init.groovy.d && \
     /usr/local/bin/fix-permissions /var/lib/jenkins && \
     /usr/local/bin/fix-permissions /var/log
 
