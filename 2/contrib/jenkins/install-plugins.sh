@@ -151,6 +151,12 @@ BUNDLE_PLUGINS=${BUNDLE_PLUGINS:-/opt/openshift/plugins/bundle-plugins.txt}
 JENKINS_WAR=${JENKINS_WAR:-/usr/lib/jenkins/jenkins.war}
 JENKINS_UC=${JENKINS_UC:-https://updates.jenkins.io}
 
+if [ ! -f $JENKINS_WAR ]; then
+  JENKINS_WAR=/usr/share/java/jenkins.war
+  mkdir -p /usr/lib/jenkins/
+  ln -s $JENKINS_WAR /usr/lib/jenkins/jenkins.war
+fi
+
 INCREMENTAL_BUILD_ARTIFACTS_DIR="/tmp/artifacts"
 
 function getLockFile() {
@@ -330,6 +336,7 @@ function resolveDependencies() {
 }
 
 function bundledPlugins() {
+    echo "Entering bundledPlugins"
     echo "Checking JENKINS_WAR=$JENKINS_WAR" > /dev/stderr
     if [ ! -f $JENKINS_WAR ]; then
         jenkins_version=$(cat $PWD/2/contrib/openshift/jenkins-version.txt )
@@ -338,7 +345,9 @@ function bundledPlugins() {
     fi
     if [ -f $JENKINS_WAR ]
     then
+        echo "File $JENKINS_WAR exists"
         TEMP_PLUGIN_DIR=/tmp/plugintemp.$$
+        echo "Created TEMP_PLUGIN_DIR : $TEMP_PLUGIN_DIR"
         for i in $(jar tf $JENKINS_WAR | egrep '[^detached-]plugins.*\..pi' | sort)
         do
             rm -fr $TEMP_PLUGIN_DIR
@@ -351,8 +360,9 @@ function bundledPlugins() {
         rm -fr $TEMP_PLUGIN_DIR
     else
         echo "ERROR file not found: $JENKINS_WAR"
-        exit 1
+        exit 102
     fi
+    echo "End of bundledPlugins"
 }
 
 function versionFromPlugin() {
@@ -445,7 +455,7 @@ main() {
 
     if [[ -f $FAILED ]]; then
         echo -e "\nSome plugins failed to download!\n$(<"$FAILED")" >&2
-        exit 1
+        exit 101
     fi
 
     echo -e "\nCleaning up locks"
