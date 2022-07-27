@@ -16,12 +16,12 @@ python3 -m venv ${PYTHON_VENV_DIR}
 ${PYTHON_VENV_DIR}/bin/pip install --upgrade setuptools
 ${PYTHON_VENV_DIR}/bin/pip install --upgrade pip
 # -- Generating a new namespace name
-# echo "test-namespace-$(uuidgen | tr '[:upper:]' '[:lower:]' | head -c 8)" > ${OUTPUT_DIR}/test-namespace
+echo "test-namespace-$(uuidgen | tr '[:upper:]' '[:lower:]' | head -c 8)" > ${OUTPUT_DIR}/test-namespace
 if [[ $OPENSHIFT_CI == true ]]; then
     # openshift-ci will not allow to create different namespaces, so will do all in the same namespace.
-    oc project -q jenkins-csb-build
+    oc project -q > ${OUTPUT_DIR}/test-namespace
 fi
-export TEST_NAMESPACE=jenkins-csb-build
+export TEST_NAMESPACE=$(cat ${OUTPUT_DIR}/test-namespace)
 echo "Assigning value to variable TEST_NAMESPACE=${TEST_NAMESPACE}"
 # -- Do clean up & create namespace
 echo "Starting cleanup"
@@ -30,6 +30,9 @@ if [[ $OPENSHIFT_CI == true ]]; then
     oc delete all,rolebindings.authorization.openshift.io,bc,cm,is,pvc,sa,secret -l app=jenkins-persistent
     oc delete all,rolebindings.authorization.openshift.io,bc,cm,is,pvc,sa,secret -l app=openshift-jee-sample
     oc delete all,rolebindings.authorization.openshift.io,bc,cm,is,pvc,sa,secret -l app=jenkins-pipeline-example
+else
+    kubectl delete namespace ${TEST_NAMESPACE} --timeout=45s --wait
+    kubectl create namespace ${TEST_NAMESPACE}
 fi
 mkdir -p ${LOGS_DIR}/smoke-tests-logs
 mkdir -p ${OUTPUT_DIR}/smoke-tests-output
