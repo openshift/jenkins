@@ -159,6 +159,12 @@ if [ ! -f $JENKINS_WAR ]; then
   ln -sf $JENKINS_WAR /usr/lib/jenkins/jenkins.war
 fi
 
+if [ ! -f $JENKINS_WAR ]; then
+  JENKINS_WAR=/usr/share/java/jenkins.war
+  mkdir -p /usr/lib/jenkins/
+  ln -sf $JENKINS_WAR /usr/lib/jenkins/jenkins.war
+fi
+
 INCREMENTAL_BUILD_ARTIFACTS_DIR="/tmp/artifacts"
 
 function getLockFile() {
