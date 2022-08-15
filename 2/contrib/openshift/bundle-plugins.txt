@@ -82,7 +82,7 @@ pam-auth:1.6
 parameterized-trigger:2.43.1
 pipeline-build-step:2.16
 pipeline-graph-analysis:1.10
-pipeline-input-step:2.12
+pipeline-input-step:449.v77f0e8b_845c4
 pipeline-milestone-step:1.3.1
 pipeline-model-api:1.9.3
 pipeline-model-definition:1.8.4
