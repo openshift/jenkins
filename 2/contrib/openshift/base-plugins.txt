@@ -28,6 +28,7 @@ openshift-sync:1.0.53
 pam-auth:1.6
 parameterized-trigger:2.43.1
 pipeline-build-step:2.16
+pipeline-input-step:449.v77f0e8b_845c4
 pipeline-utility-steps:2.12.0
 prometheus:2.0.10
 scm-api:2.6.5
