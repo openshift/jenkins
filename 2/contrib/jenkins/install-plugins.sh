@@ -151,6 +151,12 @@ BUNDLE_PLUGINS=${BUNDLE_PLUGINS:-/opt/openshift/plugins/bundle-plugins.txt}
 JENKINS_WAR=${JENKINS_WAR:-/usr/lib/jenkins/jenkins.war}
 JENKINS_UC=${JENKINS_UC:-https://updates.jenkins.io}
 
+if [ ! -f $JENKINS_WAR ]; then
+  JENKINS_WAR=/usr/share/java/jenkins.war
+  mkdir -p /usr/lib/jenkins/
+  ln -sf $JENKINS_WAR /usr/lib/jenkins/jenkins.war
+fi
+
 INCREMENTAL_BUILD_ARTIFACTS_DIR="/tmp/artifacts"
 
 function getLockFile() {

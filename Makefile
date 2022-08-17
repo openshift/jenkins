@@ -10,7 +10,7 @@
 # or <platform> version numbers in the names.
 VERSIONS="2 slave-base agent-maven-3.5 agent-nodejs-8 agent-nodejs-10"
 
-BUNDLE_PLUGINS="$(PWD)/2/contrib/openshift/bundle-plugins.txt"
+BUNDLE_PLUGINS="$(shell pwd)/2/contrib/openshift/bundle-plugins.txt"
 REF=$(shell mktemp -d)
 JENKINS_WAR="$(shell mktemp -d)/jenkins.war"
 ifeq ($(TARGET),rhel7)
