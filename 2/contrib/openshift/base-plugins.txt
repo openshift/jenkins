@@ -22,7 +22,7 @@ lockable-resources:2.11
 mapdb-api:1.0.9.0
 matrix-auth:2.6.8
 matrix-project:1.20
-mercurial:2.15
+mercurial:2.16.2
 metrics:4.0.2.8.1
 openshift-client:1.0.37
 openshift-login:1.0.27
