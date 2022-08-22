@@ -34,7 +34,7 @@ pipeline-input-step:449.v77f0e8b_845c4
 pipeline-utility-steps:2.12.0
 prometheus:2.0.10
 scm-api:2.6.5
-script-security:1158.v7c1b_73a_69a_08
+script-security:1175.v4b_d517d6db_f0
 snakeyaml-api:1.30.1
 ssh-credentials:1.19
 subversion:2.15.4
