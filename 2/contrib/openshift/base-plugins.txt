@@ -13,7 +13,7 @@ docker-commons:1.18
 favorite:2.4.1
 git:4.11.4
 git-client:3.11.1
-github:1.34.0
+github:1.34.5
 google-oauth-plugin:1.0.6
 groovy:2.4
 htmlpublisher:1.25
