@@ -1,13 +1,14 @@
 ant:1.11
 blueocean:1.24.8
 config-file-provider:3.8.1
-configuration-as-code:1.54
+configuration-as-code:1.55.1
 configuration-as-code-groovy:1.1
 credentials:2.6.1.1
-credentials-binding:1.27
+credentials-binding:1.27.1
 cloudbees-folder:6.16
 docker-commons:1.18
 favorite:2.4.1
+git:4.11.4
 git-client:3.11.1
 github:1.34.0
 google-oauth-plugin:1.0.6
