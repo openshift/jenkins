@@ -1,5 +1,8 @@
 ant:1.11
 blueocean:1.24.8
+blueocean-pipeline-scm-api:1.25.6
+cloudbees-bitbucket-branch-source:746.v350d2781c184
+cloudbees-folder:6.16
 config-file-provider:3.8.1
 configuration-as-code:1.55.1
 configuration-as-code-groovy:1.1
