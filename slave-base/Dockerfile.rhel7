@@ -41,7 +41,6 @@ RUN INSTALL_PKGS="bc gettext git java-11-openjdk-headless java-1.8.0-openjdk-hea
     chmod -R 775 /var/lib/alternatives && \
     chmod -R 775 /usr/lib/jvm && \
     chmod 775 /usr/bin && \
-    chmod 775 /usr/lib/jvm-exports && \
     chmod 775 /usr/share/man/man1 && \
     mkdir -p /var/lib/origin && \
     chmod 775 /var/lib/origin && \    
@@ -52,7 +51,6 @@ RUN INSTALL_PKGS="bc gettext git java-11-openjdk-headless java-1.8.0-openjdk-hea
     unlink /usr/bin/rmid && \
     unlink /usr/bin/rmiregistry && \
     unlink /usr/bin/unpack200 && \
-    unlink /usr/lib/jvm-exports/jre && \
     unlink /usr/share/man/man1/java.1.gz && \
     unlink /usr/share/man/man1/jjs.1.gz && \
     unlink /usr/share/man/man1/keytool.1.gz && \
