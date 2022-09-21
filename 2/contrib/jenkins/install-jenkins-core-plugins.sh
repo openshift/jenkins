@@ -23,16 +23,16 @@ if [[ "${INSTALL_JENKINS_VIA_RPMS}" == "false" ]]; then
     fi
     # Since the recent LTS jenkins update we need to install the 'daemonize' package
     # which is only available in EPEL, so enable it here
-    yum -y --setopt=tsflags=nodocs --disableplugin=subscription-manager install \
+    yum -y $YUM_FLAGS --setopt=tsflags=nodocs --disableplugin=subscription-manager install \
 	    https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
     yum -y $YUM_FLAGS --setopt=tsflags=nodocs --disableplugin=subscription-manager install jenkins-${jenkins_version}
     rpm -V jenkins-${jenkins_version}
     yum $YUM_FLAGS clean all
     /usr/local/bin/install-plugins.sh $PLUGIN_LIST
 else
-    yum install -y --disableplugin=subscription-manager jenkins-2.* jenkins-2-plugins
+    yum install -y $YUM_FLAGS --disableplugin=subscription-manager jenkins-2.* jenkins-2-plugins
     rpm -V jenkins-2.* jenkins-2-plugins
-    yum clean all
+    yum $YUM_FLAGS clean all
     # Remove the base-plugins.txt file because it's only used for Centos
     # and its presence in the rhel image is confusing.
     rm /opt/openshift/base-plugins.txt
