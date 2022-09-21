@@ -16,6 +16,7 @@ github:1.34.5
 google-oauth-plugin:1.0.6
 groovy:2.4
 htmlpublisher:1.25
+javax-mail-api:1.6.2-6
 jira:3.7.1
 job-dsl:1.77
 junit:1119.1121.vc43d0fc45561
