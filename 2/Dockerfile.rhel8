@@ -11,7 +11,7 @@ RUN GO111MODULE=off go build . && cp go-init /usr/bin
 ##############################################
 # Stage 2 : Build slave-base with go-init
 ##############################################
-FROM registry.ci.openshift.org/ocp/4.11:cli
+FROM registry.ci.openshift.org/ocp/4.12:cli
 ARG jenkins_version=latest
 MAINTAINER OpenShift Developer Services <openshift-dev-services+jenkins@redhat.com>
 COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
@@ -32,7 +32,7 @@ ENV JENKINS_VERSION=2 \
     HOME=/var/lib/jenkins \
     JENKINS_HOME=/var/lib/jenkins \
     JENKINS_UC=https://updates.jenkins.io \
-    OPENSHIFT_JENKINS_IMAGE_VERSION=4.10 \
+    OPENSHIFT_JENKINS_IMAGE_VERSION=4.12 \
     LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
     INSTALL_JENKINS_VIA_RPMS=false
