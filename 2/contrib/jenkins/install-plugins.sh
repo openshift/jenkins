@@ -147,9 +147,16 @@ copy_reference_file() {
 
 REF_DIR=${REF:-/opt/openshift/plugins}
 FAILED="$REF_DIR/failed-plugins.txt"
+WARNING="$REF_DIR/warning-plugins.txt"
 BUNDLE_PLUGINS=${BUNDLE_PLUGINS:-/opt/openshift/plugins/bundle-plugins.txt}
 JENKINS_WAR=${JENKINS_WAR:-/usr/lib/jenkins/jenkins.war}
 JENKINS_UC=${JENKINS_UC:-https://updates.jenkins.io}
+
+if [ ! -f $JENKINS_WAR ]; then
+  JENKINS_WAR=/usr/share/java/jenkins.war
+  mkdir -p /usr/lib/jenkins/
+  ln -sf $JENKINS_WAR /usr/lib/jenkins/jenkins.war
+fi
 
 INCREMENTAL_BUILD_ARTIFACTS_DIR="/tmp/artifacts"
 
@@ -162,6 +169,7 @@ function getArchiveFilename() {
 }
 
 function download() {
+
     local plugin originalPlugin version lock ignoreLockFile counter localRetry
     plugin="$1"
     version="${2:-latest}"
@@ -319,7 +327,7 @@ function resolveDependencies() {
             # download the dependence; passing "true" is needed for "download" to replace the existing dependency
             if versionLT "${versionInstalled}" "${minVersion}"; then
                 echo "Upgrading bundled dependency $d ($minVersion > $versionInstalled)"
-                download "$plugin" "$minVersion" "true"
+                download "$plugin" "$minVersion"
             else
                 echo "Skipping already bundled dependency $d ($minVersion <= $versionInstalled)"
             fi
@@ -337,7 +345,7 @@ function resolveDependencies() {
             # version of the plugin
             if versionLT "${previouslyDownloadedVersion}" "${minVersion}"; then
                 echo "Upgrading previously downloaded plugin $plugin at $previouslyDownloadedVersion to $minVersion"
-                download "$plugin" "$minVersion" "true"
+                download "$plugin" "$minVersion"
             fi
         fi
     done
@@ -420,7 +428,7 @@ main() {
             continue
         fi
         echo "Locking $plugin"
-        mkdir "$(getLockFile "${plugin%%:*}")"
+        echo "$(versionFromPlugin $plugin)" > "$(getLockFile "${plugin%%:*}")"
     done
 
     echo -e "\nAnalyzing war: $JENKINS_WAR"
@@ -458,8 +466,25 @@ main() {
     echo "Installed plugins:"
     installedPlugins
 
+    echo -e "\nVerifying Locked Plugins in Bundle..."
+    for plugin in `cat $@ | grep -v ^#`; do
+        if [ -z $plugin ]; then
+            continue
+        fi
+        if grep -q "^${plugin}$" $BUNDLE_PLUGINS; then
+            echo "Found $plugin"
+        else
+            echo "Missing $plugin"
+            echo "Plugin $plugin not found in $BUNDLE_PLUGINS" >> $FAILED
+        fi
+    done
+
+    if [[ -f $WARNING ]]; then
+        echo -e "\nSome warnings were encountered!\n$(<"$WARNING")" >&2
+    fi
+
     if [[ -f $FAILED ]]; then
-        echo -e "\nSome plugins failed to download!\n$(<"$FAILED")" >&2
+        echo -e "\nSome errors were encountered!\n$(<"$FAILED")" >&2
         exit 1
     fi
 
