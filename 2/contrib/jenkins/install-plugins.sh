@@ -166,10 +166,9 @@ function download() {
     plugin="$1"
     version="${2:-latest}"
     ignoreLockFile="${3:-}"
-    lock="$(getLockFile "$plugin")"
     localRetry=${CURL_RETRY_MIRROR:-2}
 
-    if [[ $ignoreLockFile ]] || mkdir "$lock" &>/dev/null; then
+    if [[ $ignoreLockFile ]] || ! test -f $(getLockFile $plugin); then
         for(( counter =0; counter <$localRetry ;  counter ++))
         do
             plugin="$1"
@@ -190,7 +189,6 @@ function download() {
                 counter=$localRetry
             fi
         done
-
         if ! checkIntegrity "$plugin"; then
             echo "Downloaded file is not a valid ZIP: $(getArchiveFilename "$plugin")" >&2
             echo "Download integrity: ${plugin}" >> "$FAILED"
@@ -198,6 +196,13 @@ function download() {
         fi
 
         resolveDependencies "$plugin"
+    else
+        lockFile=$(getLockFile "$plugin")
+        lockedVersion=$(cat $lockFile)
+        echo "Plugin $plugin locked to version $lockedVersion, ignoring, requested version $version"
+        if versionLT "${lockedVersion}" "${version}"; then
+            echo "Manual update from ${plugin}:${lockedVersion} to ${plugin}:${version} in base-plugins.txt may be needed." >> $WARNING
+        fi
     fi
 }
 
