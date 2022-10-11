@@ -78,7 +78,7 @@ mina-sshd-api-common:2.8.0-18.vd98674ecd652
 mina-sshd-api-core:2.8.0-18.vd98674ecd652
 oauth-credentials:0.4
 okhttp-api:4.9.2-20211102
-openshift-client:1.0.37
+openshift-client:1.0.38
 openshift-login:1.0.27
 openshift-sync:1.0.53
 pam-auth:1.6
