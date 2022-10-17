@@ -575,10 +575,10 @@ JENKINS_SERVICE_NAME=`echo ${JENKINS_SERVICE_NAME} | tr '[A-Z]' '[a-z]' | tr '_'
 create_jenkins_location_configuration_xml() {
   # Gets the jenkins URL only from the *first* route available in namespace service the service named $JENKINS_SERVICE_NAME
   JENKINS_SCHEME="https://"
-  if [ $( oc get routes -o json | jq -c -r '.items[0].spec.tls')  == "null" ]; then
+  if [ $(oc get routes -o json | jq -c -r '.items[] | select(.spec.to.name == env.JENKINS_SERVICE_NAME) | .spec.tls')  == "null" ]; then
     JENKINS_SCHEME="http://"
     fi
-  JENKINS_URL="$JENKINS_SCHEME$(oc get routes -o json | jq -c -r '.items[] | select (.spec.to.name == env.JENKINS_SERVICE_NAME ) | .spec.host ' | head -n 1)/"
+  JENKINS_URL="$JENKINS_SCHEME$(oc get routes -o json | jq -c -r '.items[] | select(.spec.to.name == env.JENKINS_SERVICE_NAME) | .spec.host' | head -n 1)/"
   echo "Using JENKINS_SERVICE_NAME=$JENKINS_SERVICE_NAME"
   echo "Generating jenkins.model.JenkinsLocationConfiguration.xml using (${JENKINS_HOME}/jenkins.model.JenkinsLocationConfiguration.xml.tpl) ..."
   export JENKINS_URL
