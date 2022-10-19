@@ -26,6 +26,7 @@ lockable-resources:2.11
 mapdb-api:1.0.9.0
 matrix-auth:3.1.5
 matrix-project:785.v06b_7f47b_c631
+maven-plugin:3.20
 mercurial:2.16.2
 metrics:4.0.2.8.1
 openshift-client:1.0.38

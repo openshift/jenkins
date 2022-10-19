@@ -56,7 +56,7 @@ instance-identity:116.vf8f487400980
 jackson2-api:2.13.3-285.vc03c0256d517
 jakarta-activation-api:2.0.0-2
 jakarta-mail-api:2.0.0-5
-javadoc:1.0
+javadoc:217.v905b_86277a_2a_
 javax-activation-api:1.2.0-3
 javax-mail-api:1.6.2-6
 jaxb:2.3.6-1
@@ -74,7 +74,7 @@ mailer:435.v79ef3972b_5c7
 mapdb-api:1.0.9.0
 matrix-auth:3.1.5
 matrix-project:785.v06b_7f47b_c631
-maven-plugin:3.7
+maven-plugin:3.20
 mercurial:2.16.2
 metrics:4.0.2.8.1
 mina-sshd-api-common:2.8.0-18.vd98674ecd652
