@@ -53,7 +53,7 @@ groovy:2.4
 handy-uri-templates-2-api:2.1.8-1.0
 htmlpublisher:1.25
 jackson2-api:2.13.2.20220328-273.v11d70a_b_a_1a_52
-javadoc:1.0
+javadoc:217.v905b_86277a_2a_
 javax-activation-api:1.2.0-2
 javax-mail-api:1.6.2-6
 jenkins-design-language:1.24.8
@@ -66,11 +66,11 @@ kubernetes:1.31.0
 kubernetes-client-api:5.10.1-171.vaa0774fb8c20
 kubernetes-credentials:0.9.0
 lockable-resources:2.11
-mailer:408.vd726a_1130320
+mailer:414.vcc4c33714601
 mapdb-api:1.0.9.0
 matrix-auth:2.6.8
 matrix-project:1.20
-maven-plugin:3.7
+maven-plugin:3.20
 mercurial:2.16.2
 metrics:4.0.2.8.1
 oauth-credentials:0.4
