@@ -4,7 +4,7 @@ ant:1.11
 apache-httpcomponents-client-4-api:4.5.13-1.0
 authentication-tokens:1.4
 blueocean:1.24.8
-blueocean-autofavorite:1.2.4
+blueocean-autofavorite:1.2.5
 blueocean-bitbucket-pipeline:1.24.8
 blueocean-commons:1.25.6
 blueocean-config:1.24.8
