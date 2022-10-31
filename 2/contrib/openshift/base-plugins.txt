@@ -30,7 +30,7 @@ maven-plugin:3.20
 mercurial:2.16.2
 metrics:4.0.2.8.1
 openshift-client:1.0.38
-openshift-login:1.0.28
+openshift-login:1.0.29
 openshift-sync:1.0.55
 pam-auth:1.6
 parameterized-trigger:2.43.1
