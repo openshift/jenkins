@@ -8,6 +8,8 @@
 # version (at least that is the initial goal).  This naming system
 # can be revisited in the future if we decide we need either jenkins
 # or <platform> version numbers in the names.
+# test pull request
+
 VERSIONS="2 slave-base agent-maven-3.5 agent-nodejs-8 agent-nodejs-10"
 
 BUNDLE_PLUGINS="$(shell pwd)/2/contrib/openshift/bundle-plugins.txt"
