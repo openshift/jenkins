@@ -1,21 +1,15 @@
 component: "Jenkins"
 
 reviewers:
-- akram
-- waveywaves
 - otaviof
-- sbose78
-- akashshinde
 - jkhelil
+- coreydaley
+- divyansh42
+- mbharatk
 
 approvers:
-- bparees
-- gabemontero
-- adambkaplan
-- akram
-- waveywaves
 - otaviof
-- sbose78
-- akashshinde
 - jkhelil
-
+- coreydaley
+- divyansh42
+- mbharatk
