@@ -147,8 +147,17 @@ copy_reference_file() {
 
 REF_DIR=${REF:-/opt/openshift/plugins}
 FAILED="$REF_DIR/failed-plugins.txt"
+WARNING="$REF_DIR/warning-plugins.txt"
 
-JENKINS_WAR=/usr/lib/jenkins/jenkins.war
+BUNDLE_PLUGINS=${BUNDLE_PLUGINS:-/opt/openshift/plugins/bundle-plugins.txt}
+JENKINS_WAR=${JENKINS_WAR:-/usr/lib/jenkins/jenkins.war}
+JENKINS_UC=${JENKINS_UC:-https://updates.jenkins.io}
+
+if [ ! -f $JENKINS_WAR ]; then
+  JENKINS_WAR=/usr/share/java/jenkins.war
+  mkdir -p /usr/lib/jenkins/
+  ln -sf $JENKINS_WAR /usr/lib/jenkins/jenkins.war
+fi
 
 INCREMENTAL_BUILD_ARTIFACTS_DIR="/tmp/artifacts"
 
@@ -167,7 +176,7 @@ function download() {
     ignoreLockFile="${3:-}"
     lock="$(getLockFile "$plugin")"
 
-    if [[ $ignoreLockFile ]] || mkdir "$lock" &>/dev/null; then
+    if [[ $ignoreLockFile ]] || ! test -f $(getLockFile $plugin); then
         if ! doDownload "$plugin" "$version"; then
             # some plugin don't follow the rules about artifact ID
             # typically: docker-plugin
@@ -187,6 +196,13 @@ function download() {
         fi
 
         resolveDependencies "$plugin"
+    else
+        lockFile=$(getLockFile "$plugin")
+        lockedVersion=$(cat $lockFile)
+        echo "Plugin $plugin locked to version $lockedVersion, ignoring, requested version $version"
+        if versionLT "${lockedVersion}" "${version}"; then
+            echo "Manual update from ${plugin}:${lockedVersion} to ${plugin}:${version} in base-plugins.txt may be needed." >> $WARNING
+        fi
     fi
 }
 
@@ -303,7 +319,7 @@ function resolveDependencies() {
             # download the dependence; passing "true" is needed for "download" to replace the existing dependency
             if versionLT "${versionInstalled}" "${minVersion}"; then
                 echo "Upgrading bundled dependency $d ($minVersion > $versionInstalled)"
-                download "$plugin" "$minVersion" "true"
+                    download "$plugin" "$minVersion"
             else
                 echo "Skipping already bundled dependency $d ($minVersion <= $versionInstalled)"
             fi
@@ -321,7 +337,7 @@ function resolveDependencies() {
             # version of the plugin
             if versionLT "${previouslyDownloadedVersion}" "${minVersion}"; then
                 echo "Upgrading previously downloaded plugin $plugin at $previouslyDownloadedVersion to $minVersion"
-                download "$plugin" "$minVersion" "true"
+                download "$plugin" "$minVersion"
             fi
         fi
     done
@@ -329,6 +345,12 @@ function resolveDependencies() {
 }
 
 function bundledPlugins() {
+    echo "Checking JENKINS_WAR=$JENKINS_WAR" > /dev/stderr
+    if [ ! -f $JENKINS_WAR ]; then
+        jenkins_version=$(cat $PWD/2/contrib/openshift/jenkins-version.txt )
+        echo "Jenkins version: ${jenkins_version}" > /dev/stderr
+	curl -L -C - -o $JENKINS_WAR https://get.jenkins.io/war-stable/$jenkins_version/jenkins.war
+    fi
     if [ -f $JENKINS_WAR ]
     then
         TEMP_PLUGIN_DIR=/tmp/plugintemp.$$
@@ -359,15 +381,19 @@ function versionFromPlugin() {
 }
 
 function installedPlugins() {
+    echo "# Generated file: To generate this file run 'make plugins-list' before pushing your changes" > $BUNDLE_PLUGINS
+    temp_bundle=$(mktemp)
     for f in "$REF_DIR"/*.jpi; do
         echo "$(basename "$f" | sed -e 's/\.jpi//'):$(get_plugin_version "$f")"
+        echo "$(basename "$f" | sed -e 's/\.jpi//'):$(get_plugin_version "$f")" >> $temp_bundle
     done
+    sort -d $temp_bundle >> $BUNDLE_PLUGINS
 }
 
 function jenkinsMajorMinorVersion() {
     if [[ -f "$JENKINS_WAR" ]]; then
         local version major minor
-        version="$(/etc/alternatives/java -jar $JENKINS_WAR --version)"
+        version="$(java -jar $JENKINS_WAR --version)"
         major="$(echo "$version" | cut -d '.' -f 1)"
         minor="$(echo "$version" | cut -d '.' -f 2)"
         echo "$major.$minor"
@@ -394,11 +420,12 @@ main() {
             continue
         fi
         echo "Locking $plugin"
-        mkdir "$(getLockFile "${plugin%%:*}")"
+        echo "$(versionFromPlugin $plugin)" > "$(getLockFile "${plugin%%:*}")"
     done
 
-    echo -e "\nAnalyzing war..."
+    echo -e "\nAnalyzing war: $JENKINS_WAR"
     bundledPlugins="$(bundledPlugins)"
+    echo -e "\nAnalyzing war ... done" 
     
     # Check if there's a version-specific update center, which is the case for LTS versions
     jenkinsVersion="$(jenkinsMajorMinorVersion)"
@@ -431,8 +458,25 @@ main() {
     echo "Installed plugins:"
     installedPlugins
 
+    echo -e "\nVerifying Locked Plugins in Bundle..."
+    for plugin in `cat $@ | grep -v ^#`; do
+        if [ -z $plugin ]; then
+            continue
+        fi
+        if grep -q "^${plugin}$" $BUNDLE_PLUGINS; then
+            echo "Found $plugin"
+        else
+            echo "Missing $plugin"
+            echo "Plugin $plugin not found in $BUNDLE_PLUGINS" >> $FAILED
+        fi
+    done
+    if [[ -f $WARNING ]]; then
+        echo -e "\nSome warnings were encountered!\n$(<"$WARNING")" >&2
+    fi
+
+
     if [[ -f $FAILED ]]; then
-        echo -e "\nSome plugins failed to download!\n$(<"$FAILED")" >&2
+        echo -e "\nSome errors were encountered!\n$(<"$FAILED")" >&2
         exit 1
     fi
 
