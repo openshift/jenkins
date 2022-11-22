@@ -53,6 +53,7 @@ groovy:2.4
 handy-uri-templates-2-api:2.1.8-22.v77d5b_75e6953
 htmlpublisher:1.25
 instance-identity:116.vf8f487400980
+ionicons-api:19.v744f3b_2b_b_e4e
 jackson2-api:2.13.3-285.vc03c0256d517
 jakarta-activation-api:2.0.0-2
 jakarta-mail-api:2.0.0-5
@@ -115,9 +116,9 @@ subversion:2.15.4
 token-macro:308.v4f2b_ed62b_b_16
 trilead-api:1.67.vc3938a_35172f
 variant:1.4
-workflow-api:1182.v41475e53ea_43
+workflow-api:1192.v2d0deb_19d212
 workflow-basic-steps:2.20
-workflow-cps:2759.v87459c4eea_ca_
+workflow-cps:2803.v1a_f77ffcc773
 workflow-cps-global-lib:588.v576c103a_ff86
 workflow-durable-task-step:2.40
 workflow-job:1145.v7f2433caa07f

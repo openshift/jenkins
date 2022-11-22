@@ -44,8 +44,8 @@ snakeyaml-api:1.32-86.ve3f030a_75631
 ssh-credentials:277.280.v1e86b_7d0056b_
 subversion:2.15.4
 token-macro:308.v4f2b_ed62b_b_16
-workflow-api:1182.v41475e53ea_43
-workflow-cps:2759.v87459c4eea_ca_
+workflow-api:1192.v2d0deb_19d212
+workflow-cps:2803.v1a_f77ffcc773
 workflow-cps-global-lib:588.v576c103a_ff86
 workflow-multibranch:711.vdfef37cda_816
 workflow-step-api:639.v6eca_cd8c04a_a_
