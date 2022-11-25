@@ -29,7 +29,7 @@ matrix-project:1.20
 maven-plugin:3.20
 mercurial:2.16.2
 metrics:4.0.2.8.1
-mina-sshd-api-common:2.9.2-50.va_0e1f42659a_a
+mina-sshd-api-common:3.9.2-50.va_0e1f42659a_a
 mina-sshd-api-core:2.9.2-50.va_0e1f42659a_a
 openshift-client:1.0.38
 openshift-login:1.0.29
@@ -37,7 +37,8 @@ openshift-sync:1.0.55
 pam-auth:1.6
 parameterized-trigger:2.43.1
 pipeline-build-step:2.16
-pipeline-input-step:449.v77f0e8b_845c4
+pipeline-input-step:456.vd8a_957db_5b_e9
+pipeline-rest-api:2.27
 pipeline-utility-steps:2.12.0
 prometheus:2.0.10
 scm-api:608.vfa_f971c5a_a_e9
