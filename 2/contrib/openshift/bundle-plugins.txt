@@ -77,8 +77,8 @@ matrix-project:785.v06b_7f47b_c631
 maven-plugin:3.20
 mercurial:2.16.2
 metrics:4.0.2.8.1
-mina-sshd-api-common:2.8.0-18.vd98674ecd652
-mina-sshd-api-core:2.8.0-18.vd98674ecd652
+mina-sshd-api-common:2.9.2-50.va_0e1f42659a_a
+mina-sshd-api-core:2.9.2-50.va_0e1f42659a_a
 oauth-credentials:0.4
 okhttp-api:4.9.2-20211102
 openshift-client:1.0.38
