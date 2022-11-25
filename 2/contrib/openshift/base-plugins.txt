@@ -29,9 +29,11 @@ matrix-project:1.20
 maven-plugin:3.20
 mercurial:2.16.2
 metrics:4.0.2.8.1
-openshift-client:1.0.37
+mina-sshd-api-common:2.9.2-50.va_0e1f42659a_a
+mina-sshd-api-core:2.9.2-50.va_0e1f42659a_a
+openshift-client:1.0.38
 openshift-login:1.0.29
-openshift-sync:1.0.53
+openshift-sync:1.0.55
 pam-auth:1.6
 parameterized-trigger:2.43.1
 pipeline-build-step:2.16
