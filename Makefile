@@ -10,6 +10,10 @@
 # or <platform> version numbers in the names.
 VERSIONS="2 slave-base agent-maven-3.5 agent-nodejs-8 agent-nodejs-10"
 
+BUNDLE_PLUGINS="$(shell pwd)/2/contrib/openshift/bundle-plugins.txt"
+REF=$(shell mktemp -d)
+JENKINS_WAR="$(shell mktemp -d)/jenkins.war"
+
 ifeq ($(TARGET),rhel7)
 	OS := rhel7
 else
@@ -23,3 +27,15 @@ build:
 .PHONY: test
 test:
 	VERSIONS=$(VERSIONS) TAG_ON_SUCCESS=$(TAG_ON_SUCCESS) TEST_MODE=true hack/build.sh $(OS) $(VERSION)
+
+.PHONY: e2e
+e2e:
+	@echo "Starting e2e tests from 2/test directory"
+	@echo "IMAGE_NAME set in environment variable with value: $(IMAGE_NAME)"
+	@cd 2/test && go test
+
+.PHONY: plugins-list
+plugins-list: 
+	@echo "Computing comprehensive plugins list in $(BUNDLE_PLUGINS)"
+	BUNDLE_PLUGINS=${BUNDLE_PLUGINS} REF=${REF} JENKINS_WAR=${JENKINS_WAR} 2/contrib/jenkins/install-plugins.sh 2/contrib/openshift/base-plugins.txt
+	@echo "Comprehensive plugins list calculated in $(BUNDLE_PLUGINS)"
