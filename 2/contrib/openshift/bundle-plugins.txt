@@ -1,4 +1,5 @@
 # Generated file: To generate this file run 'make plugins-list' before pushing your changes
+# Added for test purpose
 ace-editor:1.1
 ant:1.11
 apache-httpcomponents-client-4-api:4.5.13-138.v4e7d9a_7b_a_e61

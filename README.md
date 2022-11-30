@@ -483,6 +483,7 @@ and we reuse the v3 values (i.e. `rhel7`) for that purpose.
 on all provided versions of Jenkins. Since we are currently providing only version `2`,
 you can omit this parameter.**
 
+
 ## PR testing for this repository
 
 As with the plugins focused on OpenShift integration, see [the contribution guide](CONTRIBUTING_TO_OPENSHIFT_JENKINS_IMAGE_AND_PLUGINS.md).
