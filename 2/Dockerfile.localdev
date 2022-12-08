@@ -11,7 +11,7 @@ RUN go build . && cp go-init /usr/bin
 ##############################################
 # Stage 2 : Build slave-base with go-init
 ##############################################
-FROM quay.io/openshift/origin-cli:4.12
+FROM quay.io/openshift/origin-cli:4.13
 ARG jenkins_version=latest
 MAINTAINER Akram Ben Aissi <abenaiss@redhat.com>
 COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
