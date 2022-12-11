@@ -3,7 +3,7 @@ blueocean:1.25.8
 blueocean-autofavorite:1.2.5
 blueocean-pipeline-scm-api:1.25.8
 cloudbees-bitbucket-branch-source:791.vb_eea_a_476405b
-cloudbees-folder:6.16
+cloudbees-folder:6.729.v2b_9d1a_74d673
 config-file-provider:3.8.1
 configuration-as-code-groovy:1.1
 configuration-as-code:1512.vb_79d418d5fc8
@@ -29,13 +29,17 @@ matrix-project:785.v06b_7f47b_c631
 maven-plugin:3.20
 mercurial:2.16.2
 metrics:4.0.2.8.1
+mina-sshd-api-common:2.9.2-50.va_0e1f42659a_a
+mina-sshd-api-core:2.9.2-50.va_0e1f42659a_a
 openshift-client:1.0.38
 openshift-login:1.0.29
 openshift-sync:1.0.55
 pam-auth:1.6
 parameterized-trigger:2.43.1
 pipeline-build-step:2.16
+pipeline-groovy-lib:612.614.v48dcb_f62a_640
 pipeline-input-step:456.vd8a_957db_5b_e9
+pipeline-rest-api:2.27
 pipeline-utility-steps:2.12.0
 prometheus:2.0.10
 scm-api:621.vda_a_b_055e58f7
