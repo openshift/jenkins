@@ -20,10 +20,9 @@ function update_admin_password() {
   ADMIN_DIR=$(ls /var/lib/jenkins/users | grep ^admin | head -1) # Use strictly user admin (not kubeadmin or another)
   new_password_hash=$(obfuscate_password ${JENKINS_PASSWORD:-password})
   echo "Updating password hash in $ADMIN_DIR for user admin"
-  #password_hash_xpath="//user/properties/hudson.security.HudsonPrivateSecurityRealm_-Details/passwordHash"
+  password_hash_xpath="//user/properties/hudson.security.HudsonPrivateSecurityRealm_-Details/passwordHash"
   password_hash_jbcrypt="#jbcrypt:$new_password_hash"
-  sed -i "s,<passwordHash>.*</passwordHash>,<passwordHash>$password_hash_jbcrypt</passwordHash>,g" "${JENKINS_HOME}/users/${ADMIN_DIR}/config.xml"
-  #xmlstarlet edit -L --update "$password_hash_xpath" --value "$password_hash_jbcrypt" "${JENKINS_HOME}/users/${ADMIN_DIR}/config.xml"
+  xmlstarlet edit -L --update "$password_hash_xpath" --value "$password_hash_jbcrypt" "${JENKINS_HOME}/users/${ADMIN_DIR}/config.xml"
   echo $new_password_hash > ${JENKINS_HOME}/password
   echo "Password hash susccesfully updated"
 }
@@ -589,26 +588,26 @@ create_jenkins_location_configuration_xml() {
 create_jenkins_location_configuration_xml
 
 # xmlstarlet does not support xml version=1.1 as used by jenkins config.xml; redirecting stderr to /dev/null does the trick
-#if [ "${OPENSHIFT_ENABLE_OAUTH}" == "false" ]; then
-#  echo "OpenShift OAuth disabled: Using Jenkins built-in user database"
-#  xmlstarlet edit -L --update '//hudson/securityRealm' --value '' "${JENKINS_HOME}/config.xml"  2>/dev/null
-#  xmlstarlet edit -L --delete '//hudson/securityRealm/@plugin' "${JENKINS_HOME}/config.xml"  2>/dev/null
-#  xmlstarlet edit -L --update '//hudson/securityRealm/@class' --value 'hudson.security.HudsonPrivateSecurityRealm' "${JENKINS_HOME}/config.xml" 2>/dev/null
-#else
-#  echo "OpenShift OAuth enabled: true"
+if [ "${OPENSHIFT_ENABLE_OAUTH}" == "false" ]; then
+  echo "OpenShift OAuth disabled: Using Jenkins built-in user database"
+  xmlstarlet edit -L --update '//hudson/securityRealm' --value '' "${JENKINS_HOME}/config.xml"  2>/dev/null
+  xmlstarlet edit -L --delete '//hudson/securityRealm/@plugin' "${JENKINS_HOME}/config.xml"  2>/dev/null
+  xmlstarlet edit -L --update '//hudson/securityRealm/@class' --value 'hudson.security.HudsonPrivateSecurityRealm' "${JENKINS_HOME}/config.xml" 2>/dev/null
+else
+  echo "OpenShift OAuth enabled: true"
   # if OAUTH is enabled and the current realm is Jenkins local Database, we delete the realm, so the openshift plugins auto configures
-#  if xmlstarlet select -t -c  "/hudson/securityRealm[@class='hudson.security.HudsonPrivateSecurityRealm']" 2> /dev/null > /dev/null; then
-#    xmlstarlet edit -L --delete '//hudson/securityRealm' "${JENKINS_HOME}/config.xml"  2>/dev/null
-#  fi
+  if xmlstarlet select -t -c  "/hudson/securityRealm[@class='hudson.security.HudsonPrivateSecurityRealm']" 2> /dev/null > /dev/null; then
+    xmlstarlet edit -L --delete '//hudson/securityRealm' "${JENKINS_HOME}/config.xml"  2>/dev/null
+  fi
   # In case openshift login plugin is set as a provider but without the defaulted values, we remove it to enforce plugin re-configuration
   # TODO replace with an || statement but by improving readability
-#  if xmlstarlet select -t -c  "/hudson/securityRealm[starts-with(@plugin,'openshift-login')][@class='org.openshift.jenkins.plugins.openshiftlogin.OpenShiftOAuth2SecurityRealm']" \
-#           "${JENKINS_HOME}/config.xml"  2> /dev/null > /dev/null  && \
-#     ! xmlstarlet select -t  -c  "/hudson/securityRealm/defaultedServiceAccountDirectory" "${JENKINS_HOME}/config.xml" 2> /dev/null > /dev/null; then
-#    echo "OpenShift OAuth enabled and provider incorrectly set: Resetting openshift login provider"
-#    xmlstarlet edit -L --delete '//hudson/securityRealm' "${JENKINS_HOME}/config.xml"  2>/dev/null
-#  fi
-#fi
+  if xmlstarlet select -t -c  "/hudson/securityRealm[starts-with(@plugin,'openshift-login')][@class='org.openshift.jenkins.plugins.openshiftlogin.OpenShiftOAuth2SecurityRealm']" \
+           "${JENKINS_HOME}/config.xml"  2> /dev/null > /dev/null  && \
+     ! xmlstarlet select -t  -c  "/hudson/securityRealm/defaultedServiceAccountDirectory" "${JENKINS_HOME}/config.xml" 2> /dev/null > /dev/null; then
+    echo "OpenShift OAuth enabled and provider incorrectly set: Resetting openshift login provider"
+    xmlstarlet edit -L --delete '//hudson/securityRealm' "${JENKINS_HOME}/config.xml"  2>/dev/null
+  fi
+fi
 
 FATAL_ERROR_OPTION=""
 
