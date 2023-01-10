@@ -4,6 +4,7 @@ blueocean-autofavorite:1.2.5
 blueocean-pipeline-scm-api:1.25.8
 cloudbees-bitbucket-branch-source:791.vb_eea_a_476405b
 cloudbees-folder:6.740.ve4f4ffa_dea_54
+commons-text-api:1.10.0-27.vb_fa_3896786a_7
 config-file-provider:3.8.1
 configuration-as-code-groovy:1.1
 configuration-as-code:1512.vb_79d418d5fc8
@@ -15,13 +16,16 @@ git:4.12.1
 git-client:3.11.1
 git-server:99.va_0826a_b_cdfa_d
 github:1.34.5
-google-oauth-plugin:1.0.6
+google-oauth-plugin:1.0.7
 groovy:2.4
 htmlpublisher:1.25
+jackson2-api:2.14.1-313.v504cdd45c18b
 javax-mail-api:1.6.2-6
-jira:3.7.1
+jersey2-api:2.38-1
+jira:3.8
 job-dsl:1.77
 junit:1166.va_436e268e972
+kubernetes-client-api:5.12.2-193.v26a_6078f65a_9
 lockable-resources:2.11
 mapdb-api:1.0.9.0
 matrix-auth:3.1.5
