@@ -70,7 +70,7 @@ job-dsl:1.77
 jquery3-api:3.6.0-4
 jsch:0.1.55.2
 junit:1166.va_436e268e972
-kubernetes:1.31.0
+kubernetes:1.31.2
 kubernetes-client-api:5.12.2-193.v26a_6078f65a_9
 kubernetes-credentials:0.9.0
 lockable-resources:2.11
