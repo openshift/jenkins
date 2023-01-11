@@ -4,6 +4,7 @@ blueocean-autofavorite:1.2.5
 blueocean-pipeline-scm-api:1.25.8
 cloudbees-bitbucket-branch-source:791.vb_eea_a_476405b
 cloudbees-folder:6.740.ve4f4ffa_dea_54
+commons-lang3-api:3.12.0-36.vd97de6465d5b_
 commons-text-api:1.10.0-27.vb_fa_3896786a_7
 config-file-provider:3.8.1
 configuration-as-code-groovy:1.1
