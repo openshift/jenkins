@@ -37,6 +37,7 @@ mercurial:1260.vdfb_723cdcc81
 metrics:4.0.2.8.1
 mina-sshd-api-common:2.9.2-50.va_0e1f42659a_a
 mina-sshd-api-core:2.9.2-50.va_0e1f42659a_a
+okhttp-api:3.14.9-20211029
 openshift-client:1.0.38
 openshift-login:1.0.29
 openshift-sync:1.0.55
