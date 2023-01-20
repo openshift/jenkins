@@ -55,7 +55,7 @@
         },
         "from": {
           "kind": "DockerImage",
-          "name": "registry.redhat.io/ocp-tools-4/jenkins-rhel8:v4.10.0-1650435173.1650901980"
+          "name": "registry.redhat.io/ocp-tools-4/jenkins-rhel8:v4.11.0-1663086392.1666642635"
         },
         "referencePolicy": {
           "type": "Local"
@@ -73,7 +73,7 @@
         },
         "from": {
           "kind": "DockerImage",
-          "name": "registry.redhat.io/ocp-tools-4/jenkins-rhel8:v4.10.0"
+          "name": "registry.redhat.io/ocp-tools-4/jenkins-rhel8:v4.11.0"
         },
         "referencePolicy": {
           "type": "Local"
@@ -91,7 +91,7 @@
         },
         "from": {
           "kind": "DockerImage",
-          "name": "registry.redhat.io/ocp-tools-4/jenkins-rhel8:v4.10.0"
+          "name": "registry.redhat.io/ocp-tools-4/jenkins-rhel8:v4.11.0"
         },
         "importPolicy": {
           "scheduled": true
