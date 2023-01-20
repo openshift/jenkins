@@ -21,7 +21,7 @@ google-oauth-plugin:1.0.7
 groovy:2.4
 htmlpublisher:1.25
 jackson2-api:2.14.1-313.v504cdd45c18b
-javax-mail-api:1.6.2-6
+javax-mail-api:1.6.2-8
 jersey2-api:2.38-1
 jira:3.8
 job-dsl:1.77
@@ -37,7 +37,7 @@ mercurial:1260.vdfb_723cdcc81
 metrics:4.0.2.8.1
 mina-sshd-api-common:2.9.2-50.va_0e1f42659a_a
 mina-sshd-api-core:2.9.2-50.va_0e1f42659a_a
-okhttp-api:3.14.9-20211029
+okhttp-api:4.9.2-20211102
 openshift-client:1.0.38
 openshift-login:1.0.29
 openshift-sync:1.0.55
