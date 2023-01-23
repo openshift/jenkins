@@ -16,11 +16,12 @@ github:1.34.5
 google-oauth-plugin:1.0.6
 groovy:2.4
 htmlpublisher:1.25
+javax-mail-api:1.6.2-6
 jira:3.7.1
 job-dsl:1.77
-junit:1119.1121.vc43d0fc45561
+junit:1119.va_a_5e9068da_d7
 lockable-resources:2.11
-mailer:408.vd726a_1130320
+mailer:414.vcc4c33714601
 mapdb-api:1.0.9.0
 matrix-auth:2.6.8
 matrix-project:1.20
