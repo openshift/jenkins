@@ -21,7 +21,7 @@ htmlpublisher:1.25
 javax-mail-api:1.6.2-6
 jira:3.7.1
 job-dsl:1.77
-junit:1119.1121.vc43d0fc45561
+junit:1119.va_a_5e9068da_d7
 lockable-resources:2.11
 mapdb-api:1.0.9.0
 matrix-auth:2.6.8
@@ -30,7 +30,7 @@ maven-plugin:3.20
 mercurial:2.16.2
 metrics:4.0.2.8.1
 openshift-client:1.0.37
-openshift-login:1.0.27
+openshift-login:1.0.29
 openshift-sync:1.0.53
 pam-auth:1.6
 parameterized-trigger:2.43.1
