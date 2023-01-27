@@ -3,14 +3,13 @@
 set -o pipefail
 
 
-jenkins_version=$(cat /opt/openshift/jenkins-version.txt)
-echo "Jenkins version: ${jenkins_version}"
+echo "Jenkins version: ${JENKINS_VERSION}"
 if [[ "${INSTALL_JENKINS_VIA_RPMS}" == "false" ]]; then
     curl https://pkg.jenkins.io/redhat-stable/jenkins.repo -o /etc/yum.repos.d/jenkins.repo
     rpm --import https://pkg.jenkins.io/redhat-stable/jenkins-ci.org.key
     rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
     PLUGIN_LIST="$1"
-    echo "Plugin list wil be take from file: " $PLUGIN_LIST
+    echo "Plugin list will be take from file: " $PLUGIN_LIST
     YUM_FLAGS=" "
     shift  # Shift the script arguments. So $1 will be dropped in favor of $2
     if [ "$#" == "1" ]; then
@@ -25,22 +24,24 @@ if [[ "${INSTALL_JENKINS_VIA_RPMS}" == "false" ]]; then
     # which is only available in EPEL, so enable it here
     yum -y --setopt=tsflags=nodocs --disableplugin=subscription-manager install \
 	    https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-    yum -y $YUM_FLAGS --setopt=tsflags=nodocs --disableplugin=subscription-manager install jenkins-${jenkins_version}
-    rpm -V jenkins-${jenkins_version}
+    yum -y $YUM_FLAGS --setopt=tsflags=nodocs --disableplugin=subscription-manager install jenkins-${JENKINS_VERSION}
+    rpm -V jenkins-${JENKINS_VERSION}
     yum $YUM_FLAGS clean all
-    /usr/local/bin/install-plugins.sh $PLUGIN_LIST
+
+    curl -L https://github.com/jenkinsci/plugin-installation-manager-tool/releases/download/$JENKINS_PLUGIN_MANAGER_VERSION/jenkins-plugin-manager-$JENKINS_PLUGIN_MANAGER_VERSION.jar -o jenkins-plugin-manager.jar
+    java -jar jenkins-plugin-manager.jar --war /usr/lib/jenkins/jenkins.war --plugin-file "$PLUGIN_LIST" --war /usr/share/java/jenkins.war --jenkins-version "$JENKINS_VERSION" --latest
+    java -jar jenkins-plugin-manager.jar --war /usr/lib/jenkins/jenkins.war --plugin-file "$PLUGIN_LIST" --war /usr/share/java/jenkins.war --jenkins-version "$JENKINS_VERSION" --list
 else
     yum install -y --disableplugin=subscription-manager jenkins-2.* jenkins-2-plugins
     rpm -V jenkins-2.* jenkins-2-plugins
     yum clean all
     # Remove the base-plugins.txt file because it's only used for Centos
     # and its presence in the rhel image is confusing.
-    rm /opt/openshift/base-plugins.txt
     mkdir -p /opt/openshift/plugins
     # we symlink the rpm installed plugins from /usr/lib/jenkins to /opt/openshift/plugins so that
     # future upgrades of the image and their RPM install automatically get picked by jenkins;
     # we use symlinks vs. actual files to delineate whether the user has overridden a plugin (and
     # by extension taken over its future maintenance)
-    for FILENAME in /usr/lib/jenkins/*hpi ; do ln -s $FILENAME /opt/openshift/plugins/`basename $FILENAME .hpi`.jpi; done
+    for FILENAME in /usr/lib/jenkins/*hpi ; do ln -s "$FILENAME" /opt/openshift/plugins/`basename $FILENAME .hpi`.jpi; done
     chown 1001:0 /usr/lib/jenkins/*hpi
 fi
