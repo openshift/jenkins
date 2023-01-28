@@ -17,10 +17,10 @@ ENV MAVEN_VERSION=3.6 \
 # TODO: Remove MAVEN_OPTS env once cri-o pushes the $HOME variable in /etc/passwd
 
 # Install Maven
-RUN INSTALL_PKGS="maven java-1.8.0-openjdk-devel" && \
+RUN INSTALL_PKGS="maven " && \
     yum module enable -y maven:${MAVEN_VERSION} && \
     yum install -y $INSTALL_PKGS && \
-    rpm -V maven java-1.8.0-openjdk-devel && \
+    rpm -V maven  && \
     yum clean all -y && \
     mkdir -p $HOME/.m2
 
