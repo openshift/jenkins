@@ -67,6 +67,7 @@ RUN /usr/local/bin/install-jenkins-core-plugins.sh /opt/openshift/bundle-plugins
     chmod -R 775 /var/lib/alternatives && \
     chmod -R 775 /usr/lib/jvm && \
     chmod 775 /usr/bin && \
+    mkdir -p /usr/lib/jvm-exports && \
     chmod 775 /usr/lib/jvm-exports && \
     chmod 775 /usr/share/man/man1 && \
     mkdir -p /var/lib/origin && \
