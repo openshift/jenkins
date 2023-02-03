@@ -169,24 +169,34 @@ function getArchiveFilename() {
 }
 
 function download() {
-    local plugin originalPlugin version lock ignoreLockFile
+
+    local plugin originalPlugin version lock ignoreLockFile counter localRetry
     plugin="$1"
     version="${2:-latest}"
     ignoreLockFile="${3:-}"
+    localRetry=${CURL_RETRY_MIRROR:-2}
 
     if [[ $ignoreLockFile ]] || ! test -f $(getLockFile $plugin); then
-        if ! doDownload "$plugin" "$version"; then
-            # some plugin don't follow the rules about artifact ID
-            # typically: docker-plugin
-            originalPlugin="$plugin"
-            plugin="${plugin}-plugin"
+        for(( counter =0; counter <$localRetry ;  counter ++))
+        do
+            plugin="$1"
+            version="${2:-latest}"
             if ! doDownload "$plugin" "$version"; then
-                echo "Failed to download plugin: $originalPlugin or $plugin" >&2
-                echo "Not downloaded: ${originalPlugin}" >> "$FAILED"
-                return 1
+                # some plugin don't follow the rules about artifact ID
+                # typically: docker-plugin
+                originalPlugin="$plugin"
+                plugin="${plugin}-plugin"
+                if ! doDownload "$plugin" "$version"; then
+                    echo "Failed to download plugin: $originalPlugin or $plugin" >&2
+                    echo "Not downloaded: ${originalPlugin}" >> "$FAILED"
+                    return 1
+                else
+                    counter=$localRetry
+                fi
+            else
+                counter=$localRetry
             fi
-        fi
-
+        done
         if ! checkIntegrity "$plugin"; then
             echo "Downloaded file is not a valid ZIP: $(getArchiveFilename "$plugin")" >&2
             echo "Download integrity: ${plugin}" >> "$FAILED"
