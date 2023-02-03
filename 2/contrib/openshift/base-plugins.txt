@@ -22,6 +22,7 @@ javax-mail-api:1.6.2-6
 jira:3.7.1
 job-dsl:1.77
 junit:1166.va_436e268e972
+kubernetes-client-api:5.10.2-173.v3f2fe50ae296
 lockable-resources:2.11
 mapdb-api:1.0.9.0
 matrix-auth:3.1.5
