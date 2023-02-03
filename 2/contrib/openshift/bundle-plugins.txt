@@ -105,7 +105,7 @@ pubsub-light:1.16
 run-condition:1.3
 scm-api:621.vda_a_b_055e58f7
 script-security:1218.v39ca_7f7ed0a_c
-snakeyaml-api:1.30.2-76.vc104f7ce9870
+snakeyaml-api:1.33-90.v80dcb_3814d35
 sse-gateway:1.24
 ssh-credentials:277.280.v1e86b_7d0056b_
 sshd:3.242.va_db_9da_b_26a_c3

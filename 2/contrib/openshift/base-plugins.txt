@@ -44,7 +44,7 @@ pipeline-utility-steps:2.12.0
 prometheus:2.0.10
 scm-api:621.vda_a_b_055e58f7
 script-security:1218.v39ca_7f7ed0a_c
-snakeyaml-api:1.30.2-76.vc104f7ce9870
+snakeyaml-api:1.33-90.v80dcb_3814d35
 ssh-credentials:277.280.v1e86b_7d0056b_
 subversion:2.15.4
 token-macro:293.v283932a_0a_b_49
