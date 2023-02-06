@@ -40,7 +40,6 @@ pipeline-build-step:2.16
 pipeline-groovy-lib:621.vb_44ce045b_582
 pipeline-input-step:456.vd8a_957db_5b_e9
 pipeline-utility-steps:2.14.0
-pipeline-rest-api:2.27
 pipeline-stage-view:2.27
 prometheus:2.0.10
 scm-api:621.vda_a_b_055e58f7
@@ -54,3 +53,4 @@ workflow-cps:3536.vb_8a_6628079d5
 workflow-cps-global-lib:609.vd95673f149b_b
 workflow-multibranch:716.vc692a_e52371b_
 workflow-step-api:639.v6eca_cd8c04a_a_
+workflow-support:839.v35e2736cfd5c
