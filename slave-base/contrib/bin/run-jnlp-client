@@ -103,6 +103,13 @@ if [[ $# -eq 0 ]]; then
   fi
 fi
 
+ # If Kubernetes plugin is configured to use WebSocket, add the -webSocket flag to the arguments
+  if [[ "$@" != *"-webSocket"* ]]; then
+    if [ ! -z "$JENKINS_WEB_SOCKET" ]; then
+      set -- "${@}" "-webSocket"
+    fi
+  fi
+
 # if `docker run` has 2 or more arguments the user is passing jenkins launcher arguments
 if [[ $(echo "$@" | awk '{print NF}') -gt 1 ]]; then
   JAR="${JENKINS_HOME}/remoting.jar"
