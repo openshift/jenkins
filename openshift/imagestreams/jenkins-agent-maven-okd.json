@@ -37,7 +37,7 @@
         },
         "from": {
           "kind": "DockerImage",
-          "name": "quay.io/openshift/origin-jenkins-agent-maven:4.10"
+          "name": "quay.io/openshift/origin-jenkins-agent-maven:4.11"
         },
         "referencePolicy": {
           "type": "Local"
