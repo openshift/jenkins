@@ -19,4 +19,6 @@ Feature: Delete all resources created using jenkins ephemeral template
         And  delete all buildconfigs
         And  delete all builds
         And delete all deploymentconfig
+        And delete all services
+        And delete all imagestream
         And delete all remaining test resources
