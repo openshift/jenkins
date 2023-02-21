@@ -37,7 +37,7 @@
         },
         "from": {
           "kind": "DockerImage",
-          "name": "registry.redhat.io/openshift4/ose-jenkins-agent-maven:v4.11"
+          "name": "registry.redhat.io/openshift4/ose-jenkins-agent-maven:v4.10"
         },
         "referencePolicy": {
           "type": "Local"
