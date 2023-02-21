@@ -49,7 +49,7 @@ spec:
         version: 2.x
       from:
         kind: DockerImage
-        name: quay.io/openshift/origin-jenkins:4.11
+        name: quay.io/openshift/origin-jenkins:4.12
       referencePolicy:
         type: Local
     - name: "user-maintained-upgrade-redeploy"
@@ -67,7 +67,7 @@ spec:
         version: 2.x
       from:
         kind: DockerImage
-        name: quay.io/openshift/origin-jenkins:4.11
+        name: quay.io/openshift/origin-jenkins:4.12
       referencePolicy:
         type: Local
     - name: "scheduled-upgrade-redeploy"
@@ -84,7 +84,7 @@ spec:
         version: 2.x
       from:
         kind: DockerImage
-        name: quay.io/openshift/origin-jenkins:4.11
+        name: quay.io/openshift/origin-jenkins:4.12
       importPolicy:
         scheduled: true
       referencePolicy:

@@ -13,7 +13,7 @@ spec:
         tags: jenkins
       from:
         kind: DockerImage
-        name: registry.redhat.io/ocp-tools-4/jenkins-agent-base-rhel8:v4.11.0-1663082123
+        name: registry.redhat.io/ocp-tools-4/jenkins-agent-base-rhel8:v4.12.0-1675702335
       referencePolicy:
         type: Local
     - name: user-maintained-upgrade
@@ -27,7 +27,7 @@ spec:
         tags: jenkins
       from:
         kind: DockerImage
-        name: registry.redhat.io/ocp-tools-4/jenkins-agent-base-rhel8:v4.11.0
+        name: registry.redhat.io/ocp-tools-4/jenkins-agent-base-rhel8:v4.12.0
       referencePolicy:
         type: Local
     - name: scheduled-upgrade
@@ -40,7 +40,7 @@ spec:
         tags: jenkins
       from:
         kind: DockerImage
-        name: registry.redhat.io/ocp-tools-4/jenkins-agent-base-rhel8:v4.11.0
+        name: registry.redhat.io/ocp-tools-4/jenkins-agent-base-rhel8:v4.12.0
       importPolicy:
         scheduled: true
       referencePolicy:

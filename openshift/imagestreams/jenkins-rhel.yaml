@@ -49,7 +49,7 @@ spec:
         version: 2.x
       from:
         kind: DockerImage
-        name: registry.redhat.io/ocp-tools-4/jenkins-rhel8:v4.11.0-1663086392.1666642635
+        name: registry.redhat.io/ocp-tools-4/jenkins-rhel8:v4.12.0-1675704988
       referencePolicy:
         type: Local
     - name: "user-maintained-upgrade-redeploy"
@@ -67,7 +67,7 @@ spec:
         version: 2.x
       from:
         kind: DockerImage
-        name: registry.redhat.io/ocp-tools-4/jenkins-rhel8:v4.11.0
+        name: registry.redhat.io/ocp-tools-4/jenkins-rhel8:v4.12.0
       referencePolicy:
         type: Local
     - name: "scheduled-upgrade-redeploy"
@@ -85,7 +85,7 @@ spec:
         version: 2.x
       from:
         kind: DockerImage
-        name: registry.redhat.io/ocp-tools-4/jenkins-rhel8:v4.11.0
+        name: registry.redhat.io/ocp-tools-4/jenkins-rhel8:v4.12.0
       importPolicy:
         scheduled: true
       referencePolicy:
