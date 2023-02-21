@@ -126,14 +126,14 @@
                   }
                 },
                 "livenessProbe": {
-                    "timeoutSeconds": 240,
-                    "periodSeconds": 360,
-                    "initialDelaySeconds": 420,
-                    "failureThreshold" : 2,
-                    "httpGet": {
-                        "path": "/login",
-                        "port": 8080
-                    }
+                  "timeoutSeconds": 240,
+                  "periodSeconds": 360,
+                  "initialDelaySeconds": 420,
+                  "failureThreshold": 2,
+                  "httpGet": {
+                    "path": "/login",
+                    "port": 8080
+                  }
                 },
                 "env": [
                   {
@@ -228,29 +228,29 @@
     },
     {
       "kind": "ServiceAccount",
-        "apiVersion": "v1",
-        "metadata": {
-            "name": "${JENKINS_SERVICE_NAME}",
-            "annotations": {
-		"serviceaccounts.openshift.io/oauth-redirectreference.jenkins": "{\"kind\":\"OAuthRedirectReference\",\"apiVersion\":\"v1\",\"reference\":{\"kind\":\"Route\",\"name\":\"${JENKINS_SERVICE_NAME}\"}}"
-            }
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "${JENKINS_SERVICE_NAME}",
+        "annotations": {
+          "serviceaccounts.openshift.io/oauth-redirectreference.jenkins": "{\"kind\":\"OAuthRedirectReference\",\"apiVersion\":\"v1\",\"reference\":{\"kind\":\"Route\",\"name\":\"${JENKINS_SERVICE_NAME}\"}}"
         }
+      }
     },
     {
       "kind": "RoleBinding",
       "apiVersion": "authorization.openshift.io/v1",
       "metadata": {
-          "name": "${JENKINS_SERVICE_NAME}_edit"
+        "name": "${JENKINS_SERVICE_NAME}_edit"
       },
       "groupNames": null,
       "subjects": [
-          {
-              "kind": "ServiceAccount",
-              "name": "${JENKINS_SERVICE_NAME}"
-          }
+        {
+          "kind": "ServiceAccount",
+          "name": "${JENKINS_SERVICE_NAME}"
+        }
       ],
       "roleRef": {
-          "name": "edit"
+        "name": "edit"
       }
     },
     {
@@ -277,31 +277,31 @@
       }
     },
     {
-       "kind": "Service",
-       "apiVersion": "v1",
-       "metadata": {
-         "name": "${JENKINS_SERVICE_NAME}",
-         "annotations": {
-           "service.alpha.openshift.io/dependencies": "[{\"name\": \"${JNLP_SERVICE_NAME}\", \"namespace\": \"\", \"kind\": \"Service\"}]",
-           "service.openshift.io/infrastructure": "true"
-         }
-       },
-       "spec": {
-         "ports": [
-           {
-             "name": "web",
-             "protocol": "TCP",
-             "port": 80,
-             "targetPort": 8080,
-             "nodePort": 0
-           }
-         ],
-         "selector": {
-           "name": "${JENKINS_SERVICE_NAME}"
-         },
-         "type": "ClusterIP",
-         "sessionAffinity": "None"
-       }
+      "kind": "Service",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "${JENKINS_SERVICE_NAME}",
+        "annotations": {
+          "service.alpha.openshift.io/dependencies": "[{\"name\": \"${JNLP_SERVICE_NAME}\", \"namespace\": \"\", \"kind\": \"Service\"}]",
+          "service.openshift.io/infrastructure": "true"
+        }
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "web",
+            "protocol": "TCP",
+            "port": 80,
+            "targetPort": 8080,
+            "nodePort": 0
+          }
+        ],
+        "selector": {
+          "name": "${JENKINS_SERVICE_NAME}"
+        },
+        "type": "ClusterIP",
+        "sessionAffinity": "None"
+      }
     }
   ],
   "parameters": [
