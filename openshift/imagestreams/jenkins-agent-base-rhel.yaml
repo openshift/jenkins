@@ -4,45 +4,44 @@ metadata:
   name: jenkins-agent-base
 spec:
   tags:
-  - name: latest
-    annotations:
-      description: Provides a Jenkins Base Agent to extend Jenkins agents
-      iconClass: icon-jenkins
-      openshift.io/display-name: Jenkins Base Agent
-      openshift.io/provider-display-name: Red Hat, Inc.
-      tags: jenkins
-    from:
-      kind: DockerImage
-      name: registry.redhat.io/ocp-tools-4/jenkins-agent-base-rhel8:v4.11.0-1663082123
-    referencePolicy:
-      type: Local
-  - name: user-maintained-upgrade
-    annotations:
-      description: Provides a Jenkins Base Agent to extend Jenkins agents.
-        A user must invoke 'oc import-image jenkins-agent-base:user-maintained-upgrade-redeploy -n openshift' in order for the ImageStream controller
-        to pull the latest digest for the image tag.
-      iconClass: icon-jenkins
-      openshift.io/display-name: Jenkins Base Agent
-      openshift.io/provider-display-name: Red Hat, Inc.
-      tags: jenkins
-    from:
-      kind: DockerImage
-      name: registry.redhat.io/ocp-tools-4/jenkins-agent-base-rhel8:v4.11.0
-    referencePolicy:
-      type: Local
-  - name: scheduled-upgrade
-    annotations:
-      description: Provides a Jenkins Base Agent to extend Jenkins agents.
-        OpenShift will periodically check to ensure that the latest digest for this image tag is imported.
-      iconClass: icon-jenkins
-      openshift.io/display-name: Jenkins Base Agent
-      openshift.io/provider-display-name: Red Hat, Inc.
-      tags: jenkins
-    from:
-      kind: DockerImage
-      name: registry.redhat.io/ocp-tools-4/jenkins-agent-base-rhel8:v4.11.0
-    importPolicy:
-      scheduled: true
-    referencePolicy:
-      type: Local
-
+    - name: latest
+      annotations:
+        description: Provides a Jenkins Base Agent to extend Jenkins agents
+        iconClass: icon-jenkins
+        openshift.io/display-name: Jenkins Base Agent
+        openshift.io/provider-display-name: Red Hat, Inc.
+        tags: jenkins
+      from:
+        kind: DockerImage
+        name: registry.redhat.io/ocp-tools-4/jenkins-agent-base-rhel8:v4.11.0-1663082123
+      referencePolicy:
+        type: Local
+    - name: user-maintained-upgrade
+      annotations:
+        description: Provides a Jenkins Base Agent to extend Jenkins agents.
+          A user must invoke 'oc import-image jenkins-agent-base:user-maintained-upgrade-redeploy -n openshift' in order for the ImageStream controller
+          to pull the latest digest for the image tag.
+        iconClass: icon-jenkins
+        openshift.io/display-name: Jenkins Base Agent
+        openshift.io/provider-display-name: Red Hat, Inc.
+        tags: jenkins
+      from:
+        kind: DockerImage
+        name: registry.redhat.io/ocp-tools-4/jenkins-agent-base-rhel8:v4.11.0
+      referencePolicy:
+        type: Local
+    - name: scheduled-upgrade
+      annotations:
+        description: Provides a Jenkins Base Agent to extend Jenkins agents.
+          OpenShift will periodically check to ensure that the latest digest for this image tag is imported.
+        iconClass: icon-jenkins
+        openshift.io/display-name: Jenkins Base Agent
+        openshift.io/provider-display-name: Red Hat, Inc.
+        tags: jenkins
+      from:
+        kind: DockerImage
+        name: registry.redhat.io/ocp-tools-4/jenkins-agent-base-rhel8:v4.11.0
+      importPolicy:
+        scheduled: true
+      referencePolicy:
+        type: Local
