@@ -15,8 +15,8 @@ MAINTAINER OpenShift Developer Services <openshift-dev-services+jenkins@redhat.c
 COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
 
 # Labels consumed by Red Hat build service
-LABEL com.redhat.component="jenkins-slave-base-rhel7-container" \
-      name="openshift4/jenkins-slave-base-rhel7" \
+LABEL com.redhat.component="jenkins-slave-base-rhel8-container" \
+      name="openshift4/jenkins-slave-base-rhel8" \
       architecture="x86_64" \
       io.k8s.display-name="Jenkins Slave Base" \
       io.k8s.description="The jenkins slave base image is intended to be built on top of, to add your own tools that your jenkins job needs. The slave base image includes all the jenkins logic to operate as a slave, so users just have to yum install any additional packages their specific jenkins job will need" \
