@@ -16,12 +16,12 @@ COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
 
 # Labels consumed by Red Hat build service
 LABEL com.redhat.component="jenkins-slave-base-rhel7-container" \
-      name="openshift4/jenkins-slave-base-rhel7" \
-      architecture="x86_64" \
-      io.k8s.display-name="Jenkins Slave Base" \
-      io.k8s.description="The jenkins slave base image is intended to be built on top of, to add your own tools that your jenkins job needs. The slave base image includes all the jenkins logic to operate as a slave, so users just have to yum install any additional packages their specific jenkins job will need" \
-      io.openshift.tags="openshift,jenkins,slave" \
-      maintainer="openshift-dev-services+jenkins@redhat.com"      
+    name="openshift4/jenkins-slave-base-rhel7" \
+    architecture="x86_64" \
+    io.k8s.display-name="Jenkins Slave Base" \
+    io.k8s.description="The jenkins slave base image is intended to be built on top of, to add your own tools that your jenkins job needs. The slave base image includes all the jenkins logic to operate as a slave, so users just have to yum install any additional packages their specific jenkins job will need" \
+    io.openshift.tags="openshift,jenkins,slave" \
+    maintainer="openshift-dev-services+jenkins@redhat.com"
 
 
 ENV HOME=/home/jenkins \
@@ -30,7 +30,7 @@ ENV HOME=/home/jenkins \
 
 USER root
 # Install headless Java
-RUN INSTALL_PKGS="glibc-langpack-en bc gettext git git-lfs java-11-openjdk-headless java-1.8.0-openjdk-headless lsof rsync tar unzip which zip bzip2 jq" && \
+RUN INSTALL_PKGS="glibc-langpack-en bc gettext git git-lfs java-11-openjdk-headless java-1.8.0-openjdk-headless lsof rsync tar unzip which zip bzip2 jq glibc-locale-source" && \
     yum install -y --setopt=tsflags=nodocs --disableplugin=subscription-manager $INSTALL_PKGS && \
     rpm -V  $INSTALL_PKGS && \
     yum clean all && \
@@ -44,7 +44,7 @@ RUN INSTALL_PKGS="glibc-langpack-en bc gettext git git-lfs java-11-openjdk-headl
     chmod 775 /usr/bin && \
     chmod 775 /usr/share/man/man1 && \
     mkdir -p /var/lib/origin && \
-    chmod 775 /var/lib/origin && \    
+    chmod 775 /var/lib/origin && \
     unlink /usr/share/man/man1/java.1.gz && \
     unlink /usr/share/man/man1/jjs.1.gz && \
     unlink /usr/share/man/man1/keytool.1.gz && \
