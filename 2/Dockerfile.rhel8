@@ -66,7 +66,9 @@ RUN ln -s /usr/lib/jenkins /usr/lib64/jenkins && \
     yum install -y $INSTALL_PKGS && \
     rpm -V  $INSTALL_PKGS && \
     yum clean all  && \
-    localedef -f UTF-8 -i en_US en_US.UTF-8
+    localedef -f UTF-8 -i en_US en_US.UTF-8 && \
+    alternatives --set java java-11-openjdk.x86_64 && \
+    alternatives --set javac java-11-openjdk.x86_64
 
 COPY ./contrib/openshift /opt/openshift
 COPY ./contrib/jenkins /usr/local/bin
@@ -82,25 +84,18 @@ RUN /usr/local/bin/install-jenkins-core-plugins.sh /opt/openshift/bundle-plugins
     chmod 775 /usr/share/man/man1 && \
     mkdir -p /var/lib/origin && \
     chmod 775 /var/lib/origin && \
-    unlink /usr/bin/java && \
-    unlink /usr/bin/jjs && \
-    unlink /usr/bin/keytool && \
-    unlink /usr/bin/pack200 && \
-    unlink /usr/bin/rmid && \
-    unlink /usr/bin/rmiregistry && \
-    unlink /usr/bin/unpack200 && \
+    chown -R 1001:0 /opt/openshift && \
+    /usr/local/bin/fix-permissions /opt/openshift && \
+    /usr/local/bin/fix-permissions /opt/openshift/configuration/init.groovy.d && \
+    /usr/local/bin/fix-permissions /var/lib/jenkins && \
+    /usr/local/bin/fix-permissions /var/log && \
     unlink /usr/share/man/man1/java.1.gz && \
     unlink /usr/share/man/man1/jjs.1.gz && \
     unlink /usr/share/man/man1/keytool.1.gz && \
     unlink /usr/share/man/man1/pack200.1.gz && \
     unlink /usr/share/man/man1/rmid.1.gz && \
     unlink /usr/share/man/man1/rmiregistry.1.gz && \
-    unlink /usr/share/man/man1/unpack200.1.gz && \
-    chown -R 1001:0 /opt/openshift && \
-    /usr/local/bin/fix-permissions /opt/openshift && \
-    /usr/local/bin/fix-permissions /opt/openshift/configuration/init.groovy.d && \
-    /usr/local/bin/fix-permissions /var/lib/jenkins && \
-    /usr/local/bin/fix-permissions /var/log
+    unlink /usr/share/man/man1/unpack200.1.gz
 
 VOLUME ["/var/lib/jenkins"]
 
