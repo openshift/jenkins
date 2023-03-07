@@ -3,8 +3,8 @@ FROM registry.ci.openshift.org/ocp/4.13:jenkins-agent-base
 MAINTAINER OpenShift Developer Services <openshift-dev-services+jenkins@redhat.com>
 
 # Labels consumed by Red Hat build service
-LABEL com.redhat.component="jenkins-agent-nodejs-12-rhel7-container" \
-      name="openshift4/jenkins-agent-nodejs-12-rhel7" \
+LABEL com.redhat.component="jenkins-agent-nodejs-12-rhel8-container" \
+      name="openshift4/jenkins-agent-nodejs-12-rhel8" \
       architecture="x86_64" \
       io.k8s.display-name="Jenkins Agent Nodejs" \
       io.k8s.description="The jenkins agent nodejs image has the nodejs tools on top of the jenkins slave base image." \
