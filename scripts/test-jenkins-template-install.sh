@@ -48,7 +48,7 @@ echo "Starting local Jenkins instance"
 ${PYTHON_VENV_DIR}/bin/pip install -q -r smoke/requirements.txt
 echo "Running smoke tests in namespace with TEST_NAMESPACE=${TEST_NAMESPACE}"
 echo "Logs will be collected in "${TEST_SMOKE_OUTPUT_DIR}
-${PYTHON_VENV_DIR}/bin/behave --junit --junit-directory ${TEST_SMOKE_OUTPUT_DIR} \
+${PYTHON_VENV_DIR}/bin/behave --tags=interop --junit --junit-directory ${TEST_SMOKE_OUTPUT_DIR} \
                               --no-capture --no-capture-stderr \
                               smoke/features -D project_name=${TEST_NAMESPACE}                           
 echo "Logs collected in "${TEST_SMOKE_OUTPUT_DIR}

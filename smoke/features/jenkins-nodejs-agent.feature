@@ -7,7 +7,7 @@ Feature: Testing jenkins agent nodejs image
   Background:
     Given Project [TEST_NAMESPACE] is used
 
-  @automated @customer-scenario
+  @automated @customer-scenario @interop
   Scenario: Deploy sample application on openshift : JKNS-04-TC01
     Given The jenkins pod is up and runnning
     When The user create objects from the "smoke/samples/nodejs_pipeline.yaml" template by processing the template and piping the output to oc create
