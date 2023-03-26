@@ -1,15 +1,14 @@
 component: "Jenkins"
 
 reviewers:
-- otaviof
-- jkhelil
 - coreydaley
 - divyansh42
+- jkhelil
 - mbharatk
+- apoorvajagtap
 
 approvers:
-- otaviof
-- jkhelil
 - coreydaley
 - divyansh42
+- jkhelil
 - mbharatk
