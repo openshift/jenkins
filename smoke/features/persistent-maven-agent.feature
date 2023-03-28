@@ -7,7 +7,7 @@ Feature: Testing jenkins agent maven image
   Background:
     Given Project [TEST_NAMESPACE] is used
 
-  @automated @customer-scenario
+  @automated @customer-scenario @interop
   Scenario: Deploy JavaEE application on OpenShift : JKNS-07-TC01
       Given The jenkins pod is up and runnning
       When The user create objects from the sample maven template by processing the template and piping the output to oc create
