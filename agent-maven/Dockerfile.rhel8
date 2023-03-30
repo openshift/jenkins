@@ -2,8 +2,8 @@ FROM registry.ci.openshift.org/ocp/4.11:jenkins-agent-base
 MAINTAINER OpenShift Developer Services <openshift-dev-services+jenkins@redhat.com>
 
 # Labels consumed by Red Hat build service
-LABEL com.redhat.component="jenkins-agent-maven-35-rhel7-container" \
-      name="openshift4/jenkins-agent-maven-35-rhel7" \
+LABEL com.redhat.component="jenkins-agent-maven-35-rhel8-container" \
+      name="openshift4/jenkins-agent-maven-35-rhel8" \
       architecture="x86_64" \
       io.k8s.display-name="Jenkins Agent Maven" \
       io.k8s.description="The jenkins agent maven image has the maven tools on top of the jenkins slave base image." \
