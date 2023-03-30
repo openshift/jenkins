@@ -4,9 +4,11 @@ blueocean-autofavorite:1.2.5
 blueocean-pipeline-scm-api:1.25.8
 cloudbees-bitbucket-branch-source:791.vb_eea_a_476405b
 cloudbees-folder:6.740.ve4f4ffa_dea_54
+commons-lang3-api:3.12.0-36.vd97de6465d5b_
+commons-text-api:1.10.0-36.vc008c8fcda_7b_
 config-file-provider:3.8.1
 configuration-as-code-groovy:1.1
-configuration-as-code:1512.vb_79d418d5fc8
+configuration-as-code:1569.vb_72405b_80249
 credentials:1189.vf61b_a_5e2f62e
 credentials-binding:523.vd859a_4b_122e6
 docker-commons:1.18
@@ -45,7 +47,7 @@ prometheus:2.0.10
 scm-api:621.vda_a_b_055e58f7
 script-security:1229.v4880b_b_e905a_6
 snakeyaml-api:1.33-90.v80dcb_3814d35
-ssh-credentials:277.280.v1e86b_7d0056b_
+ssh-credentials:305.v8f4381501156
 subversion:2.15.4
 token-macro:308.v4f2b_ed62b_b_16
 workflow-api:1200.v8005c684b_a_c6
