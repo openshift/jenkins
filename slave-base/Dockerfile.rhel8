@@ -30,7 +30,7 @@ ENV HOME=/home/jenkins \
 
 USER root
 # Install headless Java
-RUN INSTALL_PKGS="glibc-langpack-en bc gettext git java-11-openjdk-headless java-1.8.0-openjdk-headless lsof rsync tar unzip which zip bzip2 jq glibc-locale-source" && \
+RUN INSTALL_PKGS="glibc-langpack-en bc gettext git git-lfs java-11-openjdk-headless java-1.8.0-openjdk-headless lsof rsync tar unzip which zip bzip2 jq glibc-locale-source" && \
     yum install -y --setopt=tsflags=nodocs --disableplugin=subscription-manager $INSTALL_PKGS && \
     rpm -V  $INSTALL_PKGS && \
     yum clean all && \
