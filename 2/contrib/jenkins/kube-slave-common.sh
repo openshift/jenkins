@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # This file provides functions to automatically discover suitable image streams
 # that the Kubernetes plugin will use to create "slave" pods.
@@ -75,7 +75,7 @@ fi
 # generate_kubernetes_config generates a configuration for the kubernetes plugin
 function generate_kubernetes_config() {
     [ -z "$oc_cmd" ] && return
-    [ ! has_service_account ] && return   
+    [ ! has_service_account ] && return
     local crt_contents=$(openssl x509 -in "${KUBE_CA}")
     if [ $? -eq 1 ] ; then
       crt_contents=""
