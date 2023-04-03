@@ -60,11 +60,12 @@ jackson2-api:2.13.4.20221013-295.v8e29ea_354141
 jakarta-activation-api:2.0.0-2
 jakarta-mail-api:2.0.0-5
 javadoc:217.v905b_86277a_2a_
-javax-activation-api:1.2.0-3
+javax-activation-api:1.2.0-4
 javax-mail-api:1.6.2-6
 jaxb:2.3.6-1
 jenkins-design-language:1.25.8
-jira:3.7.1
+jersey2-api:2.37-1
+jira:3.9
 job-dsl:1.77
 jquery3-api:3.6.0-4
 jsch:0.1.55.2
@@ -125,7 +126,7 @@ workflow-basic-steps:2.20
 workflow-cps:3536.vb_8a_6628079d5
 workflow-cps-global-lib:609.vd95673f149b_b
 workflow-durable-task-step:2.40
-workflow-job:1145.v7f2433caa07f
+workflow-job:1207.ve6191ff089f8
 workflow-multibranch:716.vc692a_e52371b_
 workflow-scm-step:400.v6b_89a_1317c9a_
 workflow-step-api:639.v6eca_cd8c04a_a_

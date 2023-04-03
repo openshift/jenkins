@@ -21,7 +21,7 @@ google-oauth-plugin:1.0.6
 groovy:2.4
 htmlpublisher:1.25
 javax-mail-api:1.6.2-6
-jira:3.7.1
+jira:3.9
 job-dsl:1.77
 junit:1166.va_436e268e972
 lockable-resources:2.11
