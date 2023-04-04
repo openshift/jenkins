@@ -139,7 +139,7 @@ function install_plugins() {
     # Call install plugins with the temporary file
     /usr/local/bin/install-plugins.sh "${plugins_file}"
   fi
-  
+
   if [ "$(ls /opt/openshift/plugins/* 2>/dev/null)" ]; then
     mkdir -p ${JENKINS_HOME}/plugins
     echo "Copying $(ls /opt/openshift/plugins/* | wc -l) files to ${JENKINS_HOME} ..."
@@ -195,7 +195,7 @@ function force_copy_plugins() {
     # we are removing those here
     rm -rf $JENKINS_HOME/plugins/managed-scripts*
     install_plugins
-  fi 
+  fi
 }
 
 # extract the different element of an url into a JSON structure
@@ -212,7 +212,7 @@ function parse_url() {
     # extract the host
     host_port="$(echo ${url/$login@/} | cut -d/ -f1) "
     host="$(echo $host_port | cut -f1 -d:) "
-    
+
     # by request - try to extract the port
     port="$(echo $host_port | sed -e 's,^.*:,:,g' -e 's,.*:\([0-9]*\).*,\1,g' -e 's,[^0-9],,g')"
     # extract the uri (if any)
@@ -234,7 +234,7 @@ function get_java_proxy_config() {
   local config proto json username password
   # -Dhttps.proxyHost=<your_proxy_host>
   # -Dhttps.proxyPort=3128
-  # -Dhttps.proxyUser=your-proxy-user 
+  # -Dhttps.proxyUser=your-proxy-user
   # -Dhttps.proxyPassword=your-proxy-password
   # -Dhttp.nonProxyHosts="*.svc|*.svc.cluster.*|*.svc.cluster.local|172.30.*|kubernetes.default|172.30.0.1"
   proto=$1
@@ -363,7 +363,7 @@ if [[ "${CONTAINER_CORE_LIMIT}" ]]; then
   JAVA_CORE_LIMIT="-XX:ParallelGCThreads=${CONTAINER_CORE_LIMIT} -Djava.util.concurrent.ForkJoinPool.common.parallelism=${CONTAINER_CORE_LIMIT} -XX:CICompilerCount=2"
 fi
 
-mkdir /tmp/war
+mkdir -p /tmp/war
 unzip -q /usr/lib/jenkins/jenkins.war -d /tmp/war
 
 # finish the move of the default logs dir, /var/log/jenkins, to the volume mount
@@ -425,7 +425,7 @@ echo ${OPENSHIFT_JENKINS_IMAGE_VERSION} > ${JENKINS_HOME}/image-version
 if [ "$(ls /usr/lib/jenkins/*.hpi 2>/dev/null)" ]; then
   # in case very first time through, make sure plugins dir is there
   mkdir -p ${JENKINS_HOME}/plugins
-   
+
   for FILENAME in /usr/lib/jenkins/*.hpi ; do
     basefilename=`basename $FILENAME .hpi`
     plugin_image_volume_location="${JENKINS_HOME}/plugins/${basefilename}.*"
@@ -433,14 +433,14 @@ if [ "$(ls /usr/lib/jenkins/*.hpi 2>/dev/null)" ]; then
       continue
     fi
     # this will link new plugins introduced into /usr/lib/jenkins to JENKINS_HOME
-    echo "Linking ${FILENAME} RPM installed Jenkins plugins to ${JENKINS_HOME} ..."  
+    echo "Linking ${FILENAME} RPM installed Jenkins plugins to ${JENKINS_HOME} ..."
     ln -s  $FILENAME ${JENKINS_HOME}/plugins/${basefilename}.jpi
   done
-   
-  # since this is rhel, if it is also the initial start of the image, we can remove the 
-  # the /usr/lib/jenkins/*.hpi link from /opt/openshift/plugins/*.jpi that 
+
+  # since this is rhel, if it is also the initial start of the image, we can remove the
+  # the /usr/lib/jenkins/*.hpi link from /opt/openshift/plugins/*.jpi that
   # was done in the rhel7 dockefile; that link is done to assist our s2i
-  # extension scenario, so that the existing plugins are available during 
+  # extension scenario, so that the existing plugins are available during
   # the s2i assemble step (which precedes the s2i run step handled by this
   # script); however, we must keep any plugins pulled in by s2i assemble, so
   # we only remove files which are the same as /usr/lib/jenkins
@@ -482,7 +482,7 @@ if [ ! -e ${JENKINS_HOME}/configured ]; then
 
   echo "Creating initial Jenkins 'admin' user ..."
   update_admin_password
-  
+
   touch ${JENKINS_HOME}/configured
 else
   shopt -s nocasematch
@@ -490,7 +490,7 @@ else
      "${OVERRIDE_PV_CONFIG_WITH_IMAGE_CONFIG}" != "false" ]]; then
     echo "Overriding jenkins configuration stored in ${JENKINS_HOME}"
 
-    # remove any files/directories in $JENKINS_HOME that are specified in $image_config_dir, 
+    # remove any files/directories in $JENKINS_HOME that are specified in $image_config_dir,
     # otherwise the two will get merged when cp is run below
     for f in ${image_config_dir}/*; do
       fileName=${f#${image_config_dir}'/'}
@@ -505,7 +505,7 @@ else
     echo "Copying Jenkins configuration to ${JENKINS_HOME}..."
     cp -r $image_config_dir/* ${JENKINS_HOME}
   fi
-    
+
   if [[ ! -z "${OVERRIDE_PV_PLUGINS_WITH_IMAGE_PLUGINS}" && \
      "${OVERRIDE_PV_PLUGINS_WITH_IMAGE_PLUGINS}" != "false" ]]; then
     echo "Overriding plugins stored in ${JENKINS_HOME}/plugins"
@@ -574,10 +574,10 @@ JENKINS_SERVICE_NAME=`echo ${JENKINS_SERVICE_NAME} | tr '[A-Z]' '[a-z]' | tr '_'
 create_jenkins_location_configuration_xml() {
   # Gets the jenkins URL only from the *first* route available in namespace service the service named $JENKINS_SERVICE_NAME
   JENKINS_SCHEME="https://"
-  if [ "$( oc get routes -o json | jq -c -r '.items[0].spec.tls')"  == "null" ]; then
+  if [[ $( oc get routes -o json | jq -c -r '.items[0].spec.tls')  == "null" ]]; then
     JENKINS_SCHEME="http://"
     fi
-  JENKINS_URL="$JENKINS_SCHEME$(oc get routes -o json | jq -c -r '.items[] | select (.spec.to.name == env.JENKINS_SERVICE_NAME ) | .spec.host ' | head -n 1)/"
+  JENKINS_URL="$JENKINS_SCHEME$(oc get routes -o json | jq -c -r --arg JENKINS_SERVICE_NAME "$JENKINS_SERVICE_NAME" '.items[] | select (.spec.to.name == $JENKINS_SERVICE_NAME) | .spec.host ' | head -n 1)/"
   echo "Using JENKINS_SERVICE_NAME=$JENKINS_SERVICE_NAME"
   echo "Generating jenkins.model.JenkinsLocationConfiguration.xml using (${JENKINS_HOME}/jenkins.model.JenkinsLocationConfiguration.xml.tpl) ..."
   export JENKINS_URL
