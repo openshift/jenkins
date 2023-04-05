@@ -6,7 +6,7 @@ cloudbees-bitbucket-branch-source:791.vb_eea_a_476405b
 cloudbees-folder:6.740.ve4f4ffa_dea_54
 commons-lang3-api:3.12.0-36.vd97de6465d5b_
 commons-text-api:1.10.0-36.vc008c8fcda_7b_
-config-file-provider:3.8.1
+config-file-provider:3.10.0
 configuration-as-code-groovy:1.1
 configuration-as-code:1569.vb_72405b_80249
 credentials:1189.vf61b_a_5e2f62e
