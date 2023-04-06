@@ -127,7 +127,7 @@ verify_plugins() {
 		name="${plugin%%:*}"
 		version="${plugin##*:}"
 
-		printf "[VERIFYING] %s.jpi\n" "${name}"
+		printf "[VERIFYING] %s.jpi:%s\n" "${name}" "${version}"
 		printf "\t%-50s" "- exists ... "
 		if test -f "${PLUGINS_DIR}/${name}.jpi"; then
 			printf "PASS\n"
@@ -154,8 +154,8 @@ verify_plugins() {
 # same version specified by the jenkins-version.txt file at the provided SHA
 #
 verify_jenkins_war() {
-	printf "[VERIFYING] %s:\n" "$JENKINS_WAR_LOCATION"
 	jenkins_version=$(cat "$COMMIT_JENKINS_VERSION_LOCATION")
+	printf "[VERIFYING] %s:%s\n" "$JENKINS_WAR_LOCATION" "${jenkins_version}"
 	jenkins_version_found=$(/usr/lib/jvm/java-11/bin/java -jar "$JENKINS_WAR_LOCATION" --version 2> /dev/null)
 	printf "\t%-50s" "- exists ... "
 		if test -f "$JENKINS_WAR_LOCATION"; then
