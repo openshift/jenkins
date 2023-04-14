@@ -8,15 +8,15 @@
 # version (at least that is the initial goal).  This naming system
 # can be revisited in the future if we decide we need either jenkins
 # or <platform> version numbers in the names.
-VERSIONS="2 slave-base agent-maven-3.5 agent-nodejs-8 agent-nodejs-10"
+VERSIONS="2 slave-base"
 
 BUNDLE_PLUGINS="$(shell pwd)/2/contrib/openshift/bundle-plugins.txt"
 REF=$(shell mktemp -d)
 JENKINS_WAR="$(shell mktemp -d)/jenkins.war"
-ifeq ($(TARGET),rhel7)
-	OS := rhel7
-else
-	OS := centos7
+ifeq ($(TARGET),rhel8)
+	OS := rhel8
+# else
+# 	OS := centos7
 endif
 
 .PHONY: build
