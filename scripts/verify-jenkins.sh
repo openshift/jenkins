@@ -220,8 +220,37 @@ check_failed_log() {
 	fi
 }
 
+verify_installed_packages() {
+	http_status_code=$(curl -s -o "/tmp/Dockerfile.rhel8" -w "%{http_code}\n" "${GITHUB_JENKINS_BASE_URL}/${SHA}/2/Dockerfile.rhel8" 2> /dev/null)
+	printf "[VERIFYING] Installed packages ...\n"
+
+	# Download the remote file to a temporary file, verifying the http_status code for the request
+	printf "\t%-50s" "- downloading Dockerfile.rhel8 ... "
+	if [ "$http_status_code" == 200 ]; then
+		printf "PASS\n"
+	else
+		printf "FAIL\n"
+		printf "failed to download %s, http status code: %s" "${remote_file_path}" "${http_status_code}" >> $FAILED_LOG_LOCATION
+	fi
+
+	 INSTALL_PKGS=$(grep "INSTALL_PKGS=" /tmp/Dockerfile.rhel8)
+	 INSTALL_PKGS=${INSTALL_PKGS//INSTALL_PKGS=\"/}
+	 INSTALL_PKGS=${INSTALL_PKGS//\" && \\/}
+	 INSTALL_PKGS=$(echo "${INSTALL_PKGS}" | xargs)
+
+	for e in ${INSTALL_PKGS[@]}; do
+			printf "\t%-50s" "- checking $e ..."
+			if ! yum list installed "${e}" &> /dev/null; then
+				printf "FAIL\n"
+				printf "package %s is not installed" "${e}\n" >> $FAILED_LOG_LOCATION
+			else
+				printf "PASS\n"
+			fi
+	done
+}
 main() {
 	ensure_sha_env_var
+	verify_installed_packages
 	verify_file "jenkins-version.txt" "/opt/openshift" "2/contrib/openshift"
 	verify_file "bundle-plugins.txt" "/opt/openshift" "2/contrib/openshift"
 	verify_plugins
