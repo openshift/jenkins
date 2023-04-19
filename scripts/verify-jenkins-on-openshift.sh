@@ -43,24 +43,6 @@ vars(){
     QUAY_IMAGE="quay.io/pipeline-integrations/openshift-ose-jenkins:${COMMIT_SHA}"
 }
 
-# get_image_ready() 
-# pulls the brew image locally, tags & pushes it to quay.
-# 
-get_image_ready(){
-    printf "\n-------------------------------------------------------\n>INFO || Pulling the Jenkins Image\n"
-    IMAGE_ID=$(podman pull "${JENKINS_IMAGE}")
-    if [ -z "${IMAGE_ID}" ]
-    then
-        printf "\n>ERR || Image Pull Failed\n"
-        exit 1
-    else
-        podman tag "${JENKINS_IMAGE}" "${QUAY_IMAGE}"
-        printf "\n-------------------------------------------------------\n>INFO || Pushing the image to 'quay.io/pipeline-integrations'\n"
-        podman push "${QUAY_IMAGE}"
-        printf "\n-------------------------------------------------------\n>INFO || Image %s pushed successful\n" "${QUAY_IMAGE}"
-    fi
-}
-
 # deploy_on_openshift()
 # Deploys the pod with the provided CPaas image, 
 # 
@@ -70,7 +52,8 @@ deploy_on_openshift(){
     oc version > /dev/null
     if [ $? != 0 ]
     then
-        printf "\n ERR || Please install 'oc' client to continue. https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/"
+        printf "\n>ERR || Please install 'oc' client to continue. https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/\n"
+        printf ">ERR || And/OR ensure that the user has been logged in to the cluster.\n"
         exit 1
     fi
 
@@ -93,11 +76,32 @@ deploy_on_openshift(){
         IFS="/" read -r POD POD_NAME <<< "${ELEMENTS[0]}"
     fi
 
-    printf "\n-------------------------------------------------------\n>INFO || Pod %s is available now\n" "${POD_NAME}"    
+    printf "\n-------------------------------------------------------\n>INFO || Pod %s is now available. Any additional tests can be performed against it.\n" "${POD_NAME}"
 }
 
-# Creates '/tmp/download_script.sh' script which is executed within the pod.
-# The `download_script.sh` downloads & executes the verify_jenkins.sh inside the pod. 
+# get_image_ready() 
+# pulls the brew image locally, tags & pushes it to quay.
+# 
+get_image_ready(){
+    printf "\n-------------------------------------------------------\n>INFO || Pulling the Jenkins Image\n"
+    IMAGE_ID=$(podman pull "${JENKINS_IMAGE}")
+    if [ -z "${IMAGE_ID}" ]
+    then
+        printf "\n>ERR || Image Pull Failed\n"
+        exit 1
+    else
+        podman tag "${JENKINS_IMAGE}" "${QUAY_IMAGE}"
+        printf "\n-------------------------------------------------------\n>INFO || Pushing the image to 'quay.io/pipeline-integrations'\n"
+        podman push "${QUAY_IMAGE}"
+        printf "\n-------------------------------------------------------\n>INFO || Image %s pushed successful\n" "${QUAY_IMAGE}"
+    fi
+
+    # now that image is available, deploy a pod on OpenShift cluster using same image.
+    deploy_on_openshift 
+}
+
+# Creates '/tmp/download_script.sh' script which is executed within the container.
+# The `download_script.sh` downloads & executes the verify_jenkins.sh inside the container. 
 # 
 execute_verification_script(){
 
@@ -108,24 +112,33 @@ curl https://raw.githubusercontent.com/openshift/jenkins/master/scripts/verify-j
 EOL
 
     # Run jenkins verification script inside the pod & redirect the output to a file.
-    printf "\n-------------------------------------------------------\n>INFO || Running the verify-jenkins.sh within the pod\n"
-    oc exec -i "$POD_NAME" -- bash -s < /tmp/download_script.sh &> /tmp/result.out
+    printf "\n-------------------------------------------------------\n>INFO || Running a container with image: %s\n" "${JENKINS_IMAGE}"
+    # in case any container with same name exists, deletes the container.
+    podman rm "jenkins-$(hostname)" -f
+    podman run -dt --name="jenkins-$(hostname)" --entrypoint /bin/bash "${JENKINS_IMAGE}"
+    printf "\n-------------------------------------------------------\n>INFO || Executing the verify-jenkins.sh within the %s container (Takes ~100 seconds)\n" "jenkins-$(hostname)"
+    podman exec -i "jenkins-$(hostname)" bash -s < /tmp/download_script.sh &> /tmp/result.out &
+    for i in {1..100}
+    do
+        printf "."
+        sleep 1
+    done
 
-    # Check if "All tests succeeded" string exists in the file.
+    # If "All tests succeeded", move ahead with deploying the pod on OpenShift, else exit.
     if [ "$(grep "All tests succeeded" /tmp/result.out)" == "" ]
     then
-        grep "Jenkins startup" /tmp/result.out -A 3
+        grep "Jenkins startup" /tmp/result.out -A 4
         printf "\n>>> ERR || Check /tmp/result.out on local machine for details\n"
         exit 1
     else
         printf "=== All tests succeeded ==="
+        printf "\n-------------------------------------------------------\n>INFO || Deploying Jenkins on OpenShift\n"
+        get_image_ready
     fi
 }
 
 main(){
     vars
-    get_image_ready
-    deploy_on_openshift
     execute_verification_script
 }
 
