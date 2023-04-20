@@ -1,7 +1,9 @@
 #!/bin/bash
 
-# This script deploys the jenkins pod with provided image (from CPaas) on an 
-# OpenShift cluster & executes verify_jenkins.sh within the newly deployed pod.
+# This script spins up a container from provided jenkins (CPaas) image 
+# & runs `verify_jenkins.sh` in it.
+# If all tests pass, it deploys a jenkins pod with the same image on an 
+# OpenShift cluster & informs once the pod is available to run e2e tests against it.
 # 
 # Prerequisites:
 # Ensure a login to OpenShift cluster, either via user:password, token
@@ -44,7 +46,7 @@ vars(){
 }
 
 # deploy_on_openshift()
-# Deploys the pod with the provided CPaas image, 
+# Deploys the pod with the provided CPaas image.
 # 
 deploy_on_openshift(){
 
