@@ -15,8 +15,8 @@ REF=$(shell mktemp -d)
 JENKINS_WAR="$(shell mktemp -d)/jenkins.war"
 ifeq ($(TARGET),rhel8)
 	OS := rhel8
-# else
-# 	OS := centos7
+ else
+ 	OS := centos8
 endif
 
 .PHONY: build
@@ -39,8 +39,7 @@ e2e:
 	@cd 2/test && go test
 
 .PHONY: plugins-list
-plugins-list: 
+plugins-list:
 	@echo "Computing comprehensive plugins list in $(BUNDLE_PLUGINS)"
 	BUNDLE_PLUGINS=${BUNDLE_PLUGINS} REF=${REF} JENKINS_WAR=${JENKINS_WAR} 2/contrib/jenkins/install-plugins.sh 2/contrib/openshift/base-plugins.txt
 	@echo "Comprehensive plugins list calculated in $(BUNDLE_PLUGINS)"
-
