@@ -40,6 +40,12 @@ e2e:
 
 .PHONY: plugins-list
 plugins-list:
-	@echo "Computing comprehensive plugins list in $(BUNDLE_PLUGINS)"
-	BUNDLE_PLUGINS=${BUNDLE_PLUGINS} REF=${REF} JENKINS_WAR=${JENKINS_WAR} 2/contrib/jenkins/install-plugins.sh 2/contrib/openshift/base-plugins.txt
-	@echo "Comprehensive plugins list calculated in $(BUNDLE_PLUGINS)"
+	@echo "Do not use this command, manually update base-plugins.txt and bundle-plugins.txt to be the same"
+
+.PHONY: verify
+verify:
+	./scripts/verify.sh
+
+.PHONY: build-development-image
+build-development-images:
+	./scripts/build-development-images.sh
