@@ -6,7 +6,7 @@ Feature: Delete all resources created using jenkins ephemeral template
     Background:
     Given Project [TEST_NAMESPACE] is used
 
-    @automated @customer-scenario
+    @automated @customer-scenario @interop
     Scenario: Delete all resources : JKNS-05-TC01
         Given we have a openshift cluster
         Then we delete deploymentconfig.apps.openshift.io "jenkins"
