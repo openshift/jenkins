@@ -6,7 +6,16 @@
 #
 # It also sets the admin password to ${JENKINS_PASSWORD}.
 #
-
+printf "Installed Jenkins Version: "
+jenkins_version_found=$(java -jar /usr/lib/jenkins/jenkins.war --version 2> /dev/null)
+printf "%s\n" "${jenkins_version_found}"
+printf "Installed Plugins and Versions: \n"
+for plugin in /opt/openshift/plugins/*.jpi; do
+  version=$(unzip -p "${plugin}" META-INF/MANIFEST.MF | grep "^Plugin-Version: " | sed -e 's#^Plugin-Version: ##')
+  version=${version%%[[:space:]]}
+  printf "%s:%s\n" "${plugin}" "${version}"
+done
+printf "\n\n\n"
 default_version=$(cat /tmp/release.version)
 JENKINS_SLAVE_IMAGE_TAG=${JENKINS_SLAVE_IMAGE_TAG:-${default_version}}
 
@@ -283,16 +292,6 @@ function container_max_memory_bytes() {
 
 CONTAINER_MEMORY_IN_BYTES=$(container_max_memory_bytes)
 CONTAINER_MEMORY_IN_MB=$((CONTAINER_MEMORY_IN_BYTES/2**20))
-
-export JAVA_VERSION=${USE_JAVA_VERSION:=java-11}
-if [[ "$(uname -m)" == "x86_64" ]]; then
-	alternatives --set java $(alternatives --display java | grep $JAVA_VERSION | awk '/family.*x86_64/ { print $1; }')
-	alternatives --set javac $(alternatives --display javac | grep $JAVA_VERSION | awk '/family.*x86_64/ { print $1; }')
-#set JVM for all other archs
-else
-  alternatives --set java $(alternatives --display java | grep $JAVA_VERSION | awk '/family.*'$(uname -m)'/ { print $1; }')
-  alternatives --set javac $(alternatives --display javac | grep $JAVA_VERSION | awk '/family.*'$(uname -m)'/ { print $1; }')
-fi
 
 echo "CONTAINER_MEMORY_IN_MB='${CONTAINER_MEMORY_IN_MB}', using $(readlink /etc/alternatives/java) and $(readlink /etc/alternatives/javac)"
 
