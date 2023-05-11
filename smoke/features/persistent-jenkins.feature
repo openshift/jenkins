@@ -6,7 +6,7 @@ Feature: Deploy Jenkins with persistent volume on openshift using template based
     Background:
     Given Project [TEST_NAMESPACE] is used
 
-    @automated @customer-scenario
+    @automated @customer-scenario @interop
     Scenario: Create jenkins  using persistent template : JKNS-06-TC01
         Given we have a openshift cluster
         When User enters oc new-app jenkins-persistent command
