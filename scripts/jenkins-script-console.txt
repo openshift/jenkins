@@ -1,0 +1,6 @@
+# Lists currently installed jenkins plugins in name:version format
+# Must be run from the Jenkins script console located at <url>/script
+Jenkins.instance.pluginManager.plugins.each{
+  plugin ->
+    println ("${plugin.getShortName()}:${plugin.getVersion()}")
+}

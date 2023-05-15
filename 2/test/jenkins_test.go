@@ -14,8 +14,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/openshift/jenkins/pkg/docker"
 	"github.com/openshift/jenkins/pkg/jenkins"
+	"github.com/openshift/jenkins/pkg/podman"
 )
 
 func Test(t *testing.T) {
@@ -23,12 +23,12 @@ func Test(t *testing.T) {
 	RunSpecs(t, "Jenkins Suite (v2)")
 }
 
-var dockercli *docker.Client
+var podmancli *podman.Client
 var imageName string
 
 var _ = BeforeSuite(func() {
 	var err error
-	dockercli, err = docker.NewEnvClient()
+	podmancli, err = podman.NewEnvClient()
 	Expect(err).NotTo(HaveOccurred())
 
 	imageName = os.Getenv("IMAGE_NAME")
@@ -43,29 +43,30 @@ var _ = Describe("Jenkins testing (v2)", func() {
 
 	BeforeEach(func() {
 		var err error
-		j = jenkins.NewJenkins(dockercli)
-		j.Volume, err = dockercli.VolumeCreate()
+		j = jenkins.NewJenkins(podmancli)
+		vcr, err := podmancli.VolumeCreate()
+		j.Volume = vcr.Name
 		Expect(err).NotTo(HaveOccurred())
 	})
 
 	AfterEach(func() {
 		if CurrentGinkgoTestDescription().Failed {
 			By("printing container logs")
-			logs, err := dockercli.ContainerLogs(j.ID)
+			logs, err := podmancli.ContainerLogs(j.ID)
 			Expect(err).NotTo(HaveOccurred())
 			_, err = GinkgoWriter.Write(logs)
 			Expect(err).NotTo(HaveOccurred())
 		}
 
-		err := dockercli.ContainerStopAndRemove(j.ID, nil)
+		_, err := podmancli.ContainerStopAndRemove(j.ID, 60)
 		Expect(err).NotTo(HaveOccurred())
 
-		err = dockercli.VolumeRemove(j.Volume)
+		err = podmancli.VolumeRemove(j.Volume)
 		Expect(err).NotTo(HaveOccurred())
 
 		for _, imageName := range imageNamesToRemove {
-			err = dockercli.ImageRemove(imageName)
-			Expect(err).NotTo(HaveOccurred())
+			_, errs := podmancli.ImagesRemove([]string{imageName})
+			Expect(len(errs)).To(Equal(0))
 		}
 		imageNamesToRemove = nil
 	})
@@ -92,12 +93,12 @@ var _ = Describe("Jenkins testing (v2)", func() {
 
 	smokeTest := func(password, invalidpassword string, createJob bool, expectedPlugins, nonExpectedPlugins []string) {
 		By("loading plugins correctly")
-		logs, err := dockercli.ContainerLogs(j.ID)
+		logs, err := podmancli.ContainerLogs(j.ID)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(logs).NotTo(ContainSubstring("Failed Loading plugin"))
 
 		By("having the right plugins installed")
-		code, out, err := dockercli.ContainerExec(j.ID, []string{"ls", "/var/lib/jenkins/plugins"})
+		code, out, err := podmancli.ContainerExec(j.ID, []string{"ls", "/var/lib/jenkins/plugins"})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(code).To(Equal(0))
 		files := strings.Split(string(out), "\n")
@@ -140,7 +141,7 @@ var _ = Describe("Jenkins testing (v2)", func() {
 		smokeTest("password", "invalidpassword", true, basePlugins, additionalPlugins)
 
 		By("restarting Jenkins with a new password")
-		err = dockercli.ContainerStopAndRemove(j.ID, docker.Duration(30*time.Second))
+		_, err = podmancli.ContainerStopAndRemove(j.ID, 30)
 		Expect(err).NotTo(HaveOccurred())
 
 		err = j.Start(imageName, []string{"JENKINS_PASSWORD=newpassword"})
@@ -169,11 +170,11 @@ var _ = Describe("Jenkins testing (v2)", func() {
 		By("running s2i build")
 		destImage := fmt.Sprintf("jenkins-test-s2i-%d", rand.Intn(1e9))
 
-		By("set up docker debug")
+		By("set up podman debug")
 		ctx, cancel := context.WithTimeout(context.Background(), 25*time.Minute)
 		cmdstrs := []string{"ps", "-ef"}
-		go dockercli.ExecInActiveContainers(GinkgoWriter, ctx, cmdstrs)
-		go dockercli.InspectActiveContainers(GinkgoWriter, ctx)
+		go podmancli.ExecInActiveContainers(GinkgoWriter, ctx, cmdstrs)
+		go podmancli.InspectActiveContainers(GinkgoWriter, ctx)
 
 		cmd := exec.Cmd{
 			Path: s2i,
@@ -210,15 +211,15 @@ var _ = Describe("Jenkins testing (v2)", func() {
 		Expect(resp.StatusCode).To(Equal(http.StatusOK))
 
 		By("checking files laid down by s2i exist")
-		code, _, err := dockercli.ContainerExec(j.ID, []string{"stat", "/var/lib/jenkins/plugins/sample.jpi.pinned"})
+		code, _, err := podmancli.ContainerExec(j.ID, []string{"stat", "/var/lib/jenkins/plugins/sample.jpi.pinned"})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(code).To(Equal(0))
 
-		code, _, err = dockercli.ContainerExec(j.ID, []string{"stat", "/var/lib/jenkins/jobs/sample-app-test/config.xml"})
+		code, _, err = podmancli.ContainerExec(j.ID, []string{"stat", "/var/lib/jenkins/jobs/sample-app-test/config.xml"})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(code).To(Equal(0))
 
-		code, _, err = dockercli.ContainerExec(j.ID, []string{"grep", "-q", "s2i-test-config", "/var/lib/jenkins/config.xml"})
+		code, _, err = podmancli.ContainerExec(j.ID, []string{"grep", "-q", "s2i-test-config", "/var/lib/jenkins/config.xml"})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(code).To(Equal(0))
 	})
@@ -229,13 +230,16 @@ var _ = Describe("Jenkins testing (v2)", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		By("checking resolved command line arguments")
-		_, bytes, err := dockercli.ContainerExec(j.ID, []string{"find", "/proc", "-name", "cmdline"})
+		_, bytes, err := podmancli.ContainerExec(j.ID, []string{"find", "/proc", "-name", "cmdline"})
 		Expect(err).NotTo(HaveOccurred())
 		output := string(bytes)
 		lines := strings.Split(output, "\n")
 		found := false
 		for _, line := range lines {
-			_, bytes, err = dockercli.ContainerExec(j.ID, []string{"cat", line})
+			_, bytes, err = podmancli.ContainerExec(j.ID, []string{"cat", line})
+			if err != nil {
+				continue
+			}
 			cat := string(bytes)
 			if strings.Contains(cat, `-Dcontains space`) && strings.Contains(cat, `-Dnospace`) {
 				found = true

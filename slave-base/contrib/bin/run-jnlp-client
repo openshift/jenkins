@@ -44,15 +44,6 @@ function container_max_memory_bytes() {
 CONTAINER_MEMORY_IN_BYTES=$(container_max_memory_bytes)
 CONTAINER_MEMORY_IN_MB=$((CONTAINER_MEMORY_IN_BYTES/2**20))
 
-if [[ "$(uname -m)" == "x86_64" ]]; then
-	alternatives --set java $(alternatives --display java | grep $JAVA_VERSION | awk '/family.*x86_64/ { print $1; }')
-	alternatives --set javac $(alternatives --display javac | grep $JAVA_VERSION | awk '/family.*x86_64/ { print $1; }')
-#set JVM for all other archs
-else
-  alternatives --set java $(alternatives --display java | grep $JAVA_VERSION | awk '/family.*'$(uname -m)'/ { print $1; }')
-  alternatives --set javac $(alternatives --display javac | grep $JAVA_VERSION | awk '/family.*'$(uname -m)'/ { print $1; }')
-fi
-
 echo "OPENSHIFT_JENKINS_JVM_ARCH='${OPENSHIFT_JENKINS_JVM_ARCH}', CONTAINER_MEMORY_IN_MB='${CONTAINER_MEMORY_IN_MB}', using $(readlink /etc/alternatives/java)"
 
 shopt -s nocasematch
@@ -101,7 +92,7 @@ if [[ $# -eq 0 ]]; then
   if [ ! -z "$JENKINS_NAME" ]; then
     set -- "${@}" "$JENKINS_NAME"
   fi
-  
+
   # If Kubernetes plugin is configured to use WebSocket, add the -webSocket flag to the arguments
   if [[ "$@" != *"-webSocket"* ]]; then
     if [ ! -z "$JENKINS_WEB_SOCKET" ]; then

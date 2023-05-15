@@ -14,7 +14,7 @@ VERSION=$2
 DOCKERFILE_PATH=""
 BASE_IMAGE_NAME="docker.io/openshift/jenkins"
 RHEL_BASE_IMAGE_NAME="registry.access.redhat.com/openshift3/jenkins"
-BUILD_WITH=${BUILD_COMMAND:="docker build"} # other possible values: "podman build --no-cache" or "buildah bud" 
+BUILD_WITH=${BUILD_COMMAND:="podman build --no-cache"} # other possible values: "podman build --no-cache" or "buildah bud" 
 JENKINS_VERSION_FILE=contrib/openshift/jenkins-version.txt
 
 # Cleanup the temporary Dockerfile created by docker build with version
@@ -59,7 +59,7 @@ for dir in ${dirs}; do
   fi
 done
 
-if [ "$OS" == "rhel7" -o "$OS" == "rhel7-candidate" ]; then
+if [ "$OS" == "rhel8" -o "$OS" == "rhel8-candidate" ]; then
   BASE_IMAGE_NAME=${RHEL_BASE_IMAGE_NAME}
 fi
 
@@ -73,8 +73,8 @@ for dir in ${dirs}; do
   echo "-> Building ${IMAGE_NAME} ..."
 
   pushd ${dir} > /dev/null
-  if [ "$OS" == "rhel7" -o "$OS" == "rhel7-candidate" ]; then
-    docker_build_with_version Dockerfile.rhel7
+  if [ "$OS" == "rhel8" -o "$OS" == "rhel8-candidate" ]; then
+    docker_build_with_version Dockerfile.rhel8
   else
     docker_build_with_version Dockerfile.localdev
   fi

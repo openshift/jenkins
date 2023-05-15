@@ -13,7 +13,6 @@ RUN GO111MODULE=off go build . && cp go-init /usr/bin
 ##############################################
 FROM registry.ci.openshift.org/ocp/4.13:cli
 ARG jenkins_version=latest
-MAINTAINER OpenShift Developer Services <openshift-dev-services+jenkins@redhat.com>
 COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
 
 # Jenkins image for OpenShift
@@ -21,54 +20,56 @@ COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
 # This image provides a Jenkins server, primarily intended for integration with
 # OpenShift v3.
 #
-# Volumes: 
+# Volumes:
 # * /var/jenkins_home
 # Environment:
 # * $JENKINS_PASSWORD - Password for the Jenkins 'admin' user.
-
-MAINTAINER OpenShift Developer Services <openshift-dev-services+jenkins@redhat.com>
 
 ENV JENKINS_VERSION=2 \
     HOME=/var/lib/jenkins \
     JENKINS_HOME=/var/lib/jenkins \
     JENKINS_UC=https://updates.jenkins.io \
-    OPENSHIFT_JENKINS_IMAGE_VERSION=4.10 \
+    OPENSHIFT_JENKINS_IMAGE_VERSION=4.13 \
     LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
     INSTALL_JENKINS_VIA_RPMS=false
 # openshift/ocp-build-data will change INSTALL_JENKINS_VIA_RPMS to true
-# so that the osbs/brew builds will install via RPMs; when this runs 
+# so that the osbs/brew builds will install via RPMs; when this runs
 # in api.ci, it will employ the old centos style, download the plugins and
 # redhat-stable core RPM for download
 
 LABEL io.k8s.description="Jenkins is a continuous integration server" \
-      io.k8s.display-name="Jenkins 2" \
-      io.openshift.tags="jenkins,jenkins2,ci" \
-      io.openshift.expose-services="8080:http" \
-      io.jenkins.version="${jenkins_version}" \
-      io.openshift.s2i.scripts-url=image:///usr/libexec/s2i 
+    io.k8s.display-name="Jenkins 2" \
+    io.openshift.tags="jenkins,jenkins2,ci" \
+    io.openshift.expose-services="8080:http" \
+    io.jenkins.version="${jenkins_version}" \
+    io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
 
 # Labels consumed by Red Hat build service
 LABEL com.redhat.component="openshift-jenkins-2-container" \
-      name="openshift4/jenkins-2-rhel8" \
-      architecture="x86_64 \
-      maintainer="openshift-dev-services+jenkins@redhat.com""
+    name="openshift4/jenkins-2-rhel8" \
+    architecture="x86_64" \
+    maintainer="openshift-dev-services+jenkins@redhat.com"
 
 # 8080 for main web interface, 50000 for slave agents
 EXPOSE 8080 50000
 
 # for backward compatibility with pre-3.6 installs leveraging a PV, where rpm installs went to /usr/lib64/jenkins, we are
-# establishing a symbolic link for that guy as well, so that existing plugins in JENKINS_HOME/plugins pointing to 
-# /usr/lib64/jenkins will subsequently get redirected to /usr/lib/jenkins; it is confirmed that the 3.7 jenkins RHEL images 
+# establishing a symbolic link for that guy as well, so that existing plugins in JENKINS_HOME/plugins pointing to
+# /usr/lib64/jenkins will subsequently get redirected to /usr/lib/jenkins; it is confirmed that the 3.7 jenkins RHEL images
 # do *NOT* have a /usr/lib64/jenkins path
 RUN ln -s /usr/lib/jenkins /usr/lib64/jenkins && \
     INSTALL_PKGS="dejavu-sans-fonts wget rsync gettext git git-lfs tar zip unzip openssl bzip2 java-11-openjdk java-11-openjdk-devel java-1.8.0-openjdk java-1.8.0-openjdk-devel jq glibc-locale-source xmlstarlet glibc-langpack-en" && \
     yum install -y $INSTALL_PKGS && \
+    yum update -y && \
     rpm -V  $INSTALL_PKGS && \
     yum clean all  && \
     localedef -f UTF-8 -i en_US en_US.UTF-8 && \
-    alternatives --set java java-11-openjdk.x86_64 && \
-    alternatives --set javac java-11-openjdk.x86_64
+    alternatives --family java-11 --install /usr/bin/java java /usr/lib/jvm/java-11-openjdk/bin/java 1  && \
+    alternatives --set java java-11 && \
+    alternatives --family javac-11 --install /usr/bin/javac javac /usr/lib/jvm/java-11-openjdk/bin/javac 1  && \
+    alternatives --set javac javac-11
+
 
 COPY ./contrib/openshift /opt/openshift
 COPY ./contrib/jenkins /usr/local/bin
@@ -88,14 +89,8 @@ RUN /usr/local/bin/install-jenkins-core-plugins.sh /opt/openshift/bundle-plugins
     /usr/local/bin/fix-permissions /opt/openshift && \
     /usr/local/bin/fix-permissions /opt/openshift/configuration/init.groovy.d && \
     /usr/local/bin/fix-permissions /var/lib/jenkins && \
-    /usr/local/bin/fix-permissions /var/log && \
-    unlink /usr/share/man/man1/java.1.gz && \
-    unlink /usr/share/man/man1/jjs.1.gz && \
-    unlink /usr/share/man/man1/keytool.1.gz && \
-    unlink /usr/share/man/man1/pack200.1.gz && \
-    unlink /usr/share/man/man1/rmid.1.gz && \
-    unlink /usr/share/man/man1/rmiregistry.1.gz && \
-    unlink /usr/share/man/man1/unpack200.1.gz
+    /usr/local/bin/fix-permissions /var/log
+
 
 VOLUME ["/var/lib/jenkins"]
 
