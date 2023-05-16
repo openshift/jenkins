@@ -7,18 +7,18 @@ import (
 	"os"
 	"time"
 
-	"github.com/docker/engine-api/types/container"
-	"github.com/openshift/jenkins/pkg/docker"
+	"github.com/containers/podman/v4/pkg/specgen"
+	"github.com/openshift/jenkins/pkg/podman"
 )
 
 type Jenkins struct {
 	ID     string
 	ip     string
 	Volume string
-	Client *docker.Client
+	Client *podman.Client
 }
 
-func NewJenkins(client *docker.Client) *Jenkins {
+func NewJenkins(client *podman.Client) *Jenkins {
 	return &Jenkins{Client: client}
 }
 
@@ -51,17 +51,10 @@ func (j *Jenkins) GetJob(name, password string) (*http.Response, error) {
 
 func (j *Jenkins) Start(image string, env []string) error {
 	var err error
-	j.ID, err = j.Client.ContainerCreate(
-		&container.Config{
-			Image: image,
-			Env:   env,
-			Tty:   true,
-		},
-		&container.HostConfig{
-			Binds: []string{
-				j.Volume + ":/var/lib/jenkins",
-			},
-		})
+	sgen := specgen.NewSpecGenerator(image, false)
+	sgen.Terminal = true
+	sgen.Volumes = []*specgen.NamedVolume{{Dest: "/var/lib/jenkins", Name: j.Volume, Options: []string{"rw"}}}
+	j.ID, err = j.Client.ContainerCreate(sgen)
 	if err != nil {
 		return err
 	}
