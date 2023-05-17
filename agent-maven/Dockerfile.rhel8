@@ -3,12 +3,12 @@ MAINTAINER OpenShift Developer Services <openshift-dev-services+jenkins@redhat.c
 
 # Labels consumed by Red Hat build service
 LABEL com.redhat.component="jenkins-agent-maven-35-rhel8-container" \
-      name="openshift4/jenkins-agent-maven-35-rhel8" \
-      architecture="x86_64" \
-      io.k8s.display-name="Jenkins Agent Maven" \
-      io.k8s.description="The jenkins agent maven image has the maven tools on top of the jenkins slave base image." \
-      io.openshift.tags="openshift,jenkins,agent,maven" \
-      maintainer="openshift-dev-services+jenkins@redhat.com"
+    name="openshift4/jenkins-agent-maven-35-rhel8" \
+    architecture="x86_64" \
+    io.k8s.display-name="Jenkins Agent Maven" \
+    io.k8s.description="The jenkins agent maven image has the maven tools on top of the jenkins slave base image." \
+    io.openshift.tags="openshift,jenkins,agent,maven" \
+    maintainer="openshift-dev-services+jenkins@redhat.com"
 
 ENV MAVEN_VERSION=3.6 \
     LANG=en_US.UTF-8 \
@@ -20,6 +20,7 @@ ENV MAVEN_VERSION=3.6 \
 RUN INSTALL_PKGS="maven java-1.8.0-openjdk-devel" && \
     yum module enable -y maven:${MAVEN_VERSION} && \
     yum install -y $INSTALL_PKGS && \
+    yum update -y && \
     rpm -V maven java-1.8.0-openjdk-devel && \
     yum clean all -y && \
     mkdir -p $HOME/.m2
