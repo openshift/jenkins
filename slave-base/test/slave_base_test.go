@@ -4,11 +4,11 @@ import (
 	"os"
 	"testing"
 
+	"github.com/containers/podman/v4/pkg/specgen"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/docker/engine-api/types/container"
-	"github.com/openshift/jenkins/pkg/docker"
+	"github.com/openshift/jenkins/pkg/podman"
 )
 
 func Test(t *testing.T) {
@@ -16,12 +16,12 @@ func Test(t *testing.T) {
 	RunSpecs(t, "Base Slave Suite")
 }
 
-var dockercli *docker.Client
+var podmancli *podman.Client
 var imageName string
 
 var _ = BeforeSuite(func() {
 	var err error
-	dockercli, err = docker.NewEnvClient()
+	podmancli, err = podman.NewEnvClient()
 	Expect(err).NotTo(HaveOccurred())
 
 	imageName = os.Getenv("IMAGE_NAME")
@@ -36,35 +36,34 @@ var _ = Describe("Base slave testing", func() {
 	AfterEach(func() {
 		if CurrentGinkgoTestDescription().Failed {
 			By("printing container logs")
-			logs, err := dockercli.ContainerLogs(id)
+			logs, err := podmancli.ContainerLogs(id)
 			Expect(err).NotTo(HaveOccurred())
 			_, err = GinkgoWriter.Write(logs)
 			Expect(err).NotTo(HaveOccurred())
 		}
 
-		err := dockercli.ContainerStop(id, nil)
+		err := podmancli.ContainerStop(id, 60)
 		Expect(err).NotTo(HaveOccurred())
 
-		err = dockercli.ContainerRemove(id)
+		_, err = podmancli.ContainerRemove(id)
 		Expect(err).NotTo(HaveOccurred())
+
 	})
 
 	It("should contain a runnable oc", func() {
 		var err error
-		id, err = dockercli.ContainerCreate(
-			&container.Config{
-				Image: imageName,
-				Cmd:   []string{"oc"},
-				Tty:   true,
-			},
-			nil)
+		sgen := specgen.NewSpecGenerator(imageName, false)
+		sgen.Terminal = true
+		sgen.Command = []string{"oc"}
+		sgen.Entrypoint = []string{"/bin/bash", "-l", "-c"}
+		id, err = podmancli.ContainerCreate(sgen)
 		Expect(err).NotTo(HaveOccurred())
 
-		err = dockercli.ContainerStart(id)
+		err = podmancli.ContainerStart(id)
 		Expect(err).NotTo(HaveOccurred())
 
-		code, err := dockercli.ContainerWait(id)
+		code, err := podmancli.ContainerWait(id)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(code).To(Equal(0))
+		Expect(code).To(Equal(int32(0)))
 	})
 })
