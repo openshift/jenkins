@@ -203,7 +203,7 @@ function download() {
             return 1
         fi
 
-        resolveDependencies "$plugin"
+        #resolveDependencies "$plugin"
     else
         lockFile=$(getLockFile "$plugin")
         lockedVersion=$(cat $lockFile)
@@ -315,10 +315,10 @@ function resolveDependencies() {
     local filename; filename=$(getArchiveFilename "$plugin")
     local previouslyDownloadedVersion; previouslyDownloadedVersion=$(get_plugin_version $filename)
     set -o pipefail
-    
-        # ${bundledPlugins} checks for plugins bundled in the jenkins.war file; per 
+
+        # ${bundledPlugins} checks for plugins bundled in the jenkins.war file; per
         # https://wiki.jenkins-ci.org/display/JENKINS/Bundling+plugins+with+Jenkins this is getting
-        # phased out, but we are keeping this check in for now while that transition bakes a bit more    
+        # phased out, but we are keeping this check in for now while that transition bakes a bit more
         if pluginInstalled="$(echo "${bundledPlugins}" | grep "^${plugin}:")"; then
             pluginInstalled="${pluginInstalled//[$'\r']}"
             # get the version of the plugin bundled
@@ -433,7 +433,7 @@ main() {
 
     echo -e "\nAnalyzing war: $JENKINS_WAR"
     bundledPlugins="$(bundledPlugins)"
-    echo -e "\nAnalyzing war ... done" 
+    echo -e "\nAnalyzing war ... done"
 
     # Check if there's a version-specific update center, which is the case for LTS versions
     jenkinsVersion="$(jenkinsMajorMinorVersion)"
