@@ -55,7 +55,7 @@
         },
         "from": {
           "kind": "DockerImage",
-          "name": "quay.io/openshift/origin-jenkins:4.12"
+          "name": "quay.io/openshift/origin-jenkins:4.13"
         },
         "referencePolicy": {
           "type": "Local"
@@ -73,7 +73,7 @@
         },
         "from": {
           "kind": "DockerImage",
-          "name": "quay.io/openshift/origin-jenkins:4.12"
+          "name": "quay.io/openshift/origin-jenkins:4.13"
         },
         "referencePolicy": {
           "type": "Local"
@@ -91,7 +91,7 @@
         },
         "from": {
           "kind": "DockerImage",
-          "name": "quay.io/openshift/origin-jenkins:4.12"
+          "name": "quay.io/openshift/origin-jenkins:4.13"
         },
         "importPolicy": {
           "scheduled": true
