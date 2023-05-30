@@ -17,7 +17,7 @@
 				},
 				"from": {
 					"kind": "DockerImage",
-					"name": "quay.io/openshift/origin-jenkins-agent-base:4.12"
+					"name": "quay.io/openshift/origin-jenkins-agent-base:4.13"
 				},
 				"referencePolicy": {
 					"type": "Local"
