@@ -51,8 +51,8 @@ LABEL io.k8s.description="Jenkins is a continuous integration server" \
 # Labels consumed by Red Hat build service
 LABEL com.redhat.component="openshift-jenkins-2-container" \
     name="openshift4/jenkins-2-rhel8" \
-    architecture="x86_64 \
-    maintainer="openshift-dev-services+jenkins@redhat.com""
+    architecture="x86_64" \
+    maintainer="openshift-dev-services+jenkins@redhat.com"
 
 # 8080 for main web interface, 50000 for slave agents
 EXPOSE 8080 50000
