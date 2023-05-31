@@ -7,3 +7,5 @@ out
 logs
 kubeconfig
 
+.kube
+__pycache__
