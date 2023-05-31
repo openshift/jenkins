@@ -30,11 +30,14 @@ ENV HOME=/home/jenkins \
 
 USER root
 # Install headless Java
-RUN INSTALL_PKGS="glibc-langpack-en bc gettext git java-11-openjdk-headless java-1.8.0-openjdk-headless lsof rsync tar unzip which zip bzip2 jq" && \
+RUN INSTALL_PKGS="glibc-langpack-en bc gettext git git-lfs java-11-openjdk-headless java-1.8.0-openjdk-headless lsof rsync tar unzip which zip bzip2 jq glibc-locale-source" && \
     yum install -y --setopt=tsflags=nodocs --disableplugin=subscription-manager $INSTALL_PKGS && \
     rpm -V  $INSTALL_PKGS && \
     yum update -y && \
     yum clean all && \
+    localedef -f UTF-8 -i en_US en_US.UTF-8 && \
+    alternatives --family java-11 --install /usr/bin/java java /usr/lib/jvm/jre-11-openjdk/bin/java 1  && \
+    alternatives --set java java-11 && \
     mkdir -p /home/jenkins && \
     chown -R 1001:0 /home/jenkins && \
     chmod -R g+w /home/jenkins && \
@@ -44,21 +47,7 @@ RUN INSTALL_PKGS="glibc-langpack-en bc gettext git java-11-openjdk-headless java
     chmod 775 /usr/bin && \
     chmod 775 /usr/share/man/man1 && \
     mkdir -p /var/lib/origin && \
-    chmod 775 /var/lib/origin && \
-    unlink /usr/bin/java && \
-    unlink /usr/bin/jjs && \
-    unlink /usr/bin/keytool && \
-    unlink /usr/bin/pack200 && \
-    unlink /usr/bin/rmid && \
-    unlink /usr/bin/rmiregistry && \
-    unlink /usr/bin/unpack200 && \
-    unlink /usr/share/man/man1/java.1.gz && \
-    unlink /usr/share/man/man1/jjs.1.gz && \
-    unlink /usr/share/man/man1/keytool.1.gz && \
-    unlink /usr/share/man/man1/pack200.1.gz && \
-    unlink /usr/share/man/man1/rmid.1.gz && \
-    unlink /usr/share/man/man1/rmiregistry.1.gz && \
-    unlink /usr/share/man/man1/unpack200.1.gz
+    chmod 775 /var/lib/origin
 
 # Copy the entrypoint
 ADD contrib/bin/* /usr/local/bin/
