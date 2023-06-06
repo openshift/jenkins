@@ -47,7 +47,7 @@ spec:
       version: 2.x
     from:
       kind: DockerImage
-      name: registry.redhat.io/ocp-tools-4/jenkins-rhel8:v4.11.0-1663086392.1666642635
+      name: quay.io/coreydaley/jenkins:latest
     referencePolicy:
       type: Local
   - name: 'user-maintained-upgrade-redeploy'

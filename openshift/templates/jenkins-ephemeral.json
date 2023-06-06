@@ -312,7 +312,7 @@
       "name": "NAMESPACE",
       "displayName": "Jenkins ImageStream Namespace",
       "description": "The OpenShift Namespace where the Jenkins ImageStream resides.",
-      "value": "openshift"
+      "value": "cdaley-jenkins"
     },
     {
       "name": "DISABLE_ADMINISTRATIVE_MONITORS",
