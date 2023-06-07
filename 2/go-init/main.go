@@ -156,7 +156,7 @@ func run(command string) error {
 		for sig := range sigs {
 			// Ignore SIGCHLD signals since
 			// thez are only usefull for go-init
-			if sig != syscall.SIGCHLD {
+			if cmd.Process != nil && sig != syscall.SIGCHLD {
 				// Forward signal to main process and all children
 				syscall.Kill(-cmd.Process.Pid, sig.(syscall.Signal))
 			}
