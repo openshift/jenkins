@@ -91,8 +91,8 @@ momentjs:1.1.1
 oauth-credentials:0.645.ve666a_c332668
 okhttp-api:4.11.0-145.vcb_8de402ef81
 openshift-client:1.1.0.420.v8817277c1990
-openshift-login:1.1.0.244.v41352b_00325d
-openshift-sync:1.1.0.793.v5c2f38dc0efd
+openshift-login:1.1.0.246.v4cf866d36639
+openshift-sync:1.1.0.795.v95fa_27a_a_e287
 pam-auth:1.10
 parameterized-trigger:2.46
 pipeline-build-step:496.v2449a_9a_221f2
