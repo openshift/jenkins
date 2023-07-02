@@ -17,7 +17,7 @@
 				},
 				"from": {
 					"kind": "DockerImage",
-					"name": "registry.redhat.io/ocp-tools-4/jenkins-agent-base-rhel8:v4.11.0-1683009733"
+					"name": "registry.redhat.io/ocp-tools-4/jenkins-agent-base-rhel8:v4.11.0-1686831582"
 				},
 				"referencePolicy": {
 					"type": "Local"
@@ -35,7 +35,7 @@
 				},
 				"from": {
 					"kind": "DockerImage",
-					"name": "registry.redhat.io/ocp-tools-4/jenkins-agent-base-rhel8:v4.12.0"
+					"name": "registry.redhat.io/ocp-tools-4/jenkins-agent-base-rhel8:v4.11.0"
 				},
 				"referencePolicy": {
 					"type": "Local"
@@ -53,7 +53,7 @@
 				},
 				"from": {
 					"kind": "DockerImage",
-					"name": "registry.redhat.io/ocp-tools-4/jenkins-agent-base-rhel8:v4.12.0"
+					"name": "registry.redhat.io/ocp-tools-4/jenkins-agent-base-rhel8:v4.11.0"
 				},
 				"importPolicy": {
 					"scheduled": true
