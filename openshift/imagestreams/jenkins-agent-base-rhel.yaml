@@ -13,7 +13,7 @@ spec:
         tags: jenkins
       from:
         kind: DockerImage
-        name: registry.redhat.io/ocp-tools-4/jenkins-agent-base-rhel8:v4.13.0-1684911762
+        name: registry.redhat.io/ocp-tools-4/jenkins-agent-base-rhel8:v4.13.0-1686680363
       referencePolicy:
         type: Local
     - name: user-maintained-upgrade
