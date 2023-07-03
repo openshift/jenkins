@@ -55,7 +55,7 @@
         },
         "from": {
           "kind": "DockerImage",
-          "name": "registry.redhat.io/ocp-tools-4/jenkins-rhel8:v4.12.0-1683010621"
+          "name": "registry.redhat.io/ocp-tools-4/jenkins-rhel8:v4.12.0-1686650770"
         },
         "referencePolicy": {
           "type": "Local"
