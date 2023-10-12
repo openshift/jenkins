@@ -5,7 +5,7 @@ set -o pipefail
 #set -o errexit
 
 #-----------------------------------------------------------------------------
-# Global Variables
+# Global Variables here
 #-----------------------------------------------------------------------------
 export V_FLAG=-v
 export OUTPUT_DIR
