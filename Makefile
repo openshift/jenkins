@@ -34,9 +34,12 @@ smoke:
 
 .PHONY: e2e
 e2e:
-	@echo "Starting e2e tests from 2/test directory"
+	@echo "Starting e2e tests from test directory"
 	@echo "IMAGE_NAME set in environment variable with value: $(IMAGE_NAME)"
-	@cd 2/test && go test
+	@cd test/jenkins && go test
+	@cd test/jenkins-slave-base && go test
+	@cd test/jenkins-sync-plugin && go test
+	@cd test/jenkins-client-plugin && go test
 
 .PHONY: plugins-list
 plugins-list:
