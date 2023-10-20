@@ -142,6 +142,14 @@ type PushOptions struct {
 	Compress *bool
 	// CompressionFormat is the format to use for the compression of the blobs
 	CompressionFormat *string
+	// CompressionLevel is the level to use for the compression of the blobs
+	CompressionLevel *int
+	// ForceCompressionFormat ensures that the compression algorithm set in
+	// CompressionFormat is used exclusively, and blobs of other compression
+	// algorithms are not reused.
+	ForceCompressionFormat *bool
+	// Add existing instances with requested compression algorithms to manifest list
+	AddCompression []string
 	// Manifest type of the pushed image
 	Format *string
 	// Password for authenticating against the registry.
@@ -158,6 +166,9 @@ type PushOptions struct {
 	Username *string `schema:"-"`
 	// Quiet can be specified to suppress progress when pushing.
 	Quiet *bool
+
+	// Manifest of the pushed image.  Set by images.Push.
+	ManifestDigest *string
 }
 
 // SearchOptions are optional options for searching images on registries
