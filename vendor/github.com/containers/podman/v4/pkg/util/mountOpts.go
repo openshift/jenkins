@@ -4,6 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/containers/podman/v4/libpod/define"
+	"github.com/containers/podman/v4/pkg/rootless"
 )
 
 var (
@@ -25,7 +28,7 @@ type defaultMountOptions struct {
 // The sourcePath variable, if not empty, contains a bind mount source.
 func ProcessOptions(options []string, isTmpfs bool, sourcePath string) ([]string, error) {
 	var (
-		foundWrite, foundSize, foundProp, foundMode, foundExec, foundSuid, foundDev, foundCopyUp, foundBind, foundZ, foundU, foundOverlay, foundIdmap, foundCopy bool
+		foundWrite, foundSize, foundProp, foundMode, foundExec, foundSuid, foundDev, foundCopyUp, foundBind, foundZ, foundU, foundOverlay, foundIdmap, foundCopy, foundNoSwap bool
 	)
 
 	newOptions := make([]string, 0, len(options))
@@ -131,7 +134,21 @@ func ProcessOptions(options []string, isTmpfs bool, sourcePath string) ([]string
 			foundCopyUp = true
 			// do not propagate notmpcopyup to the OCI runtime
 			continue
-		case "bind", "rbind":
+		case "noswap":
+
+			if !isTmpfs {
+				return nil, fmt.Errorf("the 'noswap' option is only allowed with tmpfs mounts: %w", ErrBadMntOption)
+			}
+			if rootless.IsRootless() {
+				return nil, fmt.Errorf("the 'noswap' option is only allowed with rootful tmpfs mounts: %w", ErrBadMntOption)
+			}
+			if foundNoSwap {
+				return nil, fmt.Errorf("the 'tmpswap' option can only be set once: %w", ErrDupeMntOption)
+			}
+			foundNoSwap = true
+			newOptions = append(newOptions, opt)
+			continue
+		case define.TypeBind, "rbind":
 			if isTmpfs {
 				return nil, fmt.Errorf("the 'bind' and 'rbind' options are not allowed with tmpfs mounts: %w", ErrBadMntOption)
 			}
