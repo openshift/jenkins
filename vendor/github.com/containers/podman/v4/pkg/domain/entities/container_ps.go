@@ -20,6 +20,8 @@ type ListContainer struct {
 	Created time.Time
 	// Human-readable container creation time.
 	CreatedAt string
+	// CIDFile specified at creation time.
+	CIDFile string
 	// If container has exited/stopped
 	Exited bool
 	// Time container exited
@@ -55,6 +57,10 @@ type ListContainer struct {
 	PodName string
 	// Port mappings
 	Ports []types.PortMapping
+	// Restarts is how many times the container was restarted by its
+	// restart policy. This is NOT incremented by normal container restarts
+	// (only by restart policy).
+	Restarts uint
 	// Size of the container rootfs.  Requires the size boolean to be true
 	Size *define.ContainerSize
 	// Time when container started
