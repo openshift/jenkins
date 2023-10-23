@@ -29,6 +29,11 @@
 #
 #base_hosts_file = ""
 
+# The database backend of Podman.  Supported values are "boltdb" (default) and
+# "sqlite". Please run `podman-system-reset` prior to changing the database
+# backend of an existing deployment, to make sure Podman can operate correctly.
+#database_backend="boltdb"
+
 # List of default capabilities for containers. If it is empty or commented out,
 # the default capabilities defined in the container engine will be added.
 #
@@ -94,7 +99,6 @@ default_sysctls = [
 #
 #env = [
 #  "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-#  "TERM=xterm",
 #]
 
 # Pass all host environment variables into the container.
@@ -306,6 +310,13 @@ default_sysctls = [
 #
 #compression_format = "gzip"
 
+# The compression level to use when pushing an image.
+# Valid options depend on the compression format used.
+# For gzip, valid options are 1-9, with a default of 5.
+# For zstd, valid options are 1-20, with a default of 3.
+#
+#compression_level = 5
+
 # Environment variables to pass into conmon
 #
 #conmon_env_vars = [
@@ -488,7 +499,7 @@ default_sysctls = [
 # List of the OCI runtimes that support --format=json. When json is supported
 # engine will use it for reporting nicer errors.
 #
-#runtime_supports_json = ["crun", "runc", "kata", "runsc", "youki", "krun"]
+#runtime_supports_json = ["crun", "runc", "kata", "runsc", "youki", "krun", "ocijail"]
 
 # List of the OCI runtimes that supports running containers with KVM Separation.
 #
@@ -649,3 +660,11 @@ default_sysctls = [
 # TOML does not provide a way to end a table other than a further table being
 # defined, so every key hereafter will be part of [machine] and not the
 # main config.
+
+[farms]
+#
+# the default farm to use when farming out builds
+# default = ""
+#
+# map of existing farms
+#[farms.list]
