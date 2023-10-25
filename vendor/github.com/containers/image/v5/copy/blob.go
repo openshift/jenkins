@@ -43,7 +43,7 @@ func (ic *imageCopier) copyBlobFromStream(ctx context.Context, srcReader io.Read
 	stream.reader = bar.ProxyReader(stream.reader)
 
 	// === Decrypt the stream, if required.
-	decryptionStep, err := ic.c.blobPipelineDecryptionStep(&stream, srcInfo)
+	decryptionStep, err := ic.blobPipelineDecryptionStep(&stream, srcInfo)
 	if err != nil {
 		return types.BlobInfo{}, err
 	}
@@ -78,17 +78,17 @@ func (ic *imageCopier) copyBlobFromStream(ctx context.Context, srcReader io.Read
 		// Before relaxing this, see the original pull request’s review if there are other reasons to reject this.
 		return types.BlobInfo{}, errors.New("Unable to support both decryption and encryption in the same copy")
 	}
-	encryptionStep, err := ic.c.blobPipelineEncryptionStep(&stream, toEncrypt, srcInfo, decryptionStep)
+	encryptionStep, err := ic.blobPipelineEncryptionStep(&stream, toEncrypt, srcInfo, decryptionStep)
 	if err != nil {
 		return types.BlobInfo{}, err
 	}
 
-	// === Report progress using the ic.c.progress channel, if required.
-	if ic.c.progress != nil && ic.c.progressInterval > 0 {
+	// === Report progress using the ic.c.options.Progress channel, if required.
+	if ic.c.options.Progress != nil && ic.c.options.ProgressInterval > 0 {
 		progressReader := newProgressReader(
 			stream.reader,
-			ic.c.progress,
-			ic.c.progressInterval,
+			ic.c.options.Progress,
+			ic.c.options.ProgressInterval,
 			srcInfo,
 		)
 		defer progressReader.reportDone()

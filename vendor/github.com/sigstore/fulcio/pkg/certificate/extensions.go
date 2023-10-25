@@ -39,19 +39,20 @@ var (
 	OIDIssuerV2  = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 8}
 
 	// CI extensions
-	OIDBuildSignerURI                  = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 9}
-	OIDBuildSignerDigest               = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 10}
-	OIDRunnerEnvironment               = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 11}
-	OIDSourceRepositoryURI             = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 12}
-	OIDSourceRepositoryDigest          = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 13}
-	OIDSourceRepositoryRef             = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 14}
-	OIDSourceRepositoryIdentifier      = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 15}
-	OIDSourceRepositoryOwnerURI        = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 16}
-	OIDSourceRepositoryOwnerIdentifier = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 17}
-	OIDBuildConfigURI                  = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 18}
-	OIDBuildConfigDigest               = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 19}
-	OIDBuildTrigger                    = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 20}
-	OIDRunInvocationURI                = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 21}
+	OIDBuildSignerURI                      = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 9}
+	OIDBuildSignerDigest                   = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 10}
+	OIDRunnerEnvironment                   = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 11}
+	OIDSourceRepositoryURI                 = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 12}
+	OIDSourceRepositoryDigest              = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 13}
+	OIDSourceRepositoryRef                 = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 14}
+	OIDSourceRepositoryIdentifier          = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 15}
+	OIDSourceRepositoryOwnerURI            = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 16}
+	OIDSourceRepositoryOwnerIdentifier     = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 17}
+	OIDBuildConfigURI                      = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 18}
+	OIDBuildConfigDigest                   = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 19}
+	OIDBuildTrigger                        = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 20}
+	OIDRunInvocationURI                    = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 21}
+	OIDSourceRepositoryVisibilityAtSigning = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 57264, 1, 22}
 )
 
 // Extensions contains all custom x509 extensions defined by Fulcio
@@ -128,6 +129,9 @@ type Extensions struct {
 
 	// Run Invocation URL to uniquely identify the build execution.
 	RunInvocationURI string // 1.3.6.1.4.1.57264.1.21
+
+	// Source repository visibility at the time of signing the certificate.
+	SourceRepositoryVisibilityAtSigning string // 1.3.6.1.4.1.57264.1.22
 }
 
 func (e Extensions) Render() ([]pkix.Extension, error) {
@@ -320,6 +324,16 @@ func (e Extensions) Render() ([]pkix.Extension, error) {
 			Value: val,
 		})
 	}
+	if e.SourceRepositoryVisibilityAtSigning != "" {
+		val, err := asn1.MarshalWithParams(e.SourceRepositoryVisibilityAtSigning, "utf8")
+		if err != nil {
+			return nil, err
+		}
+		exts = append(exts, pkix.Extension{
+			Id:    OIDSourceRepositoryVisibilityAtSigning,
+			Value: val,
+		})
+	}
 
 	return exts, nil
 }
@@ -344,59 +358,63 @@ func parseExtensions(ext []pkix.Extension) (Extensions, error) {
 			out.GithubWorkflowRef = string(e.Value)
 		// END: Deprecated
 		case e.Id.Equal(OIDIssuerV2):
-			if err := parseDERString(e.Value, &out.Issuer); err != nil {
+			if err := ParseDERString(e.Value, &out.Issuer); err != nil {
 				return Extensions{}, err
 			}
 		case e.Id.Equal(OIDBuildSignerURI):
-			if err := parseDERString(e.Value, &out.BuildSignerURI); err != nil {
+			if err := ParseDERString(e.Value, &out.BuildSignerURI); err != nil {
 				return Extensions{}, err
 			}
 		case e.Id.Equal(OIDBuildSignerDigest):
-			if err := parseDERString(e.Value, &out.BuildSignerDigest); err != nil {
+			if err := ParseDERString(e.Value, &out.BuildSignerDigest); err != nil {
 				return Extensions{}, err
 			}
 		case e.Id.Equal(OIDRunnerEnvironment):
-			if err := parseDERString(e.Value, &out.RunnerEnvironment); err != nil {
+			if err := ParseDERString(e.Value, &out.RunnerEnvironment); err != nil {
 				return Extensions{}, err
 			}
 		case e.Id.Equal(OIDSourceRepositoryURI):
-			if err := parseDERString(e.Value, &out.SourceRepositoryURI); err != nil {
+			if err := ParseDERString(e.Value, &out.SourceRepositoryURI); err != nil {
 				return Extensions{}, err
 			}
 		case e.Id.Equal(OIDSourceRepositoryDigest):
-			if err := parseDERString(e.Value, &out.SourceRepositoryDigest); err != nil {
+			if err := ParseDERString(e.Value, &out.SourceRepositoryDigest); err != nil {
 				return Extensions{}, err
 			}
 		case e.Id.Equal(OIDSourceRepositoryRef):
-			if err := parseDERString(e.Value, &out.SourceRepositoryRef); err != nil {
+			if err := ParseDERString(e.Value, &out.SourceRepositoryRef); err != nil {
 				return Extensions{}, err
 			}
 		case e.Id.Equal(OIDSourceRepositoryIdentifier):
-			if err := parseDERString(e.Value, &out.SourceRepositoryIdentifier); err != nil {
+			if err := ParseDERString(e.Value, &out.SourceRepositoryIdentifier); err != nil {
 				return Extensions{}, err
 			}
 		case e.Id.Equal(OIDSourceRepositoryOwnerURI):
-			if err := parseDERString(e.Value, &out.SourceRepositoryOwnerURI); err != nil {
+			if err := ParseDERString(e.Value, &out.SourceRepositoryOwnerURI); err != nil {
 				return Extensions{}, err
 			}
 		case e.Id.Equal(OIDSourceRepositoryOwnerIdentifier):
-			if err := parseDERString(e.Value, &out.SourceRepositoryOwnerIdentifier); err != nil {
+			if err := ParseDERString(e.Value, &out.SourceRepositoryOwnerIdentifier); err != nil {
 				return Extensions{}, err
 			}
 		case e.Id.Equal(OIDBuildConfigURI):
-			if err := parseDERString(e.Value, &out.BuildConfigURI); err != nil {
+			if err := ParseDERString(e.Value, &out.BuildConfigURI); err != nil {
 				return Extensions{}, err
 			}
 		case e.Id.Equal(OIDBuildConfigDigest):
-			if err := parseDERString(e.Value, &out.BuildConfigDigest); err != nil {
+			if err := ParseDERString(e.Value, &out.BuildConfigDigest); err != nil {
 				return Extensions{}, err
 			}
 		case e.Id.Equal(OIDBuildTrigger):
-			if err := parseDERString(e.Value, &out.BuildTrigger); err != nil {
+			if err := ParseDERString(e.Value, &out.BuildTrigger); err != nil {
 				return Extensions{}, err
 			}
 		case e.Id.Equal(OIDRunInvocationURI):
-			if err := parseDERString(e.Value, &out.RunInvocationURI); err != nil {
+			if err := ParseDERString(e.Value, &out.RunInvocationURI); err != nil {
+				return Extensions{}, err
+			}
+		case e.Id.Equal(OIDSourceRepositoryVisibilityAtSigning):
+			if err := ParseDERString(e.Value, &out.SourceRepositoryVisibilityAtSigning); err != nil {
 				return Extensions{}, err
 			}
 		}
@@ -407,9 +425,9 @@ func parseExtensions(ext []pkix.Extension) (Extensions, error) {
 	return out, nil
 }
 
-// parseDERString decodes a DER-encoded string and puts the value in parsedVal.
-// Rerturns an error if the unmarshalling fails or if there are trailing bytes in the encoding.
-func parseDERString(val []byte, parsedVal *string) error {
+// ParseDERString decodes a DER-encoded string and puts the value in parsedVal.
+// Returns an error if the unmarshalling fails or if there are trailing bytes in the encoding.
+func ParseDERString(val []byte, parsedVal *string) error {
 	rest, err := asn1.Unmarshal(val, parsedVal)
 	if err != nil {
 		return fmt.Errorf("unexpected error unmarshalling DER-encoded string: %v", err)
