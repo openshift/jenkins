@@ -272,15 +272,18 @@ class Openshift(object):
             return output
         return None
 
-    def getmasterpod(self, namespace: str)-> str:
+    def getmasterpod(self, namespace: str) -> str:
         '''
         returns the jenkins master pod name
         '''
-        v1 = client.CoreV1Api()
-        pods = v1.list_namespaced_pod(namespace, label_selector='deploymentconfig=jenkins')
-        if len(pods.items) > 1:
-            raise AssertionError
-        return pods.items[0].metadata.name
+        time.sleep(30)
+        cmd = r'oc get pods --selector="deploymentconfig=jenkins" -o jsonpath --template="{.items[0].metadata.name}" -n ' + namespace
+        print(cmd)
+        output, exit_status = self.cmd.run(cmd)
+        if exit_status == 0:
+            return output
+        return None
+
     
     def scaleReplicas(self, namespace: str, replicas: int, rep_controller: str):
         '''
