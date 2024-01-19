@@ -10,7 +10,7 @@ RUN go build . && cp go-init /usr/bin
 ##############################################
 # Stage 2 : Build slave-base with go-init
 ##############################################
-FROM quay.io/openshift/origin-cli:4.13
+FROM quay.io/openshift/origin-cli:4.15
 MAINTAINER Akram Ben Aissi <abenaiss@redhat.com>
 COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
 
@@ -38,7 +38,7 @@ RUN curl http://mirror.centos.org/centos-7/7/os/x86_64/RPM-GPG-KEY-CentOS-7 -o /
     chmod 775 /usr/bin && \
     chmod 775 /usr/share/man/man1 && \
     mkdir -p /var/lib/origin && \
-    chmod 775 /var/lib/origin && \    
+    chmod 775 /var/lib/origin && \
     unlink /usr/bin/java && \
     unlink /usr/bin/jjs && \
     unlink /usr/bin/keytool && \
