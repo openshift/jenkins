@@ -25,7 +25,7 @@ current_project = ''
 config.load_kube_config()
 oc = Openshift()
 podStatus = {}
-podtemplate_build_ref = 'https://github.com/openshift/jenkins.git\#container-nodes'
+podtemplate_build_ref = 'https://github.com/openshift/jenkins.git#container-nodes'
 
 # STEP
 
@@ -89,7 +89,7 @@ def configure_pod_templates(context):
         raise AssertionError
 
 
-@when(u'the user creates a new build refering to "https://github.com/openshift/jenkins.git\#container-nodes"')
+@when(u'the user creates a new build refering to "https://github.com/openshift/jenkins.git#container-nodes"')
 def trigger_new_build(context):
     res = oc.new_build(podtemplate_build_ref)
     time.sleep(30)
