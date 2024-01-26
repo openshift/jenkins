@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# this is a test comment
+
 # Assumes the following directory structure exists:
 # ~/projects/github.com/openshift/jenkins
 # ~/projects/github.com/openshift/jenkins-sync-plugin
