@@ -28,6 +28,9 @@ class Openshift(object):
         (output, exit_code) = self.cmd.run(f'oc get {resource_plural} -n {namespace} -o "jsonpath={{.items['
                                            f'*].metadata.name}}"')
         exit_code | should.be_equal_to(0)
+        output = str(output)
+        output = output.replace("Warning: apps.openshift.io/v1 DeploymentConfig is deprecated in v4.14+, unavailable in v4.10000+","")
+        output = output.lstrip()
         return output
 
     def search_item_in_lst(self, lst, search_pattern):
@@ -272,15 +275,18 @@ class Openshift(object):
             return output
         return None
 
-    def getmasterpod(self, namespace: str)-> str:
+    def getmasterpod(self, namespace: str) -> str:
         '''
         returns the jenkins master pod name
         '''
-        v1 = client.CoreV1Api()
-        pods = v1.list_namespaced_pod(namespace, label_selector='deploymentconfig=jenkins')
-        if len(pods.items) > 1:
-            raise AssertionError
-        return pods.items[0].metadata.name
+        time.sleep(30)
+        cmd = r'oc get pods --selector="deploymentconfig=jenkins" -o jsonpath --template="{.items[0].metadata.name}" -n ' + namespace
+        print(cmd)
+        output, exit_status = self.cmd.run(cmd)
+        if exit_status == 0:
+            return output
+        return None
+
     
     def scaleReplicas(self, namespace: str, replicas: int, rep_controller: str):
         '''
