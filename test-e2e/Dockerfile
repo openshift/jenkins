@@ -1,3 +1,5 @@
+# test comment
+
 FROM openshift/origin
 RUN mkdir -p /usr/libexec/origin
 COPY tag-in-image.sh /usr/libexec/origin
