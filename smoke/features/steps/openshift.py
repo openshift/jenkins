@@ -28,6 +28,9 @@ class Openshift(object):
         (output, exit_code) = self.cmd.run(f'oc get {resource_plural} -n {namespace} -o "jsonpath={{.items['
                                            f'*].metadata.name}}"')
         exit_code | should.be_equal_to(0)
+        output = str(output)
+        output = output.replace("Warning: apps.openshift.io/v1 DeploymentConfig is deprecated in v4.14+, unavailable in v4.10000+","")
+        output = output.lstrip()
         return output
 
     def search_item_in_lst(self, lst, search_pattern):
