@@ -56,12 +56,12 @@ RUN curl http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-Official -o /etc/pki
     yum update --excludepkgs redhat-release -y && \
     rpm -V  $INSTALL_PKGS && \
     yum clean all && \
-    alternatives --family java-11 --install /usr/bin/java java /usr/lib/jvm/java-11-openjdk/bin/java 1  && \
-    alternatives --set java java-11 && \
-    alternatives --family javac-11 --install /usr/bin/javac javac /usr/lib/jvm/java-11-openjdk/bin/javac 1  && \
-    alternatives --set javac javac-11 && \
-    alternatives --family jar-11 --install /usr/bin/jar jar /usr/lib/jvm/java-11-openjdk/bin/jar 1  && \
-    alternatives --set jar jar-11
+    alternatives --family java-17 --install /usr/bin/java java /usr/lib/jvm/java-17-openjdk/bin/java 1  && \
+    alternatives --set java java-17 && \
+    alternatives --family javac-17 --install /usr/bin/javac javac /usr/lib/jvm/java-17-openjdk/bin/javac 1  && \
+    alternatives --set javac javac-17 && \
+    alternatives --family jar-17 --install /usr/bin/jar jar /usr/lib/jvm/java-17-openjdk/bin/jar 1  && \
+    alternatives --set jar jar-17
 
 COPY ./contrib/openshift /opt/openshift
 COPY ./contrib/jenkins /usr/local/bin
