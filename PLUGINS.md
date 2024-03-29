@@ -5,7 +5,7 @@
 An initial set of Jenkins plugins are included in the OpenShift Jenkins images.  The general methodology
 is that the CentOS7 image if first updated with any changes to the list of plugins.  After some level
 of verification with that image, the RHEL7 image is updated.
-```
+
 
 #### Plugin installation for CentOS7 V4
 In v4, that call has been moved to [this script](2/contrib/jenkins/install-jenkins-core-plugins.sh), which is called from
