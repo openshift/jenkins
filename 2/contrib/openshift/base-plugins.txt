@@ -57,7 +57,7 @@ google-oauth-plugin:1.330.vf5e86021cb_ec
 groovy:457.v99900cb_85593
 gson-api:2.10.1-15.v0d99f670e0a_7
 handy-uri-templates-2-api:2.1.8-30.v7e777411b_148
-htmlpublisher:1.32
+htmlpublisher:1.33
 instance-identity:185.v303dc7c645f9
 ionicons-api:56.v1b_1c8c49374e
 jackson2-api:2.16.1-373.ve709c6871598
