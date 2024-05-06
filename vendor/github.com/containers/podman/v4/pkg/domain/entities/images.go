@@ -478,3 +478,17 @@ type ImageUnmountReport struct {
 	Err error
 	Id  string //nolint:revive,stylecheck
 }
+
+const (
+	LocalFarmImageBuilderName   = "(local)"
+	LocalFarmImageBuilderDriver = "local"
+)
+
+// FarmInspectReport describes the response from farm inspect
+type FarmInspectReport struct {
+	NativePlatforms   []string
+	EmulatedPlatforms []string
+	OS                string
+	Arch              string
+	Variant           string
+}
