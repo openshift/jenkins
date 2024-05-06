@@ -52,8 +52,8 @@
       }
     },
     {
-      "kind": "Deployment",
-      "apiVersion": "apps/v1",
+      "kind": "DeploymentConfig",
+      "apiVersion": "apps.openshift.io/v1",
       "metadata": {
         "name": "${JENKINS_SERVICE_NAME}",
         "annotations": {
@@ -86,14 +86,12 @@
         ],
         "replicas": 1,
         "selector": {
-          "matchLabels": {
-            "app": "${JENKINS_SERVICE_NAME}"
-          }
+          "name": "${JENKINS_SERVICE_NAME}"
         },
         "template": {
           "metadata": {
             "labels": {
-              "app": "${JENKINS_SERVICE_NAME}"
+              "name": "${JENKINS_SERVICE_NAME}"
             }
           },
           "spec": {
