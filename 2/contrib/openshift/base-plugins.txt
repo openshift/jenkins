@@ -49,7 +49,7 @@ favorite:2.208.v91d65b_7792a_c
 font-awesome-api:6.5.1-1
 git:5.2.1
 git-client:4.6.0
-git-server:99.va_0826a_b_cdfa_d
+git-server:99.101.v720e86326c09
 github:1.37.3.1
 github-api:1.318-461.v7a_c09c9fa_d63
 github-branch-source:1772.va_69eda_d018d4
