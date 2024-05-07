@@ -86,7 +86,7 @@ lockable-resources:1232.v512d6c434eb_d
 mailer:463.vedf8358e006b_
 mapdb-api:1.0.9-28.vf251ce40855d
 matrix-auth:3.2.1
-matrix-project:822.v01b_8c85d16d2
+matrix-project:822.824.v14451b_c0fd42
 maven-plugin:3.23
 mercurial:1260.vdfb_723cdcc81
 metrics:4.2.18-442.v02e107157925
