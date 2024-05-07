@@ -3,9 +3,11 @@ agent-maven-3.5/Dockerfile.rhel7.version
 agent-maven-3.5/Dockerfile.localdev.version
 slave-base/Dockerfile.localdev.version
 slave-base/Dockerfile.rhel7.version
+slave-base/Dockerfile.rhel8.version
 out
 logs
 kubeconfig
 
 __pycache__
 .kube
+.idea
