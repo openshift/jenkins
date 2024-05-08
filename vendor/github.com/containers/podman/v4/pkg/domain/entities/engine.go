@@ -14,12 +14,6 @@ type EngineSetup string
 const (
 	ABIMode    = EngineMode("abi")
 	TunnelMode = EngineMode("tunnel")
-
-	MigrateMode  = EngineSetup("migrate")
-	NoFDsMode    = EngineSetup("disablefds")
-	NormalMode   = EngineSetup("normal")
-	RenumberMode = EngineSetup("renumber")
-	ResetMode    = EngineSetup("reset")
 )
 
 // Convert EngineMode to String
@@ -40,16 +34,20 @@ type PodmanConfig struct {
 	ConmonPath               string         // --conmon flag will set Engine.ConmonPath
 	CPUProfile               string         // Hidden: Should CPU profile be taken
 	EngineMode               EngineMode     // ABI or Tunneling mode
-	Identity                 string         // ssh identity for connecting to server
-	MaxWorks                 int            // maximum number of parallel threads
-	MemoryProfile            string         // Hidden: Should memory profile be taken
-	RegistriesConf           string         // allows for specifying a custom registries.conf
-	Remote                   bool           // Connection to Podman API Service will use RESTful API
-	RuntimePath              string         // --runtime flag will set Engine.RuntimePath
-	RuntimeFlags             []string       // global flags for the container runtime
-	Syslog                   bool           // write logging information to syslog as well as the console
-	Trace                    bool           // Hidden: Trace execution
-	URI                      string         // URI to RESTful API Service
+	HooksDir                 []string
+	Identity                 string   // ssh identity for connecting to server
+	IsRenumber               bool     // Is this a system renumber command? If so, a number of checks will be relaxed
+	IsReset                  bool     // Is this a system reset command? If so, a number of checks will be skipped/omitted
+	MaxWorks                 int      // maximum number of parallel threads
+	MemoryProfile            string   // Hidden: Should memory profile be taken
+	RegistriesConf           string   // allows for specifying a custom registries.conf
+	Remote                   bool     // Connection to Podman API Service will use RESTful API
+	RuntimePath              string   // --runtime flag will set Engine.RuntimePath
+	RuntimeFlags             []string // global flags for the container runtime
+	Syslog                   bool     // write logging information to syslog as well as the console
+	Trace                    bool     // Hidden: Trace execution
+	URI                      string   // URI to RESTful API Service
+	FarmNodeName             string   // Name of farm node
 
 	Runroot        string
 	ImageStore     string
@@ -58,4 +56,5 @@ type PodmanConfig struct {
 	SSHMode        string
 	MachineMode    bool
 	TransientStore bool
+	GraphRoot      string
 }
