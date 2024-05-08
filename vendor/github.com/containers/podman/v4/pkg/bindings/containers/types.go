@@ -29,9 +29,11 @@ type LogOptions struct {
 type CommitOptions struct {
 	Author  *string
 	Changes []string
+	Config  *io.Reader `schema:"-"`
 	Comment *string
 	Format  *string
 	Pause   *bool
+	Stream  *bool
 	Squash  *bool
 	Repo    *string
 	Tag     *string
@@ -332,4 +334,11 @@ type CopyOptions struct {
 	// NoOverwriteDirNonDir when true prevents an existing directory or file from being overwritten
 	// by the other type.
 	NoOverwriteDirNonDir *bool
+}
+
+// ExecRemoveOptions are optional options for removing an exec session
+//
+//go:generate go run ../generator/generator.go ExecRemoveOptions
+type ExecRemoveOptions struct {
+	Force *bool
 }
