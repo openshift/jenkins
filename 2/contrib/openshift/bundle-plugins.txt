@@ -120,7 +120,7 @@ prometheus:2.5.1
 pubsub-light:1.18
 run-condition:1.7
 scm-api:683.vb_16722fb_b_80b_
-script-security:1313.v7a_6067dc7087
+script-security:1336.vf33a_a_9863911
 snakeyaml-api:2.2-111.vc6598e30cc65
 sse-gateway:1.26
 ssh-credentials:308.ve4497b_ccd8f4
