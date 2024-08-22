@@ -29,14 +29,14 @@ ENV HOME=/home/jenkins \
 
 USER root
 # Install headless Java
-RUN INSTALL_PKGS="glibc-langpack-en bc gettext git git-lfs java-11-openjdk-headless java-1.8.0-openjdk-headless lsof rsync tar unzip which zip bzip2 jq glibc-locale-source" && \
+RUN INSTALL_PKGS="glibc-langpack-en bc gettext git git-lfs java-21-openjdk-headless java-11-openjdk-headless java-1.8.0-openjdk-headless lsof rsync tar unzip which zip bzip2 jq glibc-locale-source" && \
     yum install -y --setopt=tsflags=nodocs --disableplugin=subscription-manager $INSTALL_PKGS && \
     rpm -V  $INSTALL_PKGS && \
     yum update -y && \
     yum clean all && \
     localedef -f UTF-8 -i en_US en_US.UTF-8 && \
-    alternatives --family java-11 --install /usr/bin/java java /usr/lib/jvm/jre-11-openjdk/bin/java 1  && \
-    alternatives --set java java-11 && \
+    alternatives --family java-21 --install /usr/bin/java java /usr/lib/jvm/jre-21-openjdk/bin/java 1  && \
+    alternatives --set java java-21 && \
     mkdir -p /home/jenkins && \
     chown -R 1001:0 /home/jenkins && \
     chmod -R g+w /home/jenkins && \
