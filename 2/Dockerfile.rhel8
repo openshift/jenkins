@@ -59,19 +59,16 @@ EXPOSE 8080 50000
 # /usr/lib64/jenkins will subsequently get redirected to /usr/lib/jenkins; it is confirmed that the 3.7 jenkins RHEL images
 # do *NOT* have a /usr/lib64/jenkins path
 RUN ln -s /usr/lib/jenkins /usr/lib64/jenkins && \
-    INSTALL_PKGS="dejavu-sans-fonts wget rsync gettext git git-lfs tar zip unzip openssl bzip2 java-21-openjdk java-21-openjdk-devel java-17-openjdk java-17-openjdk-devel java-11-openjdk java-11-openjdk-devel java-1.8.0-openjdk java-1.8.0-openjdk-devel jq glibc-locale-source xmlstarlet glibc-langpack-en" && \
+    INSTALL_PKGS="dejavu-sans-fonts wget rsync gettext git git-lfs tar zip unzip openssl bzip2 java-21-openjdk java-21-openjdk-devel java-17-openjdk java-17-openjdk-devel java-11-openjdk java-11-openjdk-devel jq glibc-locale-source xmlstarlet glibc-langpack-en" && \
     yum install -y $INSTALL_PKGS && \
     yum update -y && \
     rpm -V  $INSTALL_PKGS && \
     yum clean all  && \
     localedef -f UTF-8 -i en_US en_US.UTF-8 && \
-    alternatives --family java-21 --install /usr/bin/java java /usr/lib/jvm/java-21-openjdk/bin/java 1  && \
-    alternatives --set java java-21 && \
-    alternatives --family javac-21 --install /usr/bin/javac javac /usr/lib/jvm/java-21-openjdk/bin/javac 1  && \
-    alternatives --set javac javac-21 && \
-    alternatives --family jar-21 --install /usr/bin/jar jar /usr/lib/jvm/java-21-openjdk/bin/jar 1  && \
-    alternatives --set jar jar-21
-
+    alternatives --set java $(alternatives --display java | grep 'family java-21-openjdk' | cut -d ' ' -f 1) && \
+    alternatives --set javac $(alternatives --display javac | grep 'family java-21-openjdk' | cut -d ' ' -f 1) && \
+    alternatives --family $(alternatives --display java | grep 'family java-21-openjdk' | cut -d ' ' -f 4) --install /usr/bin/jar  jar $(alternatives --display java | grep 'family java-21-openjdk' | cut -d' ' -f1 | sed 's,/[^/]*$,/jar,') 1 && \
+    alternatives --set jar $(alternatives --display java | grep 'family java-21-openjdk' | cut -d ' ' -f 4)
 
 COPY ./contrib/openshift /opt/openshift
 COPY ./contrib/jenkins /usr/local/bin
