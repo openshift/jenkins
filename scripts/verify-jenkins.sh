@@ -156,7 +156,7 @@ verify_plugins() {
 verify_jenkins_war() {
 	jenkins_version=$(cat "$COMMIT_JENKINS_VERSION_LOCATION")
 	printf "[VERIFYING] %s:%s\n" "$JENKINS_WAR_LOCATION" "${jenkins_version}"
-	jenkins_version_found=$(/usr/lib/jvm/java-11/bin/java -jar "$JENKINS_WAR_LOCATION" --version 2> /dev/null)
+	jenkins_version_found=$(/usr/lib/jvm/java-17/bin/java -jar "$JENKINS_WAR_LOCATION" --version 2> /dev/null)
 	printf "\t%-50s" "- exists ... "
 		if test -f "$JENKINS_WAR_LOCATION"; then
 			printf "PASS\n"

@@ -1,15 +1,15 @@
-# Hacking
+# Building Jenkins Images
 
 The basics to build this project and test it locally
 
-## Locally 
+## Locally
 
 ## Building locally
 Jenkins images can be built using  `podman`, `buildah` or `docker`. For historical reasons, the default build runtime is `docker`
 
 To build on podman:
 ```
-make VERSIONS="2 maven-3.5" BUILD_COMMAND="podman build --no-cache"
+make VERSIONS="2 slave-base" BUILD_COMMAND="podman build --no-cache"
 ```
 
 
@@ -31,6 +31,3 @@ oc new-build https://github.com/origin/jenkins.git#your-branch-name --context-di
 ```
 oc new-app jenkins-persistent -p NAMESPACE=$(oc project -q) -p JENKINS_IMAGE_STREAM_TAG=jenkins:latest
 ```
-
-
-
