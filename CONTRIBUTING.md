@@ -22,7 +22,7 @@ You will need an environment with the following tools installed:
 
 * Maven (the `mvn` command)
 * Git
-* Java 11
+* Java 17
 * an IDE or editor of your choosing
 
 ### Basic code development flow

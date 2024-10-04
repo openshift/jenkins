@@ -34,7 +34,7 @@ initialization by passing `-e VAR=VALUE` to the Docker run command.
 | `AGENT_BASE_IMAGE`	|	Setting this value overrides the image used for the 'jnlp' container in the sample kubernetes plug-in PodTemplates provided with this image.  Otherwise, the image from the 'jenkins-agent-base:latest' ImageStreamTag in the 'openshift' namespace is used.	|
 | `JAVA_BUILDER_IMAGE`	|	Setting this value overrides the image used for the 'java-builder' container in the sample kubernetes plug-in PodTemplates provided with this image.  Otherwise, the image from the 'java:latest' ImageStreamTag in the 'openshift' namespace is used.	|
 | `NODEJS_BUILDER_IMAGE`	|	Setting this value overrides the image used for the 'nodejs-builder' container in the sample kubernetes plug-in PodTemplates provided with this image.  Otherwise, the image from the 'nodejs:latest' ImageStreamTag in the 'openshift' namespace is used.	|
-| `JAVA_FIPS_OPTIONS`  | Per this [OpenJDK support article](https://access.redhat.com/documentation/en-us/openjdk/11/html-single/configuring_openjdk_11_on_rhel_with_fips/index#config-fips-in-openjdk) control how the JVM operates when running on a FIPS node. |
+| `JAVA_FIPS_OPTIONS`  | Per this [OpenJDK support article](https://docs.redhat.com/en/documentation/red_hat_build_of_openjdk/17/html-single/configuring_red_hat_build_of_openjdk_17_on_rhel_with_fips/index#fips_settings) control how the JVM operates when running on a FIPS node. |
 
 You can also set the following mount points by passing the `-v /host:/container` flag to Docker.
 

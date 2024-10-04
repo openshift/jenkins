@@ -49,7 +49,7 @@ EXPOSE 8080 50000
 RUN rm /etc/yum.repos.d/*
 COPY contrib/openshift/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo
 RUN curl http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-Official -o /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS && \
-    INSTALL_PKGS="dejavu-sans-fonts rsync gettext git git-lfs tar zip unzip openssl bzip2 java-17-openjdk java-17-openjdk-devel java-11-openjdk java-11-openjdk-devel jq xmlstarlet" && \
+    INSTALL_PKGS="dejavu-sans-fonts rsync gettext git git-lfs tar zip unzip openssl bzip2 java-17-openjdk java-17-openjdk-devel jq xmlstarlet" && \
     DISABLES="" && \
     yum $DISABLES -y --setopt=tsflags=nodocs --disableplugin=subscription-manager install epel-release && \
     yum $DISABLES -y --setopt=tsflags=nodocs --disableplugin=subscription-manager install $INSTALL_PKGS && \

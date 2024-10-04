@@ -139,7 +139,6 @@ if [[ $(echo "$@" | awk '{print NF}') -gt 1 ]]; then
     fi
   fi
 
-  #NOTE: The following default options are deprecated with java 11. We disable them for all, including java-1.8
   if [[ -z "${JAVA_TOOL_OPTIONS}" ]]; then
     # these options will automatically be picked up by any JVM process but can
     # be overridden on that process' command line.
