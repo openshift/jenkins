@@ -61,8 +61,8 @@ htmlpublisher:1.33
 instance-identity:185.v303dc7c645f9
 ionicons-api:56.v1b_1c8c49374e
 jackson2-api:2.16.1-373.ve709c6871598
-jakarta-activation-api:2.0.1-3
-jakarta-mail-api:2.0.1-3
+jakarta-activation-api:2.1.3-1
+jakarta-mail-api:2.1.3-1
 javadoc:243.vb_b_503b_b_45537
 javax-activation-api:1.2.0-6
 javax-mail-api:1.6.2-9
