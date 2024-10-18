@@ -383,7 +383,7 @@
     {
       "name": "JAVA_FIPS_OPTIONS",
       "displayName": "Allows control over how the JVM interacts with FIPS on startup.",
-      "description": "See https://access.redhat.com/documentation/en-us/openjdk/11/html-single/configuring_openjdk_11_on_rhel_with_fips/index#config-fips-in-openjdk for the available command line properties to facilitate the JVM running on FIPS nodes.",
+      "description": "See https://docs.redhat.com/en/documentation/red_hat_build_of_openjdk/17/html-single/configuring_red_hat_build_of_openjdk_17_on_rhel_with_fips/index#fips_settings for the available command line properties to facilitate the JVM running on FIPS nodes.",
       "value": "-Dcom.redhat.fips=false"
     },
     {
