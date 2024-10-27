@@ -1,0 +1,94 @@
+##############################################
+# Stage 1 : Reference binary dependencies
+##############################################
+FROM quay.io/redhat-user-workloads/ocp-tools-jenkins-tenant/adambkaplan-go-init-4-17@sha256:42be4b464de1194585f5ba14b292f2ecaf309a123c732a3870f1afce50db4e5c AS go-init
+
+FROM quay.io/redhat-user-workloads/ocp-tools-jenkins-tenant/jenkinsci-jenkins-4-17@sha256:95a2d0577cf954702a23c4ee8aef3ec9ad9ae1eed7a98a8f17cf063e3a95a9ae AS jenkins-war
+##############################################
+# Stage 2 : Build Jenkins controller with Konflux-built binaries.
+##############################################
+FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.17
+ARG jenkins_version=latest
+COPY --from=go-init /usr/bin/go-init /usr/bin/go-init
+COPY --from=jenkins-war /deployments/jenkins.war /usr/lib/jenkins/jenkins.war
+
+# Jenkins image for OpenShift
+#
+# This image provides a Jenkins server, primarily intended for integration with
+# OpenShift v4.
+#
+# Volumes:
+# * /var/jenkins_home
+# Environment:
+# * $JENKINS_PASSWORD - Password for the Jenkins 'admin' user.
+
+ENV JENKINS_VERSION=2 \
+    HOME=/var/lib/jenkins \
+    JENKINS_HOME=/var/lib/jenkins \
+    JENKINS_UC=https://updates.jenkins.io \
+    OPENSHIFT_JENKINS_IMAGE_VERSION=4.16 \
+    LANG=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8 \
+    # Setting INSTALL_JENKINS_VIA_RPS=true is used for CPaaS-driven builds, where we package
+    # `jenkins.war` and the plugins into RPMs. On Konflux, we can source binaries from containers
+    # or OCI artifacts.
+    INSTALL_JENKINS_VIA_RPMS=false
+
+LABEL io.k8s.description="Jenkins is a continuous integration server" \
+    io.k8s.display-name="Jenkins 2" \
+    io.openshift.tags="jenkins,jenkins2,ci" \
+    io.openshift.expose-services="8080:http" \
+    io.jenkins.version="${jenkins_version}" \
+    io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
+
+# Labels consumed by Red Hat build service
+LABEL com.redhat.component="openshift-jenkins-2-container" \
+    name="openshift4/jenkins-2-rhel9" \
+    architecture="x86_64" \
+    maintainer="openshift-dev-services+jenkins@redhat.com"
+
+# 8080 for main web interface, 50000 for slave agents
+EXPOSE 8080 50000
+
+# for backward compatibility with pre-3.6 installs leveraging a PV, where rpm installs went to /usr/lib64/jenkins, we are
+# establishing a symbolic link for that guy as well, so that existing plugins in JENKINS_HOME/plugins pointing to
+# /usr/lib64/jenkins will subsequently get redirected to /usr/lib/jenkins; it is confirmed that the 3.7 jenkins RHEL images
+# do *NOT* have a /usr/lib64/jenkins path
+RUN ln -s /usr/lib/jenkins /usr/lib64/jenkins && \
+    INSTALL_PKGS="dejavu-sans-fonts wget rsync gettext git git-lfs tar zip unzip openssl bzip2 java-21-openjdk java-21-openjdk-devel java-17-openjdk java-17-openjdk-devel jq glibc-locale-source xmlstarlet glibc-langpack-en" && \
+    yum install -y $INSTALL_PKGS && \
+    yum update -y && \
+    rpm -V  $INSTALL_PKGS && \
+    yum clean all  && \
+    localedef -f UTF-8 -i en_US en_US.UTF-8 && \
+    alternatives --set java $(alternatives --display java | grep 'family java-21-openjdk' | cut -d ' ' -f 1) && \
+    alternatives --set javac $(alternatives --display javac | grep 'family java-21-openjdk' | cut -d ' ' -f 1) && \
+    alternatives --family $(alternatives --display java | grep 'family java-21-openjdk' | cut -d ' ' -f 4) --install /usr/bin/jar  jar $(alternatives --display java | grep 'family java-21-openjdk' | cut -d' ' -f1 | sed 's,/[^/]*$,/jar,') 1 && \
+    alternatives --set jar $(alternatives --display java | grep 'family java-21-openjdk' | cut -d ' ' -f 4)
+
+COPY ./contrib/openshift /opt/openshift
+COPY ./contrib/jenkins /usr/local/bin
+ADD ./contrib/s2i /usr/libexec/s2i
+ADD release.version /tmp/release.version
+
+RUN mkdir -p /var/lib/jenkins && \
+    /usr/local/bin/install-jenkins-core-plugins.sh /opt/openshift/bundle-plugins.txt && \
+    rm -rf /var/log/jenkins && \
+    chmod -R 775 /etc/alternatives && \
+    chmod -R 775 /var/lib/alternatives && \
+    chmod -R 775 /usr/lib/jvm && \
+    chmod 775 /usr/bin && \
+    chmod 775 /usr/share/man/man1 && \
+    mkdir -p /var/lib/origin && \
+    chmod 775 /var/lib/origin && \
+    chown -R 1001:0 /opt/openshift && \
+    /usr/local/bin/fix-permissions /opt/openshift && \
+    /usr/local/bin/fix-permissions /opt/openshift/configuration/init.groovy.d && \
+    /usr/local/bin/fix-permissions /var/lib/jenkins && \
+    /usr/local/bin/fix-permissions /var/log
+
+
+VOLUME ["/var/lib/jenkins"]
+
+USER 1001
+ENTRYPOINT ["/usr/bin/go-init", "-main", "/usr/libexec/s2i/run"]
