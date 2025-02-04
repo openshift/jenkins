@@ -6,3 +6,4 @@ urllib3
 pyfiglet
 clint
 python-jenkins
+setuptools>=70.0.0 # not directly required, pinned by Snyk to avoid a vulnerability
