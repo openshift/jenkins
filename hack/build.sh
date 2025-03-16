@@ -1,7 +1,7 @@
 #!/bin/bash -e
 # This script is used to build, test and squash the OpenShift Docker images.
 #
-# $1 - Specifies distribution - "rhel7" or "centos7" for v3.x, "rhel7" only for 4.x
+# $1 - Specifies distribution - "rhel8" or "rhel9" for 4.x
 # $2 - Specifies the image version - (must match with subdirectory in repo)# TEST_MODE - If set, build a candidate image and test it
 # TEST_MODE - If set, build a candidate image and test it
 # TAG_ON_SUCCESS - If set, tested image will be re-tagged as a non-candidate
@@ -12,8 +12,8 @@ OS=$1
 VERSION=$2
 
 DOCKERFILE_PATH=""
-BASE_IMAGE_NAME="docker.io/openshift/jenkins"
-RHEL_BASE_IMAGE_NAME="registry.access.redhat.com/openshift3/jenkins"
+BASE_IMAGE_NAME="quay.io/${USER}/jenkins"
+RHEL_BASE_IMAGE_NAME="registry.redhat.io/ocp-tools-4/jenkins"
 BUILD_WITH=${BUILD_COMMAND:="podman build --no-cache"} # other possible values: "podman build --no-cache" or "buildah bud" 
 JENKINS_VERSION_FILE=contrib/openshift/jenkins-version.txt
 
@@ -59,7 +59,7 @@ for dir in ${dirs}; do
   fi
 done
 
-if [ "$OS" == "rhel8" -o "$OS" == "rhel8-candidate" ]; then
+if [ "$OS" == "rhel8" -o "$OS" == "rhel8-candidate" -o "$OS" == "rhel9" -o "$OS" == "rhel9-candidate" ]; then
   BASE_IMAGE_NAME=${RHEL_BASE_IMAGE_NAME}
 fi
 
@@ -73,7 +73,9 @@ for dir in ${dirs}; do
   echo "-> Building ${IMAGE_NAME} ..."
 
   pushd ${dir} > /dev/null
-  if [ "$OS" == "rhel8" -o "$OS" == "rhel8-candidate" ]; then
+  if [ "$OS" == "rhel9" -o "$OS" == "rhel9-candidate" ]; then
+    docker_build_with_version Dockerfile.rhel9
+  elif [ "$OS" == "rhel8" -o "$OS" == "rhel8-candidate" ]; then
     docker_build_with_version Dockerfile.rhel8
   else
     docker_build_with_version Dockerfile.localdev

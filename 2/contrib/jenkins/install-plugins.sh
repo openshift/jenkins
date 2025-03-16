@@ -5,7 +5,7 @@
 #
 # Usage:
 #
-# FROM openshift/jenkins-2-centos7
+# FROM registry.redhat.io/ocp-tools-4/jenkins-rhel9:v4.17.0
 # COPY plugins.txt /plugins.txt
 # RUN /usr/local/bin/install-plugins.sh /plugins.txt
 #
