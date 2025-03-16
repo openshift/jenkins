@@ -12,7 +12,7 @@ A quick recipe of how to do that via layering would be:
 * create a Dockerfile with (adjusting the image ref as you see fit)
 
 ```
-FROM registry.access.redhat.com/ocp-tools-4/jenkins-rhel8:latest
+FROM registry.redhat.io/ocp-tools-4/jenkins-rhel9:v4.17.0
 COPY ./contrib/openshift /opt/openshift
 ```
 
@@ -23,13 +23,13 @@ the existing run script your new image inherits from this repositories Jenkins i
 Usage
 ---------------------------------
 
-For this, we will assume that you are using an `quay.io/openshift/origin-jenkins` for v4.x.
+For this, we will assume that you are using an `registry.redhat.io/ocp-tools-4/jenkins-rhel9` for v4.x.
 
 If you want to set only the mandatory environment variables and store the database
 in the `/tmp/jenkins` directory on the host filesystem, execute the following command:
 
 ```
-$ docker run -d -e JENKINS_PASSWORD=<password> -v /tmp/jenkins:/var/lib/jenkins openshift/jenkins-2-centos7
+$ docker run -d -e JENKINS_PASSWORD=<password> -v /tmp/jenkins:/var/lib/jenkins ocp-tools-4/jenkins-rhel9:v4.17.0
 ```
 
 
