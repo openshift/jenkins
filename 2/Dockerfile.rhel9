@@ -1,24 +1,28 @@
 ##############################################
 # Stage 1 : Build go-init
 ##############################################
-FROM registry.ci.openshift.org/ocp/builder:rhel-9-golang-1.21-openshift-4.16 AS go-init-builder
-ARG jenkins_version=latest
+FROM registry.redhat.io/ubi9/go-toolset:1.21 AS go-init-builder
 WORKDIR  /go/src/github.com/openshift/jenkins
 COPY . .
 WORKDIR  /go/src/github.com/openshift/jenkins/go-init
-RUN GO111MODULE=off go build . && cp go-init /usr/bin
+RUN GO111MODULE=off go build -o /usr/bin/go-init .
 
 ##############################################
-# Stage 2 : Build slave-base with go-init
+# Stage 2 : Build controller with go-init
 ##############################################
-FROM registry.ci.openshift.org/ocp/4.16:cli
+FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.17 as oc-417
+FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.16 as oc-416
+
+FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.18
 ARG jenkins_version=latest
-COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
+COPY --from=go-init-builder --chown=root:root /usr/bin/go-init /usr/bin/go-init
+COPY --from=oc-417 --chown=root:root /usr/bin/oc /usr/share/openshift/bin/oc-417/oc
+COPY --from=oc-416 --chown=root:root /usr/bin/oc /usr/share/openshift/bin/oc-416/oc
 
 # Jenkins image for OpenShift
 #
 # This image provides a Jenkins server, primarily intended for integration with
-# OpenShift v3.
+# OpenShift v4.
 #
 # Volumes:
 # * /var/jenkins_home
@@ -29,7 +33,7 @@ ENV JENKINS_VERSION=2 \
     HOME=/var/lib/jenkins \
     JENKINS_HOME=/var/lib/jenkins \
     JENKINS_UC=https://updates.jenkins.io \
-    OPENSHIFT_JENKINS_IMAGE_VERSION=4.16 \
+    OPENSHIFT_JENKINS_IMAGE_VERSION=v4.18.0 \
     LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
     INSTALL_JENKINS_VIA_RPMS=false
