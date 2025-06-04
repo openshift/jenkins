@@ -1,5 +1,4 @@
 //go:build !windows && !darwin
-// +build !windows,!darwin
 
 package chrootarchive
 
@@ -98,9 +97,6 @@ func applyLayerHandler(dest string, layer io.Reader, options *archive.TarOptions
 		if unshare.IsRootless() {
 			options.InUserNS = true
 		}
-	}
-	if options.ExcludePatterns == nil {
-		options.ExcludePatterns = []string{}
 	}
 
 	data, err := json.Marshal(options)

@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/containers/podman/v4/pkg/specgen"
+	"github.com/containers/podman/v5/pkg/specgen"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 

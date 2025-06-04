@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"iter"
 	"maps"
 	"reflect"
 	"slices"
@@ -109,7 +110,7 @@ func (c *copier) copySingleImage(ctx context.Context, unparsedImage *image.Unpar
 		}
 	}
 
-	if err := checkImageDestinationForCurrentRuntime(ctx, c.options.DestinationCtx, src, c.dest); err != nil {
+	if err := prepareImageConfigForDest(ctx, c.options.DestinationCtx, src, c.dest); err != nil {
 		return copySingleImageResult{}, err
 	}
 
@@ -316,35 +317,37 @@ func (c *copier) copySingleImage(ctx context.Context, unparsedImage *image.Unpar
 	return res, nil
 }
 
-// checkImageDestinationForCurrentRuntime enforces dest.MustMatchRuntimeOS, if necessary.
-func checkImageDestinationForCurrentRuntime(ctx context.Context, sys *types.SystemContext, src types.Image, dest types.ImageDestination) error {
-	if dest.MustMatchRuntimeOS() {
-		c, err := src.OCIConfig(ctx)
-		if err != nil {
-			return fmt.Errorf("parsing image configuration: %w", err)
-		}
-		wantedPlatforms, err := platform.WantedPlatforms(sys)
-		if err != nil {
-			return fmt.Errorf("getting current platform information %#v: %w", sys, err)
-		}
+// prepareImageConfigForDest enforces dest.MustMatchRuntimeOS and handles dest.NoteOriginalOCIConfig, if necessary.
+func prepareImageConfigForDest(ctx context.Context, sys *types.SystemContext, src types.Image, dest private.ImageDestination) error {
+	ociConfig, configErr := src.OCIConfig(ctx)
+	// Do not fail on configErr here, this might be an artifact
+	// and maybe nothing needs this to be a container image and to process the config.
 
-		options := newOrderedSet()
-		match := false
-		for _, wantedPlatform := range wantedPlatforms {
+	if dest.MustMatchRuntimeOS() {
+		if configErr != nil {
+			return fmt.Errorf("parsing image configuration: %w", configErr)
+		}
+		wantedPlatforms := platform.WantedPlatforms(sys)
+
+		if !slices.ContainsFunc(wantedPlatforms, func(wantedPlatform imgspecv1.Platform) bool {
 			// For a transitional period, this might trigger warnings because the Variant
 			// field was added to OCI config only recently. If this turns out to be too noisy,
 			// revert this check to only look for (OS, Architecture).
-			if platform.MatchesPlatform(c.Platform, wantedPlatform) {
-				match = true
-				break
+			return platform.MatchesPlatform(ociConfig.Platform, wantedPlatform)
+		}) {
+			options := newOrderedSet()
+			for _, p := range wantedPlatforms {
+				options.append(fmt.Sprintf("%s+%s+%q", p.OS, p.Architecture, p.Variant))
 			}
-			options.append(fmt.Sprintf("%s+%s+%q", wantedPlatform.OS, wantedPlatform.Architecture, wantedPlatform.Variant))
-		}
-		if !match {
 			logrus.Infof("Image operating system mismatch: image uses OS %q+architecture %q+%q, expecting one of %q",
-				c.OS, c.Architecture, c.Variant, strings.Join(options.list, ", "))
+				ociConfig.OS, ociConfig.Architecture, ociConfig.Variant, strings.Join(options.list, ", "))
 		}
 	}
+
+	if err := dest.NoteOriginalOCIConfig(ociConfig, configErr); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -415,7 +418,7 @@ func (ic *imageCopier) compareImageDestinationManifestEqual(ctx context.Context,
 		}
 	}
 
-	algos, err := algorithmsByNames(compressionAlgos.Values())
+	algos, err := algorithmsByNames(compressionAlgos.All())
 	if err != nil {
 		return nil, err
 	}
@@ -550,7 +553,7 @@ func (ic *imageCopier) copyLayers(ctx context.Context) ([]compressiontypes.Algor
 	if srcInfosUpdated || layerDigestsDiffer(srcInfos, destInfos) {
 		ic.manifestUpdates.LayerInfos = destInfos
 	}
-	algos, err := algorithmsByNames(compressionAlgos.Values())
+	algos, err := algorithmsByNames(compressionAlgos.All())
 	if err != nil {
 		return nil, err
 	}
@@ -822,11 +825,16 @@ func (ic *imageCopier) copyLayer(ctx context.Context, srcInfo types.BlobInfo, to
 				logrus.Debugf("Retrieved partial blob %v", srcInfo.Digest)
 				return true, updatedBlobInfoFromUpload(srcInfo, uploadedBlob), nil
 			}
-			logrus.Debugf("Failed to retrieve partial blob: %v", err)
-			return false, types.BlobInfo{}, nil
+			// On a "partial content not available" error, ignore it and retrieve the whole layer.
+			var perr private.ErrFallbackToOrdinaryLayerDownload
+			if errors.As(err, &perr) {
+				logrus.Debugf("Failed to retrieve partial blob: %v", err)
+				return false, types.BlobInfo{}, nil
+			}
+			return false, types.BlobInfo{}, err
 		}()
 		if err != nil {
-			return types.BlobInfo{}, "", err
+			return types.BlobInfo{}, "", fmt.Errorf("partial pull of blob %s: %w", srcInfo.Digest, err)
 		}
 		if reused {
 			return blobInfo, cachedDiffID, nil
@@ -981,10 +989,10 @@ func computeDiffID(stream io.Reader, decompressor compressiontypes.DecompressorF
 	return digest.Canonical.FromReader(stream)
 }
 
-// algorithmsByNames returns slice of Algorithms from slice of Algorithm Names
-func algorithmsByNames(names []string) ([]compressiontypes.Algorithm, error) {
+// algorithmsByNames returns slice of Algorithms from a sequence of Algorithm Names
+func algorithmsByNames(names iter.Seq[string]) ([]compressiontypes.Algorithm, error) {
 	result := []compressiontypes.Algorithm{}
-	for _, name := range names {
+	for name := range names {
 		algo, err := compression.AlgorithmByName(name)
 		if err != nil {
 			return nil, err
