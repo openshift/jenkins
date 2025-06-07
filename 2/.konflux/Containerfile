@@ -7,7 +7,7 @@ FROM quay.io/redhat-user-workloads/ocp-tools-jenkins-tenant/jenkinsci-jenkins-4-
 ##############################################
 # Stage 2 : Build Jenkins controller with Konflux-built binaries.
 ##############################################
-FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.17
+FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.18
 ARG jenkins_version=latest
 COPY --from=go-init /usr/bin/go-init /usr/bin/go-init
 COPY --from=jenkins-war /deployments/jenkins.war /usr/lib/jenkins/jenkins.war
