@@ -234,8 +234,8 @@ github.com/containers/podman/v4/pkg/trust
 github.com/containers/podman/v4/pkg/util
 github.com/containers/podman/v4/version
 github.com/containers/podman/v4/version/rawversion
-# github.com/containers/psgo v1.8.0
-## explicit; go 1.14
+# github.com/containers/psgo v1.9.0
+## explicit; go 1.18
 github.com/containers/psgo
 github.com/containers/psgo/internal/capabilities
 github.com/containers/psgo/internal/cgroups
