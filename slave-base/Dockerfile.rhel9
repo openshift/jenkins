@@ -10,7 +10,7 @@ RUN GO111MODULE=off go build -o /usr/bin/go-init .
 ##############################################
 # Stage 2 : Build slave-base with go-init
 ##############################################
-FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.18
+FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.19
 COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
 
 # Labels consumed by Red Hat build service
