@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/cilium/ebpf/internal"
+	"github.com/cilium/ebpf/internal/platform"
 	"github.com/cilium/ebpf/internal/sys"
 	"github.com/cilium/ebpf/internal/unix"
 )
@@ -41,35 +42,69 @@ func NewHandle(b *Builder) (*Handle, error) {
 //
 // Returns an error wrapping ErrNotSupported if the kernel doesn't support BTF.
 func NewHandleFromRawBTF(btf []byte) (*Handle, error) {
+	const minLogSize = 64 * 1024
+
+	if platform.IsWindows {
+		return nil, fmt.Errorf("btf: handle: %w", internal.ErrNotSupportedOnOS)
+	}
+
 	if uint64(len(btf)) > math.MaxUint32 {
 		return nil, errors.New("BTF exceeds the maximum size")
 	}
 
 	attr := &sys.BtfLoadAttr{
-		Btf:     sys.NewSlicePointer(btf),
+		Btf:     sys.SlicePointer(btf),
 		BtfSize: uint32(len(btf)),
 	}
 
-	fd, err := sys.BtfLoad(attr)
-	if err == nil {
-		return &Handle{fd, attr.BtfSize, false}, nil
+	var (
+		logBuf []byte
+		err    error
+	)
+	for {
+		var fd *sys.FD
+		fd, err = sys.BtfLoad(attr)
+		if err == nil {
+			return &Handle{fd, attr.BtfSize, false}, nil
+		}
+
+		if attr.BtfLogTrueSize != 0 && attr.BtfLogSize >= attr.BtfLogTrueSize {
+			// The log buffer already has the correct size.
+			break
+		}
+
+		if attr.BtfLogSize != 0 && !errors.Is(err, unix.ENOSPC) {
+			// Up until at least kernel 6.0, the BTF verifier does not return ENOSPC
+			// if there are other verification errors. ENOSPC is only returned when
+			// the BTF blob is correct, a log was requested, and the provided buffer
+			// is too small. We're therefore not sure whether we got the full
+			// log or not.
+			break
+		}
+
+		// Make an educated guess how large the buffer should be. Start
+		// at a reasonable minimum and then double the size.
+		logSize := uint32(max(len(logBuf)*2, minLogSize))
+		if int(logSize) < len(logBuf) {
+			return nil, errors.New("overflow while probing log buffer size")
+		}
+
+		if attr.BtfLogTrueSize != 0 {
+			// The kernel has given us a hint how large the log buffer has to be.
+			logSize = attr.BtfLogTrueSize
+		}
+
+		logBuf = make([]byte, logSize)
+		attr.BtfLogSize = logSize
+		attr.BtfLogBuf = sys.SlicePointer(logBuf)
+		attr.BtfLogLevel = 1
 	}
 
 	if err := haveBTF(); err != nil {
 		return nil, err
 	}
 
-	logBuf := make([]byte, 64*1024)
-	attr.BtfLogBuf = sys.NewSlicePointer(logBuf)
-	attr.BtfLogSize = uint32(len(logBuf))
-	attr.BtfLogLevel = 1
-
-	// Up until at least kernel 6.0, the BTF verifier does not return ENOSPC
-	// if there are other verification errors. ENOSPC is only returned when
-	// the BTF blob is correct, a log was requested, and the provided buffer
-	// is too small.
-	_, ve := sys.BtfLoad(attr)
-	return nil, internal.ErrorWithLog("load btf", err, logBuf, errors.Is(ve, unix.ENOSPC))
+	return nil, internal.ErrorWithLog("load btf", err, logBuf)
 }
 
 // NewHandleFromID returns the BTF handle for a given id.
@@ -80,6 +115,10 @@ func NewHandleFromRawBTF(btf []byte) (*Handle, error) {
 //
 // Requires CAP_SYS_ADMIN.
 func NewHandleFromID(id ID) (*Handle, error) {
+	if platform.IsWindows {
+		return nil, fmt.Errorf("btf: handle: %w", internal.ErrNotSupportedOnOS)
+	}
+
 	fd, err := sys.BtfGetFdById(&sys.BtfGetFdByIdAttr{
 		Id: uint32(id),
 	})
@@ -103,7 +142,8 @@ func NewHandleFromID(id ID) (*Handle, error) {
 func (h *Handle) Spec(base *Spec) (*Spec, error) {
 	var btfInfo sys.BtfInfo
 	btfBuffer := make([]byte, h.size)
-	btfInfo.Btf, btfInfo.BtfSize = sys.NewSlicePointerLen(btfBuffer)
+	btfInfo.Btf = sys.SlicePointer(btfBuffer)
+	btfInfo.BtfSize = uint32(len(btfBuffer))
 
 	if err := sys.ObjInfo(h.fd, &btfInfo); err != nil {
 		return nil, err
@@ -174,7 +214,8 @@ func newHandleInfoFromFD(fd *sys.FD) (*HandleInfo, error) {
 	btfInfo.BtfSize = 0
 
 	nameBuffer := make([]byte, btfInfo.NameLen)
-	btfInfo.Name, btfInfo.NameLen = sys.NewSlicePointerLen(nameBuffer)
+	btfInfo.Name = sys.SlicePointer(nameBuffer)
+	btfInfo.NameLen = uint32(len(nameBuffer))
 	if err := sys.ObjInfo(fd, &btfInfo); err != nil {
 		return nil, err
 	}
@@ -212,6 +253,11 @@ type HandleIterator struct {
 // Returns true if another BTF object was found. Call [HandleIterator.Err] after
 // the function returns false.
 func (it *HandleIterator) Next() bool {
+	if platform.IsWindows {
+		it.err = fmt.Errorf("btf: %w", internal.ErrNotSupportedOnOS)
+		return false
+	}
+
 	id := it.ID
 	for {
 		attr := &sys.BtfGetNextIdAttr{Id: id}
