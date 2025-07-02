@@ -1,11 +1,14 @@
 package sysregistriesv2
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
+	"maps"
 	"os"
 	"path/filepath"
 	"reflect"
+	"slices"
 	"sort"
 	"strings"
 	"sync"
@@ -13,10 +16,10 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/containers/image/v5/docker/reference"
 	"github.com/containers/image/v5/types"
+	"github.com/containers/storage/pkg/fileutils"
 	"github.com/containers/storage/pkg/homedir"
 	"github.com/containers/storage/pkg/regexp"
 	"github.com/sirupsen/logrus"
-	"golang.org/x/exp/maps"
 )
 
 // systemRegistriesConfPath is the path to the system-wide registry
@@ -247,6 +250,11 @@ type V2RegistriesConf struct {
 	// potentially use all unqualified-search registries
 	ShortNameMode string `toml:"short-name-mode"`
 
+	// AdditionalLayerStoreAuthHelper is a helper binary that receives
+	// registry credentials pass them to Additional Layer Store for
+	// registry authentication. These credentials are only collected when pulling (not pushing).
+	AdditionalLayerStoreAuthHelper string `toml:"additional-layer-store-auth-helper"`
+
 	shortNameAliasConf
 
 	// If you add any field, make sure to update Nonempty() below.
@@ -423,7 +431,8 @@ func (config *V2RegistriesConf) postProcessRegistries() error {
 			return fmt.Errorf("pull-from-mirror must not be set for a non-mirror registry %q", reg.Prefix)
 		}
 		// make sure mirrors are valid
-		for _, mir := range reg.Mirrors {
+		for j := range reg.Mirrors {
+			mir := &reg.Mirrors[j]
 			mir.Location, err = parseLocation(mir.Location)
 			if err != nil {
 				return err
@@ -564,7 +573,7 @@ func newConfigWrapperWithHomeDir(ctx *types.SystemContext, homeDir string) confi
 	// decide configPath using per-user path or system file
 	if ctx != nil && ctx.SystemRegistriesConfPath != "" {
 		wrapper.configPath = ctx.SystemRegistriesConfPath
-	} else if _, err := os.Stat(userRegistriesFilePath); err == nil {
+	} else if err := fileutils.Exists(userRegistriesFilePath); err == nil {
 		// per-user registries.conf exists, not reading system dir
 		// return config dirs from ctx or per-user one
 		wrapper.configPath = userRegistriesFilePath
@@ -738,6 +747,11 @@ func tryUpdatingCache(ctx *types.SystemContext, wrapper configWrapper) (*parsedC
 		// Enforce v2 format for drop-in-configs.
 		dropIn, err := loadConfigFile(path, true)
 		if err != nil {
+			if errors.Is(err, fs.ErrNotExist) {
+				// file must have been removed between the directory listing
+				// and the open call, ignore that as it is a expected race
+				continue
+			}
 			return nil, fmt.Errorf("loading drop-in registries configuration %q: %w", path, err)
 		}
 		config.updateWithConfigurationFrom(dropIn)
@@ -822,6 +836,16 @@ func CredentialHelpers(sys *types.SystemContext) ([]string, error) {
 		return nil, err
 	}
 	return config.partialV2.CredentialHelpers, nil
+}
+
+// AdditionalLayerStoreAuthHelper returns the helper for passing registry
+// credentials to Additional Layer Store.
+func AdditionalLayerStoreAuthHelper(sys *types.SystemContext) (string, error) {
+	config, err := getConfig(sys)
+	if err != nil {
+		return "", err
+	}
+	return config.partialV2.AdditionalLayerStoreAuthHelper, nil
 }
 
 // refMatchingSubdomainPrefix returns the length of ref
@@ -1018,12 +1042,10 @@ func (c *parsedConfig) updateWithConfigurationFrom(updates *parsedConfig) {
 	}
 
 	// Go maps have a non-deterministic order when iterating the keys, so
-	// we dump them in a slice and sort it to enforce some order in
-	// Registries slice.  Some consumers of c/image (e.g., CRI-O) log the
-	// configuration where a non-deterministic order could easily cause
-	// confusion.
-	prefixes := maps.Keys(registryMap)
-	sort.Strings(prefixes)
+	// we sort the keys to enforce some order in Registries slice.
+	// Some consumers of c/image (e.g., CRI-O) log the configuration
+	// and a non-deterministic order could easily cause confusion.
+	prefixes := slices.Sorted(maps.Keys(registryMap))
 
 	c.partialV2.Registries = []Registry{}
 	for _, prefix := range prefixes {
@@ -1048,6 +1070,11 @@ func (c *parsedConfig) updateWithConfigurationFrom(updates *parsedConfig) {
 	// We don’t maintain c.partialV2.ShortNameMode.
 	if updates.shortNameMode != types.ShortNameModeInvalid {
 		c.shortNameMode = updates.shortNameMode
+	}
+
+	// == Merge AdditionalLayerStoreAuthHelper:
+	if updates.partialV2.AdditionalLayerStoreAuthHelper != "" {
+		c.partialV2.AdditionalLayerStoreAuthHelper = updates.partialV2.AdditionalLayerStoreAuthHelper
 	}
 
 	// == Merge aliasCache:

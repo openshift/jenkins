@@ -12,15 +12,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/containers/podman/v4/libpod/define"
-	"github.com/containers/podman/v4/pkg/api/handlers"
-	"github.com/containers/podman/v4/pkg/bindings"
-	bcontainers "github.com/containers/podman/v4/pkg/bindings/containers"
-	bimages "github.com/containers/podman/v4/pkg/bindings/images"
-	bvolumes "github.com/containers/podman/v4/pkg/bindings/volumes"
-	"github.com/containers/podman/v4/pkg/domain/entities"
-	"github.com/containers/podman/v4/pkg/domain/entities/reports"
-	"github.com/containers/podman/v4/pkg/specgen"
+	"github.com/containers/podman/v5/libpod/define"
+	"github.com/containers/podman/v5/pkg/api/handlers"
+	"github.com/containers/podman/v5/pkg/bindings"
+	bcontainers "github.com/containers/podman/v5/pkg/bindings/containers"
+	bimages "github.com/containers/podman/v5/pkg/bindings/images"
+	bvolumes "github.com/containers/podman/v5/pkg/bindings/volumes"
+	"github.com/containers/podman/v5/pkg/domain/entities"
+	"github.com/containers/podman/v5/pkg/domain/entities/reports"
+	"github.com/containers/podman/v5/pkg/specgen"
 )
 
 type Client struct {

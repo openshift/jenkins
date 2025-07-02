@@ -10,6 +10,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/containers/storage/pkg/fileutils"
 	"github.com/containers/storage/pkg/idtools"
 	"github.com/containers/storage/pkg/pools"
 	"github.com/containers/storage/pkg/system"
@@ -29,9 +30,6 @@ func UnpackLayer(dest string, layer io.Reader, options *TarOptions) (size int64,
 
 	if options == nil {
 		options = &TarOptions{}
-	}
-	if options.ExcludePatterns == nil {
-		options.ExcludePatterns = []string{}
 	}
 	idMappings := idtools.NewIDMappingsFromMaps(options.UIDMaps, options.GIDMaps)
 
@@ -84,7 +82,7 @@ func UnpackLayer(dest string, layer io.Reader, options *TarOptions) (size int64,
 			parent := filepath.Dir(hdr.Name)
 			parentPath := filepath.Join(dest, parent)
 
-			if _, err := os.Lstat(parentPath); err != nil && os.IsNotExist(err) {
+			if err := fileutils.Lexists(parentPath); err != nil && os.IsNotExist(err) {
 				err = os.MkdirAll(parentPath, 0o755)
 				if err != nil {
 					return 0, err
@@ -106,7 +104,7 @@ func UnpackLayer(dest string, layer io.Reader, options *TarOptions) (size int64,
 					}
 					defer os.RemoveAll(aufsTempdir)
 				}
-				if err := createTarFile(filepath.Join(aufsTempdir, basename), dest, hdr, tr, true, nil, options.InUserNS, options.IgnoreChownErrors, options.ForceMask, buffer); err != nil {
+				if err := extractTarFileEntry(filepath.Join(aufsTempdir, basename), dest, hdr, tr, true, nil, options.InUserNS, options.IgnoreChownErrors, options.ForceMask, buffer); err != nil {
 					return 0, err
 				}
 			}
@@ -130,7 +128,7 @@ func UnpackLayer(dest string, layer io.Reader, options *TarOptions) (size int64,
 		if strings.HasPrefix(base, WhiteoutPrefix) {
 			dir := filepath.Dir(path)
 			if base == WhiteoutOpaqueDir {
-				_, err := os.Lstat(dir)
+				err := fileutils.Lexists(dir)
 				if err != nil {
 					return 0, err
 				}
@@ -175,12 +173,12 @@ func UnpackLayer(dest string, layer io.Reader, options *TarOptions) (size int64,
 			// We always reset the immutable flag (if present) to allow metadata
 			// changes and to allow directory modification. The flag will be
 			// re-applied based on the contents of hdr either at the end for
-			// directories or in createTarFile otherwise.
+			// directories or in extractTarFileEntry otherwise.
 			if fi, err := os.Lstat(path); err == nil {
 				if err := resetImmutable(path, &fi); err != nil {
 					return 0, err
 				}
-				if !(fi.IsDir() && hdr.Typeflag == tar.TypeDir) {
+				if !fi.IsDir() || hdr.Typeflag != tar.TypeDir {
 					if err := os.RemoveAll(path); err != nil {
 						return 0, err
 					}
@@ -211,7 +209,7 @@ func UnpackLayer(dest string, layer io.Reader, options *TarOptions) (size int64,
 				return 0, err
 			}
 
-			if err := createTarFile(path, dest, srcHdr, srcData, true, nil, options.InUserNS, options.IgnoreChownErrors, options.ForceMask, buffer); err != nil {
+			if err := extractTarFileEntry(path, dest, srcHdr, srcData, true, nil, options.InUserNS, options.IgnoreChownErrors, options.ForceMask, buffer); err != nil {
 				return 0, err
 			}
 
