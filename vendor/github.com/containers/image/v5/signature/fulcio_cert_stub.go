@@ -1,5 +1,4 @@
 //go:build containers_image_fulcio_stub
-// +build containers_image_fulcio_stub
 
 package signature
 
@@ -20,7 +19,7 @@ func (f *fulcioTrustRoot) validate() error {
 	return errors.New("fulcio disabled at compile-time")
 }
 
-func verifyRekorFulcio(rekorPublicKey *ecdsa.PublicKey, fulcioTrustRoot *fulcioTrustRoot, untrustedRekorSET []byte,
+func verifyRekorFulcio(rekorPublicKeys []*ecdsa.PublicKey, fulcioTrustRoot *fulcioTrustRoot, untrustedRekorSET []byte,
 	untrustedCertificateBytes []byte, untrustedIntermediateChainBytes []byte, untrustedBase64Signature string,
 	untrustedPayloadBytes []byte) (crypto.PublicKey, error) {
 	return nil, errors.New("fulcio disabled at compile-time")
