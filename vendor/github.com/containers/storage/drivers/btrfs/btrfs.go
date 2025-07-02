@@ -1,5 +1,4 @@
 //go:build linux && cgo
-// +build linux,cgo
 
 package btrfs
 
@@ -673,4 +672,9 @@ func (d *Driver) ListLayers() ([]string, error) {
 // AdditionalImageStores returns additional image stores supported by the driver
 func (d *Driver) AdditionalImageStores() []string {
 	return nil
+}
+
+// Dedup performs deduplication of the driver's storage.
+func (d *Driver) Dedup(req graphdriver.DedupArgs) (graphdriver.DedupResult, error) {
+	return graphdriver.DedupResult{}, nil
 }
