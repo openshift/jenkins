@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -29,6 +30,7 @@ import (
 	"github.com/containers/image/v5/manifest"
 	"github.com/containers/image/v5/types"
 	"github.com/containers/storage/pkg/archive"
+	"github.com/containers/storage/pkg/fileutils"
 	"github.com/klauspost/pgzip"
 	"github.com/opencontainers/go-digest"
 	selinux "github.com/opencontainers/selinux/go-selinux"
@@ -141,16 +143,24 @@ func (d *ostreeImageDestination) PutBlobWithOptions(ctx context.Context, stream 
 		return private.UploadedBlob{}, err
 	}
 
+	digester, stream := putblobdigest.DigestIfCanonicalUnknown(stream, inputInfo)
+
 	blobPath := filepath.Join(tmpDir, "content")
 	blobFile, err := os.Create(blobPath)
 	if err != nil {
 		return private.UploadedBlob{}, err
 	}
-	defer blobFile.Close()
-
-	digester, stream := putblobdigest.DigestIfCanonicalUnknown(stream, inputInfo)
-	// TODO: This can take quite some time, and should ideally be cancellable using ctx.Done().
-	size, err := io.Copy(blobFile, stream)
+	size, err := func() (_ int64, retErr error) { // A scope for defer
+		// since we are writing to this file, make sure we handle errors
+		defer func() {
+			closeErr := blobFile.Close()
+			if retErr == nil {
+				retErr = closeErr
+			}
+		}()
+		// TODO: This can take quite some time, and should ideally be cancellable using ctx.Done().
+		return io.Copy(blobFile, stream)
+	}()
 	if err != nil {
 		return private.UploadedBlob{}, err
 	}
@@ -162,7 +172,7 @@ func (d *ostreeImageDestination) PutBlobWithOptions(ctx context.Context, stream 
 		return private.UploadedBlob{}, err
 	}
 
-	hash := blobDigest.Hex()
+	hash := blobDigest.Encoded()
 	d.blobs[hash] = &blobToImport{Size: size, Digest: blobDigest, BlobPath: blobPath}
 	return private.UploadedBlob{Digest: blobDigest, Size: size}, nil
 }
@@ -245,9 +255,15 @@ func (d *ostreeImageDestination) ostreeCommit(repo *otbuiltin.Repo, branch strin
 	return err
 }
 
-func generateTarSplitMetadata(output *bytes.Buffer, file string) (digest.Digest, int64, error) {
+func generateTarSplitMetadata(output *bytes.Buffer, file string) (_ digest.Digest, _ int64, retErr error) {
 	mfz := pgzip.NewWriter(output)
-	defer mfz.Close()
+	// since we are writing to this, make sure we handle errors
+	defer func() {
+		closeErr := mfz.Close()
+		if retErr == nil {
+			retErr = closeErr
+		}
+	}()
 	metaPacker := storage.NewJSONPacker(mfz)
 
 	stream, err := os.OpenFile(file, os.O_RDONLY, 0)
@@ -280,8 +296,8 @@ func generateTarSplitMetadata(output *bytes.Buffer, file string) (digest.Digest,
 func (d *ostreeImageDestination) importBlob(selinuxHnd *C.struct_selabel_handle, repo *otbuiltin.Repo, blob *blobToImport) error {
 	// TODO: This can take quite some time, and should ideally be cancellable using a context.Context.
 
-	ostreeBranch := fmt.Sprintf("ociimage/%s", blob.Digest.Hex())
-	destinationPath := filepath.Join(d.tmpDirPath, blob.Digest.Hex(), "root")
+	ostreeBranch := fmt.Sprintf("ociimage/%s", blob.Digest.Encoded())
+	destinationPath := filepath.Join(d.tmpDirPath, blob.Digest.Encoded(), "root")
 	if err := ensureDirectoryExists(destinationPath); err != nil {
 		return err
 	}
@@ -321,7 +337,7 @@ func (d *ostreeImageDestination) importBlob(selinuxHnd *C.struct_selabel_handle,
 }
 
 func (d *ostreeImageDestination) importConfig(repo *otbuiltin.Repo, blob *blobToImport) error {
-	ostreeBranch := fmt.Sprintf("ociimage/%s", blob.Digest.Hex())
+	ostreeBranch := fmt.Sprintf("ociimage/%s", blob.Digest.Encoded())
 	destinationPath := filepath.Dir(blob.BlobPath)
 
 	return d.ostreeCommit(repo, ostreeBranch, destinationPath, []string{fmt.Sprintf("docker.size=%d", blob.Size)})
@@ -335,7 +351,7 @@ func (d *ostreeImageDestination) importConfig(repo *otbuiltin.Repo, blob *blobTo
 // reflected in the manifest that will be written.
 // If the transport can not reuse the requested blob, TryReusingBlob returns (false, {}, nil); it returns a non-nil error only on an unexpected failure.
 func (d *ostreeImageDestination) TryReusingBlobWithOptions(ctx context.Context, info types.BlobInfo, options private.TryReusingBlobOptions) (bool, private.ReusedBlob, error) {
-	if !impl.OriginalBlobMatchesRequiredCompression(options) {
+	if !impl.OriginalCandidateMatchesTryReusingBlobOptions(options) {
 		return false, private.ReusedBlob{}, nil
 	}
 	if d.repo == nil {
@@ -345,7 +361,11 @@ func (d *ostreeImageDestination) TryReusingBlobWithOptions(ctx context.Context, 
 		}
 		d.repo = repo
 	}
-	branch := fmt.Sprintf("ociimage/%s", info.Digest.Hex())
+
+	if err := info.Digest.Validate(); err != nil { // digest.Digest.Encoded() panics on failure, so validate explicitly.
+		return false, private.ReusedBlob{}, err
+	}
+	branch := fmt.Sprintf("ociimage/%s", info.Digest.Encoded())
 
 	found, data, err := readMetadata(d.repo, branch, "docker.uncompressed_digest")
 	if err != nil || !found {
@@ -429,7 +449,11 @@ func (d *ostreeImageDestination) PutSignaturesWithFormat(ctx context.Context, si
 	return nil
 }
 
-func (d *ostreeImageDestination) Commit(context.Context, types.UnparsedImage) error {
+// CommitWithOptions marks the process of storing the image as successful and asks for the image to be persisted.
+// WARNING: This does not have any transactional semantics:
+// - Uploaded data MAY be visible to others before CommitWithOptions() is called
+// - Uploaded data MAY be removed or MAY remain around if Close() is called without CommitWithOptions() (i.e. rollback is allowed but not guaranteed)
+func (d *ostreeImageDestination) CommitWithOptions(ctx context.Context, options private.CommitOptions) error {
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 
@@ -470,13 +494,19 @@ func (d *ostreeImageDestination) Commit(context.Context, types.UnparsedImage) er
 		return nil
 	}
 	for _, layer := range d.schema.LayersDescriptors {
-		hash := layer.Digest.Hex()
+		if err := layer.Digest.Validate(); err != nil { // digest.Digest.Encoded() panics on failure, so validate explicitly.
+			return err
+		}
+		hash := layer.Digest.Encoded()
 		if err = checkLayer(hash); err != nil {
 			return err
 		}
 	}
 	for _, layer := range d.schema.FSLayers {
-		hash := layer.BlobSum.Hex()
+		if err := layer.BlobSum.Validate(); err != nil { // digest.Digest.Encoded() panics on failure, so validate explicitly.
+			return err
+		}
+		hash := layer.BlobSum.Encoded()
 		if err = checkLayer(hash); err != nil {
 			return err
 		}
@@ -504,7 +534,7 @@ func (d *ostreeImageDestination) Commit(context.Context, types.UnparsedImage) er
 }
 
 func ensureDirectoryExists(path string) error {
-	if _, err := os.Stat(path); err != nil && os.IsNotExist(err) {
+	if err := fileutils.Exists(path); err != nil && errors.Is(err, fs.ErrNotExist) {
 		if err := os.MkdirAll(path, 0755); err != nil {
 			return err
 		}
