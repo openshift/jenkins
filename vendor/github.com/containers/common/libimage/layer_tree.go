@@ -1,5 +1,4 @@
 //go:build !remote
-// +build !remote
 
 package libimage
 
@@ -9,6 +8,7 @@ import (
 
 	"github.com/containers/storage"
 	storageTypes "github.com/containers/storage/types"
+	digest "github.com/opencontainers/go-digest"
 	ociv1 "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/sirupsen/logrus"
 )
@@ -23,6 +23,10 @@ type layerTree struct {
 	// emptyImages do not have any top-layer so we cannot create a
 	// *layerNode for them.
 	emptyImages []*Image
+	// manifestList keep track of images based on their digest.
+	// Library will use this map when checking if a image is dangling.
+	// If an image is used in a manifestList it is NOT dangling
+	manifestListDigests map[digest.Digest]struct{}
 }
 
 // node returns a layerNode for the specified layerID.
@@ -90,24 +94,22 @@ func (l *layerNode) repoTags() ([]string, error) {
 	return orderedTags, nil
 }
 
-// layerTree extracts a layerTree from the layers in the local storage and
-// relates them to the specified images.
-func (r *Runtime) layerTree(images []*Image) (*layerTree, error) {
-	layers, err := r.store.Layers()
+// newFreshLayerTree extracts a layerTree from consistent layers and images in the local storage.
+func (r *Runtime) newFreshLayerTree() (*layerTree, error) {
+	images, layers, err := r.getImagesAndLayers()
 	if err != nil {
 		return nil, err
 	}
+	return r.newLayerTreeFromData(images, layers, false)
+}
 
-	if images == nil {
-		images, err = r.ListImages(context.Background(), nil, nil)
-		if err != nil {
-			return nil, err
-		}
-	}
-
+// newLayerTreeFromData extracts a layerTree from the given the layers and images.
+// The caller is responsible for (layers, images) being consistent.
+func (r *Runtime) newLayerTreeFromData(images []*Image, layers []storage.Layer, generateManifestDigestList bool) (*layerTree, error) {
 	tree := layerTree{
-		nodes:    make(map[string]*layerNode),
-		ociCache: make(map[string]*ociv1.Image),
+		nodes:               make(map[string]*layerNode),
+		ociCache:            make(map[string]*ociv1.Image),
+		manifestListDigests: make(map[digest.Digest]struct{}),
 	}
 
 	// First build a tree purely based on layer information.
@@ -128,6 +130,30 @@ func (r *Runtime) layerTree(images []*Image) (*layerTree, error) {
 		topLayer := img.TopLayer()
 		if topLayer == "" {
 			tree.emptyImages = append(tree.emptyImages, img)
+			// When img is a manifest list, cache the lists of
+			// digests refereenced in manifest list. Digests can
+			// be used to check for dangling images.
+			if !generateManifestDigestList {
+				continue
+			}
+			// ignore errors, common errors are
+			//  - image is not manifest
+			//  - image has been removed from the store in the meantime
+			// In all cases we should ensure image listing still works and not error out.
+			mlist, err := img.ToManifestList()
+			if err != nil {
+				// If it is not a manifest it likely is a regular image so just ignore it.
+				// If the image is unknown that likely means there was a race where the image/manifest
+				// was removed after out MultiList() call so we ignore that as well.
+				if errors.Is(err, ErrNotAManifestList) || errors.Is(err, storageTypes.ErrImageUnknown) {
+					continue
+				}
+				return nil, err
+			}
+
+			for _, digest := range mlist.list.Instances() {
+				tree.manifestListDigests[digest] = struct{}{}
+			}
 			continue
 		}
 		node, exists := tree.nodes[topLayer]
@@ -136,24 +162,13 @@ func (r *Runtime) layerTree(images []*Image) (*layerTree, error) {
 			// mistake. Users may not be able to recover, so we're now
 			// throwing a warning to guide them to resolve the issue and
 			// turn the errors non-fatal.
-			logrus.Warnf("Top layer %s of image %s not found in layer tree. The storage may be corrupted, consider running `podman system reset`.", topLayer, img.ID())
+			logrus.Warnf("Top layer %s of image %s not found in layer tree. The storage may be corrupted, consider running `podman system check`.", topLayer, img.ID())
 			continue
 		}
 		node.images = append(node.images, img)
 	}
 
 	return &tree, nil
-}
-
-// layersOf returns all storage layers of the specified image.
-func (t *layerTree) layersOf(image *Image) []*storage.Layer {
-	var layers []*storage.Layer
-	node := t.node(image.TopLayer())
-	for node != nil {
-		layers = append(layers, node.layer)
-		node = node.parent
-	}
-	return layers
 }
 
 // children returns the child images of parent. Child images are images with
@@ -233,7 +248,7 @@ func (t *layerTree) children(ctx context.Context, parent *Image, all bool) ([]*I
 		// mistake. Users may not be able to recover, so we're now
 		// throwing a warning to guide them to resolve the issue and
 		// turn the errors non-fatal.
-		logrus.Warnf("Layer %s not found in layer tree. The storage may be corrupted, consider running `podman system reset`.", parent.TopLayer())
+		logrus.Warnf("Layer %s not found in layer tree. The storage may be corrupted, consider running `podman system check`.", parent.TopLayer())
 		return children, nil
 	}
 
@@ -335,7 +350,7 @@ func (t *layerTree) parent(ctx context.Context, child *Image) (*Image, error) {
 		// mistake. Users may not be able to recover, so we're now
 		// throwing a warning to guide them to resolve the issue and
 		// turn the errors non-fatal.
-		logrus.Warnf("Layer %s not found in layer tree. The storage may be corrupted, consider running `podman system reset`.", child.TopLayer())
+		logrus.Warnf("Layer %s not found in layer tree. The storage may be corrupted, consider running `podman system check`.", child.TopLayer())
 		return nil, nil
 	}
 

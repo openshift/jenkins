@@ -1,19 +1,23 @@
 //go:build !remote
-// +build !remote
 
 package libimage
 
 import (
 	"context"
+	"fmt"
 	"time"
 
+	"github.com/containers/common/pkg/config"
 	dockerArchiveTransport "github.com/containers/image/v5/docker/archive"
+	dockerDaemonTransport "github.com/containers/image/v5/docker/daemon"
 	"github.com/containers/image/v5/docker/reference"
+	"github.com/containers/image/v5/manifest"
+	compressiontypes "github.com/containers/image/v5/pkg/compression/types"
 	"github.com/containers/image/v5/transports/alltransports"
 	"github.com/sirupsen/logrus"
 )
 
-// PushOptions allows for custommizing image pushes.
+// PushOptions allows for customizing image pushes.
 type PushOptions struct {
 	CopyOptions
 }
@@ -30,6 +34,23 @@ type PushOptions struct {
 func (r *Runtime) Push(ctx context.Context, source, destination string, options *PushOptions) ([]byte, error) {
 	if options == nil {
 		options = &PushOptions{}
+	}
+
+	defaultConfig, err := config.Default()
+	if err != nil {
+		return nil, err
+	}
+	if options.MaxRetries == nil {
+		options.MaxRetries = &defaultConfig.Engine.Retry
+	}
+	if options.RetryDelay == nil {
+		if defaultConfig.Engine.RetryDelay != "" {
+			duration, err := time.ParseDuration(defaultConfig.Engine.RetryDelay)
+			if err != nil {
+				return nil, fmt.Errorf("failed to parse containers.conf retry_delay: %w", err)
+			}
+			options.RetryDelay = &duration
+		}
 	}
 
 	// Look up the local image.  Note that we need to ignore the platform
@@ -66,6 +87,22 @@ func (r *Runtime) Push(ctx context.Context, source, destination string, options 
 		destRef = dockerRef
 	}
 
+	// docker-archive and DockerV2Schema2MediaType support only Gzip compression
+	// If the CompressionFormat has come from containers.conf (set as a default),
+	// but isn't supported for this push, we want to ignore it.
+	// If the CompressionFormat has come from the CLI (ForceCompressionFormat
+	// requires CompressionFormat to be set), we want to strip the invalid value
+	// so that the push attempt fails.
+	//
+	// Ideally this should all happen at a much higher layer, where the code can differentiate
+	// between a value coming from containers.conf vs. the CLI.
+	if options.CompressionFormat != nil && options.CompressionFormat.Name() != compressiontypes.GzipAlgorithmName &&
+		(destRef.Transport().Name() == dockerArchiveTransport.Transport.Name() ||
+			destRef.Transport().Name() == dockerDaemonTransport.Transport.Name() ||
+			options.ManifestMIMEType == manifest.DockerV2Schema2MediaType) {
+		options.CompressionFormat = nil
+	}
+
 	if r.eventChannel != nil {
 		defer r.writeEvent(&Event{ID: image.ID(), Name: destination, Time: time.Now(), Type: EventTypeImagePush})
 	}
@@ -86,7 +123,7 @@ func (r *Runtime) Push(ctx context.Context, source, destination string, options 
 		return nil, err
 	}
 
-	defer c.close()
+	defer c.Close()
 
-	return c.copy(ctx, srcRef, destRef)
+	return c.Copy(ctx, srcRef, destRef)
 }
