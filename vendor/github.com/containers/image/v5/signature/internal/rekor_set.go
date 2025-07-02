@@ -1,5 +1,4 @@
 //go:build !containers_image_rekor_stub
-// +build !containers_image_rekor_stub
 
 package internal
 
@@ -42,13 +41,7 @@ var _ json.Unmarshaler = (*UntrustedRekorSET)(nil)
 
 // UnmarshalJSON implements the json.Unmarshaler interface
 func (s *UntrustedRekorSET) UnmarshalJSON(data []byte) error {
-	err := s.strictUnmarshalJSON(data)
-	if err != nil {
-		if formatErr, ok := err.(JSONFormatError); ok {
-			err = NewInvalidSignatureError(formatErr.Error())
-		}
-	}
-	return err
+	return JSONFormatToInvalidSignatureError(s.strictUnmarshalJSON(data))
 }
 
 // strictUnmarshalJSON is UnmarshalJSON, except that it may return the internal JSONFormatError error type.
@@ -77,13 +70,7 @@ var _ json.Unmarshaler = (*UntrustedRekorPayload)(nil)
 
 // UnmarshalJSON implements the json.Unmarshaler interface
 func (p *UntrustedRekorPayload) UnmarshalJSON(data []byte) error {
-	err := p.strictUnmarshalJSON(data)
-	if err != nil {
-		if formatErr, ok := err.(JSONFormatError); ok {
-			err = NewInvalidSignatureError(formatErr.Error())
-		}
-	}
-	return err
+	return JSONFormatToInvalidSignatureError(p.strictUnmarshalJSON(data))
 }
 
 // strictUnmarshalJSON is UnmarshalJSON, except that it may return the internal JSONFormatError error type.
