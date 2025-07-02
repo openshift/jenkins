@@ -1,11 +1,11 @@
 //go:build !containers_image_storage_stub
-// +build !containers_image_storage_stub
 
 package storage
 
 import (
 	"context"
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/containers/image/v5/docker/reference"
@@ -15,7 +15,6 @@ import (
 	"github.com/containers/storage"
 	digest "github.com/opencontainers/go-digest"
 	"github.com/sirupsen/logrus"
-	"golang.org/x/exp/slices"
 )
 
 // A storageReference holds an arbitrary name and/or an ID, which is a 32-byte
@@ -37,7 +36,7 @@ func newReference(transport storageTransport, named reference.Named, id string) 
 	}
 	if id != "" {
 		if err := validateImageID(id); err != nil {
-			return nil, fmt.Errorf("invalid ID value %q: %v: %w", id, err, ErrInvalidReference)
+			return nil, fmt.Errorf("invalid ID value %q: %v: %w", id, err.Error(), ErrInvalidReference)
 		}
 	}
 	// We take a copy of the transport, which contains a pointer to the
@@ -73,7 +72,10 @@ func multiArchImageMatchesSystemContext(store storage.Store, img *storage.Image,
 	// We don't need to care about storage.ImageDigestBigDataKey because
 	// manifests lists are only stored into storage by c/image versions
 	// that know about manifestBigDataKey, and only using that key.
-	key := manifestBigDataKey(manifestDigest)
+	key, err := manifestBigDataKey(manifestDigest)
+	if err != nil {
+		return false // This should never happen, manifestDigest comes from a reference.Digested, and that validates the format.
+	}
 	manifestBytes, err := store.ImageBigData(img.ID, key)
 	if err != nil {
 		return false
@@ -95,7 +97,10 @@ func multiArchImageMatchesSystemContext(store storage.Store, img *storage.Image,
 	if err != nil {
 		return false
 	}
-	key = manifestBigDataKey(chosenInstance)
+	key, err = manifestBigDataKey(chosenInstance)
+	if err != nil {
+		return false
+	}
 	_, err = store.ImageBigData(img.ID, key)
 	return err == nil // true if img.ID is based on chosenInstance.
 }
@@ -147,7 +152,9 @@ func (s *storageReference) resolveImage(sys *types.SystemContext) (*storage.Imag
 	}
 	if s.id == "" {
 		logrus.Debugf("reference %q does not resolve to an image ID", s.StringWithinTransport())
-		return nil, fmt.Errorf("reference %q does not resolve to an image ID: %w", s.StringWithinTransport(), ErrNoSuchImage)
+		// %.0w makes the error visible to error.Unwrap() without including any text.
+		// ErrNoSuchImage ultimately is “identifier is not an image”, which is not helpful for identifying the root cause.
+		return nil, fmt.Errorf("reference %q does not resolve to an image ID%.0w", s.StringWithinTransport(), ErrNoSuchImage)
 	}
 	if loadedImage == nil {
 		img, err := s.transport.store.Image(s.id)

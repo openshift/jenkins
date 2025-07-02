@@ -1,19 +1,20 @@
 //go:build !remote
-// +build !remote
 
 package libimage
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"os"
 	"time"
 
 	dirTransport "github.com/containers/image/v5/directory"
 	dockerArchiveTransport "github.com/containers/image/v5/docker/archive"
 	ociArchiveTransport "github.com/containers/image/v5/oci/archive"
 	ociTransport "github.com/containers/image/v5/oci/layout"
+	"github.com/containers/image/v5/transports"
 	"github.com/containers/image/v5/types"
+	"github.com/containers/storage/pkg/fileutils"
 	"github.com/sirupsen/logrus"
 )
 
@@ -21,9 +22,36 @@ type LoadOptions struct {
 	CopyOptions
 }
 
+// doLoadReference does the heavy lifting for LoadReference() and Load(),
+// without adding debug messages or handling defaults.
+func (r *Runtime) doLoadReference(ctx context.Context, ref types.ImageReference, options *LoadOptions) (images []string, transportName string, err error) {
+	transportName = ref.Transport().Name()
+	switch transportName {
+	case dockerArchiveTransport.Transport.Name():
+		images, err = r.loadMultiImageDockerArchive(ctx, ref, &options.CopyOptions)
+	default:
+		_, images, err = r.copyFromDefault(ctx, ref, &options.CopyOptions)
+	}
+	return images, ref.Transport().Name(), err
+}
+
+// LoadReference loads one or more images from the specified location.
+func (r *Runtime) LoadReference(ctx context.Context, ref types.ImageReference, options *LoadOptions) ([]string, error) {
+	logrus.Debugf("Loading image from %q", transports.ImageName(ref))
+
+	if options == nil {
+		options = &LoadOptions{}
+	}
+	images, _, err := r.doLoadReference(ctx, ref, options)
+	return images, err
+}
+
 // Load loads one or more images (depending on the transport) from the
 // specified path.  The path may point to an image the following transports:
 // oci, oci-archive, dir, docker-archive.
+//
+// Load returns a string slice with names of recently loaded images.
+// If images are unnamed in the source, it returns a string slice of image IDs instead.
 func (r *Runtime) Load(ctx context.Context, path string, options *LoadOptions) ([]string, error) {
 	logrus.Debugf("Loading image from %q", path)
 
@@ -41,8 +69,7 @@ func (r *Runtime) Load(ctx context.Context, path string, options *LoadOptions) (
 			if err != nil {
 				return nil, ociTransport.Transport.Name(), err
 			}
-			images, err := r.copyFromDefault(ctx, ref, &options.CopyOptions)
-			return images, ociTransport.Transport.Name(), err
+			return r.doLoadReference(ctx, ref, options)
 		},
 
 		// OCI-ARCHIVE
@@ -52,8 +79,7 @@ func (r *Runtime) Load(ctx context.Context, path string, options *LoadOptions) (
 			if err != nil {
 				return nil, ociArchiveTransport.Transport.Name(), err
 			}
-			images, err := r.copyFromDefault(ctx, ref, &options.CopyOptions)
-			return images, ociArchiveTransport.Transport.Name(), err
+			return r.doLoadReference(ctx, ref, options)
 		},
 
 		// DOCKER-ARCHIVE
@@ -63,8 +89,7 @@ func (r *Runtime) Load(ctx context.Context, path string, options *LoadOptions) (
 			if err != nil {
 				return nil, dockerArchiveTransport.Transport.Name(), err
 			}
-			images, err := r.loadMultiImageDockerArchive(ctx, ref, &options.CopyOptions)
-			return images, dockerArchiveTransport.Transport.Name(), err
+			return r.doLoadReference(ctx, ref, options)
 		},
 
 		// DIR
@@ -74,8 +99,7 @@ func (r *Runtime) Load(ctx context.Context, path string, options *LoadOptions) (
 			if err != nil {
 				return nil, dirTransport.Transport.Name(), err
 			}
-			images, err := r.copyFromDefault(ctx, ref, &options.CopyOptions)
-			return images, dirTransport.Transport.Name(), err
+			return r.doLoadReference(ctx, ref, options)
 		},
 	} {
 		loadedImages, transportName, err := f()
@@ -91,8 +115,8 @@ func (r *Runtime) Load(ctx context.Context, path string, options *LoadOptions) (
 
 	// Give a decent error message if nothing above worked.
 	// we want the colon here for the multiline error
-	//nolint:revive
-	loadError := fmt.Errorf("payload does not match any of the supported image formats:")
+	//nolint:revive,staticcheck
+	loadError := errors.New("payload does not match any of the supported image formats:")
 	for _, err := range loadErrors {
 		loadError = fmt.Errorf("%v\n * %v", loadError, err)
 	}
@@ -120,8 +144,9 @@ func (r *Runtime) loadMultiImageDockerArchive(ctx context.Context, ref types.Ima
 	// syntax to reference an image within the archive was used, so we
 	// should.
 	path := ref.StringWithinTransport()
-	if _, err := os.Stat(path); err != nil {
-		return r.copyFromDockerArchive(ctx, ref, options)
+	if err := fileutils.Exists(path); err != nil {
+		_, names, err := r.copyFromDockerArchive(ctx, ref, options)
+		return names, err
 	}
 
 	reader, err := dockerArchiveTransport.NewReader(r.systemContextCopy(), path)
@@ -142,7 +167,7 @@ func (r *Runtime) loadMultiImageDockerArchive(ctx context.Context, ref types.Ima
 	var copiedImages []string
 	for _, list := range refLists {
 		for _, listRef := range list {
-			names, err := r.copyFromDockerArchiveReaderReference(ctx, reader, listRef, options)
+			_, names, err := r.copyFromDockerArchiveReaderReference(ctx, reader, listRef, options)
 			if err != nil {
 				return nil, err
 			}
