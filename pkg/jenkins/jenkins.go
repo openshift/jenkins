@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/containers/podman/v4/pkg/specgen"
+	"github.com/containers/podman/v5/pkg/specgen"
 	"github.com/openshift/jenkins/pkg/podman"
 )
 
@@ -52,7 +52,7 @@ func (j *Jenkins) GetJob(name, password string) (*http.Response, error) {
 func (j *Jenkins) Start(image string, env []string) error {
 	var err error
 	sgen := specgen.NewSpecGenerator(image, false)
-	sgen.Terminal = true
+	*sgen.Terminal = true
 	sgen.Volumes = []*specgen.NamedVolume{{Dest: "/var/lib/jenkins", Name: j.Volume, Options: []string{"rw"}}}
 	j.ID, err = j.Client.ContainerCreate(sgen)
 	if err != nil {
