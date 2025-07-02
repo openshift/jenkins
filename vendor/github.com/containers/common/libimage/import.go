@@ -1,5 +1,4 @@
 //go:build !remote
-// +build !remote
 
 package libimage
 
@@ -109,9 +108,9 @@ func (r *Runtime) Import(ctx context.Context, path string, options *ImportOption
 	if err != nil {
 		return "", err
 	}
-	defer c.close()
+	defer c.Close()
 
-	if _, err := c.copy(ctx, srcRef, destRef); err != nil {
+	if _, err := c.Copy(ctx, srcRef, destRef); err != nil {
 		return "", err
 	}
 
