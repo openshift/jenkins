@@ -1,5 +1,4 @@
 //go:build !remote
-// +build !remote
 
 package libimage
 
@@ -12,9 +11,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/containerd/containerd/platforms"
+	"github.com/containerd/platforms"
 	"github.com/containers/common/libimage/platform"
 	"github.com/containers/image/v5/docker/reference"
+	"github.com/containers/image/v5/image"
 	"github.com/containers/image/v5/manifest"
 	storageTransport "github.com/containers/image/v5/storage"
 	"github.com/containers/image/v5/types"
@@ -67,7 +67,7 @@ type Image struct {
 	}
 }
 
-// reload the image and pessimitically clear all cached data.
+// reload the image and pessimistically clear all cached data.
 func (i *Image) reload() error {
 	logrus.Tracef("Reloading image %s", i.ID())
 	img, err := i.runtime.store.Image(i.ID())
@@ -85,7 +85,7 @@ func (i *Image) reload() error {
 }
 
 // isCorrupted returns an error if the image may be corrupted.
-func (i *Image) isCorrupted(name string) error {
+func (i *Image) isCorrupted(ctx context.Context, name string) error {
 	// If it's a manifest list, we're good for now.
 	if _, err := i.getManifestList(); err == nil {
 		return nil
@@ -96,7 +96,7 @@ func (i *Image) isCorrupted(name string) error {
 		return err
 	}
 
-	img, err := ref.NewImage(context.Background(), nil)
+	img, err := ref.NewImage(ctx, nil)
 	if err != nil {
 		if name == "" {
 			name = i.ID()[:12]
@@ -191,13 +191,21 @@ func (i *Image) IsReadOnly() bool {
 }
 
 // IsDangling returns true if the image is dangling, that is an untagged image
-// without children.
+// without children and not used in a manifest list.
 func (i *Image) IsDangling(ctx context.Context) (bool, error) {
-	return i.isDangling(ctx, nil)
+	images, layers, err := i.runtime.getImagesAndLayers()
+	if err != nil {
+		return false, err
+	}
+	tree, err := i.runtime.newLayerTreeFromData(images, layers, true)
+	if err != nil {
+		return false, err
+	}
+	return i.isDangling(ctx, tree)
 }
 
 // isDangling returns true if the image is dangling, that is an untagged image
-// without children.  If tree is nil, it will created for this invocation only.
+// without children and not used in a manifest list.  If tree is nil, it will created for this invocation only.
 func (i *Image) isDangling(ctx context.Context, tree *layerTree) (bool, error) {
 	if len(i.Names()) > 0 {
 		return false, nil
@@ -206,7 +214,8 @@ func (i *Image) isDangling(ctx context.Context, tree *layerTree) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return len(children) == 0, nil
+	_, usedInManfiestList := tree.manifestListDigests[i.Digest()]
+	return (len(children) == 0 && !usedInManfiestList), nil
 }
 
 // IsIntermediate returns true if the image is an intermediate image, that is
@@ -258,7 +267,7 @@ func (i *Image) TopLayer() string {
 
 // Parent returns the parent image or nil if there is none
 func (i *Image) Parent(ctx context.Context) (*Image, error) {
-	tree, err := i.runtime.layerTree(nil)
+	tree, err := i.runtime.newFreshLayerTree()
 	if err != nil {
 		return nil, err
 	}
@@ -292,7 +301,7 @@ func (i *Image) Children(ctx context.Context) ([]*Image, error) {
 // created for this invocation only.
 func (i *Image) getChildren(ctx context.Context, all bool, tree *layerTree) ([]*Image, error) {
 	if tree == nil {
-		t, err := i.runtime.layerTree(nil)
+		t, err := i.runtime.newFreshLayerTree()
 		if err != nil {
 			return nil, err
 		}
@@ -454,13 +463,13 @@ func (i *Image) removeRecursive(ctx context.Context, rmMap map[string]*RemoveIma
 	skipRemove := false
 	numNames := len(i.Names())
 
-	// NOTE: the `numNames == 1` check is not only a performance
+	// NOTE: the `numNames != 1` check is not only a performance
 	// optimization but also preserves existing Podman/Docker behaviour.
 	// If image "foo" is used by a container and has only this tag/name,
 	// an `rmi foo` will not untag "foo" but instead attempt to remove the
 	// entire image.  If there's a container using "foo", we should get an
 	// error.
-	if !(referencedBy == "" || numNames == 1) {
+	if referencedBy != "" && numNames != 1 {
 		byID := strings.HasPrefix(i.ID(), referencedBy)
 		byDigest := strings.HasPrefix(referencedBy, "sha256:")
 		if !options.Force {
@@ -611,7 +620,7 @@ func (i *Image) Untag(name string) error {
 	}
 
 	// FIXME: this is breaking Podman CI but must be re-enabled once
-	// c/storage supports alterting the digests of an image.  Then,
+	// c/storage supports altering the digests of an image.  Then,
 	// Podman will do the right thing.
 	//
 	// !!! Also make sure to re-enable the tests !!!
@@ -789,27 +798,25 @@ func (i *Image) Mount(_ context.Context, mountOptions []string, mountLabel strin
 // Mountpoint returns the path to image's mount point.  The path is empty if
 // the image is not mounted.
 func (i *Image) Mountpoint() (string, error) {
-	mountedTimes, err := i.runtime.store.Mounted(i.TopLayer())
-	if err != nil || mountedTimes == 0 {
-		if errors.Is(err, storage.ErrLayerUnknown) {
-			// Can happen, Podman did it, but there's no
-			// explanation why.
-			err = nil
+	for _, layerID := range append([]string{i.TopLayer()}, i.storageImage.MappedTopLayers...) {
+		mountedTimes, err := i.runtime.store.Mounted(layerID)
+		if err != nil {
+			if errors.Is(err, storage.ErrLayerUnknown) {
+				// Can happen, Podman did it, but there's no
+				// explanation why.
+				continue
+			}
+			return "", err
 		}
-		return "", err
+		if mountedTimes > 0 {
+			layer, err := i.runtime.store.Layer(layerID)
+			if err != nil {
+				return "", err
+			}
+			return filepath.EvalSymlinks(layer.MountPoint)
+		}
 	}
-
-	layer, err := i.runtime.store.Layer(i.TopLayer())
-	if err != nil {
-		return "", err
-	}
-
-	mountPoint, err := filepath.EvalSymlinks(layer.MountPoint)
-	if err != nil {
-		return "", err
-	}
-
-	return mountPoint, nil
+	return "", nil
 }
 
 // Unmount the image.  Use force to ignore the reference counter and forcefully
@@ -1003,7 +1010,7 @@ func (i *Image) Manifest(ctx context.Context) (rawManifest []byte, mimeType stri
 	if err != nil {
 		return nil, "", err
 	}
-	return src.GetManifest(ctx, nil)
+	return image.UnparsedInstance(src, nil).Manifest(ctx)
 }
 
 // getImageID creates an image object and uses the hex value of the config
@@ -1031,7 +1038,7 @@ func getImageID(ctx context.Context, src types.ImageReference, sys *types.System
 //   - 2) a bool indicating whether architecture, os or variant were set (some callers need that to decide whether they need to throw an error)
 //   - 3) a fatal error that occurred prior to check for matches (e.g., storage errors etc.)
 func (i *Image) matchesPlatform(ctx context.Context, os, arch, variant string) (error, bool, error) {
-	if err := i.isCorrupted(""); err != nil {
+	if err := i.isCorrupted(ctx, ""); err != nil {
 		return err, false, nil
 	}
 	inspectInfo, err := i.inspectInfo(ctx)

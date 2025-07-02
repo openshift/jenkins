@@ -41,6 +41,7 @@ import (
 type dockerImageDestination struct {
 	impl.Compat
 	impl.PropertyMethodsInitialize
+	stubs.IgnoresOriginalOCIConfig
 	stubs.NoPutBlobPartialInitialize
 
 	ref dockerReference
@@ -242,8 +243,12 @@ func (d *dockerImageDestination) blobExists(ctx context.Context, repo reference.
 	defer res.Body.Close()
 	switch res.StatusCode {
 	case http.StatusOK:
+		size, err := getBlobSize(res)
+		if err != nil {
+			return false, -1, fmt.Errorf("determining size of blob %s in %s: %w", digest, repo.Name(), err)
+		}
 		logrus.Debugf("... already exists")
-		return true, getBlobSize(res), nil
+		return true, size, nil
 	case http.StatusUnauthorized:
 		logrus.Debugf("... not authorized")
 		return false, -1, fmt.Errorf("checking whether a blob %s exists in %s: %w", digest, repo.Name(), registryHTTPResponseToError(res))
@@ -923,13 +928,10 @@ func (d *dockerImageDestination) putSignaturesToAPIExtension(ctx context.Context
 	return nil
 }
 
-// Commit marks the process of storing the image as successful and asks for the image to be persisted.
-// unparsedToplevel contains data about the top-level manifest of the source (which may be a single-arch image or a manifest list
-// if PutManifest was only called for the single-arch image with instanceDigest == nil), primarily to allow lookups by the
-// original manifest list digest, if desired.
+// CommitWithOptions marks the process of storing the image as successful and asks for the image to be persisted.
 // WARNING: This does not have any transactional semantics:
-// - Uploaded data MAY be visible to others before Commit() is called
-// - Uploaded data MAY be removed or MAY remain around if Close() is called without Commit() (i.e. rollback is allowed but not guaranteed)
-func (d *dockerImageDestination) Commit(context.Context, types.UnparsedImage) error {
+// - Uploaded data MAY be visible to others before CommitWithOptions() is called
+// - Uploaded data MAY be removed or MAY remain around if Close() is called without CommitWithOptions() (i.e. rollback is allowed but not guaranteed)
+func (d *dockerImageDestination) CommitWithOptions(ctx context.Context, options private.CommitOptions) error {
 	return nil
 }

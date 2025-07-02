@@ -1,17 +1,20 @@
 //go:build linux
-// +build linux
 
 package cgroups
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"math/big"
 	"path/filepath"
+	"slices"
+	"strconv"
 	"strings"
 
 	systemdDbus "github.com/coreos/go-systemd/v22/dbus"
 	"github.com/godbus/dbus/v5"
-	"github.com/opencontainers/runc/libcontainer/configs"
+	"github.com/opencontainers/cgroups"
 )
 
 type BlkioDev struct {
@@ -19,14 +22,14 @@ type BlkioDev struct {
 	Bytes  uint64
 }
 
-func systemdCreate(resources *configs.Resources, path string, c *systemdDbus.Conn) error {
+func systemdCreate(resources *cgroups.Resources, path string, c *systemdDbus.Conn) error {
 	slice, name := filepath.Split(path)
 	slice = strings.TrimSuffix(slice, "/")
 
 	var lastError error
-	for i := 0; i < 2; i++ {
+	for i := range 2 {
 		properties := []systemdDbus.Property{
-			systemdDbus.PropDescription(fmt.Sprintf("cgroup %s", name)),
+			systemdDbus.PropDescription("cgroup " + name),
 			systemdDbus.PropWants(slice),
 		}
 		var ioString string
@@ -54,7 +57,11 @@ func systemdCreate(resources *configs.Resources, path string, c *systemdDbus.Con
 			properties = append(properties, p)
 		}
 
-		uMap, sMap, bMap, iMap, structMap := resourcesToProps(resources, v2)
+		uMap, sMap, bMap, iMap, structMap, err := resourcesToProps(resources, v2)
+		if err != nil {
+			lastError = err
+			continue
+		}
 		for k, v := range uMap {
 			p := systemdDbus.Property{
 				Name:  k,
@@ -96,7 +103,7 @@ func systemdCreate(resources *configs.Resources, path string, c *systemdDbus.Con
 		}
 
 		ch := make(chan string)
-		_, err := c.StartTransientUnitContext(context.TODO(), name, "replace", properties, ch)
+		_, err = c.StartTransientUnitContext(context.TODO(), name, "replace", properties, ch)
 		if err != nil {
 			lastError = err
 			continue
@@ -131,13 +138,19 @@ func systemdDestroyConn(path string, c *systemdDbus.Conn) error {
 	ch := make(chan string)
 	_, err := c.StopUnitContext(context.TODO(), name, "replace", ch)
 	if err != nil {
+		if dbe, ok := err.(dbus.Error); ok {
+			if dbe.Name == "org.freedesktop.systemd1.NoSuchUnit" {
+				// the unit was already removed
+				return nil
+			}
+		}
 		return err
 	}
 	<-ch
 	return nil
 }
 
-func resourcesToProps(res *configs.Resources, v2 bool) (map[string]uint64, map[string]string, map[string][]byte, map[string]int64, map[string][]BlkioDev) {
+func resourcesToProps(res *cgroups.Resources, v2 bool) (map[string]uint64, map[string]string, map[string][]byte, map[string]int64, map[string][]BlkioDev, error) {
 	bMap := make(map[string][]byte)
 	// this array is not used but will be once more resource limits are added
 	sMap := make(map[string]string)
@@ -174,11 +187,19 @@ func resourcesToProps(res *configs.Resources, v2 bool) (map[string]uint64, map[s
 
 	// CPUSet
 	if res.CpusetCpus != "" {
-		bits := []byte(res.CpusetCpus)
+		bits, err := rangeToBits(res.CpusetCpus)
+		if err != nil {
+			return nil, nil, nil, nil, nil, fmt.Errorf("resources.CpusetCpus=%q conversion error: %w",
+				res.CpusetCpus, err)
+		}
 		bMap["AllowedCPUs"] = bits
 	}
 	if res.CpusetMems != "" {
-		bits := []byte(res.CpusetMems)
+		bits, err := rangeToBits(res.CpusetMems)
+		if err != nil {
+			return nil, nil, nil, nil, nil, fmt.Errorf("resources.CpusetMems=%q conversion error: %w",
+				res.CpusetMems, err)
+		}
 		bMap["AllowedMemoryNodes"] = bits
 	}
 
@@ -253,5 +274,51 @@ func resourcesToProps(res *configs.Resources, v2 bool) (map[string]uint64, map[s
 		}
 	}
 
-	return uMap, sMap, bMap, iMap, structMap
+	return uMap, sMap, bMap, iMap, structMap, nil
+}
+
+func rangeToBits(str string) ([]byte, error) {
+	bits := new(big.Int)
+
+	for _, r := range strings.Split(str, ",") {
+		// allow extra spaces around
+		r = strings.TrimSpace(r)
+		// allow empty elements (extra commas)
+		if r == "" {
+			continue
+		}
+		startr, endr, ok := strings.Cut(r, "-")
+		if ok {
+			start, err := strconv.ParseUint(startr, 10, 32)
+			if err != nil {
+				return nil, err
+			}
+			end, err := strconv.ParseUint(endr, 10, 32)
+			if err != nil {
+				return nil, err
+			}
+			if start > end {
+				return nil, errors.New("invalid range: " + r)
+			}
+			for i := start; i <= end; i++ {
+				bits.SetBit(bits, int(i), 1)
+			}
+		} else {
+			val, err := strconv.ParseUint(startr, 10, 32)
+			if err != nil {
+				return nil, err
+			}
+			bits.SetBit(bits, int(val), 1)
+		}
+	}
+
+	ret := bits.Bytes()
+	if len(ret) == 0 {
+		// do not allow empty values
+		return nil, errors.New("empty value")
+	}
+
+	// fit cpuset parsing order in systemd
+	slices.Reverse(ret)
+	return ret, nil
 }
