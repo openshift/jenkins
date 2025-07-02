@@ -11,6 +11,7 @@ import (
 	"sync"
 
 	"github.com/BurntSushi/toml"
+	"github.com/containers/storage/pkg/fileutils"
 	"github.com/sirupsen/logrus"
 )
 
@@ -21,7 +22,6 @@ var (
 )
 
 const (
-	// FIXME: update code base and tests to use the two constants below.
 	containersConfEnv         = "CONTAINERS_CONF"
 	containersConfOverrideEnv = containersConfEnv + "_OVERRIDE"
 )
@@ -79,11 +79,12 @@ func newLocked(options *Options) (*Config, error) {
 	if err != nil {
 		return nil, fmt.Errorf("finding config on system: %w", err)
 	}
+
 	for _, path := range configs {
 		// Merge changes in later configs with the previous configs.
 		// Each config file that specified fields, will override the
 		// previous fields.
-		if err = readConfigFromFile(path, config); err != nil {
+		if err = readConfigFromFile(path, config, true); err != nil {
 			return nil, fmt.Errorf("reading system config %q: %w", path, err)
 		}
 		logrus.Debugf("Merged system config %q", path)
@@ -101,7 +102,7 @@ func newLocked(options *Options) (*Config, error) {
 	// The _OVERRIDE variable _must_ always win.  That's a contract we need
 	// to honor (for the Podman CI).
 	if path := os.Getenv(containersConfOverrideEnv); path != "" {
-		if _, err := os.Stat(path); err != nil {
+		if err := fileutils.Exists(path); err != nil {
 			return nil, fmt.Errorf("%s file: %w", containersConfOverrideEnv, err)
 		}
 		options.additionalConfigs = append(options.additionalConfigs, path)
@@ -115,7 +116,7 @@ func newLocked(options *Options) (*Config, error) {
 		}
 		// readConfigFromFile reads in container config in the specified
 		// file and then merge changes with the current default.
-		if err := readConfigFromFile(add, config); err != nil {
+		if err := readConfigFromFile(add, config, false); err != nil {
 			return nil, fmt.Errorf("reading additional config %q: %w", add, err)
 		}
 		logrus.Debugf("Merged additional config %q", add)
@@ -152,36 +153,34 @@ func NewConfig(userConfigPath string) (*Config, error) {
 // file settings.
 func systemConfigs() (configs []string, finalErr error) {
 	if path := os.Getenv(containersConfEnv); path != "" {
-		if _, err := os.Stat(path); err != nil {
+		if err := fileutils.Exists(path); err != nil {
 			return nil, fmt.Errorf("%s file: %w", containersConfEnv, err)
 		}
 		return append(configs, path), nil
 	}
-	if _, err := os.Stat(DefaultContainersConfig); err == nil {
-		configs = append(configs, DefaultContainersConfig)
-	}
-	if _, err := os.Stat(OverrideContainersConfig); err == nil {
-		configs = append(configs, OverrideContainersConfig)
-	}
+
+	configs = append(configs, DefaultContainersConfig)
 
 	var err error
-	configs, err = addConfigs(OverrideContainersConfig+".d", configs)
+	path, err := overrideContainersConfigPath()
+	if err != nil {
+		return nil, err
+	}
+	configs = append(configs, path)
+
+	configs, err = addConfigs(path+".d", configs)
 	if err != nil {
 		return nil, err
 	}
 
-	path, err := ifRootlessConfigPath()
+	path, err = userConfigPath()
 	if err != nil {
 		return nil, err
 	}
-	if path != "" {
-		if _, err := os.Stat(path); err == nil {
-			configs = append(configs, path)
-		}
-		configs, err = addConfigs(path+".d", configs)
-		if err != nil {
-			return nil, err
-		}
+	configs = append(configs, path)
+	configs, err = addConfigs(path+".d", configs)
+	if err != nil {
+		return nil, err
 	}
 	return configs, nil
 }
@@ -225,10 +224,13 @@ func addConfigs(dirPath string, configs []string) ([]string, error) {
 // unmarshal its content into a Config. The config param specifies the previous
 // default config. If the path, only specifies a few fields in the Toml file
 // the defaults from the config parameter will be used for all other fields.
-func readConfigFromFile(path string, config *Config) error {
+func readConfigFromFile(path string, config *Config, ignoreErrNotExist bool) error {
 	logrus.Tracef("Reading configuration file %q", path)
 	meta, err := toml.DecodeFile(path, config)
 	if err != nil {
+		if ignoreErrNotExist && errors.Is(err, fs.ErrNotExist) {
+			return nil
+		}
 		return fmt.Errorf("decode configuration %v: %w", path, err)
 	}
 	keys := meta.Undecoded()

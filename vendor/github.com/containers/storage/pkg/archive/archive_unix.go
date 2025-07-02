@@ -1,5 +1,4 @@
 //go:build !windows
-// +build !windows
 
 package archive
 
@@ -14,6 +13,31 @@ import (
 	"github.com/containers/storage/pkg/system"
 	"golang.org/x/sys/unix"
 )
+
+func init() {
+	sysStatOverride = statUnix
+}
+
+// statUnix populates hdr from system-dependent fields of fi without performing
+// any OS lookups.
+// Adapted from Moby.
+func statUnix(fi os.FileInfo, hdr *tar.Header) error {
+	s, ok := fi.Sys().(*syscall.Stat_t)
+	if !ok {
+		return nil
+	}
+
+	hdr.Uid = int(s.Uid)
+	hdr.Gid = int(s.Gid)
+
+	if s.Mode&unix.S_IFBLK != 0 ||
+		s.Mode&unix.S_IFCHR != 0 {
+		hdr.Devmajor = int64(unix.Major(uint64(s.Rdev))) //nolint: unconvert
+		hdr.Devminor = int64(unix.Minor(uint64(s.Rdev))) //nolint: unconvert
+	}
+
+	return nil
+}
 
 // fixVolumePathPrefix does platform specific processing to ensure that if
 // the path being passed in is not in a volume path format, convert it to one.
@@ -43,7 +67,7 @@ func chmodTarEntry(perm os.FileMode) os.FileMode {
 	return perm // noop for unix as golang APIs provide perm bits correctly
 }
 
-func setHeaderForSpecialDevice(hdr *tar.Header, name string, stat interface{}) (err error) {
+func setHeaderForSpecialDevice(hdr *tar.Header, name string, stat any) (err error) {
 	s, ok := stat.(*syscall.Stat_t)
 
 	if ok {
@@ -58,7 +82,7 @@ func setHeaderForSpecialDevice(hdr *tar.Header, name string, stat interface{}) (
 	return
 }
 
-func getInodeFromStat(stat interface{}) (inode uint64, err error) {
+func getInodeFromStat(stat any) (inode uint64, err error) {
 	s, ok := stat.(*syscall.Stat_t)
 
 	if ok {
@@ -68,7 +92,7 @@ func getInodeFromStat(stat interface{}) (inode uint64, err error) {
 	return
 }
 
-func getFileUIDGID(stat interface{}) (idtools.IDPair, error) {
+func getFileUIDGID(stat any) (idtools.IDPair, error) {
 	s, ok := stat.(*syscall.Stat_t)
 
 	if !ok {
