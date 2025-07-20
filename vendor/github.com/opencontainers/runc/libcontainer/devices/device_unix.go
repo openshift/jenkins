@@ -1,5 +1,4 @@
 //go:build !windows
-// +build !windows
 
 package devices
 
@@ -19,13 +18,6 @@ var (
 	unixLstat = unix.Lstat
 	osReadDir = os.ReadDir
 )
-
-func mkDev(d *Rule) (uint64, error) {
-	if d.Major == Wildcard || d.Minor == Wildcard {
-		return 0, errors.New("cannot mkdev() device with wildcards")
-	}
-	return unix.Mkdev(uint32(d.Major), uint32(d.Minor)), nil
-}
 
 // DeviceFromPath takes the path to a device and its cgroup_permissions (which
 // cannot be easily queried) to look up the information about a linux device
