@@ -10,6 +10,8 @@ import (
 	"strings"
 
 	graphdriver "github.com/containers/storage/drivers"
+	"github.com/containers/storage/internal/dedup"
+	"github.com/containers/storage/internal/tempdir"
 	"github.com/containers/storage/pkg/archive"
 	"github.com/containers/storage/pkg/directory"
 	"github.com/containers/storage/pkg/fileutils"
@@ -21,7 +23,10 @@ import (
 	"github.com/vbatts/tar-split/tar/storage"
 )
 
-const defaultPerms = os.FileMode(0o555)
+const (
+	defaultPerms = os.FileMode(0o555)
+	tempDirName  = "tempdirs"
+)
 
 func init() {
 	graphdriver.MustRegister("vfs", Init)
@@ -243,6 +248,42 @@ func (d *Driver) Remove(id string) error {
 	return system.EnsureRemoveAll(d.dir(id))
 }
 
+func (d *Driver) GetTempDirRootDirs() []string {
+	tempDirs := []string{filepath.Join(d.home, tempDirName)}
+	// Include imageStore temp directory if it's configured
+	// Writable layers can only be in d.home or d.imageStore, not in additionalHomes (which are read-only)
+	if d.imageStore != "" {
+		tempDirs = append(tempDirs, filepath.Join(d.imageStore, d.String(), tempDirName))
+	}
+	return tempDirs
+}
+
+// Determine the correct temp directory root based on where the layer actually exists.
+func (d *Driver) getTempDirRoot(id string) string {
+	layerDir := d.dir(id)
+	if d.imageStore != "" {
+		expectedLayerDir := filepath.Join(d.imageStore, d.String(), "dir", filepath.Base(id))
+		if layerDir == expectedLayerDir {
+			return filepath.Join(d.imageStore, d.String(), tempDirName)
+		}
+	}
+	return filepath.Join(d.home, tempDirName)
+}
+
+func (d *Driver) DeferredRemove(id string) (tempdir.CleanupTempDirFunc, error) {
+	tempDirRoot := d.getTempDirRoot(id)
+	t, err := tempdir.NewTempDir(tempDirRoot)
+	if err != nil {
+		return nil, err
+	}
+
+	layerDir := d.dir(id)
+	if err := t.StageDeletion(layerDir); err != nil {
+		return t.Cleanup, err
+	}
+	return t.Cleanup, nil
+}
+
 // Get returns the directory for the given id.
 func (d *Driver) Get(id string, options graphdriver.MountOpts) (_ string, retErr error) {
 	dir := d.dir(id)
@@ -311,9 +352,9 @@ func (d *Driver) AdditionalImageStores() []string {
 	return nil
 }
 
-// SupportsShifting tells whether the driver support shifting of the UIDs/GIDs in an userNS
-func (d *Driver) SupportsShifting() bool {
-	return d.updater.SupportsShifting()
+// SupportsShifting tells whether the driver support shifting of the UIDs/GIDs to the provided mapping in an userNS
+func (d *Driver) SupportsShifting(uidmap, gidmap []idtools.IDMap) bool {
+	return d.updater.SupportsShifting(uidmap, gidmap)
 }
 
 // UpdateLayerIDMap updates ID mappings in a from matching the ones specified
@@ -347,4 +388,20 @@ func (d *Driver) Diff(id string, idMappings *idtools.IDMappings, parent string, 
 // relative to its base filesystem directory.
 func (d *Driver) DiffSize(id string, idMappings *idtools.IDMappings, parent string, parentMappings *idtools.IDMappings, mountLabel string) (size int64, err error) {
 	return d.naiveDiff.DiffSize(id, idMappings, parent, parentMappings, mountLabel)
+}
+
+// Dedup performs deduplication of the driver's storage.
+func (d *Driver) Dedup(req graphdriver.DedupArgs) (graphdriver.DedupResult, error) {
+	var dirs []string
+	for _, layer := range req.Layers {
+		dir := d.dir2(layer, false)
+		if err := fileutils.Exists(dir); err == nil {
+			dirs = append(dirs, dir)
+		}
+	}
+	r, err := dedup.DedupDirs(dirs, req.Options)
+	if err != nil {
+		return graphdriver.DedupResult{}, err
+	}
+	return graphdriver.DedupResult{Deduped: r.Deduped}, nil
 }
