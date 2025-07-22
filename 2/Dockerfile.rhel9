@@ -14,7 +14,10 @@ FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.17 as oc-417
 FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.16 as oc-416
 
 FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.18
-ARG jenkins_version=latest
+ARG JENKINS_LTS \
+    CI_UPSTREAM_COMMIT \
+    CI_UPSTREAM_URL \
+    OCP_VERSION
 COPY --from=go-init-builder --chown=root:root /usr/bin/go-init /usr/bin/go-init
 COPY --from=oc-417 --chown=root:root /usr/bin/oc /usr/share/openshift/bin/oc-417/oc
 COPY --from=oc-416 --chown=root:root /usr/bin/oc /usr/share/openshift/bin/oc-416/oc
@@ -46,14 +49,25 @@ LABEL io.k8s.description="Jenkins is a continuous integration server" \
     io.k8s.display-name="Jenkins 2" \
     io.openshift.tags="jenkins,jenkins2,ci" \
     io.openshift.expose-services="8080:http" \
-    io.jenkins.version="${jenkins_version}" \
+    io.jenkins.version="${JENKINS_LTS}" \
     io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
 
 # Labels consumed by Red Hat build service
 LABEL com.redhat.component="openshift-jenkins-2-container" \
-    name="openshift4/jenkins-2-rhel9" \
+    name="ocp-tools-4/jenkins-rhel9" \
+    description="Jenkins 2 is a continuous integration server" \
     architecture="x86_64" \
-    maintainer="openshift-dev-services+jenkins@redhat.com"
+    maintainer="openshift-dev-services+jenkins@redhat.com" \
+    License="GPLv2+" \
+    vendor="Red Hat, Inc." \
+    io.openshift.maintainer.product="OpenShift Container Platform" \
+    io.openshift.maintainer.component="Jenkins" \
+    io.openshift.build.commit.id="${CI_UPSTREAM_COMMIT}" \
+    io.openshift.build.source-location="${CI_UPSTREAM_URL}" \
+    io.openshift.build.commit.url="${CI_UPSTREAM_URL}/commit/${CI_UPSTREAM_COMMIT}" \
+    version="${OCP_VERSION}" \
+    url="https://catalog.redhat.com/software/containers/ocp-tools-4/jenkins-rhel9/65dc9063b7db2e8b83a5b299" \
+    summary="Provides a Jenkins server, primarily intended for integration with OpenShift v4"
 
 # 8080 for main web interface, 50000 for slave agents
 EXPOSE 8080 50000
