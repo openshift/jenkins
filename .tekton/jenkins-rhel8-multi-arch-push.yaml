@@ -8,14 +8,14 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "false"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch
-      == "release-rhel8" && ( "slave-base/***".pathChanged() || ".tekton/jenkins-agent-base-rhel8-pull-request.yaml".pathChanged()
-      || "slave-base/Dockerfile.rhel8".pathChanged() )
+      == "release-rhel8" && ( "2/***".pathChanged() || ".tekton/jenkins-rhel8-multi-arch-pull-request.yaml".pathChanged()
+      || "2/Dockerfile.rhel8-multi-arch".pathChanged() )
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: openshift-jenkins-rhel8
-    appstudio.openshift.io/component: jenkins-agent-base-rhel8
+    appstudio.openshift.io/component: jenkins-rhel8-multi-arch
     pipelines.appstudio.openshift.io/type: build
-  name: jenkins-agent-base-rhel8-on-push
+  name: jenkins-rhel8-multi-arch-on-push
   namespace: ocp-tools-jenkins-tenant
 spec:
   params:
@@ -24,7 +24,7 @@ spec:
   - name: revision
     value: '{{revision}}'
   - name: output-image
-    value: quay.io/redhat-user-workloads/ocp-tools-jenkins-tenant/jenkins-agent-base-rhel8:{{revision}}
+    value: quay.io/redhat-user-workloads/ocp-tools-jenkins-tenant/jenkins-rhel8-multi-arch:{{revision}}
   - name: build-platforms
     value:
     - linux/x86_64
@@ -32,21 +32,21 @@ spec:
     - linux/ppc64le
     - linux/s390x
   - name: dockerfile
-    value: slave-base/Dockerfile.rhel8
+    value: 2/Dockerfile.rhel8-multi-arch
   - name: path-context
-    value: slave-base
+    value: "2"
   - name: build-args
     value:
     - CI_UPSTREAM_COMMIT={{revision}}
     - CI_UPSTREAM_URL={{source_url}}
   - name: build-args-file
-    value: "slave/konflux-build-args.env"
+    value: "2/konflux-build-args.env"
   - name: build-source-image
     value: "true"
   pipelineRef:
     name: build-pipeline
   taskRunTemplate:
-    serviceAccountName: build-pipeline-jenkins-agent-base-rhel8
+    serviceAccountName: build-pipeline-jenkins-rhel8-multi-arch
   workspaces:
   - name: git-auth
     secret:
