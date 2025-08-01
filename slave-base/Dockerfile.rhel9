@@ -11,17 +11,30 @@ RUN GO111MODULE=off go build -o /usr/bin/go-init .
 # Stage 2 : Build slave-base with go-init
 ##############################################
 FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.18
+ARG CI_UPSTREAM_COMMIT \
+    CI_UPSTREAM_URL \
+    OCP_VERSION
 COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
 
 # Labels consumed by Red Hat build service
-LABEL com.redhat.component="jenkins-slave-base-rhel9-container" \
-    name="openshift4/jenkins-slave-base-rhel9" \
+LABEL com.redhat.component="jenkins-agent-base-rhel9-container" \
+    name="ocp-tools-4/jenkins-agent-base-rhel9" \
+    description="The jenkins agent base image is intended to be built on top of, to add your own tools that your jenkins job needs. The agent base image includes all the jenkins logic to operate as a agent, so users just have to yum install any additional packages their specific jenkins job will need" \
     architecture="x86_64" \
-    io.k8s.display-name="Jenkins Slave Base" \
-    io.k8s.description="The jenkins slave base image is intended to be built on top of, to add your own tools that your jenkins job needs. The slave base image includes all the jenkins logic to operate as a slave, so users just have to yum install any additional packages their specific jenkins job will need" \
-    io.openshift.tags="openshift,jenkins,slave" \
-    maintainer="openshift-dev-services+jenkins@redhat.com"
-
+    io.k8s.display-name="Jenkins Agent Base" \
+    io.k8s.description="The jenkins agent base image is intended to be built on top of, to add your own tools that your jenkins job needs. The slave base image includes all the jenkins logic to operate as a slave, so users just have to yum install any additional packages their specific jenkins job will need" \
+    maintainer="openshift-dev-services+jenkins@redhat.com" \
+    io.openshift.tags="openshift,jenkins,agent" \
+    License="GPLv2+" \
+    vendor="Red Hat, Inc." \
+    io.openshift.maintainer.product="OpenShift Container Platform" \
+    io.openshift.maintainer.component="Jenkins" \
+    io.openshift.build.commit.id="${CI_UPSTREAM_COMMIT}" \
+    io.openshift.build.source-location="${CI_UPSTREAM_URL}" \
+    io.openshift.build.commit.url="${CI_UPSTREAM_URL}/commit/${CI_UPSTREAM_COMMIT}" \
+    version="${OCP_VERSION}" \
+    url="https://catalog.redhat.com/software/containers/ocp-tools-4/jenkins-agent-base-rhel9/65dc9063b7db2e8b83a5b29e" \
+    summary="Provides a Jenkins agent base, primarily intended for integration with OpenShift v4"
 
 ENV HOME=/home/jenkins \
     LANG=en_US.UTF-8 \
