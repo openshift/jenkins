@@ -2,24 +2,22 @@
 # Stage 1 : Build go-init
 ##############################################
 FROM registry.redhat.io/ubi8/go-toolset:1.21 AS go-init-builder
-ARG jenkins_version=latest
 WORKDIR  /go/src/github.com/openshift/jenkins
 COPY . .
 WORKDIR  /go/src/github.com/openshift/jenkins/go-init
 RUN GO111MODULE=off go build -o /usr/bin/go-init .
 
-FROM registry.redhat.io/openshift4/ose-cli:v4.14 as oc-414
-FROM registry.redhat.io/openshift4/ose-cli:v4.13 as oc-413
 FROM registry.redhat.io/openshift4/ose-cli:v4.12 as oc-412
 
 ##############################################
 # Stage 2 : Build controller with go-init
 ##############################################
-FROM registry.redhat.io/openshift4/ose-cli:v4.15
-ARG jenkins_version=latest
+FROM registry.redhat.io/openshift4/ose-cli:v4.13
+ARG JENKINS_LTS \
+    CI_UPSTREAM_COMMIT \
+    CI_UPSTREAM_URL \
+    OCP_VERSION
 COPY --from=go-init-builder /usr/bin/go-init /usr/bin/go-init
-COPY --from=oc-414 --chown=root:root /usr/bin/oc /usr/share/openshift/bin/oc-414/oc
-COPY --from=oc-413 --chown=root:root /usr/bin/oc /usr/share/openshift/bin/oc-413/oc
 COPY --from=oc-412 --chown=root:root /usr/bin/oc /usr/share/openshift/bin/oc-412/oc
 
 # Jenkins image for OpenShift
@@ -49,14 +47,25 @@ LABEL io.k8s.description="Jenkins is a continuous integration server" \
     io.k8s.display-name="Jenkins 2" \
     io.openshift.tags="jenkins,jenkins2,ci" \
     io.openshift.expose-services="8080:http" \
-    io.jenkins.version="${jenkins_version}" \
-    io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
+    io.jenkins.version="${JENKINS_LTS}" \
+    io.openshift.s2i.scripts-url="image:///usr/libexec/s2i"
 
 # Labels consumed by Red Hat build service
 LABEL com.redhat.component="openshift-jenkins-2-container" \
-    name="openshift4/jenkins-2-rhel8" \
+    name="ocp-tools-4/jenkins-rhel8" \
+    description="Jenkins 2 is a continuous integration server" \
     architecture="x86_64" \
-    maintainer="openshift-dev-services+jenkins@redhat.com"
+    maintainer="openshift-dev-services+jenkins@redhat.com" \
+    License="GPLv2+" \
+    vendor="Red Hat, Inc." \
+    io.openshift.maintainer.product="OpenShift Container Platform" \
+    io.openshift.maintainer.component="Jenkins" \
+    io.openshift.build.commit.id="${CI_UPSTREAM_COMMIT}" \
+    io.openshift.build.source-location="${CI_UPSTREAM_URL}" \
+    io.openshift.build.commit.url="${CI_UPSTREAM_URL}/commit/${CI_UPSTREAM_COMMIT}" \
+    version="${OCP_VERSION}" \
+    url="https://catalog.redhat.com/software/containers/ocp-tools-4/jenkins-rhel8" \
+    summary="Provides a Jenkins server, primarily intended for integration with OpenShift v4"
 
 # 8080 for main web interface, 50000 for slave agents
 EXPOSE 8080 50000
