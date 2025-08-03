@@ -10,7 +10,7 @@ RUN GO111MODULE=off go build -o /usr/bin/go-init .
 ##############################################
 # Stage 2 : Build slave-base with go-init
 ##############################################
-FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.18
+FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.19
 ARG CI_UPSTREAM_COMMIT \
     CI_UPSTREAM_URL \
     OCP_VERSION
