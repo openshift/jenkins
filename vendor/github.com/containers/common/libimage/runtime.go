@@ -1,5 +1,4 @@
 //go:build !remote
-// +build !remote
 
 package libimage
 
@@ -162,7 +161,24 @@ func (r *Runtime) storageToImage(storageImage *storage.Image, ref types.ImageRef
 	}
 }
 
-// Exists returns true if the specicifed image exists in the local containers
+// getImagesAndLayers obtains consistent slices of Image and storage.Layer
+func (r *Runtime) getImagesAndLayers() ([]*Image, []storage.Layer, error) {
+	snapshot, err := r.store.MultiList(
+		storage.MultiListOptions{
+			Images: true,
+			Layers: true,
+		})
+	if err != nil {
+		return nil, nil, err
+	}
+	images := []*Image{}
+	for i := range snapshot.Images {
+		images = append(images, r.storageToImage(&snapshot.Images[i], nil))
+	}
+	return images, snapshot.Layers, nil
+}
+
+// Exists returns true if the specified image exists in the local containers
 // storage.  Note that it may return false if an image corrupted.
 func (r *Runtime) Exists(name string) (bool, error) {
 	image, _, err := r.LookupImage(name, nil)
@@ -172,7 +188,7 @@ func (r *Runtime) Exists(name string) (bool, error) {
 	if image == nil {
 		return false, nil
 	}
-	if err := image.isCorrupted(name); err != nil {
+	if err := image.isCorrupted(context.Background(), name); err != nil {
 		logrus.Error(err)
 		return false, nil
 	}
@@ -235,8 +251,12 @@ func (r *Runtime) LookupImage(name string, options *LookupImageOptions) (*Image,
 		if storageRef.Transport().Name() != storageTransport.Transport.Name() {
 			return nil, "", fmt.Errorf("unsupported transport %q for looking up local images", storageRef.Transport().Name())
 		}
-		img, err := storageTransport.Transport.GetStoreImage(r.store, storageRef)
+		_, img, err := storageTransport.ResolveReference(storageRef)
 		if err != nil {
+			if errors.Is(err, storageTransport.ErrNoSuchImage) {
+				// backward compatibility
+				return nil, "", storage.ErrImageUnknown
+			}
 			return nil, "", err
 		}
 		logrus.Debugf("Found image %q in local containers storage (%s)", name, storageRef.StringWithinTransport())
@@ -247,7 +267,7 @@ func (r *Runtime) LookupImage(name string, options *LookupImageOptions) (*Image,
 	// off and entirely ignored.  The digest is the sole source of truth.
 	normalizedName, possiblyUnqualifiedNamedReference, err := normalizeTaggedDigestedString(name)
 	if err != nil {
-		return nil, "", err
+		return nil, "", fmt.Errorf(`parsing reference %q: %w`, name, err)
 	}
 	name = normalizedName
 
@@ -347,9 +367,9 @@ func (r *Runtime) lookupImageInLocalStorage(name, candidate string, namedCandida
 		if err != nil {
 			return nil, err
 		}
-		img, err = storageTransport.Transport.GetStoreImage(r.store, ref)
+		_, img, err = storageTransport.ResolveReference(ref)
 		if err != nil {
-			if errors.Is(err, storage.ErrImageUnknown) {
+			if errors.Is(err, storageTransport.ErrNoSuchImage) {
 				return nil, nil
 			}
 			return nil, err
@@ -476,7 +496,7 @@ func (r *Runtime) lookupImageInDigestsAndRepoTags(name string, possiblyUnqualifi
 		return nil, "", fmt.Errorf("%s: %w (could not cast to tagged)", originalName, storage.ErrImageUnknown)
 	}
 
-	allImages, err := r.ListImages(context.Background(), nil, nil)
+	allImages, err := r.ListImages(context.Background(), nil)
 	if err != nil {
 		return nil, "", err
 	}
@@ -564,39 +584,56 @@ type ListImagesOptions struct {
 	SetListData bool
 }
 
-// ListImages lists images in the local container storage.  If names are
-// specified, only images with the specified names are looked up and filtered.
-func (r *Runtime) ListImages(ctx context.Context, names []string, options *ListImagesOptions) ([]*Image, error) {
+// ListImagesByNames lists the images in the local container storage by specified names
+// The name lookups use the LookupImage semantics.
+func (r *Runtime) ListImagesByNames(names []string) ([]*Image, error) {
+	images := []*Image{}
+	for _, name := range names {
+		image, _, err := r.LookupImage(name, nil)
+		if err != nil {
+			return nil, err
+		}
+		images = append(images, image)
+	}
+	return images, nil
+}
+
+// ListImages lists the images in the local container storage and filter the images by ListImagesOptions
+//
+// podman images consumes the output of ListImages and produces one line for each tag in each Image.Names value,
+// rather than one line for each Image with all Names, so if options.Filters contains one reference filter
+// with a fully qualified image name without negation, it is considered a query so it makes more sense for
+// the user to see only the corresponding names in the output, not all the names of the deduplicated
+// image; therefore, we make the corresponding names available to the caller by overwriting the actual image names
+// with the corresponding names when the reference filter matches and the reference is a fully qualified image name
+// (i.e., contains a tag or digest, not just a bare repository name).
+//
+// This overwriting is done only in memory and is not written to storage in any way.
+func (r *Runtime) ListImages(ctx context.Context, options *ListImagesOptions) ([]*Image, error) {
 	if options == nil {
 		options = &ListImagesOptions{}
 	}
 
-	var images []*Image
-	if len(names) > 0 {
-		for _, name := range names {
-			image, _, err := r.LookupImage(name, nil)
-			if err != nil {
-				return nil, err
-			}
-			images = append(images, image)
-		}
-	} else {
-		storageImages, err := r.store.Images()
-		if err != nil {
-			return nil, err
-		}
-		for i := range storageImages {
-			images = append(images, r.storageToImage(&storageImages[i], nil))
-		}
-	}
-
-	filtered, err := r.filterImages(ctx, images, options)
+	filters, needsLayerTree, err := r.compileImageFilters(ctx, options)
 	if err != nil {
 		return nil, err
 	}
 
-	if !options.SetListData {
-		return filtered, nil
+	if options.SetListData {
+		needsLayerTree = true
+	}
+
+	snapshot, err := r.store.MultiList(
+		storage.MultiListOptions{
+			Images: true,
+			Layers: needsLayerTree,
+		})
+	if err != nil {
+		return nil, err
+	}
+	images := []*Image{}
+	for i := range snapshot.Images {
+		images = append(images, r.storageToImage(&snapshot.Images[i], nil))
 	}
 
 	// If explicitly requested by the user, pre-compute and cache the
@@ -605,9 +642,21 @@ func (r *Runtime) ListImages(ctx context.Context, names []string, options *ListI
 	// as the layer tree will computed once for all instead of once for
 	// each individual image (see containers/podman/issues/17828).
 
-	tree, err := r.layerTree(images)
+	var tree *layerTree
+	if needsLayerTree {
+		tree, err = r.newLayerTreeFromData(images, snapshot.Layers, true)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	filtered, err := r.filterImages(ctx, images, filters, tree)
 	if err != nil {
 		return nil, err
+	}
+
+	if !options.SetListData {
+		return filtered, nil
 	}
 
 	for i := range filtered {
@@ -687,7 +736,7 @@ func (r *Runtime) RemoveImages(ctx context.Context, names []string, options *Rem
 	}
 
 	if options.ExternalContainers && options.IsExternalContainerFunc == nil {
-		return nil, []error{fmt.Errorf("libimage error: cannot remove external containers without callback")}
+		return nil, []error{errors.New("libimage error: cannot remove external containers without callback")}
 	}
 
 	// The logic here may require some explanation.  Image removal is
@@ -750,7 +799,7 @@ func (r *Runtime) RemoveImages(ctx context.Context, names []string, options *Rem
 			IsExternalContainerFunc: options.IsExternalContainerFunc,
 			Filters:                 options.Filters,
 		}
-		filteredImages, err := r.ListImages(ctx, nil, options)
+		filteredImages, err := r.ListImages(ctx, options)
 		if err != nil {
 			appendError(err)
 			return nil, rmErrors

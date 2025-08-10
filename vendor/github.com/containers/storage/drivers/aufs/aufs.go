@@ -1,5 +1,4 @@
 //go:build linux
-// +build linux
 
 /*
 
@@ -37,6 +36,7 @@ import (
 	"time"
 
 	graphdriver "github.com/containers/storage/drivers"
+	"github.com/containers/storage/internal/tempdir"
 	"github.com/containers/storage/pkg/archive"
 	"github.com/containers/storage/pkg/chrootarchive"
 	"github.com/containers/storage/pkg/directory"
@@ -518,7 +518,7 @@ func (a *Driver) isParent(id, parent string) bool {
 	if parent == "" && len(parents) > 0 {
 		return false
 	}
-	return !(len(parents) > 0 && parent != parents[0])
+	return len(parents) == 0 || parent == parents[0]
 }
 
 // Diff produces an archive of the changes between the specified
@@ -773,7 +773,23 @@ func (a *Driver) UpdateLayerIDMap(id string, toContainer, toHost *idtools.IDMapp
 	return fmt.Errorf("aufs doesn't support changing ID mappings")
 }
 
-// SupportsShifting tells whether the driver support shifting of the UIDs/GIDs in an userNS
-func (a *Driver) SupportsShifting() bool {
+// SupportsShifting tells whether the driver support shifting of the UIDs/GIDs to the provided mapping in an userNS
+func (a *Driver) SupportsShifting(uidmap, gidmap []idtools.IDMap) bool {
 	return false
+}
+
+// Dedup performs deduplication of the driver's storage.
+func (a *Driver) Dedup(req graphdriver.DedupArgs) (graphdriver.DedupResult, error) {
+	return graphdriver.DedupResult{}, nil
+}
+
+// DeferredRemove is not implemented.
+// It calls Remove directly.
+func (a *Driver) DeferredRemove(id string) (tempdir.CleanupTempDirFunc, error) {
+	return nil, a.Remove(id)
+}
+
+// GetTempDirRootDirs is not implemented.
+func (a *Driver) GetTempDirRootDirs() []string {
+	return []string{}
 }
