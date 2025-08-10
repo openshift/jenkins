@@ -1,17 +1,13 @@
 //go:build linux
-// +build linux
 
 package cgroups
 
 import (
-	"fmt"
 	"path/filepath"
-	"strconv"
 
-	"github.com/opencontainers/runc/libcontainer/cgroups"
-	"github.com/opencontainers/runc/libcontainer/cgroups/fs"
-	"github.com/opencontainers/runc/libcontainer/cgroups/fs2"
-	"github.com/opencontainers/runc/libcontainer/configs"
+	"github.com/opencontainers/cgroups"
+	"github.com/opencontainers/cgroups/fs"
+	"github.com/opencontainers/cgroups/fs2"
 )
 
 type linuxMemHandler struct {
@@ -23,7 +19,7 @@ func getMemoryHandler() *linuxMemHandler {
 }
 
 // Apply set the specified constraints
-func (c *linuxMemHandler) Apply(ctr *CgroupControl, res *configs.Resources) error {
+func (c *linuxMemHandler) Apply(ctr *CgroupControl, res *cgroups.Resources) error {
 	if ctr.cgroup2 {
 		man, err := fs2.NewManager(ctr.config, filepath.Join(cgroupRoot, ctr.config.Path))
 		if err != nil {
@@ -59,31 +55,44 @@ func (c *linuxMemHandler) Stat(ctr *CgroupControl, m *cgroups.Stats) error {
 	if ctr.cgroup2 {
 		memoryRoot = filepath.Join(cgroupRoot, ctr.config.Path)
 		limitFilename = "memory.max"
-		if memUsage.Usage.Usage, err = readFileByKeyAsUint64(filepath.Join(memoryRoot, "memory.stat"), "anon"); err != nil {
+
+		// Read memory.current
+		current, err := readFileAsUint64(filepath.Join(memoryRoot, "memory.current"))
+		if err != nil {
 			return err
+		}
+
+		// Read inactive_file from memory.stat
+		inactiveFile, err := readFileByKeyAsUint64(filepath.Join(memoryRoot, "memory.stat"), "inactive_file")
+		if err != nil {
+			return err
+		}
+
+		// Docker calculation: memory.current - memory.stat['inactive_file']
+		memUsage.Usage.Usage = 0
+		if inactiveFile < current {
+			memUsage.Usage.Usage = current - inactiveFile
 		}
 	} else {
 		memoryRoot = ctr.getCgroupv1Path(Memory)
 		limitFilename = "memory.limit_in_bytes"
 
-		path := filepath.Join(memoryRoot, "memory.stat")
-		values, err := readCgroupMapPath(path)
+		// Read memory.usage_in_bytes
+		usageInBytes, err := readFileAsUint64(filepath.Join(memoryRoot, "memory.usage_in_bytes"))
 		if err != nil {
 			return err
 		}
 
-		// cgroup v1 does not have a single "anon" field, but we can calculate it
-		// from total_active_anon and total_inactive_anon
+		// Read total_inactive_file from memory.stat
+		totalInactiveFile, err := readFileByKeyAsUint64(filepath.Join(memoryRoot, "memory.stat"), "total_inactive_file")
+		if err != nil {
+			return err
+		}
+
+		// Docker calculation: memory.usage_in_bytes - memory.stat['total_inactive_file']
 		memUsage.Usage.Usage = 0
-		for _, key := range []string{"total_active_anon", "total_inactive_anon"} {
-			if _, found := values[key]; !found {
-				continue
-			}
-			res, err := strconv.ParseUint(values[key][0], 10, 64)
-			if err != nil {
-				return fmt.Errorf("parse %s from %s: %w", key, path, err)
-			}
-			memUsage.Usage.Usage += res
+		if totalInactiveFile < usageInBytes {
+			memUsage.Usage.Usage = usageInBytes - totalInactiveFile
 		}
 	}
 
