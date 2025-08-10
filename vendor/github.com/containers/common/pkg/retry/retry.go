@@ -4,11 +4,14 @@ import (
 	"context"
 	"io"
 	"math"
+	"math/rand/v2"
 	"net"
+	"net/http"
 	"net/url"
 	"syscall"
 	"time"
 
+	"github.com/containers/image/v5/docker"
 	"github.com/docker/distribution/registry/api/errcode"
 	errcodev2 "github.com/docker/distribution/registry/api/v2"
 	"github.com/hashicorp/go-multierror"
@@ -45,9 +48,11 @@ func IfNecessary(ctx context.Context, operation func() error, options *Options) 
 			delay = options.Delay
 		}
 		logrus.Warnf("Failed, retrying in %s ... (%d/%d). Error: %v", delay, attempt+1, options.MaxRetry, err)
+		delay += rand.N(delay / 10) // 10 % jitter so that a failure blip doesn’t cause a deterministic stampede
+		logrus.Debugf("Retry delay with added jitter: %s", delay)
 		select {
 		case <-time.After(delay):
-			break
+			// Do nothing.
 		case <-ctx.Done():
 			return err
 		}
@@ -81,6 +86,13 @@ func IsErrorRetryable(err error) bool {
 			return false
 		}
 		return true
+	case docker.UnexpectedHTTPStatusError:
+		// Retry on 502, 502 and 503 http server errors, they appear to be quite common in the field.
+		// https://github.com/containers/common/issues/2299
+		if e.StatusCode >= http.StatusBadGateway && e.StatusCode <= http.StatusGatewayTimeout {
+			return true
+		}
+		return false
 	case *net.OpError:
 		return IsErrorRetryable(e.Err)
 	case *url.Error: // This includes errors returned by the net/http client.
