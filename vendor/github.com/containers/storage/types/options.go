@@ -160,19 +160,17 @@ func loadStoreOptionsFromConfFile(storageConf string) (StoreOptions, error) {
 		defaultRootlessGraphRoot = storageOpts.GraphRoot
 		storageOpts = StoreOptions{}
 		reloadConfigurationFileIfNeeded(storageConf, &storageOpts)
-		if usePerUserStorage() {
-			// If the file did not specify a graphroot or runroot,
-			// set sane defaults so we don't try and use root-owned
-			// directories
-			if storageOpts.RunRoot == "" {
-				storageOpts.RunRoot = defaultRootlessRunRoot
-			}
-			if storageOpts.GraphRoot == "" {
-				if storageOpts.RootlessStoragePath != "" {
-					storageOpts.GraphRoot = storageOpts.RootlessStoragePath
-				} else {
-					storageOpts.GraphRoot = defaultRootlessGraphRoot
-				}
+		// If the file did not specify a graphroot or runroot,
+		// set sane defaults so we don't try and use root-owned
+		// directories
+		if storageOpts.RunRoot == "" {
+			storageOpts.RunRoot = defaultRootlessRunRoot
+		}
+		if storageOpts.GraphRoot == "" {
+			if storageOpts.RootlessStoragePath != "" {
+				storageOpts.GraphRoot = storageOpts.RootlessStoragePath
+			} else {
+				storageOpts.GraphRoot = defaultRootlessGraphRoot
 			}
 		}
 	}
@@ -344,8 +342,8 @@ func getRootlessStorageOpts(systemOpts StoreOptions) (StoreOptions, error) {
 			dirEntries, err := os.ReadDir(opts.GraphRoot)
 			if err == nil {
 				for _, entry := range dirEntries {
-					if strings.HasSuffix(entry.Name(), "-images") {
-						opts.GraphDriverName = strings.TrimSuffix(entry.Name(), "-images")
+					if name, ok := strings.CutSuffix(entry.Name(), "-images"); ok {
+						opts.GraphDriverName = name
 						break
 					}
 				}
@@ -394,7 +392,7 @@ func ReloadConfigurationFileIfNeeded(configFile string, storeOptions *StoreOptio
 	}
 
 	mtime := fi.ModTime()
-	if prevReloadConfig.storeOptions != nil && prevReloadConfig.mod == mtime && prevReloadConfig.configFile == configFile {
+	if prevReloadConfig.storeOptions != nil && mtime.Equal(prevReloadConfig.mod) && prevReloadConfig.configFile == configFile {
 		*storeOptions = *prevReloadConfig.storeOptions
 		return nil
 	}
