@@ -1,8 +1,8 @@
 module github.com/openshift/jenkins
 
-go 1.21.0
+go 1.23
 
-toolchain go1.21.10
+toolchain go1.24.4
 
 require (
 	github.com/containers/podman/v4 v4.9.4
@@ -34,7 +34,7 @@ require (
 	github.com/containers/ocicrypt v1.2.0 // indirect
 	github.com/containers/psgo v1.8.0 // indirect
 	github.com/containers/storage v1.55.0 // indirect
-	github.com/coreos/go-systemd/v22 v22.5.1-0.20231103132048-7d375ecc2b09 // indirect
+	github.com/coreos/go-systemd/v22 v22.5.1-0.20250813193232-446c54abefa6 // indirect
 	github.com/cyberphone/json-canonicalization v0.0.0-20231217050601-ba74d44ecf5f // indirect
 	github.com/cyphar/filepath-securejoin v0.3.1 // indirect
 	github.com/disiqueira/gotree/v3 v3.0.2 // indirect
