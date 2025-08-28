@@ -52,7 +52,8 @@ func (j *Jenkins) GetJob(name, password string) (*http.Response, error) {
 func (j *Jenkins) Start(image string, env []string) error {
 	var err error
 	sgen := specgen.NewSpecGenerator(image, false)
-	*sgen.Terminal = true
+	var terminal = true
+	sgen.Terminal = &terminal
 	sgen.Volumes = []*specgen.NamedVolume{{Dest: "/var/lib/jenkins", Name: j.Volume, Options: []string{"rw"}}}
 	j.ID, err = j.Client.ContainerCreate(sgen)
 	if err != nil {
