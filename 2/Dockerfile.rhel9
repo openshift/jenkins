@@ -93,6 +93,8 @@ COPY ./contrib/jenkins /usr/local/bin
 ADD ./contrib/s2i /usr/libexec/s2i
 ADD release.version /tmp/release.version
 
+RUN mkdir -p /usr/lib/jenkins/ /var/lib/jenkins && curl -#Lo /usr/lib/jenkins/jenkins.war https://updates.jenkins.io/download/war/2.525/jenkins.war
+
 RUN /usr/local/bin/install-jenkins-core-plugins.sh /opt/openshift/bundle-plugins.txt && \
     rm -rf /var/log/jenkins && \
     chmod -R 775 /etc/alternatives && \
