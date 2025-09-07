@@ -1,9 +1,9 @@
 //go:build !remote
-// +build !remote
 
 package libimage
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -14,7 +14,7 @@ import (
 // Tree generates a tree for the specified image and its layers.  Use
 // `traverseChildren` to traverse the layers of all children.  By default, only
 // layers of the image are printed.
-func (i *Image) Tree(traverseChildren bool) (string, error) {
+func (i *Image) Tree(ctx context.Context, traverseChildren bool) (string, error) {
 	// NOTE: a string builder prevents us from copying to much data around
 	// and compile the string when and where needed.
 	sb := &strings.Builder{}
@@ -38,7 +38,7 @@ func (i *Image) Tree(traverseChildren bool) (string, error) {
 		fmt.Fprintf(sb, "No Image Layers")
 	}
 
-	layerTree, err := i.runtime.layerTree(nil)
+	layerTree, err := i.runtime.newFreshLayerTree()
 	if err != nil {
 		return "", err
 	}
@@ -53,7 +53,7 @@ func (i *Image) Tree(traverseChildren bool) (string, error) {
 		return tree.Print(), nil
 	}
 
-	// Walk all layers of the image and assemlbe their data.  Note that the
+	// Walk all layers of the image and assemble their data.  Note that the
 	// tree is constructed in reverse order to remain backwards compatible
 	// with Podman.
 	contents := []string{}
