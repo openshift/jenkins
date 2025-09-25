@@ -151,9 +151,9 @@ func openRepo(path string) (*C.struct_OstreeRepo, error) {
 	var cerr *C.GError
 	cpath := C.CString(path)
 	defer C.free(unsafe.Pointer(cpath))
-	pathc := C.g_file_new_for_path(cpath)
-	defer C.g_object_unref(C.gpointer(pathc))
-	repo := C.ostree_repo_new(pathc)
+	file := C.g_file_new_for_path(cpath)
+	defer C.g_object_unref(C.gpointer(file))
+	repo := C.ostree_repo_new(file)
 	r := glib.GoBool(glib.GBoolean(C.ostree_repo_open(repo, nil, &cerr)))
 	if !r {
 		C.g_object_unref(C.gpointer(repo))
@@ -190,7 +190,7 @@ func (o ostreeReader) Read(p []byte) (int, error) {
 	if count == 0 {
 		return 0, io.EOF
 	}
-	data := (*[1 << 30]byte)(unsafe.Pointer(C.g_bytes_get_data(b, nil)))[:count:count]
+	data := unsafe.Slice((*byte)(C.g_bytes_get_data(b, nil)), count)
 	copy(p, data)
 	return count, nil
 }
@@ -250,9 +250,7 @@ func newOSTreePathFileGetter(repo *C.struct_OstreeRepo, commit string) (*ostreeP
 
 func (o ostreePathFileGetter) Get(filename string) (io.ReadCloser, error) {
 	var file *C.GFile
-	if strings.HasPrefix(filename, "./") {
-		filename = filename[2:]
-	}
+	filename, _ = strings.CutPrefix(filename, "./")
 	cfilename := C.CString(filename)
 	defer C.free(unsafe.Pointer(cfilename))
 
@@ -286,8 +284,10 @@ func (s *ostreeImageSource) readSingleFile(commit, path string) (io.ReadCloser, 
 // The Digest field in BlobInfo is guaranteed to be provided, Size may be -1 and MediaType may be optionally provided.
 // May update BlobInfoCache, preferably after it knows for certain that a blob truly exists at a specific location.
 func (s *ostreeImageSource) GetBlob(ctx context.Context, info types.BlobInfo, cache types.BlobInfoCache) (io.ReadCloser, int64, error) {
-
-	blob := info.Digest.Hex()
+	if err := info.Digest.Validate(); err != nil { // digest.Digest.Encoded() panics on failure, so validate explicitly.
+		return nil, -1, err
+	}
+	blob := info.Digest.Encoded()
 
 	// Ensure s.compressed is initialized.  It is build by LayerInfosForCopy.
 	if s.compressed == nil {
@@ -299,7 +299,7 @@ func (s *ostreeImageSource) GetBlob(ctx context.Context, info types.BlobInfo, ca
 	}
 	compressedBlob, isCompressed := s.compressed[info.Digest]
 	if isCompressed {
-		blob = compressedBlob.Hex()
+		blob = compressedBlob.Encoded()
 	}
 	branch := fmt.Sprintf("ociimage/%s", blob)
 
@@ -422,7 +422,7 @@ func (s *ostreeImageSource) LayerInfosForCopy(ctx context.Context, instanceDiges
 	layerBlobs := man.LayerInfos()
 
 	for _, layerBlob := range layerBlobs {
-		branch := fmt.Sprintf("ociimage/%s", layerBlob.Digest.Hex())
+		branch := fmt.Sprintf("ociimage/%s", layerBlob.Digest.Encoded())
 		found, uncompressedDigestStr, err := readMetadata(s.repo, branch, "docker.uncompressed_digest")
 		if err != nil || !found {
 			return nil, err
@@ -437,7 +437,10 @@ func (s *ostreeImageSource) LayerInfosForCopy(ctx context.Context, instanceDiges
 		if err != nil {
 			return nil, err
 		}
-		uncompressedDigest := digest.Digest(uncompressedDigestStr)
+		uncompressedDigest, err := digest.Parse(uncompressedDigestStr)
+		if err != nil {
+			return nil, err
+		}
 		blobInfo := types.BlobInfo{
 			Digest:    uncompressedDigest,
 			Size:      uncompressedSize,

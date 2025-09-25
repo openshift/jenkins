@@ -1,5 +1,4 @@
 //go:build !remote
-// +build !remote
 
 package config
 
@@ -7,9 +6,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
+	"strconv"
 	"strings"
 
+	"github.com/containers/storage/pkg/fileutils"
 	units "github.com/docker/go-units"
 	"tags.cncf.io/container-device-interface/pkg/parser"
 )
@@ -43,6 +43,14 @@ func (c *ContainersConfig) validateDevices() error {
 	return nil
 }
 
+func (c *ContainersConfig) validateInterfaceName() error {
+	if c.InterfaceName == "device" || c.InterfaceName == "" {
+		return nil
+	}
+
+	return fmt.Errorf("invalid interface_name option %s", c.InterfaceName)
+}
+
 func (c *ContainersConfig) validateUlimits() error {
 	for _, u := range c.DefaultUlimits.Get() {
 		ul, err := units.ParseUlimit(u)
@@ -67,9 +75,16 @@ func (c *ContainersConfig) validateTZ() error {
 		"/etc/zoneinfo",
 	}
 
+	// Allow using TZDIR to override the lookupPaths. Ref:
+	// https://sourceware.org/git/?p=glibc.git;a=blob;f=time/tzfile.c;h=8a923d0cccc927a106dc3e3c641be310893bab4e;hb=HEAD#l149
+	tzdir := os.Getenv("TZDIR")
+	if tzdir != "" {
+		lookupPaths = []string{tzdir}
+	}
+
 	for _, paths := range lookupPaths {
 		zonePath := filepath.Join(paths, c.TZ)
-		if _, err := os.Stat(zonePath); err == nil {
+		if err := fileutils.Exists(zonePath); err == nil {
 			// found zone information
 			return nil
 		}
@@ -82,8 +97,9 @@ func (c *ContainersConfig) validateTZ() error {
 }
 
 func (c *ContainersConfig) validateUmask() error {
-	validUmask := regexp.MustCompile(`^[0-7]{1,4}$`)
-	if !validUmask.MatchString(c.Umask) {
+	// Valid values are 0 to 7777 octal.
+	_, err := strconv.ParseUint(c.Umask, 8, 12)
+	if err != nil {
 		return fmt.Errorf("not a valid umask %s", c.Umask)
 	}
 	return nil
