@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/containers/podman/v4/pkg/specgen"
+	"github.com/containers/podman/v5/pkg/specgen"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -53,7 +53,8 @@ var _ = Describe("Base slave testing", func() {
 	It("should contain a runnable oc", func() {
 		var err error
 		sgen := specgen.NewSpecGenerator(imageName, false)
-		sgen.Terminal = true
+		var terminal = true
+		sgen.Terminal = &terminal
 		sgen.Command = []string{"oc"}
 		sgen.Entrypoint = []string{"/bin/bash", "-l", "-c"}
 		id, err = podmancli.ContainerCreate(sgen)
