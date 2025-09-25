@@ -1,5 +1,4 @@
 //go:build containers_image_openpgp
-// +build containers_image_openpgp
 
 package signature
 
@@ -15,6 +14,7 @@ import (
 
 	"github.com/containers/image/v5/signature/internal"
 	"github.com/containers/storage/pkg/homedir"
+
 	// This is a fallback code; the primary recommendation is to use the gpgme mechanism
 	// implementation, which is out-of-process and more appropriate for handling long-term private key material
 	// than any Go implementation.
@@ -150,7 +150,7 @@ func (m *openpgpSigningMechanism) Verify(unverifiedSignature []byte) (contents [
 		return nil, "", fmt.Errorf("signature error: %v", md.SignatureError)
 	}
 	if md.SignedBy == nil {
-		return nil, "", internal.NewInvalidSignatureError(fmt.Sprintf("Invalid GPG signature: %#v", md.Signature))
+		return nil, "", internal.NewInvalidSignatureError(fmt.Sprintf("Key not found for key ID %x in signature", md.SignedByKeyId))
 	}
 	if md.Signature != nil {
 		if md.Signature.SigLifetimeSecs != nil {
