@@ -1,8 +1,8 @@
 module github.com/openshift/jenkins
 
-go 1.21.0
+go 1.24.0
 
-toolchain go1.21.10
+toolchain go1.24.6
 
 require (
 	github.com/containers/podman/v4 v4.9.4
@@ -46,7 +46,7 @@ require (
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
-	github.com/go-jose/go-jose/v4 v4.0.2 // indirect
+	github.com/go-jose/go-jose/v4 v4.1.3 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/analysis v0.23.0 // indirect
