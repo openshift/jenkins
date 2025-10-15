@@ -11,7 +11,7 @@ RUN GO111MODULE=off go build -o /usr/bin/go-init .
 # Stage 2 : Build controller with go-init
 ##############################################
 FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.17 as oc-417
-FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.16 as oc-416
+FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.17 as oc-416
 
 FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.18
 ARG JENKINS_LTS \
