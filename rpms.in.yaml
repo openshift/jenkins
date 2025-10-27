@@ -1,0 +1,5 @@
+contentOrigin:
+  repofiles:
+    - ./ubi.repo
+packages: [dejavu-sans-fonts, wget, rsync, gettext, git, git-lfs, tar, zip, unzip, openssl, bzip2, java-21-openjdk, java-21-openjdk-devel, java-17-openjdk, java-17-openjdk-devel, jq, glibc-locale-source, xmlstarlet, glibc-langpack-en, bc]
+arches: [x86_64, aarch64, s390x, ppc64le]
