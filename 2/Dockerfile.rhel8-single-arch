@@ -91,6 +91,21 @@ COPY ./contrib/jenkins /usr/local/bin
 ADD ./contrib/s2i /usr/libexec/s2i
 ADD release.version /tmp/release.version
 
+# Konflux-specific logic for hermetic builds
+# If the cachi2 output directory exists, create the necessary directories and copy the jenkins.war and plugins into the image
+RUN if [ -d /cachi2/output/deps/generic ]; then \
+       install -d -m 755 /usr/lib/jenkins \
+                         /usr/lib/jenkins/plugins \
+                         /opt/openshift/plugins \
+                         /var/lib/jenkins \
+                         /var/log/jenkins \
+                         /var/cache/jenkins && \
+       install -m 644 /cachi2/output/deps/generic/jenkins.war \
+                      /usr/lib/jenkins/jenkins.war && \
+       install -m 644 -t /opt/openshift/plugins \
+                      /cachi2/output/deps/generic/*.jpi; \
+    fi
+
 RUN /usr/local/bin/install-jenkins-core-plugins.sh /opt/openshift/bundle-plugins.txt && \
     rm -rf /var/log/jenkins && \
     chmod -R 775 /etc/alternatives && \
@@ -105,7 +120,6 @@ RUN /usr/local/bin/install-jenkins-core-plugins.sh /opt/openshift/bundle-plugins
     /usr/local/bin/fix-permissions /opt/openshift/configuration/init.groovy.d && \
     /usr/local/bin/fix-permissions /var/lib/jenkins && \
     /usr/local/bin/fix-permissions /var/log
-
 
 VOLUME ["/var/lib/jenkins"]
 

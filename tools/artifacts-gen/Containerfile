@@ -1,0 +1,24 @@
+# Build stage
+FROM registry.access.redhat.com/ubi9/go-toolset:1.23 AS builder
+
+# Copy source files
+COPY --chown=1001:0 go.mod main.go ./
+
+# Build static binary
+RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags="-w -s" -o artifacts-gen main.go
+
+# Runtime stage - use UBI9 minimal
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
+
+# Set working directory
+WORKDIR /workspace
+
+# Copy the binary from builder
+COPY --from=builder /opt/app-root/src/artifacts-gen /usr/local/bin/artifacts-gen
+
+# Set non-root user
+USER 1001
+
+# Run as the binary
+ENTRYPOINT ["/usr/local/bin/artifacts-gen"]
+

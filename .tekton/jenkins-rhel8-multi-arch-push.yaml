@@ -43,6 +43,10 @@ spec:
     value: "2/konflux-build-args.env"
   - name: build-source-image
     value: "true"
+  - name: hermetic
+    value: "true"
+  - name: prefetch-input
+    value: '{"packages": [{"type": "generic"},{"type": "rpm"}]}'
   pipelineRef:
     name: build-pipeline
   taskRunTemplate:
