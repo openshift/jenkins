@@ -9,7 +9,11 @@ import (
 	"github.com/cilium/ebpf/btf"
 	"github.com/cilium/ebpf/internal"
 	"github.com/cilium/ebpf/internal/sys"
+	"github.com/cilium/ebpf/internal/unix"
 )
+
+// Type is the kind of link.
+type Type = sys.LinkType
 
 var ErrNotSupported = internal.ErrNotSupported
 
@@ -36,6 +40,11 @@ type Link interface {
 	// A link may continue past the lifetime of the process if Close is
 	// not called.
 	Close() error
+
+	// Detach the link from its corresponding attachment point.
+	//
+	// May return an error wrapping ErrNotSupported.
+	Detach() error
 
 	// Info returns metadata on a link.
 	//
@@ -78,7 +87,9 @@ func NewFromID(id ID) (Link, error) {
 	return wrapRawLink(&RawLink{fd, ""})
 }
 
-// LoadPinnedLink loads a link that was persisted into a bpffs.
+// LoadPinnedLink loads a Link from a pin (file) on the BPF virtual filesystem.
+//
+// Requires at least Linux 5.7.
 func LoadPinnedLink(fileName string, opts *ebpf.LoadPinOptions) (Link, error) {
 	raw, err := loadPinnedRawLink(fileName, opts)
 	if err != nil {
@@ -86,49 +97,6 @@ func LoadPinnedLink(fileName string, opts *ebpf.LoadPinOptions) (Link, error) {
 	}
 
 	return wrapRawLink(raw)
-}
-
-// wrap a RawLink in a more specific type if possible.
-//
-// The function takes ownership of raw and closes it on error.
-func wrapRawLink(raw *RawLink) (_ Link, err error) {
-	defer func() {
-		if err != nil {
-			raw.Close()
-		}
-	}()
-
-	info, err := raw.Info()
-	if err != nil {
-		return nil, err
-	}
-
-	switch info.Type {
-	case RawTracepointType:
-		return &rawTracepoint{*raw}, nil
-	case TracingType:
-		return &tracing{*raw}, nil
-	case CgroupType:
-		return &linkCgroup{*raw}, nil
-	case IterType:
-		return &Iter{*raw}, nil
-	case NetNsType:
-		return &NetNsLink{*raw}, nil
-	case KprobeMultiType:
-		return &kprobeMultiLink{*raw}, nil
-	case UprobeMultiType:
-		return &uprobeMultiLink{*raw}, nil
-	case PerfEventType:
-		return nil, fmt.Errorf("recovering perf event fd: %w", ErrNotSupported)
-	case TCXType:
-		return &tcxLink{*raw}, nil
-	case NetfilterType:
-		return &netfilterLink{*raw}, nil
-	case NetkitType:
-		return &netkitLink{*raw}, nil
-	default:
-		return raw, nil
-	}
 }
 
 // ID uniquely identifies a BPF link.
@@ -156,158 +124,6 @@ type Info struct {
 	extra   interface{}
 }
 
-type TracingInfo struct {
-	AttachType  sys.AttachType
-	TargetObjId uint32
-	TargetBtfId sys.TypeID
-}
-
-type CgroupInfo struct {
-	CgroupId   uint64
-	AttachType sys.AttachType
-	_          [4]byte
-}
-
-type NetNsInfo struct {
-	NetnsIno   uint32
-	AttachType sys.AttachType
-}
-
-type TCXInfo struct {
-	Ifindex    uint32
-	AttachType sys.AttachType
-}
-
-type XDPInfo struct {
-	Ifindex uint32
-}
-
-type NetfilterInfo struct {
-	Pf       uint32
-	Hooknum  uint32
-	Priority int32
-	Flags    uint32
-}
-
-type NetkitInfo struct {
-	Ifindex    uint32
-	AttachType sys.AttachType
-}
-
-type KprobeMultiInfo struct {
-	count  uint32
-	flags  uint32
-	missed uint64
-}
-
-// AddressCount is the number of addresses hooked by the kprobe.
-func (kpm *KprobeMultiInfo) AddressCount() (uint32, bool) {
-	return kpm.count, kpm.count > 0
-}
-
-func (kpm *KprobeMultiInfo) Flags() (uint32, bool) {
-	return kpm.flags, kpm.count > 0
-}
-
-func (kpm *KprobeMultiInfo) Missed() (uint64, bool) {
-	return kpm.missed, kpm.count > 0
-}
-
-type PerfEventInfo struct {
-	Type  sys.PerfEventType
-	extra interface{}
-}
-
-func (r *PerfEventInfo) Kprobe() *KprobeInfo {
-	e, _ := r.extra.(*KprobeInfo)
-	return e
-}
-
-type KprobeInfo struct {
-	address uint64
-	missed  uint64
-}
-
-func (kp *KprobeInfo) Address() (uint64, bool) {
-	return kp.address, kp.address > 0
-}
-
-func (kp *KprobeInfo) Missed() (uint64, bool) {
-	return kp.missed, kp.address > 0
-}
-
-// Tracing returns tracing type-specific link info.
-//
-// Returns nil if the type-specific link info isn't available.
-func (r Info) Tracing() *TracingInfo {
-	e, _ := r.extra.(*TracingInfo)
-	return e
-}
-
-// Cgroup returns cgroup type-specific link info.
-//
-// Returns nil if the type-specific link info isn't available.
-func (r Info) Cgroup() *CgroupInfo {
-	e, _ := r.extra.(*CgroupInfo)
-	return e
-}
-
-// NetNs returns netns type-specific link info.
-//
-// Returns nil if the type-specific link info isn't available.
-func (r Info) NetNs() *NetNsInfo {
-	e, _ := r.extra.(*NetNsInfo)
-	return e
-}
-
-// XDP returns XDP type-specific link info.
-//
-// Returns nil if the type-specific link info isn't available.
-func (r Info) XDP() *XDPInfo {
-	e, _ := r.extra.(*XDPInfo)
-	return e
-}
-
-// TCX returns TCX type-specific link info.
-//
-// Returns nil if the type-specific link info isn't available.
-func (r Info) TCX() *TCXInfo {
-	e, _ := r.extra.(*TCXInfo)
-	return e
-}
-
-// Netfilter returns netfilter type-specific link info.
-//
-// Returns nil if the type-specific link info isn't available.
-func (r Info) Netfilter() *NetfilterInfo {
-	e, _ := r.extra.(*NetfilterInfo)
-	return e
-}
-
-// Netkit returns netkit type-specific link info.
-//
-// Returns nil if the type-specific link info isn't available.
-func (r Info) Netkit() *NetkitInfo {
-	e, _ := r.extra.(*NetkitInfo)
-	return e
-}
-
-// KprobeMulti returns kprobe-multi type-specific link info.
-//
-// Returns nil if the type-specific link info isn't available.
-func (r Info) KprobeMulti() *KprobeMultiInfo {
-	e, _ := r.extra.(*KprobeMultiInfo)
-	return e
-}
-
-// PerfEvent returns perf-event type-specific link info.
-//
-// Returns nil if the type-specific link info isn't available.
-func (r Info) PerfEvent() *PerfEventInfo {
-	e, _ := r.extra.(*PerfEventInfo)
-	return e
-}
-
 // RawLink is the low-level API to bpf_link.
 //
 // You should consider using the higher level interfaces in this
@@ -317,43 +133,18 @@ type RawLink struct {
 	pinnedPath string
 }
 
-// AttachRawLink creates a raw link.
-func AttachRawLink(opts RawLinkOptions) (*RawLink, error) {
-	if err := haveBPFLink(); err != nil {
-		return nil, err
-	}
-
-	if opts.Target < 0 {
-		return nil, fmt.Errorf("invalid target: %s", sys.ErrClosedFd)
-	}
-
-	progFd := opts.Program.FD()
-	if progFd < 0 {
-		return nil, fmt.Errorf("invalid program: %s", sys.ErrClosedFd)
-	}
-
-	attr := sys.LinkCreateAttr{
-		TargetFd:    uint32(opts.Target),
-		ProgFd:      uint32(progFd),
-		AttachType:  sys.AttachType(opts.Attach),
-		TargetBtfId: opts.BTF,
-		Flags:       opts.Flags,
-	}
-	fd, err := sys.LinkCreate(&attr)
-	if err != nil {
-		return nil, fmt.Errorf("create link: %w", err)
-	}
-
-	return &RawLink{fd, ""}, nil
-}
-
 func loadPinnedRawLink(fileName string, opts *ebpf.LoadPinOptions) (*RawLink, error) {
-	fd, err := sys.ObjGet(&sys.ObjGetAttr{
+	fd, typ, err := sys.ObjGetTyped(&sys.ObjGetAttr{
 		Pathname:  sys.NewStringPointer(fileName),
 		FileFlags: opts.Marshal(),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("load pinned link: %w", err)
+	}
+
+	if typ != sys.BPF_TYPE_LINK {
+		_ = fd.Close()
+		return nil, fmt.Errorf("%s is not a Link", fileName)
 	}
 
 	return &RawLink{fd, fileName}, nil
@@ -378,7 +169,7 @@ func (l *RawLink) Close() error {
 // Calling Close on a pinned Link will not break the link
 // until the pin is removed.
 func (l *RawLink) Pin(fileName string) error {
-	if err := internal.Pin(l.pinnedPath, fileName, l.fd); err != nil {
+	if err := sys.Pin(l.pinnedPath, fileName, l.fd); err != nil {
 		return err
 	}
 	l.pinnedPath = fileName
@@ -387,7 +178,7 @@ func (l *RawLink) Pin(fileName string) error {
 
 // Unpin implements the Link interface.
 func (l *RawLink) Unpin() error {
-	if err := internal.Unpin(l.pinnedPath); err != nil {
+	if err := sys.Unpin(l.pinnedPath); err != nil {
 		return err
 	}
 	l.pinnedPath = ""
@@ -434,10 +225,34 @@ func (l *RawLink) UpdateArgs(opts RawLinkUpdateOptions) error {
 		OldProgFd: uint32(oldFd),
 		Flags:     opts.Flags,
 	}
-	return sys.LinkUpdate(&attr)
+	if err := sys.LinkUpdate(&attr); err != nil {
+		return fmt.Errorf("update link: %w", err)
+	}
+	return nil
+}
+
+// Detach the link from its corresponding attachment point.
+func (l *RawLink) Detach() error {
+	attr := sys.LinkDetachAttr{
+		LinkFd: l.fd.Uint(),
+	}
+
+	err := sys.LinkDetach(&attr)
+
+	switch {
+	case errors.Is(err, unix.EOPNOTSUPP):
+		return internal.ErrNotSupported
+	case err != nil:
+		return fmt.Errorf("detach link: %w", err)
+	default:
+		return nil
+	}
 }
 
 // Info returns metadata about the link.
+//
+// Linktype specific metadata is not included and can be retrieved
+// via the linktype specific Info() method.
 func (l *RawLink) Info() (*Info, error) {
 	var info sys.LinkInfo
 
@@ -445,117 +260,11 @@ func (l *RawLink) Info() (*Info, error) {
 		return nil, fmt.Errorf("link info: %s", err)
 	}
 
-	var extra interface{}
-	switch info.Type {
-	case CgroupType:
-		var cgroupInfo sys.CgroupLinkInfo
-		if err := sys.ObjInfo(l.fd, &cgroupInfo); err != nil {
-			return nil, fmt.Errorf("cgroup link info: %s", err)
-		}
-		extra = &CgroupInfo{
-			CgroupId:   cgroupInfo.CgroupId,
-			AttachType: cgroupInfo.AttachType,
-		}
-	case NetNsType:
-		var netnsInfo sys.NetNsLinkInfo
-		if err := sys.ObjInfo(l.fd, &netnsInfo); err != nil {
-			return nil, fmt.Errorf("netns link info: %s", err)
-		}
-		extra = &NetNsInfo{
-			NetnsIno:   netnsInfo.NetnsIno,
-			AttachType: netnsInfo.AttachType,
-		}
-	case TracingType:
-		var tracingInfo sys.TracingLinkInfo
-		if err := sys.ObjInfo(l.fd, &tracingInfo); err != nil {
-			return nil, fmt.Errorf("tracing link info: %s", err)
-		}
-		extra = &TracingInfo{
-			TargetObjId: tracingInfo.TargetObjId,
-			TargetBtfId: tracingInfo.TargetBtfId,
-			AttachType:  tracingInfo.AttachType,
-		}
-	case XDPType:
-		var xdpInfo sys.XDPLinkInfo
-		if err := sys.ObjInfo(l.fd, &xdpInfo); err != nil {
-			return nil, fmt.Errorf("xdp link info: %s", err)
-		}
-		extra = &XDPInfo{
-			Ifindex: xdpInfo.Ifindex,
-		}
-	case RawTracepointType, IterType, UprobeMultiType:
-		// Extra metadata not supported.
-	case TCXType:
-		var tcxInfo sys.TcxLinkInfo
-		if err := sys.ObjInfo(l.fd, &tcxInfo); err != nil {
-			return nil, fmt.Errorf("tcx link info: %s", err)
-		}
-		extra = &TCXInfo{
-			Ifindex:    tcxInfo.Ifindex,
-			AttachType: tcxInfo.AttachType,
-		}
-	case NetfilterType:
-		var netfilterInfo sys.NetfilterLinkInfo
-		if err := sys.ObjInfo(l.fd, &netfilterInfo); err != nil {
-			return nil, fmt.Errorf("netfilter link info: %s", err)
-		}
-		extra = &NetfilterInfo{
-			Pf:       netfilterInfo.Pf,
-			Hooknum:  netfilterInfo.Hooknum,
-			Priority: netfilterInfo.Priority,
-			Flags:    netfilterInfo.Flags,
-		}
-	case NetkitType:
-		var netkitInfo sys.NetkitLinkInfo
-		if err := sys.ObjInfo(l.fd, &netkitInfo); err != nil {
-			return nil, fmt.Errorf("tcx link info: %s", err)
-		}
-		extra = &NetkitInfo{
-			Ifindex:    netkitInfo.Ifindex,
-			AttachType: netkitInfo.AttachType,
-		}
-	case KprobeMultiType:
-		var kprobeMultiInfo sys.KprobeMultiLinkInfo
-		if err := sys.ObjInfo(l.fd, &kprobeMultiInfo); err != nil {
-			return nil, fmt.Errorf("kprobe multi link info: %s", err)
-		}
-		extra = &KprobeMultiInfo{
-			count:  kprobeMultiInfo.Count,
-			flags:  kprobeMultiInfo.Flags,
-			missed: kprobeMultiInfo.Missed,
-		}
-	case PerfEventType:
-		var perfEventInfo sys.PerfEventLinkInfo
-		if err := sys.ObjInfo(l.fd, &perfEventInfo); err != nil {
-			return nil, fmt.Errorf("perf event link info: %s", err)
-		}
-
-		var extra2 interface{}
-		switch perfEventInfo.PerfEventType {
-		case sys.BPF_PERF_EVENT_KPROBE, sys.BPF_PERF_EVENT_KRETPROBE:
-			var kprobeInfo sys.KprobeLinkInfo
-			if err := sys.ObjInfo(l.fd, &kprobeInfo); err != nil {
-				return nil, fmt.Errorf("kprobe multi link info: %s", err)
-			}
-			extra2 = &KprobeInfo{
-				address: kprobeInfo.Addr,
-				missed:  kprobeInfo.Missed,
-			}
-		}
-
-		extra = &PerfEventInfo{
-			Type:  perfEventInfo.PerfEventType,
-			extra: extra2,
-		}
-	default:
-		return nil, fmt.Errorf("unknown link info type: %d", info.Type)
-	}
-
 	return &Info{
 		info.Type,
 		info.Id,
 		ebpf.ProgramID(info.ProgId),
-		extra,
+		nil,
 	}, nil
 }
 

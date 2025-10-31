@@ -1,3 +1,5 @@
+//go:build !windows
+
 package link
 
 import (
@@ -69,3 +71,21 @@ type netkitLink struct {
 }
 
 var _ Link = (*netkitLink)(nil)
+
+func (netkit *netkitLink) Info() (*Info, error) {
+	var info sys.NetkitLinkInfo
+	if err := sys.ObjInfo(netkit.fd, &info); err != nil {
+		return nil, fmt.Errorf("netkit link info: %s", err)
+	}
+	extra := &NetkitInfo{
+		Ifindex:    info.Ifindex,
+		AttachType: info.AttachType,
+	}
+
+	return &Info{
+		info.Type,
+		info.Id,
+		ebpf.ProgramID(info.ProgId),
+		extra,
+	}, nil
+}
