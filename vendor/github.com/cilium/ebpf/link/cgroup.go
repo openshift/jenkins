@@ -1,3 +1,5 @@
+//go:build !windows
+
 package link
 
 import (
@@ -6,6 +8,7 @@ import (
 	"os"
 
 	"github.com/cilium/ebpf"
+	"github.com/cilium/ebpf/internal/sys"
 )
 
 type cgroupAttachFlags uint32
@@ -164,6 +167,10 @@ func (cg *progAttachCgroup) Unpin() error {
 	return fmt.Errorf("can't unpin cgroup: %w", ErrNotSupported)
 }
 
+func (cg *progAttachCgroup) Detach() error {
+	return fmt.Errorf("can't detach cgroup: %w", ErrNotSupported)
+}
+
 func (cg *progAttachCgroup) Info() (*Info, error) {
 	return nil, fmt.Errorf("can't get cgroup info: %w", ErrNotSupported)
 }
@@ -186,4 +193,22 @@ func newLinkCgroup(cgroup *os.File, attach ebpf.AttachType, prog *ebpf.Program) 
 	}
 
 	return &linkCgroup{*link}, err
+}
+
+func (cg *linkCgroup) Info() (*Info, error) {
+	var info sys.CgroupLinkInfo
+	if err := sys.ObjInfo(cg.fd, &info); err != nil {
+		return nil, fmt.Errorf("cgroup link info: %s", err)
+	}
+	extra := &CgroupInfo{
+		CgroupId:   info.CgroupId,
+		AttachType: info.AttachType,
+	}
+
+	return &Info{
+		info.Type,
+		info.Id,
+		ebpf.ProgramID(info.ProgId),
+		extra,
+	}, nil
 }

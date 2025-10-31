@@ -1,3 +1,5 @@
+//go:build !windows
+
 package link
 
 import (
@@ -69,3 +71,21 @@ type tcxLink struct {
 }
 
 var _ Link = (*tcxLink)(nil)
+
+func (tcx *tcxLink) Info() (*Info, error) {
+	var info sys.TcxLinkInfo
+	if err := sys.ObjInfo(tcx.fd, &info); err != nil {
+		return nil, fmt.Errorf("tcx link info: %s", err)
+	}
+	extra := &TCXInfo{
+		Ifindex:    info.Ifindex,
+		AttachType: info.AttachType,
+	}
+
+	return &Info{
+		info.Type,
+		info.Id,
+		ebpf.ProgramID(info.ProgId),
+		extra,
+	}, nil
+}
