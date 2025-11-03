@@ -1,0 +1,7 @@
+volatileConfig:
+  exclude:
+{{range .}}    - value: {{.}}
+      effectiveUntil: "2026-06-30T00:00:00Z"
+      reference: https://issues.redhat.com/browse/PSX-948
+{{end}}
+
