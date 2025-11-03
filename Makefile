@@ -12,7 +12,7 @@ VERSIONS="2 slave-base"
 BUNDLE_PLUGINS="$(shell pwd)/2/contrib/openshift/bundle-plugins.txt"
 REF=$(shell mktemp -d)
 JENKINS_WAR="$(shell mktemp -d)/jenkins.war"
-JENKINS_FILE := "$(shell pwd)/2/contrib/openshift/jenkins-version.txt"
+JENKINS_VERSION := "$(shell pwd)/2/contrib/openshift/jenkins-version.txt"
 ARTIFACTS_OUTPUT_FILE := $(shell pwd)/artifacts.lock.yaml
 ARTIFACTS_IMAGE := localhost/artifacts-gen:latest
 PULLSECRET ?=
@@ -75,13 +75,13 @@ artifacts-gen: build-artifact-gen-image
 	@echo "Generating $$(basename $(ARTIFACTS_OUTPUT_FILE)) with podman ..."
 	@touch $$(basename $(ARTIFACTS_OUTPUT_FILE))
 	@podman run --rm \
-		--userns=keep-id \
+		--security-opt label=disable \
 		-v $(BUNDLE_PLUGINS):/data/$$(basename $(BUNDLE_PLUGINS)).txt:ro \
-		-v $(JENKINS_FILE):/data/$$(basename $(JENKINS_FILE)).txt:ro \
+		-v $(JENKINS_VERSION):/data/$$(basename $(JENKINS_VERSION)).txt:ro \
 		-v $(ARTIFACTS_OUTPUT_FILE):/output/$$(basename $(ARTIFACTS_OUTPUT_FILE)):rw \
 		$(ARTIFACTS_IMAGE) \
 		--plugins /data/$$(basename $(BUNDLE_PLUGINS)).txt \
-		--jenkins /data/$$(basename $(JENKINS_FILE)).txt \
+		--jenkins /data/$$(basename $(JENKINS_VERSION)).txt \
 		--output /output/$$(basename $(ARTIFACTS_OUTPUT_FILE)) || { rm -f $(ARTIFACTS_OUTPUT_FILE); exit 1; }
 	@echo "✓ Generated $$(basename $(ARTIFACTS_OUTPUT_FILE))"
 
@@ -91,13 +91,13 @@ verify-artifacts:
 	@echo "Verifying $$(basename $(ARTIFACTS_OUTPUT_FILE)) is up-to-date with podman ..."
 	@touch $(ARTIFACTS_OUTPUT_FILE).tmp
 	@if podman run --rm \
-		--userns=keep-id \
+		--security-opt label=disable \
 		-v $(BUNDLE_PLUGINS):/data/$$(basename $(BUNDLE_PLUGINS)).txt:ro \
-		-v $(JENKINS_FILE):/data/$$(basename $(JENKINS_FILE)).txt:ro \
+		-v $(JENKINS_VERSION):/data/$$(basename $(JENKINS_VERSION)).txt:ro \
 		-v $(ARTIFACTS_OUTPUT_FILE).tmp:/output/$$(basename $(ARTIFACTS_OUTPUT_FILE)).tmp:rw \
 		$(ARTIFACTS_IMAGE) \
 		--plugins /data/$$(basename $(BUNDLE_PLUGINS)).txt \
-		--jenkins /data/$$(basename $(JENKINS_FILE)).txt \
+		--jenkins /data/$$(basename $(JENKINS_VERSION)).txt \
 		--output /output/$$(basename $(ARTIFACTS_OUTPUT_FILE)).tmp; then \
 		if diff -q $(ARTIFACTS_OUTPUT_FILE) $(ARTIFACTS_OUTPUT_FILE).tmp; then \
 			echo "✓ $$(basename $(ARTIFACTS_OUTPUT_FILE)) is up-to-date"; \
@@ -131,8 +131,9 @@ rpms-lock: build-rpm-lock-image
 		exit 1; \
 	fi
 	@echo "Generating $$(basename $(RPMS_LOCK_FILE)) file with podman ..."
+	@touch $$(basename $(RPMS_LOCK_FILE))
 	@podman run --rm \
-		--userns=keep-id \
+		--security-opt label=disable \
 		-e REGISTRY_AUTH_FILE=/work/$$(basename $(PULLSECRET)) \
 		-v $(RPMS_LOCK_FILE):/work/$$(basename $(RPMS_LOCK_FILE)):rw \
 		-v $(RPMS_LOCK_IN_FILE):/work/$$(basename $(RPMS_LOCK_IN_FILE)):ro \
@@ -141,7 +142,7 @@ rpms-lock: build-rpm-lock-image
 		$(RPMS_LOCK_IMAGE) \
 		--image $(BASE_IMAGE) \
 		--outfile=/work/$$(basename $(RPMS_LOCK_FILE)) \
-		/work/$$(basename $(RPMS_LOCK_IN_FILE))
+		/work/$$(basename $(RPMS_LOCK_IN_FILE)) || { rm -f $(RPMS_LOCK_FILE); exit 1; }
 	@echo "✓ Generated $$(basename $(RPMS_LOCK_FILE))"
 
 .PHONY: update-tekton-tasks
