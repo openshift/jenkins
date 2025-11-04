@@ -7,9 +7,7 @@ metadata:
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/cancel-in-progress: "false"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
-    pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch
-      == "release-rhel8" && ( "2/***".pathChanged() || ".tekton/jenkins-rhel8-multi-arch-pull-request.yaml".pathChanged()
-      || "2/Dockerfile.rhel8-multi-arch".pathChanged() )
+    pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch == "release-rhel8" && ( "2/***".pathChanged() || ".tekton/jenkins-rhel8-multi-arch-push.yaml".pathChanged() || "2/Dockerfile.rhel8-multi-arch".pathChanged() )
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: openshift-jenkins-rhel8
@@ -19,40 +17,34 @@ metadata:
   namespace: ocp-tools-jenkins-tenant
 spec:
   params:
-  - name: git-url
-    value: '{{source_url}}'
-  - name: revision
-    value: '{{revision}}'
-  - name: output-image
-    value: quay.io/redhat-user-workloads/ocp-tools-jenkins-tenant/jenkins-rhel8-multi-arch:{{revision}}
-  - name: build-platforms
-    value:
-    - linux/x86_64
-    - linux/arm64
-    - linux/ppc64le
-    - linux/s390x
-  - name: dockerfile
-    value: 2/Dockerfile.rhel8-multi-arch
-  - name: path-context
-    value: "2"
-  - name: build-args
-    value:
-    - CI_UPSTREAM_COMMIT={{revision}}
-    - CI_UPSTREAM_URL={{source_url}}
-  - name: build-args-file
-    value: "2/konflux-build-args.env"
-  - name: build-source-image
-    value: "true"
-  - name: hermetic
-    value: "true"
-  - name: prefetch-input
-    value: '{"packages": [{"type": "generic"},{"type": "rpm"}]}'
-  pipelineRef:
-    name: build-pipeline
+    - name: git-url
+      value: '{{source_url}}'
+    - name: revision
+      value: '{{revision}}'
+    - name: output-image
+      value: quay.io/redhat-user-workloads/ocp-tools-jenkins-tenant/jenkins-rhel8-multi-arch:{{revision}}
+    - name: build-platforms
+      value:
+        - linux/x86_64
+        - linux/arm64
+        - linux/ppc64le
+        - linux/s390x
+    - name: dockerfile
+      value: 2/Dockerfile.rhel8-multi-arch
+    - name: path-context
+      value: "2"
+    - name: build-source-image
+      value: "true"
+    - name: hermetic
+      value: "true"
+    - name: prefetch-input
+      value: '{"packages": [{"type": "generic"},{"type": "rpm"}]}'
   taskRunTemplate:
     serviceAccountName: build-pipeline-jenkins-rhel8-multi-arch
   workspaces:
-  - name: git-auth
-    secret:
-      secretName: '{{ git_auth_secret }}'
+    - name: git-auth
+      secret:
+        secretName: '{{ git_auth_secret }}'
+  pipelineRef:
+    name: build-pipeline
 status: {}
