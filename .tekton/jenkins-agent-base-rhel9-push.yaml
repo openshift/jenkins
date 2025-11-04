@@ -7,9 +7,7 @@ metadata:
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/cancel-in-progress: "false"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
-    pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch
-      == "release-rhel9" && ( "slave-base/***".pathChanged() || ".tekton/jenkins-agent-base-rhel9-pull-request.yaml".pathChanged()
-      || "slave-base/Dockerfile.rhel9".pathChanged() )
+    pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch == "release-rhel9" && ( "slave-base/***".pathChanged() || ".tekton/jenkins-agent-base-rhel9-push.yaml".pathChanged() || "slave-base/Dockerfile.rhel9".pathChanged() )
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: openshift-jenkins-rhel9
@@ -19,40 +17,34 @@ metadata:
   namespace: ocp-tools-jenkins-tenant
 spec:
   params:
-  - name: git-url
-    value: '{{source_url}}'
-  - name: revision
-    value: '{{revision}}'
-  - name: output-image
-    value: quay.io/redhat-user-workloads/ocp-tools-jenkins-tenant/jenkins-agent-base-rhel9:{{revision}}
-  - name: build-platforms
-    value:
-    - linux/x86_64
-    - linux/arm64
-    - linux/ppc64le
-    - linux/s390x
-  - name: dockerfile
-    value: slave-base/Dockerfile.rhel9
-  - name: path-context
-    value: slave-base
-  - name: build-args
-    value:
-    - CI_UPSTREAM_COMMIT={{revision}}
-    - CI_UPSTREAM_URL={{source_url}}
-  - name: build-args-file
-    value: "slave/konflux-build-args.env"
-  - name: build-source-image
-    value: "true"
-  - name: hermetic
-    value: "true"
-  - name: prefetch-input
-    value: '{"packages": [{"type": "generic"},{"type": "rpm"}]}'
-  pipelineRef:
-    name: build-pipeline
+    - name: git-url
+      value: '{{source_url}}'
+    - name: revision
+      value: '{{revision}}'
+    - name: output-image
+      value: quay.io/redhat-user-workloads/ocp-tools-jenkins-tenant/jenkins-agent-base-rhel9:{{revision}}
+    - name: build-platforms
+      value:
+        - linux/x86_64
+        - linux/arm64
+        - linux/ppc64le
+        - linux/s390x
+    - name: dockerfile
+      value: slave-base/Dockerfile.rhel9
+    - name: path-context
+      value: slave-base
+    - name: build-source-image
+      value: "true"
+    - name: hermetic
+      value: "true"
+    - name: prefetch-input
+      value: '{"packages": [{"type": "generic"},{"type": "rpm"}]}'
   taskRunTemplate:
     serviceAccountName: build-pipeline-jenkins-agent-base-rhel9
   workspaces:
-  - name: git-auth
-    secret:
-      secretName: '{{ git_auth_secret }}'
+    - name: git-auth
+      secret:
+        secretName: '{{ git_auth_secret }}'
+  pipelineRef:
+    name: build-pipeline
 status: {}
