@@ -2,6 +2,38 @@
 
 set -euo pipefail
 
+#################################################################################
+# CONFIGURATION - Modify these values as needed
+#################################################################################
+
+# Additional files to add to pipelinesascode CEL expression (space-separated)
+ADDITIONAL_PATHCHANGED_FILES="rpms.lock.yaml rpms.in.yaml ubi.repo artifacts.lock.yaml"
+
+# Additional parameters to add to the PipelineRun
+BUILD_SOURCE_IMAGE="true"
+HERMETIC="true"
+PREFETCH_INPUT='{"packages": [{"type": "generic"},{"type": "rpm"}]}'
+
+# Build arguments (array items, one per line)
+BUILD_ARGS_ITEMS=(
+    "CI_UPSTREAM_COMMIT={{revision}}"
+    "CI_UPSTREAM_URL={{source_url}}"
+)
+
+# Build args file path
+BUILD_ARGS_FILE="konflux-build-args.env"
+
+# Multi-arch platforms (in addition to linux/x86_64)
+MULTI_ARCH_PLATFORMS=(
+    "linux/arm64"
+    "linux/ppc64le"
+    "linux/s390x"
+)
+
+#################################################################################
+# END CONFIGURATION
+#################################################################################
+
 # Colors for output
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -16,6 +48,13 @@ usage() {
     echo "Arguments:"
     echo "  <arch-type>    Architecture type: 'single-arch' or 'multi-arch'"
     echo "  <github-url>   GitHub URL to the file (blob or raw URL)"
+    echo ""
+    echo "Configuration:"
+    echo "  Edit the CONFIGURATION section at the top of this script to customize:"
+    echo "  - Additional files for CEL expression"
+    echo "  - Build parameters (hermetic, prefetch-input, etc.)"
+    echo "  - Build arguments"
+    echo "  - Multi-arch platforms"
     echo ""
     echo "Examples:"
     echo "  $0 single-arch https://github.com/openshift/jenkins/blob/7bd0d72b84262d7e1851e8a1ec924309f7f4d560/.tekton/jenkins-rhel9-push.yaml"
@@ -95,6 +134,7 @@ echo "  Repository: ${GITHUB_REPO}"
 echo "  Commit ID: ${COMMIT_ID}"
 echo "  Source File: ${SOURCE_FILE_PATH}"
 echo "  Output File: ${PIPELINE_RUN_FILE}"
+echo "  Additional Files: ${ADDITIONAL_PATHCHANGED_FILES}"
 echo ""
 echo -e "${BLUE}Downloading source YAML from GitHub...${NC}"
 if ! curl -sSL "$SOURCE_URL" -o "$TEMP_FILE"; then
@@ -132,35 +172,94 @@ yq eval '
 
 echo -e "${BLUE}Adding additional parameters...${NC}"
 
-# Add the three additional parameters
+# Build the build-args array from configuration
+BUILD_ARGS_JSON="["
+for i in "${!BUILD_ARGS_ITEMS[@]}"; do
+    if [ $i -gt 0 ]; then
+        BUILD_ARGS_JSON="${BUILD_ARGS_JSON},"
+    fi
+    BUILD_ARGS_JSON="${BUILD_ARGS_JSON}\"${BUILD_ARGS_ITEMS[$i]}\""
+done
+BUILD_ARGS_JSON="${BUILD_ARGS_JSON}]"
+
+# Write configuration values to temp files to avoid escaping issues
+echo "$BUILD_SOURCE_IMAGE" > "${TEMP_FILE}.build-source-image"
+echo "$HERMETIC" > "${TEMP_FILE}.hermetic"
+echo "$PREFETCH_INPUT" > "${TEMP_FILE}.prefetch-input"
+echo "$BUILD_ARGS_FILE" > "${TEMP_FILE}.build-args-file"
+
+# Add the additional parameters using configuration values
 yq eval -i '
   .spec.params += [
     {
       "name": "build-source-image",
-      "value": "true"
+      "value": load_str("'"${TEMP_FILE}"'.build-source-image")
     },
     {
       "name": "hermetic",
-      "value": "true"
+      "value": load_str("'"${TEMP_FILE}"'.hermetic")
     },
     {
       "name": "prefetch-input",
-      "value": "{\"packages\": [{\"type\": \"generic\"},{\"type\": \"rpm\"}]}"
+      "value": load_str("'"${TEMP_FILE}"'.prefetch-input")
+    },
+    {
+      "name": "build-args",
+      "value": '"${BUILD_ARGS_JSON}"'
+    },
+    {
+      "name": "build-args-file",
+      "value": load_str("'"${TEMP_FILE}"'.build-args-file")
     }
   ]
 ' "$PIPELINE_RUN_FILE"
 
+# Clean up temp files
+rm -f "${TEMP_FILE}.build-source-image" "${TEMP_FILE}.hermetic" "${TEMP_FILE}.prefetch-input" "${TEMP_FILE}.build-args-file"
+
 # Add additional platforms if multi-arch
 if [ "$ARCH_TYPE" = "multi-arch" ]; then
     echo -e "${BLUE}Adding multi-arch platforms...${NC}"
-    yq eval -i '
-      (.spec.params[] | select(.name == "build-platforms") | .value) += [
-        "linux/arm64",
-        "linux/ppc64le",
-        "linux/s390x"
-      ]
-    ' "$PIPELINE_RUN_FILE"
-    echo -e "${GREEN}✓ Added arm64, ppc64le, and s390x platforms${NC}"
+    
+    # Build the platforms array from configuration
+    PLATFORMS_JSON="["
+    for i in "${!MULTI_ARCH_PLATFORMS[@]}"; do
+        if [ $i -gt 0 ]; then
+            PLATFORMS_JSON="${PLATFORMS_JSON},"
+        fi
+        PLATFORMS_JSON="${PLATFORMS_JSON}\"${MULTI_ARCH_PLATFORMS[$i]}\""
+    done
+    PLATFORMS_JSON="${PLATFORMS_JSON}]"
+    
+    yq eval -i "
+      (.spec.params[] | select(.name == \"build-platforms\") | .value) += ${PLATFORMS_JSON}
+    " "$PIPELINE_RUN_FILE"
+    echo -e "${GREEN}✓ Added platforms: ${MULTI_ARCH_PLATFORMS[*]}${NC}"
+fi
+
+# Update pipelinesascode on-cel-expression annotation if it exists
+echo -e "${BLUE}Updating pipelinesascode CEL expression...${NC}"
+if yq eval '.metadata.annotations["pipelinesascode.tekton.dev/on-cel-expression"]' "$PIPELINE_RUN_FILE" | grep -q "pathChanged"; then
+    # Get the current expression
+    CURRENT_CEL=$(yq eval '.metadata.annotations["pipelinesascode.tekton.dev/on-cel-expression"]' "$PIPELINE_RUN_FILE")
+    
+    # Build the CEL expression addition from the file list
+    CEL_ADDITION=""
+    for file in $ADDITIONAL_PATHCHANGED_FILES; do
+        CEL_ADDITION="${CEL_ADDITION} || \"${file}\".pathChanged()"
+    done
+    
+    # Remove trailing ) and add new files, then add ) back
+    NEW_CEL="${CURRENT_CEL% )}${CEL_ADDITION} )"
+    
+    # Write the new expression to a temporary file and use yq to load it
+    echo "$NEW_CEL" > "${TEMP_FILE}.cel"
+    yq eval -i ".metadata.annotations[\"pipelinesascode.tekton.dev/on-cel-expression\"] = load_str(\"${TEMP_FILE}.cel\")" "$PIPELINE_RUN_FILE"
+    rm -f "${TEMP_FILE}.cel"
+    
+    echo -e "${GREEN}✓ Added files to CEL expression: ${ADDITIONAL_PATHCHANGED_FILES}${NC}"
+else
+    echo -e "${YELLOW}⚠ No pipelinesascode CEL expression found, skipping${NC}"
 fi
 
 echo -e "${GREEN}✓ Created $PIPELINE_RUN_FILE with additional parameters${NC}"
@@ -181,13 +280,22 @@ echo "Generated files:"
 echo "  1. $BUILD_PIPELINE_FILE - Reusable Pipeline definition"
 echo "  2. $PIPELINE_RUN_FILE - PipelineRun with additional parameters"
 echo ""
-echo "Additional parameters added to $PIPELINE_RUN_FILE:"
-echo "  - build-source-image: true"
-echo "  - hermetic: true"
-echo "  - prefetch-input: {\"packages\": [{\"type\": \"generic\"},{\"type\": \"rpm\"}]}"
+echo "Modifications to $PIPELINE_RUN_FILE:"
+echo ""
+echo "Additional parameters:"
+echo "  - build-source-image: ${BUILD_SOURCE_IMAGE}"
+echo "  - hermetic: ${HERMETIC}"
+echo "  - prefetch-input: ${PREFETCH_INPUT}"
+echo "  - build-args: [$(IFS=, ; echo "${BUILD_ARGS_ITEMS[*]}")]"
+echo "  - build-args-file: ${BUILD_ARGS_FILE}"
 if [ "$ARCH_TYPE" = "multi-arch" ]; then
-    echo "  - build-platforms: linux/x86_64, linux/arm64, linux/ppc64le, linux/s390x"
+    echo "  - build-platforms: linux/x86_64, ${MULTI_ARCH_PLATFORMS[*]// /, }"
 else
     echo "  - build-platforms: linux/x86_64"
 fi
+echo ""
+echo "CEL expression updated with additional files:"
+for file in $ADDITIONAL_PATHCHANGED_FILES; do
+    echo "  - ${file}"
+done
 
