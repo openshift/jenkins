@@ -112,10 +112,14 @@ GITHUB_REPO="${GITHUB_OWNER}/${GITHUB_REPO_NAME}"
 SOURCE_FILENAME=$(basename "$SOURCE_FILE_PATH")
 FILENAME_WITHOUT_EXT="${SOURCE_FILENAME%.yaml}"
 
-# Configuration
-BUILD_PIPELINE_FILE="build-pipeline.yaml"
-PIPELINE_RUN_FILE="${FILENAME_WITHOUT_EXT}.yaml"
+# Configuration - Output to .tekton directory
+OUTPUT_DIR=".tekton"
+BUILD_PIPELINE_FILE="${OUTPUT_DIR}/build-pipeline.yaml"
+PIPELINE_RUN_FILE="${OUTPUT_DIR}/${FILENAME_WITHOUT_EXT}.yaml"
 TEMP_FILE="temp-source.yaml"
+
+# Create .tekton directory if it doesn't exist
+mkdir -p "$OUTPUT_DIR"
 
 # Check if yq is installed
 if ! command -v yq &> /dev/null; then
@@ -182,22 +186,19 @@ for i in "${!BUILD_ARGS_ITEMS[@]}"; do
 done
 BUILD_ARGS_JSON="${BUILD_ARGS_JSON}]"
 
-# Write configuration values to temp files to avoid escaping issues
-echo "$BUILD_SOURCE_IMAGE" > "${TEMP_FILE}.build-source-image"
-echo "$HERMETIC" > "${TEMP_FILE}.hermetic"
-echo "$PREFETCH_INPUT" > "${TEMP_FILE}.prefetch-input"
-echo "$BUILD_ARGS_FILE" > "${TEMP_FILE}.build-args-file"
+# Write PREFETCH_INPUT to temp file (complex JSON value)
+echo -n "$PREFETCH_INPUT" > "${TEMP_FILE}.prefetch-input"
 
 # Add the additional parameters using configuration values
 yq eval -i '
   .spec.params += [
     {
       "name": "build-source-image",
-      "value": load_str("'"${TEMP_FILE}"'.build-source-image")
+      "value": "'"${BUILD_SOURCE_IMAGE}"'"
     },
     {
       "name": "hermetic",
-      "value": load_str("'"${TEMP_FILE}"'.hermetic")
+      "value": "'"${HERMETIC}"'"
     },
     {
       "name": "prefetch-input",
@@ -209,13 +210,13 @@ yq eval -i '
     },
     {
       "name": "build-args-file",
-      "value": load_str("'"${TEMP_FILE}"'.build-args-file")
+      "value": "'"${BUILD_ARGS_FILE}"'"
     }
   ]
 ' "$PIPELINE_RUN_FILE"
 
-# Clean up temp files
-rm -f "${TEMP_FILE}.build-source-image" "${TEMP_FILE}.hermetic" "${TEMP_FILE}.prefetch-input" "${TEMP_FILE}.build-args-file"
+# Clean up temp file
+rm -f "${TEMP_FILE}.prefetch-input"
 
 # Add additional platforms if multi-arch
 if [ "$ARCH_TYPE" = "multi-arch" ]; then

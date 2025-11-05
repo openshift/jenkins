@@ -35,21 +35,17 @@ spec:
     - name: path-context
       value: slave-base
     - name: build-source-image
-      value: |
-        true
+      value: "true"
     - name: hermetic
-      value: |
-        true
+      value: "true"
     - name: prefetch-input
-      value: |
-        {"packages": [{"type": "generic"},{"type": "rpm"}]}
+      value: '{"packages": [{"type": "generic"},{"type": "rpm"}]}'
     - name: build-args
       value:
         - CI_UPSTREAM_COMMIT={{revision}}
         - CI_UPSTREAM_URL={{source_url}}
     - name: build-args-file
-      value: |
-        konflux-build-args.env
+      value: konflux-build-args.env
   taskRunTemplate:
     serviceAccountName: build-pipeline-jenkins-agent-base-rhel9
   workspaces:
