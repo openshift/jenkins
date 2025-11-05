@@ -8,7 +8,8 @@ metadata:
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
-    pipelinesascode.tekton.dev/on-cel-expression: event == "pull_request" && target_branch == "release-rhel9" && ( "2/***".pathChanged() || ".tekton/jenkins-rhel9-pull-request.yaml".pathChanged() || "2/Dockerfile.rhel9".pathChanged() )
+    pipelinesascode.tekton.dev/on-cel-expression: |
+      event == "pull_request" && target_branch == "release-rhel9" && ( "2/***".pathChanged() || ".tekton/jenkins-rhel9-pull-request.yaml".pathChanged() || "2/Dockerfile.rhel9".pathChanged() || "rpms.lock.yaml".pathChanged() || "rpms.in.yaml".pathChanged() || "ubi.repo".pathChanged() || "artifacts.lock.yaml".pathChanged() )
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: openshift-jenkins-rhel9
@@ -37,11 +38,21 @@ spec:
     - name: path-context
       value: "2"
     - name: build-source-image
-      value: "true"
+      value: |
+        true
     - name: hermetic
-      value: "true"
+      value: |
+        true
     - name: prefetch-input
-      value: '{"packages": [{"type": "generic"},{"type": "rpm"}]}'
+      value: |
+        {"packages": [{"type": "generic"},{"type": "rpm"}]}
+    - name: build-args
+      value:
+        - CI_UPSTREAM_COMMIT={{revision}}
+        - CI_UPSTREAM_URL={{source_url}}
+    - name: build-args-file
+      value: |
+        konflux-build-args.env
   taskRunTemplate:
     serviceAccountName: build-pipeline-jenkins-rhel9
   workspaces:
