@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"regexp"
@@ -58,6 +59,10 @@ func main() {
 				if err := t.Execute(os.Stdout, extract(d)); err != nil {
 					log.Fatalf("Failed to execute template: %v", err)
 				}
+				fmt.Fprintln(os.Stderr, "Use yq command to merge the exclusions:")
+				fmt.Fprintln(os.Stderr, "REPLACE=foo.yaml")
+				fmt.Fprintln(os.Stderr, "INPUT=bar.yaml")
+				fmt.Fprintln(os.Stderr, `yq eval ".spec.sources[0].volatileConfig = load(env(REPLACE)).volatileConfig" "$INPUT"`)
 				return
 			}
 		}
@@ -83,7 +88,7 @@ func extract(d interface{}) (r []string) {
 			}
 		case string:
 			for _, s := range re.FindAllStringSubmatch(x, -1) {
-				if len(s) > 1 && strings.HasPrefix(s[1], "sbom_spdx.allowed_package_sources:") {
+				if len(s) > 1 {
 					m[s[1]] = true
 				}
 			}
@@ -96,4 +101,3 @@ func extract(d interface{}) (r []string) {
 	sort.Strings(r)
 	return
 }
-
