@@ -17,18 +17,18 @@ package proc
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"os"
 )
 
 // ParseCmdLine parses a /proc/$pid/cmdline file and returns a string slice.
 func ParseCmdLine(pid string) ([]string, error) {
-	data, err := ioutil.ReadFile(fmt.Sprintf("/proc/%s/cmdline", pid))
+	data, err := os.ReadFile(fmt.Sprintf("/proc/%s/cmdline", pid))
 	if err != nil {
 		return nil, err
 	}
 
 	cmdLine := []string{}
-	for _, rawCmd := range bytes.Split(data, []byte{0}) {
+	for rawCmd := range bytes.SplitSeq(data, []byte{0}) {
 		cmdLine = append(cmdLine, string(rawCmd))
 	}
 
