@@ -22,7 +22,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/containers/storage/pkg/idtools"
+	"go.podman.io/storage/pkg/idtools"
 )
 
 // Status is a direct translation of a `/proc/[pid]/status`, which provides much
@@ -156,6 +156,9 @@ type Status struct {
 	// provided only if the kernel was built with the CONFIG_SECCOMP kernel
 	// configu- ration option enabled.
 	Seccomp string
+	// SeccompFilters: Amount of filters attached to the process.
+	// (since Linux 5.9)
+	SeccompFilters string
 	// Cpus_allowed:  Mask  of  CPUs  on  which  this process may run
 	// (since Linux 2.6.24, see cpuset(7)).
 	CpusAllowed string
@@ -379,6 +382,8 @@ func parseStatus(pid string, lines []string) (*Status, error) {
 			s.NoNewPrivs = fields[1]
 		case "Seccomp:":
 			s.Seccomp = fields[1]
+		case "Seccomp_filters:":
+			s.SeccompFilters = fields[1]
 		case "Cpus_allowed:":
 			s.CpusAllowed = fields[1]
 		case "Cpus_allowed_list:":

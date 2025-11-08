@@ -20,7 +20,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/containers/storage/pkg/idtools"
+	"go.podman.io/storage/pkg/idtools"
 )
 
 // ParsePIDNamespace returns the content of /proc/$pid/ns/pid.
@@ -47,7 +47,7 @@ func ReadMappings(path string) ([]idtools.IDMap, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+	defer file.Close() //nolint:errcheck
 
 	var mappings []idtools.IDMap
 
