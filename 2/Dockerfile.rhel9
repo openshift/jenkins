@@ -10,15 +10,17 @@ RUN GO111MODULE=off go build -o /usr/bin/go-init .
 ##############################################
 # Stage 2 : Build controller with go-init
 ##############################################
+FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.18 as oc-418
 FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.17 as oc-417
 FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.16 as oc-416
 
-FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.18
+FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.19
 ARG JENKINS_LTS \
     CI_UPSTREAM_COMMIT \
     CI_UPSTREAM_URL \
     OCP_VERSION
 COPY --from=go-init-builder --chown=root:root /usr/bin/go-init /usr/bin/go-init
+COPY --from=oc-418 --chown=root:root /usr/bin/oc /usr/share/openshift/bin/oc-418/oc
 COPY --from=oc-417 --chown=root:root /usr/bin/oc /usr/share/openshift/bin/oc-417/oc
 COPY --from=oc-416 --chown=root:root /usr/bin/oc /usr/share/openshift/bin/oc-416/oc
 
@@ -36,7 +38,7 @@ ENV JENKINS_VERSION=2 \
     HOME=/var/lib/jenkins \
     JENKINS_HOME=/var/lib/jenkins \
     JENKINS_UC=https://updates.jenkins.io \
-    OPENSHIFT_JENKINS_IMAGE_VERSION=v4.18.0 \
+    OPENSHIFT_JENKINS_IMAGE_VERSION=v4.19.0 \
     LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
     INSTALL_JENKINS_VIA_RPMS=false
