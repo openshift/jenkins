@@ -617,8 +617,8 @@ github.com/pkg/errors
 ## explicit; go 1.15
 github.com/pkg/sftp
 github.com/pkg/sftp/internal/encoding/ssh/filexfer
-# github.com/proglottis/gpgme v0.1.3
-## explicit; go 1.11
+# github.com/proglottis/gpgme v0.1.6
+## explicit; go 1.17
 github.com/proglottis/gpgme
 # github.com/rivo/uniseg v0.4.7
 ## explicit; go 1.18
