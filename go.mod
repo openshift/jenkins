@@ -103,7 +103,7 @@ require (
 	github.com/ostreedev/ostree-go v0.0.0-20210805093236-719684c64e4f // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pkg/sftp v1.13.6 // indirect
-	github.com/proglottis/gpgme v0.1.3 // indirect
+	github.com/proglottis/gpgme v0.1.6 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/secure-systems-lab/go-securesystemslib v0.8.0 // indirect
 	github.com/sigstore/fulcio v1.4.5 // indirect
