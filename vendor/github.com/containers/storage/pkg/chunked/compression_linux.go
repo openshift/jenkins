@@ -2,19 +2,30 @@ package chunked
 
 import (
 	archivetar "archive/tar"
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
 	"maps"
+	"os"
+	"slices"
 	"strconv"
 	"time"
 
-	"github.com/containers/storage/pkg/chunked/internal"
+	"github.com/containers/storage/pkg/chunked/internal/minimal"
 	"github.com/klauspost/compress/zstd"
 	"github.com/klauspost/pgzip"
 	digest "github.com/opencontainers/go-digest"
 	"github.com/vbatts/tar-split/archive/tar"
-	expMaps "golang.org/x/exp/maps"
+	"github.com/vbatts/tar-split/tar/asm"
+	"github.com/vbatts/tar-split/tar/storage"
+	"golang.org/x/sys/unix"
+)
+
+const (
+	// maxTocSize is the maximum size of a blob that we will attempt to process.
+	// It is used to prevent DoS attacks from layers that embed a very large TOC file.
+	maxTocSize = (1 << 20) * 150
 )
 
 var typesToTar = map[string]byte{
@@ -35,31 +46,33 @@ func typeToTarType(t string) (byte, error) {
 	return r, nil
 }
 
+// readEstargzChunkedManifest reads the estargz manifest from the seekable stream blobStream.
+// It may return an error matching ErrFallbackToOrdinaryLayerDownload / errFallbackCanConvert.
 func readEstargzChunkedManifest(blobStream ImageSourceSeekable, blobSize int64, tocDigest digest.Digest) ([]byte, int64, error) {
 	// information on the format here https://github.com/containerd/stargz-snapshotter/blob/main/docs/stargz-estargz.md
 	footerSize := int64(51)
 	if blobSize <= footerSize {
 		return nil, 0, errors.New("blob too small")
 	}
-	chunk := ImageSourceChunk{
-		Offset: uint64(blobSize - footerSize),
-		Length: uint64(footerSize),
-	}
-	parts, errs, err := blobStream.GetBlobAt([]ImageSourceChunk{chunk})
-	if err != nil {
-		return nil, 0, err
-	}
-	var reader io.ReadCloser
-	select {
-	case r := <-parts:
-		reader = r
-	case err := <-errs:
-		return nil, 0, err
-	}
-	defer reader.Close()
+
 	footer := make([]byte, footerSize)
-	if _, err := io.ReadFull(reader, footer); err != nil {
+	streamsOrErrors, err := getBlobAt(blobStream, ImageSourceChunk{Offset: uint64(blobSize - footerSize), Length: uint64(footerSize)})
+	if err != nil {
+		var badRequestErr ErrBadRequest
+		if errors.As(err, &badRequestErr) {
+			err = errFallbackCanConvert{newErrFallbackToOrdinaryLayerDownload(err)}
+		}
 		return nil, 0, err
+	}
+
+	for soe := range streamsOrErrors {
+		if soe.stream != nil {
+			_, err = io.ReadFull(soe.stream, footer)
+			_ = soe.stream.Close()
+		}
+		if soe.err != nil && err == nil {
+			err = soe.err
+		}
 	}
 
 	/* Read the ToC offset:
@@ -76,50 +89,61 @@ func readEstargzChunkedManifest(blobStream ImageSourceSeekable, blobSize int64, 
 		return nil, 0, fmt.Errorf("parse ToC offset: %w", err)
 	}
 
-	size := int64(blobSize - footerSize - tocOffset)
+	size := blobSize - footerSize - tocOffset
 	// set a reasonable limit
-	if size > (1<<20)*50 {
-		return nil, 0, errors.New("manifest too big")
+	if size > maxTocSize {
+		// Not errFallbackCanConvert: we would still use too much memory.
+		return nil, 0, newErrFallbackToOrdinaryLayerDownload(fmt.Errorf("estargz manifest too big to process in memory (%d bytes)", size))
 	}
 
-	chunk = ImageSourceChunk{
-		Offset: uint64(tocOffset),
-		Length: uint64(size),
-	}
-	parts, errs, err = blobStream.GetBlobAt([]ImageSourceChunk{chunk})
+	streamsOrErrors, err = getBlobAt(blobStream, ImageSourceChunk{Offset: uint64(tocOffset), Length: uint64(size)})
 	if err != nil {
+		var badRequestErr ErrBadRequest
+		if errors.As(err, &badRequestErr) {
+			err = errFallbackCanConvert{newErrFallbackToOrdinaryLayerDownload(err)}
+		}
 		return nil, 0, err
 	}
 
-	var tocReader io.ReadCloser
-	select {
-	case r := <-parts:
-		tocReader = r
-	case err := <-errs:
-		return nil, 0, err
-	}
-	defer tocReader.Close()
+	var manifestUncompressed []byte
 
-	r, err := pgzip.NewReader(tocReader)
-	if err != nil {
-		return nil, 0, err
-	}
-	defer r.Close()
+	for soe := range streamsOrErrors {
+		if soe.stream != nil {
+			err1 := func() error {
+				defer soe.stream.Close()
 
-	aTar := archivetar.NewReader(r)
+				r, err := pgzip.NewReader(soe.stream)
+				if err != nil {
+					return err
+				}
+				defer r.Close()
 
-	header, err := aTar.Next()
-	if err != nil {
-		return nil, 0, err
-	}
-	// set a reasonable limit
-	if header.Size > (1<<20)*50 {
-		return nil, 0, errors.New("manifest too big")
-	}
+				aTar := archivetar.NewReader(r)
 
-	manifestUncompressed := make([]byte, header.Size)
-	if _, err := io.ReadFull(aTar, manifestUncompressed); err != nil {
-		return nil, 0, err
+				header, err := aTar.Next()
+				if err != nil {
+					return err
+				}
+				// set a reasonable limit
+				if header.Size > maxTocSize {
+					return errors.New("manifest too big")
+				}
+
+				manifestUncompressed = make([]byte, header.Size)
+				if _, err := io.ReadFull(aTar, manifestUncompressed); err != nil {
+					return err
+				}
+				return nil
+			}()
+			if err == nil {
+				err = err1
+			}
+		} else if err == nil {
+			err = soe.err
+		}
+	}
+	if manifestUncompressed == nil {
+		return nil, 0, errors.New("manifest not found")
 	}
 
 	manifestDigester := digest.Canonical.Digester()
@@ -135,12 +159,39 @@ func readEstargzChunkedManifest(blobStream ImageSourceSeekable, blobSize int64, 
 	return manifestUncompressed, tocOffset, nil
 }
 
+func openTmpFile(tmpDir string) (*os.File, error) {
+	file, err := os.OpenFile(tmpDir, unix.O_TMPFILE|unix.O_RDWR|unix.O_CLOEXEC|unix.O_EXCL, 0o600)
+	if err == nil {
+		return file, nil
+	}
+	return openTmpFileNoTmpFile(tmpDir)
+}
+
+// openTmpFileNoTmpFile is a fallback used by openTmpFile when the underlying file system does not
+// support O_TMPFILE.
+func openTmpFileNoTmpFile(tmpDir string) (*os.File, error) {
+	file, err := os.CreateTemp(tmpDir, ".tmpfile")
+	if err != nil {
+		return nil, err
+	}
+	// Unlink the file immediately so that only the open fd refers to it.
+	_ = os.Remove(file.Name())
+	return file, nil
+}
+
 // readZstdChunkedManifest reads the zstd:chunked manifest from the seekable stream blobStream.
-// Returns (manifest blob, parsed manifest, tar-split blob, manifest offset).
-func readZstdChunkedManifest(blobStream ImageSourceSeekable, tocDigest digest.Digest, annotations map[string]string) ([]byte, *internal.TOC, []byte, int64, error) {
-	offsetMetadata := annotations[internal.ManifestInfoKey]
+// tmpDir is a directory where the tar-split temporary file is written to.  The file is opened with
+// O_TMPFILE so that it is automatically removed when it is closed.
+// Returns (manifest blob, parsed manifest, tar-split file or nil, manifest offset).
+// The opened tar-split file’s position is unspecified.
+// It may return an error matching ErrFallbackToOrdinaryLayerDownload / errFallbackCanConvert.
+// The compressed parameter indicates whether the manifest and tar-split data are zstd-compressed
+// (true) or stored uncompressed (false).  Uncompressed data is used only for an optimization to convert
+// a regular OCI layer to zstd:chunked when convert_images is set, and it is not used for distributed images.
+func readZstdChunkedManifest(tmpDir string, blobStream ImageSourceSeekable, tocDigest digest.Digest, annotations map[string]string, compressed bool) (_ []byte, _ *minimal.TOC, _ *os.File, _ int64, retErr error) {
+	offsetMetadata := annotations[minimal.ManifestInfoKey]
 	if offsetMetadata == "" {
-		return nil, nil, nil, 0, fmt.Errorf("%q annotation missing", internal.ManifestInfoKey)
+		return nil, nil, nil, 0, fmt.Errorf("%q annotation missing", minimal.ManifestInfoKey)
 	}
 	var manifestChunk ImageSourceChunk
 	var manifestLengthUncompressed, manifestType uint64
@@ -150,48 +201,59 @@ func readZstdChunkedManifest(blobStream ImageSourceSeekable, tocDigest digest.Di
 	// The tarSplit… values are valid if tarSplitChunk.Offset > 0
 	var tarSplitChunk ImageSourceChunk
 	var tarSplitLengthUncompressed uint64
-	if tarSplitInfoKeyAnnotation, found := annotations[internal.TarSplitInfoKey]; found {
+	if tarSplitInfoKeyAnnotation, found := annotations[minimal.TarSplitInfoKey]; found {
 		if _, err := fmt.Sscanf(tarSplitInfoKeyAnnotation, "%d:%d:%d", &tarSplitChunk.Offset, &tarSplitChunk.Length, &tarSplitLengthUncompressed); err != nil {
 			return nil, nil, nil, 0, err
 		}
 	}
 
-	if manifestType != internal.ManifestTypeCRFS {
+	if manifestType != minimal.ManifestTypeCRFS {
 		return nil, nil, nil, 0, errors.New("invalid manifest type")
 	}
 
 	// set a reasonable limit
-	if manifestChunk.Length > (1<<20)*50 {
-		return nil, nil, nil, 0, errors.New("manifest too big")
+	if manifestChunk.Length > maxTocSize {
+		// Not errFallbackCanConvert: we would still use too much memory.
+		return nil, nil, nil, 0, newErrFallbackToOrdinaryLayerDownload(fmt.Errorf("zstd:chunked manifest too big to process in memory (%d bytes compressed)", manifestChunk.Length))
 	}
-	if manifestLengthUncompressed > (1<<20)*50 {
-		return nil, nil, nil, 0, errors.New("manifest too big")
+	if manifestLengthUncompressed > maxTocSize {
+		// Not errFallbackCanConvert: we would still use too much memory.
+		return nil, nil, nil, 0, newErrFallbackToOrdinaryLayerDownload(fmt.Errorf("zstd:chunked manifest too big to process in memory (%d bytes uncompressed)", manifestLengthUncompressed))
 	}
 
 	chunks := []ImageSourceChunk{manifestChunk}
 	if tarSplitChunk.Offset > 0 {
 		chunks = append(chunks, tarSplitChunk)
 	}
-	parts, errs, err := blobStream.GetBlobAt(chunks)
+
+	streamsOrErrors, err := getBlobAt(blobStream, chunks...)
 	if err != nil {
+		var badRequestErr ErrBadRequest
+		if errors.As(err, &badRequestErr) {
+			err = errFallbackCanConvert{newErrFallbackToOrdinaryLayerDownload(err)}
+		}
 		return nil, nil, nil, 0, err
 	}
 
-	readBlob := func(len uint64) ([]byte, error) {
-		var reader io.ReadCloser
-		select {
-		case r := <-parts:
-			reader = r
-		case err := <-errs:
-			return nil, err
+	defer func() {
+		err := ensureAllBlobsDone(streamsOrErrors)
+		if retErr == nil {
+			retErr = err
 		}
+	}()
+
+	readBlob := func(len uint64) ([]byte, error) {
+		soe, ok := <-streamsOrErrors
+		if !ok {
+			return nil, errors.New("stream closed")
+		}
+		if soe.err != nil {
+			return nil, soe.err
+		}
+		defer soe.stream.Close()
 
 		blob := make([]byte, len)
-		if _, err := io.ReadFull(reader, blob); err != nil {
-			reader.Close()
-			return nil, err
-		}
-		if err := reader.Close(); err != nil {
+		if _, err := io.ReadFull(soe.stream, blob); err != nil {
 			return nil, err
 		}
 		return blob, nil
@@ -202,7 +264,7 @@ func readZstdChunkedManifest(blobStream ImageSourceSeekable, tocDigest digest.Di
 		return nil, nil, nil, 0, err
 	}
 
-	decodedBlob, err := decodeAndValidateBlob(manifest, manifestLengthUncompressed, tocDigest.String())
+	decodedBlob, err := decodeAndValidateBlob(manifest, manifestLengthUncompressed, tocDigest.String(), compressed)
 	if err != nil {
 		return nil, nil, nil, 0, fmt.Errorf("validating and decompressing TOC: %w", err)
 	}
@@ -211,17 +273,25 @@ func readZstdChunkedManifest(blobStream ImageSourceSeekable, tocDigest digest.Di
 		return nil, nil, nil, 0, fmt.Errorf("unmarshaling TOC: %w", err)
 	}
 
-	decodedTarSplit := []byte{}
+	var decodedTarSplit *os.File
 	if toc.TarSplitDigest != "" {
 		if tarSplitChunk.Offset <= 0 {
-			return nil, nil, nil, 0, fmt.Errorf("TOC requires a tar-split, but the %s annotation does not describe a position", internal.TarSplitInfoKey)
+			return nil, nil, nil, 0, fmt.Errorf("TOC requires a tar-split, but the %s annotation does not describe a position", minimal.TarSplitInfoKey)
 		}
 		tarSplit, err := readBlob(tarSplitChunk.Length)
 		if err != nil {
 			return nil, nil, nil, 0, err
 		}
-		decodedTarSplit, err = decodeAndValidateBlob(tarSplit, tarSplitLengthUncompressed, toc.TarSplitDigest.String())
+		decodedTarSplit, err = openTmpFile(tmpDir)
 		if err != nil {
+			return nil, nil, nil, 0, err
+		}
+		defer func() {
+			if retErr != nil {
+				decodedTarSplit.Close()
+			}
+		}()
+		if err := decodeAndValidateBlobToStream(tarSplit, decodedTarSplit, toc.TarSplitDigest.String(), compressed); err != nil {
 			return nil, nil, nil, 0, fmt.Errorf("validating and decompressing tar-split: %w", err)
 		}
 		// We use the TOC for creating on-disk files, but the tar-split for creating metadata
@@ -240,15 +310,15 @@ func readZstdChunkedManifest(blobStream ImageSourceSeekable, tocDigest digest.Di
 			return nil, nil, nil, 0, err
 		}
 	}
-	return decodedBlob, toc, decodedTarSplit, int64(manifestChunk.Offset), err
+	return decodedBlob, toc, decodedTarSplit, int64(manifestChunk.Offset), nil
 }
 
 // ensureTOCMatchesTarSplit validates that toc and tarSplit contain _exactly_ the same entries.
-func ensureTOCMatchesTarSplit(toc *internal.TOC, tarSplit []byte) error {
-	pendingFiles := map[string]*internal.FileMetadata{} // Name -> an entry in toc.Entries
+func ensureTOCMatchesTarSplit(toc *minimal.TOC, tarSplit *os.File) error {
+	pendingFiles := map[string]*minimal.FileMetadata{} // Name -> an entry in toc.Entries
 	for i := range toc.Entries {
 		e := &toc.Entries[i]
-		if e.Type != internal.TypeChunk {
+		if e.Type != minimal.TypeChunk {
 			if _, ok := pendingFiles[e.Name]; ok {
 				return fmt.Errorf("TOC contains duplicate entries for path %q", e.Name)
 			}
@@ -256,13 +326,18 @@ func ensureTOCMatchesTarSplit(toc *internal.TOC, tarSplit []byte) error {
 		}
 	}
 
-	if err := iterateTarSplit(tarSplit, func(hdr *tar.Header) error {
+	if _, err := tarSplit.Seek(0, io.SeekStart); err != nil {
+		return err
+	}
+
+	unpacker := storage.NewJSONUnpacker(tarSplit)
+	if err := asm.IterateHeaders(unpacker, func(hdr *tar.Header) error {
 		e, ok := pendingFiles[hdr.Name]
 		if !ok {
 			return fmt.Errorf("tar-split contains an entry for %q missing in TOC", hdr.Name)
 		}
 		delete(pendingFiles, hdr.Name)
-		expected, err := internal.NewFileMetadata(hdr)
+		expected, err := minimal.NewFileMetadata(hdr)
 		if err != nil {
 			return fmt.Errorf("determining expected metadata for %q: %w", hdr.Name, err)
 		}
@@ -275,13 +350,43 @@ func ensureTOCMatchesTarSplit(toc *internal.TOC, tarSplit []byte) error {
 		return err
 	}
 	if len(pendingFiles) != 0 {
-		remaining := expMaps.Keys(pendingFiles)
+		remaining := slices.Collect(maps.Keys(pendingFiles))
 		if len(remaining) > 5 {
 			remaining = remaining[:5] // Just to limit the size of the output.
 		}
 		return fmt.Errorf("TOC contains entries not present in tar-split, incl. %q", remaining)
 	}
 	return nil
+}
+
+// tarSizeFromTarSplit computes the total tarball size, using only the tarSplit metadata
+func tarSizeFromTarSplit(tarSplit io.Reader) (int64, error) {
+	var res int64 = 0
+
+	unpacker := storage.NewJSONUnpacker(tarSplit)
+	for {
+		entry, err := unpacker.Next()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return -1, fmt.Errorf("reading tar-split entries: %w", err)
+		}
+		switch entry.Type {
+		case storage.SegmentType:
+			res += int64(len(entry.Payload))
+		case storage.FileType:
+			// entry.Size is the “logical size”, which might not be the physical size for sparse entries;
+			// but the way tar-split/tar/asm.WriteOutputTarStream combines FileType entries and returned files contents,
+			// sparse files are not supported.
+			// Also https://github.com/opencontainers/image-spec/blob/main/layer.md says
+			// > Sparse files SHOULD NOT be used because they lack consistent support across tar implementations.
+			res += entry.Size
+		default:
+			return -1, fmt.Errorf("unexpected tar-split entry type %q", entry.Type)
+		}
+	}
+	return res, nil
 }
 
 // ensureTimePointersMatch ensures that a and b are equal
@@ -313,8 +418,8 @@ func ensureTimePointersMatch(a, b *time.Time) error {
 
 // ensureFileMetadataAttributesMatch ensures that a and b match in file attributes (it ignores entries relevant to locating data
 // in the tar stream or matching contents)
-func ensureFileMetadataAttributesMatch(a, b *internal.FileMetadata) error {
-	// Keep this in sync with internal.FileMetadata!
+func ensureFileMetadataAttributesMatch(a, b *minimal.FileMetadata) error {
+	// Keep this in sync with minimal.FileMetadata!
 
 	if a.Type != b.Type {
 		return fmt.Errorf("mismatch of Type: %q != %q", a.Type, b.Type)
@@ -368,22 +473,33 @@ func ensureFileMetadataAttributesMatch(a, b *internal.FileMetadata) error {
 	return nil
 }
 
-func decodeAndValidateBlob(blob []byte, lengthUncompressed uint64, expectedCompressedChecksum string) ([]byte, error) {
+func validateBlob(blob []byte, expectedCompressedChecksum string) error {
 	d, err := digest.Parse(expectedCompressedChecksum)
 	if err != nil {
-		return nil, fmt.Errorf("invalid digest %q: %w", expectedCompressedChecksum, err)
+		return fmt.Errorf("invalid digest %q: %w", expectedCompressedChecksum, err)
 	}
 
 	blobDigester := d.Algorithm().Digester()
 	blobChecksum := blobDigester.Hash()
 	if _, err := blobChecksum.Write(blob); err != nil {
-		return nil, err
+		return err
 	}
 	if blobDigester.Digest() != d {
-		return nil, fmt.Errorf("invalid blob checksum, expected checksum %s, got %s", d, blobDigester.Digest())
+		return fmt.Errorf("invalid blob checksum, expected checksum %s, got %s", d, blobDigester.Digest())
+	}
+	return nil
+}
+
+func decodeAndValidateBlob(blob []byte, lengthUncompressed uint64, expectedCompressedChecksum string, compressed bool) ([]byte, error) {
+	if err := validateBlob(blob, expectedCompressedChecksum); err != nil {
+		return nil, err
 	}
 
-	decoder, err := zstd.NewReader(nil) //nolint:contextcheck
+	if !compressed {
+		return blob, nil
+	}
+
+	decoder, err := zstd.NewReader(nil)
 	if err != nil {
 		return nil, err
 	}
@@ -391,4 +507,24 @@ func decodeAndValidateBlob(blob []byte, lengthUncompressed uint64, expectedCompr
 
 	b := make([]byte, 0, lengthUncompressed)
 	return decoder.DecodeAll(blob, b)
+}
+
+func decodeAndValidateBlobToStream(blob []byte, w *os.File, expectedCompressedChecksum string, compressed bool) error {
+	if err := validateBlob(blob, expectedCompressedChecksum); err != nil {
+		return err
+	}
+
+	if !compressed {
+		_, err := w.Write(blob)
+		return err
+	}
+
+	decoder, err := zstd.NewReader(bytes.NewReader(blob))
+	if err != nil {
+		return err
+	}
+	defer decoder.Close()
+
+	_, err = decoder.WriteTo(w)
+	return err
 }
