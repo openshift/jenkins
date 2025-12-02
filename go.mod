@@ -2,7 +2,7 @@ module github.com/openshift/jenkins
 
 go 1.21.0
 
-toolchain go1.21.10
+toolchain go1.25.5
 
 require (
 	github.com/containers/podman/v4 v4.9.4
