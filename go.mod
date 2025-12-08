@@ -6,7 +6,7 @@ toolchain go1.21.10
 
 require (
 	github.com/containers/podman/v4 v4.9.4
-	github.com/onsi/ginkgo v1.16.5
+	github.com/onsi/ginkgo/v2 v2.27.3
 	github.com/onsi/gomega v1.30.0
 )
 
