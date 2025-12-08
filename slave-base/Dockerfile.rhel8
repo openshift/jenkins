@@ -33,12 +33,16 @@ LABEL com.redhat.component="jenkins-agent-base-container" \
     io.openshift.build.source-location="${CI_UPSTREAM_URL}" \
     io.openshift.build.commit.url="${CI_UPSTREAM_URL}/commit/${CI_UPSTREAM_COMMIT}" \
     version="${OCP_VERSION}" \
-    url="https://catalog.redhat.com/software/containers/ocp-tools-4/jenkins-agent-base-rhel8" \
-    summary="Provides a base image for Jenkins agents, primarily intended for integration with OpenShift v4"
+    url="https://catalog.redhat.com/en/software/containers/ocp-tools-4/jenkins-agent-base-rhel8/6241e3457847116cf8577aea" \
+    summary="Provides a base image for Jenkins agents, primarily intended for integration with OpenShift v4" \
+    com.redhat.license_terms="https://www.redhat.com/agreements"
 
 ENV HOME=/home/jenkins \
     LANG=en_US.UTF-8 \
-    LC_ALL=en_US.UTF-8
+    LC_ALL=en_US.UTF-8 \
+    BUILD_VERSION=${OCP_VERSION} \
+    OS_GIT_MINOR=${OS_GIT_MINOR} \
+    USE_JAVA_VERSION=java-21
 
 USER root
 # Install headless Java

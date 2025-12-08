@@ -34,10 +34,13 @@ ENV JENKINS_VERSION=2 \
     HOME=/var/lib/jenkins \
     JENKINS_HOME=/var/lib/jenkins \
     JENKINS_UC=https://updates.jenkins.io \
-    OPENSHIFT_JENKINS_IMAGE_VERSION=4.15 \
+    OPENSHIFT_JENKINS_IMAGE_VERSION=${OCP_VERSION} \
     LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
-    INSTALL_JENKINS_VIA_RPMS=false
+    INSTALL_JENKINS_VIA_RPMS=false \
+    USE_JAVA_VERSION=java-21 \
+    BUILD_VERSION=${OCP_VERSION} \
+    OS_GIT_MINOR=${OS_GIT_MINOR}
 # openshift/ocp-build-data will change INSTALL_JENKINS_VIA_RPMS to true
 # so that the osbs/brew builds will install via RPMs; when this runs
 # in api.ci, it will employ the old centos style, download the plugins and
@@ -64,8 +67,9 @@ LABEL com.redhat.component="openshift-jenkins-2-container" \
     io.openshift.build.source-location="${CI_UPSTREAM_URL}" \
     io.openshift.build.commit.url="${CI_UPSTREAM_URL}/commit/${CI_UPSTREAM_COMMIT}" \
     version="${OCP_VERSION}" \
-    url="https://catalog.redhat.com/software/containers/ocp-tools-4/jenkins-rhel8" \
-    summary="Provides a Jenkins server, primarily intended for integration with OpenShift v4"
+    url="https://catalog.redhat.com/en/software/containers/ocp-tools-4/jenkins-rhel8/5fe1f38288e9c2f788526306" \
+    summary="Provides a Jenkins server, primarily intended for integration with OpenShift v4" \
+    com.redhat.license_terms="https://www.redhat.com/agreements"
 
 # 8080 for main web interface, 50000 for slave agents
 EXPOSE 8080 50000
@@ -94,15 +98,15 @@ ADD release.version /tmp/release.version
 # Konflux-specific logic for hermetic builds
 # If the cachi2 output directory exists, create the necessary directories and copy the jenkins.war and plugins into the image
 RUN if [ -d /cachi2/output/deps/generic ]; then \
-       install -d -m 755 /usr/lib/jenkins \
+       install -d -m 775 /usr/lib/jenkins \
                          /usr/lib/jenkins/plugins \
                          /opt/openshift/plugins \
                          /var/lib/jenkins \
                          /var/log/jenkins \
                          /var/cache/jenkins && \
-       install -m 644 /cachi2/output/deps/generic/jenkins.war \
+       install -m 777 /cachi2/output/deps/generic/jenkins.war \
                       /usr/lib/jenkins/jenkins.war && \
-       install -m 644 -t /opt/openshift/plugins \
+       install -m 777 -t /opt/openshift/plugins \
                       /cachi2/output/deps/generic/*.jpi; \
     fi
 
