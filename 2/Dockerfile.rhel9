@@ -10,16 +10,18 @@ RUN GO111MODULE=off go build -o /usr/bin/go-init .
 ##############################################
 # Stage 2 : Build controller with go-init
 ##############################################
+FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.19 as oc-419
 FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.18 as oc-418
 FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.17 as oc-417
 FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.16 as oc-416
 
-FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.19
+FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.20
 ARG JENKINS_LTS \
     CI_UPSTREAM_COMMIT \
     CI_UPSTREAM_URL \
     OCP_VERSION
 COPY --from=go-init-builder --chown=root:root /usr/bin/go-init /usr/bin/go-init
+COPY --from=oc-419 --chown=root:root /usr/bin/oc /usr/share/openshift/bin/oc-419/oc
 COPY --from=oc-418 --chown=root:root /usr/bin/oc /usr/share/openshift/bin/oc-418/oc
 COPY --from=oc-417 --chown=root:root /usr/bin/oc /usr/share/openshift/bin/oc-417/oc
 COPY --from=oc-416 --chown=root:root /usr/bin/oc /usr/share/openshift/bin/oc-416/oc
@@ -38,10 +40,13 @@ ENV JENKINS_VERSION=2 \
     HOME=/var/lib/jenkins \
     JENKINS_HOME=/var/lib/jenkins \
     JENKINS_UC=https://updates.jenkins.io \
-    OPENSHIFT_JENKINS_IMAGE_VERSION=v4.19.0 \
+    OPENSHIFT_JENKINS_IMAGE_VERSION=${OCP_VERSION} \
     LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
-    INSTALL_JENKINS_VIA_RPMS=false
+    INSTALL_JENKINS_VIA_RPMS=false \
+    USE_JAVA_VERSION=java-21 \
+    BUILD_VERSION=${OCP_VERSION} \
+    OS_GIT_MINOR=${OS_GIT_MINOR}
 # openshift/ocp-build-data will change INSTALL_JENKINS_VIA_RPMS to true
 # so that the osbs/brew builds will install via RPMs; when this runs
 # in api.ci, it will employ the old centos style, download the plugins and
@@ -68,8 +73,9 @@ LABEL com.redhat.component="openshift-jenkins-2-container" \
     io.openshift.build.source-location="${CI_UPSTREAM_URL}" \
     io.openshift.build.commit.url="${CI_UPSTREAM_URL}/commit/${CI_UPSTREAM_COMMIT}" \
     version="${OCP_VERSION}" \
-    url="https://catalog.redhat.com/software/containers/ocp-tools-4/jenkins-rhel9/65dc9063b7db2e8b83a5b299" \
-    summary="Provides a Jenkins server, primarily intended for integration with OpenShift v4"
+    url="https://catalog.redhat.com/en/software/containers/ocp-tools-4/jenkins-rhel9/65dc9063b7db2e8b83a5b299" \
+    summary="Provides a Jenkins server, primarily intended for integration with OpenShift v4" \
+    com.redhat.license_terms="https://www.redhat.com/agreements"
 
 # 8080 for main web interface, 50000 for slave agents
 EXPOSE 8080 50000
@@ -98,15 +104,15 @@ ADD release.version /tmp/release.version
 # Konflux-specific logic for hermetic builds
 # If the cachi2 output directory exists, create the necessary directories and copy the jenkins.war and plugins into the image
 RUN if [ -d /cachi2/output/deps/generic ]; then \
-       install -d -m 755 /usr/lib/jenkins \
+       install -d -m 775 /usr/lib/jenkins \
                          /usr/lib/jenkins/plugins \
                          /opt/openshift/plugins \
                          /var/lib/jenkins \
                          /var/log/jenkins \
                          /var/cache/jenkins && \
-       install -m 644 /cachi2/output/deps/generic/jenkins.war \
+       install -m 777 /cachi2/output/deps/generic/jenkins.war \
                       /usr/lib/jenkins/jenkins.war && \
-       install -m 644 -t /opt/openshift/plugins \
+       install -m 777 -t /opt/openshift/plugins \
                       /cachi2/output/deps/generic/*.jpi; \
     fi
 
