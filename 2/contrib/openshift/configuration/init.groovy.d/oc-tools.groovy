@@ -8,7 +8,8 @@ def descriptor = Jenkins.instance.getDescriptor(OpenShiftClientTools)
 def toolsToAdd = [
     "oc-4.16": "/usr/share/openshift/bin/oc-416",
     "oc-4.17": "/usr/share/openshift/bin/oc-417",
-    "oc-4.18": "/usr/share/openshift/bin/oc-418"
+    "oc-4.18": "/usr/share/openshift/bin/oc-418",
+    "oc-4.19": "/usr/share/openshift/bin/oc-419"
 ]
 
 def existing = descriptor.getInstallations() as List

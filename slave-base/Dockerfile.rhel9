@@ -34,11 +34,15 @@ LABEL com.redhat.component="jenkins-agent-base-rhel9-container" \
     io.openshift.build.commit.url="${CI_UPSTREAM_URL}/commit/${CI_UPSTREAM_COMMIT}" \
     version="${OCP_VERSION}" \
     url="https://catalog.redhat.com/software/containers/ocp-tools-4/jenkins-agent-base-rhel9/65dc9063b7db2e8b83a5b29e" \
-    summary="Provides a Jenkins agent base, primarily intended for integration with OpenShift v4"
+    summary="Provides a Jenkins agent base, primarily intended for integration with OpenShift v4" \
+    com.redhat.license_terms="https://www.redhat.com/agreements"
 
 ENV HOME=/home/jenkins \
     LANG=en_US.UTF-8 \
-    LC_ALL=en_US.UTF-8
+    LC_ALL=en_US.UTF-8 \
+    BUILD_VERSION=${OCP_VERSION} \
+    OS_GIT_MINOR=${OS_GIT_MINOR} \
+    USE_JAVA_VERSION=java-21
 
 USER root
 # Install headless Java
