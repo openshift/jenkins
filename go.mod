@@ -5,7 +5,7 @@ go 1.21.0
 toolchain go1.21.10
 
 require (
-	github.com/containers/podman/v4 v4.9.4
+	github.com/containers/podman/v5 v5.7.1
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.30.0
 )
