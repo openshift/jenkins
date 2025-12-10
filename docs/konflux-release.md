@@ -45,4 +45,5 @@ flowchart TD
   click ECPMR "https://gitlab.cee.redhat.com/releng/konflux-release-data/-/merge_requests/12729"
   click UpdateArtifacts "https://github.com/openshift/jenkins/pull/2112"
   click UpdateTask "https://github.com/openshift/jenkins/pull/2114"
+  click RunECPGen "https://github.com/openshift/jenkins/blob/release-rhel8/tools/knflx-ecp-gen/README.md"
 ```
