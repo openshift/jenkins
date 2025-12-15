@@ -29,9 +29,12 @@ if [[ "${INSTALL_JENKINS_VIA_RPMS}" == false ]]; then
     
     /usr/local/bin/install-plugins.sh $PLUGIN_LIST
 else
-    yum install -y --disableplugin=subscription-manager jenkins-2.* jenkins-2-plugins
-    rpm -V jenkins-2.* jenkins-2-plugins
-    yum clean all
+    # Konflux build copies the /usr/lib/jenkins/plugins/*.hpi from the cachi2;
+    # Hence commenting the RPM installation commands
+    # yum install -y --disableplugin=subscription-manager jenkins-2.* jenkins-2-plugins
+    # rpm -V jenkins-2.* jenkins-2-plugins
+    # yum clean all
+
     # Remove the base-plugins.txt file because it's only used for Centos
     # and its presence in the rhel image is confusing.
     rm /opt/openshift/base-plugins.txt
