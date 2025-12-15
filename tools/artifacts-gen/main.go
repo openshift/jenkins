@@ -394,10 +394,7 @@ func main() {
 
 		filename := filepath.Base(plugin.DownloadURL)
 		if filename == "" || filename == "." {
-			filename = plugin.Name + ".jpi"
-		} else {
-			// Replace .hpi extension with .jpi
-			filename = strings.Replace(filename, ".hpi", ".jpi", 1)
+			filename = plugin.Name + ".hpi"
 		}
 
 		// Build artifact
