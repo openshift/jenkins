@@ -6,23 +6,30 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
 	"strings"
 
+	"github.com/moby/sys/capability"
 	rspec "github.com/opencontainers/runtime-spec/specs-go"
 	"github.com/opencontainers/runtime-tools/generate/seccomp"
 	capsCheck "github.com/opencontainers/runtime-tools/validate/capabilities"
-	"github.com/syndtr/gocapability/capability"
 )
 
 var (
 	// Namespaces include the names of supported namespaces.
-	Namespaces = []string{"network", "pid", "mount", "ipc", "uts", "user", "cgroup"}
+	Namespaces = []string{"network", "pid", "mount", "ipc", "uts", "user", "cgroup", "time"}
 
 	// we don't care about order...and this is way faster...
 	removeFunc = func(s []string, i int) []string {
 		s[i] = s[len(s)-1]
 		return s[:len(s)-1]
 	}
+)
+
+const (
+	// UnlimitedPidsLimit can be passed to SetLinuxResourcesPidsLimit to
+	// request unlimited PIDs.
+	UnlimitedPidsLimit int64 = -1
 )
 
 // Generator represents a generator for a container config.
@@ -88,7 +95,8 @@ func New(os string) (generator Generator, err error) {
 		}
 	}
 
-	if os == "linux" {
+	switch os {
+	case "linux":
 		config.Process.Capabilities = &rspec.LinuxCapabilities{
 			Bounding: []string{
 				"CAP_CHOWN",
@@ -237,7 +245,7 @@ func New(os string) (generator Generator, err error) {
 			},
 			Seccomp: seccomp.DefaultProfile(&config),
 		}
-	} else if os == "freebsd" {
+	case "freebsd":
 		config.Mounts = []rspec.Mount{
 			{
 				Destination: "/dev",
@@ -593,12 +601,10 @@ func (g *Generator) ClearProcessAdditionalGids() {
 }
 
 // AddProcessAdditionalGid adds an additional gid into g.Config.Process.AdditionalGids.
-func (g *Generator) AddProcessAdditionalGid(gid uint32) {
+func (g *Generator) AddProcessAdditionalGid(gid uint32) { //nolint:staticcheck // Ignore ST1003: method AddProcessAdditionalGid should be AddProcessAdditionalGID
 	g.initConfigProcess()
-	for _, group := range g.Config.Process.User.AdditionalGids {
-		if group == gid {
-			return
-		}
+	if slices.Contains(g.Config.Process.User.AdditionalGids, gid) {
+		return
 	}
 	g.Config.Process.User.AdditionalGids = append(g.Config.Process.User.AdditionalGids, gid)
 }
@@ -625,6 +631,12 @@ func (g *Generator) SetLinuxIntelRdtClosID(clos string) {
 func (g *Generator) SetLinuxIntelRdtL3CacheSchema(schema string) {
 	g.initConfigLinuxIntelRdt()
 	g.Config.Linux.IntelRdt.L3CacheSchema = schema
+}
+
+// SetLinuxTimeOffset sets g.Config.Linux.TimeOffsets[clock]
+func (g *Generator) SetLinuxTimeOffset(clock string, offset rspec.LinuxTimeOffset) {
+	g.initConfigLinuxTimeOffsets()
+	g.Config.Linux.TimeOffsets[clock] = offset
 }
 
 // SetLinuxMountLabel sets g.Config.Linux.MountLabel.
@@ -868,7 +880,7 @@ func (g *Generator) DropLinuxResourcesHugepageLimit(pageSize string) {
 	}
 }
 
-// AddLinuxResourcesUnified sets the g.Config.Linux.Resources.Unified
+// SetLinuxResourcesUnified sets the g.Config.Linux.Resources.Unified.
 func (g *Generator) SetLinuxResourcesUnified(unified map[string]string) {
 	g.initConfigLinuxResourcesUnified()
 	for k, v := range unified {
@@ -911,7 +923,7 @@ func (g *Generator) SetLinuxResourcesMemorySwap(swap int64) {
 // SetLinuxResourcesMemoryKernel sets g.Config.Linux.Resources.Memory.Kernel.
 func (g *Generator) SetLinuxResourcesMemoryKernel(kernel int64) {
 	g.initConfigLinuxResourcesMemory()
-	g.Config.Linux.Resources.Memory.Kernel = &kernel
+	g.Config.Linux.Resources.Memory.Kernel = &kernel //nolint:staticcheck // Ignore SA1019: g.Config.Linux.Resources.Memory.Kernel is deprecated
 }
 
 // SetLinuxResourcesMemoryKernelTCP sets g.Config.Linux.Resources.Memory.KernelTCP.
@@ -970,7 +982,7 @@ func (g *Generator) DropLinuxResourcesNetworkPriorities(name string) {
 // SetLinuxResourcesPidsLimit sets g.Config.Linux.Resources.Pids.Limit.
 func (g *Generator) SetLinuxResourcesPidsLimit(limit int64) {
 	g.initConfigLinuxResourcesPids()
-	g.Config.Linux.Resources.Pids.Limit = limit
+	g.Config.Linux.Resources.Pids.Limit = &limit
 }
 
 // ClearLinuxSysctl clears g.Config.Linux.Sysctl.
@@ -1060,13 +1072,13 @@ func (g *Generator) ClearPreStartHooks() {
 	if g.Config == nil || g.Config.Hooks == nil {
 		return
 	}
-	g.Config.Hooks.Prestart = []rspec.Hook{}
+	g.Config.Hooks.Prestart = []rspec.Hook{} //nolint:staticcheck // Ignore SA1019: g.Config.Hooks.Prestart is deprecated
 }
 
 // AddPreStartHook add a prestart hook into g.Config.Hooks.Prestart.
 func (g *Generator) AddPreStartHook(preStartHook rspec.Hook) {
 	g.initConfigHooks()
-	g.Config.Hooks.Prestart = append(g.Config.Hooks.Prestart, preStartHook)
+	g.Config.Hooks.Prestart = append(g.Config.Hooks.Prestart, preStartHook) //nolint:staticcheck // Ignore SA1019: g.Config.Hooks.Prestart is deprecated
 }
 
 // ClearPostStopHooks clear g.Config.Hooks.Poststop.
@@ -1135,10 +1147,11 @@ func (g *Generator) ClearMounts() {
 func (g *Generator) SetupPrivileged(privileged bool) {
 	if privileged { // Add all capabilities in privileged mode.
 		var finalCapList []string
-		for _, cap := range capability.List() {
-			if g.HostSpecific && cap > capsCheck.LastCap() {
-				continue
-			}
+		capList := capability.ListKnown()
+		if g.HostSpecific {
+			capList, _ = capability.ListSupported()
+		}
+		for _, cap := range capList {
 			finalCapList = append(finalCapList, fmt.Sprintf("CAP_%s", strings.ToUpper(cap.String())))
 		}
 		g.initConfigLinux()
@@ -1478,6 +1491,8 @@ func mapStrToNamespace(ns string, path string) (rspec.LinuxNamespace, error) {
 		return rspec.LinuxNamespace{Type: rspec.UserNamespace, Path: path}, nil
 	case "cgroup":
 		return rspec.LinuxNamespace{Type: rspec.CgroupNamespace, Path: path}, nil
+	case "time":
+		return rspec.LinuxNamespace{Type: rspec.TimeNamespace, Path: path}, nil
 	default:
 		return rspec.LinuxNamespace{}, fmt.Errorf("unrecognized namespace %q", ns)
 	}
