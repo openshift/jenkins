@@ -110,7 +110,7 @@ execute_verification_script(){
     # Create a script, that'll execute the `verify-jenkins.sh` within the pod
     # read -e -p "Enter the relevant commit's COMMIT_SHA: " COMMIT_SHA
     cat > /tmp/download_script.sh << EOL
-curl https://raw.githubusercontent.com/openshift/jenkins/master/scripts/verify-jenkins.sh | SHA=${COMMIT_SHA} sh
+curl https://raw.githubusercontent.com/openshift/jenkins/release-rhel9/scripts/verify-jenkins.sh | SHA=${COMMIT_SHA} sh
 EOL
 
     # Run jenkins verification script inside the pod & redirect the output to a file.
