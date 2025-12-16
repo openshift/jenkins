@@ -221,7 +221,7 @@ check_failed_log() {
 }
 
 verify_installed_packages() {
-	http_status_code=$(curl -s -o "/tmp/Dockerfile.rhel8" -w "%{http_code}\n" "${GITHUB_JENKINS_BASE_URL}/${SHA}/2/Dockerfile.rhel9" 2> /dev/null)
+	http_status_code=$(curl -s -o "/tmp/Dockerfile.rhel8" -w "%{http_code}\n" "${GITHUB_JENKINS_BASE_URL}/${SHA}/2/Dockerfile.rhel8-multi-arch" 2> /dev/null)
 	printf "[VERIFYING] Installed packages ...\n"
 
 	# Download the remote file to a temporary file, verifying the http_status code for the request
@@ -248,6 +248,7 @@ verify_installed_packages() {
 			fi
 	done
 }
+
 main() {
 	ensure_sha_env_var
 	verify_installed_packages
