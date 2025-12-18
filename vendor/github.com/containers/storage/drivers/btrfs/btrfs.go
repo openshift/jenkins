@@ -1,5 +1,4 @@
 //go:build linux && cgo
-// +build linux,cgo
 
 package btrfs
 
@@ -31,6 +30,7 @@ import (
 	"unsafe"
 
 	graphdriver "github.com/containers/storage/drivers"
+	"github.com/containers/storage/internal/tempdir"
 	"github.com/containers/storage/pkg/directory"
 	"github.com/containers/storage/pkg/fileutils"
 	"github.com/containers/storage/pkg/idtools"
@@ -673,4 +673,20 @@ func (d *Driver) ListLayers() ([]string, error) {
 // AdditionalImageStores returns additional image stores supported by the driver
 func (d *Driver) AdditionalImageStores() []string {
 	return nil
+}
+
+// Dedup performs deduplication of the driver's storage.
+func (d *Driver) Dedup(req graphdriver.DedupArgs) (graphdriver.DedupResult, error) {
+	return graphdriver.DedupResult{}, nil
+}
+
+// DeferredRemove is not implemented.
+// It calls Remove directly.
+func (d *Driver) DeferredRemove(id string) (tempdir.CleanupTempDirFunc, error) {
+	return nil, d.Remove(id)
+}
+
+// GetTempDirRootDirs is not implemented.
+func (d *Driver) GetTempDirRootDirs() []string {
+	return []string{}
 }
