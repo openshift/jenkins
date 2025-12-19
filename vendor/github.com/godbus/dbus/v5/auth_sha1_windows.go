@@ -7,6 +7,7 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"os"
+	"os/user"
 )
 
 // AuthCookieSha1 returns an Auth that authenticates as the given user with the
@@ -99,4 +100,11 @@ func (a authCookieSha1) generateChallenge() []byte {
 	enc := make([]byte, 32)
 	hex.Encode(enc, b)
 	return enc
+}
+
+func getHomeDir() string {
+	if dir, err := os.UserHomeDir(); err == nil {
+		return dir
+	}
+	return "/"
 }
