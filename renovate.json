@@ -1,7 +1,32 @@
 {
-    "schedule": ["on Saturday"],
-    "groupName": "Konflux build pipeline",
-    "includePaths": [".tekton/*"],
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "commitMessagePrefix": "NO-ISSUE: ",
-    "labels": ["lgtm", "approved"]
+    "labels": [
+        "lgtm",
+        "approved"
+    ],
+    "prHourlyLimit": 0,
+    "prConcurrentLimit": 0,
+    "enabledManagers": [
+        "tekton"
+    ],
+    "tekton": {
+        "managerFilePatterns": [
+            "/^.tekton/*/"
+        ]
+    },
+    "packageRules": [
+        {
+            "groupName": "Konflux build pipeline",
+            "addLabels": [
+                "konflux"
+            ],
+            "schedule": [
+                "on Saturday"
+            ],
+            "matchManagers": [
+                "tekton"
+            ]
+        }
+    ]
 }
