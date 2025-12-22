@@ -1,32 +1,32 @@
 {
-    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "commitMessagePrefix": "NO-ISSUE: ",
-    "labels": [
-        "lgtm",
-        "approved"
-    ],
-    "prHourlyLimit": 0,
-    "prConcurrentLimit": 0,
-    "enabledManagers": [
-        "tekton"
-    ],
-    "tekton": {
-        "managerFilePatterns": [
-            "/^.tekton/*/"
-        ]
-    },
-    "packageRules": [
-        {
-            "groupName": "Konflux build pipeline",
-            "addLabels": [
-                "konflux"
-            ],
-            "schedule": [
-                "on Saturday"
-            ],
-            "matchManagers": [
-                "tekton"
-            ]
-        }
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+
+  "commitMessagePrefix": "NO-ISSUE: ",
+  "labels": ["lgtm", "approved"],
+
+  "prHourlyLimit": 0,
+  "prConcurrentLimit": 0,
+
+  "enabledManagers": ["tekton"],
+
+  "gomod": { "enabled": false },
+  "dockerfile": { "enabled": false },
+  "github-actions": { "enabled": false },
+  "helm": { "enabled": false },
+  "npm": { "enabled": false },
+
+  "tekton": {
+    "managerFilePatterns": [
+      "^\\.tekton/.*\\.ya?ml$"
     ]
+  },
+
+  "packageRules": [
+    {
+      "groupName": "Konflux build pipeline",
+      "matchManagers": ["tekton"],
+      "addLabels": ["konflux"],
+      "schedule": ["on Saturday"]
+    }
+  ]
 }
