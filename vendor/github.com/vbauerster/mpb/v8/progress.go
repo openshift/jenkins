@@ -2,6 +2,7 @@ package mpb
 
 import (
 	"bytes"
+	"cmp"
 	"context"
 	"fmt"
 	"io"
@@ -15,9 +16,10 @@ import (
 )
 
 const defaultRefreshRate = 150 * time.Millisecond
+const defaultHmQueueLength = 128
 
-// DoneError represents use after `(*Progress).Wait()` error.
-var DoneError = fmt.Errorf("%T instance can't be reused after %[1]T.Wait()", (*Progress)(nil))
+// ErrDone represents use after `(*Progress).Wait()` error.
+var ErrDone = fmt.Errorf("%T instance can't be reused after %[1]T.Wait()", (*Progress)(nil))
 
 // Progress represents a container that renders one or more progress bars.
 type Progress struct {
@@ -31,16 +33,16 @@ type Progress struct {
 
 // pState holds bars in its priorityQueue, it gets passed to (*Progress).serve monitor goroutine.
 type pState struct {
-	ctx          context.Context
-	hm           heapManager
-	dropS, dropD chan struct{}
-	renderReq    chan time.Time
-	idCount      int
-	popPriority  int
+	ctx         context.Context
+	hm          heapManager
+	renderReq   chan time.Time
+	idCount     int
+	popPriority int
 
-	// following are provided/overrided by user
-	refreshRate      time.Duration
+	// following are provided/overrode by user
+	hmQueueLen       int
 	reqWidth         int
+	refreshRate      time.Duration
 	popCompleted     bool
 	autoRefresh      bool
 	delayRC          <-chan struct{}
@@ -68,9 +70,7 @@ func NewWithContext(ctx context.Context, options ...ContainerOption) *Progress {
 	ctx, cancel := context.WithCancel(ctx)
 	s := &pState{
 		ctx:         ctx,
-		hm:          make(heapManager),
-		dropS:       make(chan struct{}),
-		dropD:       make(chan struct{}),
+		hmQueueLen:  defaultHmQueueLength,
 		renderReq:   make(chan time.Time),
 		popPriority: math.MinInt32,
 		refreshRate: defaultRefreshRate,
@@ -84,6 +84,8 @@ func NewWithContext(ctx context.Context, options ...ContainerOption) *Progress {
 			opt(s)
 		}
 	}
+
+	s.hm = make(heapManager, s.hmQueueLen)
 
 	p := &Progress{
 		uwg:          s.uwg,
@@ -109,8 +111,8 @@ func NewWithContext(ctx context.Context, options ...ContainerOption) *Progress {
 	}
 
 	p.pwg.Add(1)
+	go s.hm.run(s.shutdownNotifier)
 	go p.serve(s, cw)
-	go s.hm.run()
 	return p
 }
 
@@ -126,6 +128,9 @@ func (p *Progress) AddSpinner(total int64, options ...BarOption) *Bar {
 
 // New creates a bar by calling `Build` method on provided `BarFillerBuilder`.
 func (p *Progress) New(total int64, builder BarFillerBuilder, options ...BarOption) *Bar {
+	if builder == nil {
+		return p.MustAdd(total, nil, options...)
+	}
 	return p.MustAdd(total, builder.Build(), options...)
 }
 
@@ -143,16 +148,14 @@ func (p *Progress) MustAdd(total int64, filler BarFiller, options ...BarOption) 
 // Add creates a bar which renders itself by provided BarFiller.
 // If `total <= 0` triggering complete event by increment methods
 // is disabled. If called after `(*Progress).Wait()` then
-// `(nil, DoneError)` is returned.
+// `(nil, ErrDone)` is returned.
 func (p *Progress) Add(total int64, filler BarFiller, options ...BarOption) (*Bar, error) {
 	if filler == nil {
 		filler = NopStyle().Build()
+	} else if f, ok := filler.(BarFillerFunc); ok && f == nil {
+		filler = NopStyle().Build()
 	}
-	type result struct {
-		bar *Bar
-		bs  *bState
-	}
-	ch := make(chan result)
+	ch := make(chan *Bar)
 	select {
 	case p.operateState <- func(ps *pState) {
 		bs := ps.makeBarState(total, filler, options...)
@@ -163,34 +166,22 @@ func (p *Progress) Add(total int64, filler BarFiller, options ...BarOption) (*Ba
 			ps.hm.push(bar, true)
 		}
 		ps.idCount++
-		ch <- result{bar, bs}
+		ch <- bar
 	}:
-		res := <-ch
-		bar, bs := res.bar, res.bs
-		bar.TraverseDecorators(func(d decor.Decorator) {
-			if d, ok := d.(decor.AverageDecorator); ok {
-				bs.averageDecorators = append(bs.averageDecorators, d)
-			}
-			if d, ok := d.(decor.EwmaDecorator); ok {
-				bs.ewmaDecorators = append(bs.ewmaDecorators, d)
-			}
-			if d, ok := d.(decor.ShutdownListener); ok {
-				bs.shutdownListeners = append(bs.shutdownListeners, d)
-			}
-		})
-		return bar, nil
+		return <-ch, nil
 	case <-p.done:
-		return nil, DoneError
+		return nil, ErrDone
 	}
 }
 
 func (p *Progress) traverseBars(cb func(b *Bar) bool) {
-	iter, drop := make(chan *Bar), make(chan struct{})
+	req := make(iterRequest, 1)
 	select {
-	case p.operateState <- func(s *pState) { s.hm.iter(iter, drop) }:
-		for b := range iter {
+	case p.operateState <- func(s *pState) {
+		s.hm.iter(req)
+	}:
+		for b := range <-req {
 			if !cb(b) {
-				close(drop)
 				break
 			}
 		}
@@ -214,8 +205,7 @@ func (p *Progress) UpdateBarPriority(b *Bar, priority int, lazy bool) {
 // Write is implementation of io.Writer.
 // Writing to `*Progress` will print lines above a running bar.
 // Writes aren't flushed immediately, but at next refresh cycle.
-// If called after `(*Progress).Wait()` then `(0, DoneError)`
-// is returned.
+// If called after `(*Progress).Wait()` then `(0, ErrDone)` is returned.
 func (p *Progress) Write(b []byte) (int, error) {
 	type result struct {
 		n   int
@@ -230,7 +220,7 @@ func (p *Progress) Write(b []byte) (int, error) {
 		res := <-ch
 		return res.n, res.err
 	case <-p.done:
-		return 0, DoneError
+		return 0, ErrDone
 	}
 }
 
@@ -241,7 +231,6 @@ func (p *Progress) Wait() {
 	if p.uwg != nil {
 		p.uwg.Wait()
 	}
-
 	p.bwg.Wait()
 	p.Shutdown()
 }
@@ -255,7 +244,10 @@ func (p *Progress) Shutdown() {
 }
 
 func (p *Progress) serve(s *pState, cw *cwriter.Writer) {
-	defer p.pwg.Done()
+	defer func() {
+		close(s.hm)
+		p.pwg.Done()
+	}()
 	var err error
 	var w *cwriter.Writer
 	renderReq := s.renderReq
@@ -309,7 +301,6 @@ func (p *Progress) serve(s *pState, cw *cwriter.Writer) {
 					s.hm.state(update)
 				}
 			}
-			s.hm.end(s.shutdownNotifier)
 			return
 		}
 	}
@@ -346,59 +337,49 @@ func (s *pState) manualRefreshListener(done chan struct{}) {
 }
 
 func (s *pState) render(cw *cwriter.Writer) (err error) {
-	s.hm.sync(s.dropS)
-	iter := make(chan *Bar)
-	go s.hm.iter(iter, s.dropS)
+	req := make(iterRequest, 2)
+	s.hm.sync()
+	s.hm.iter(req, req)
 
 	var width, height int
 	if cw.IsTerminal() {
 		width, height, err = cw.GetTermSize()
 		if err != nil {
-			close(s.dropS)
 			return err
 		}
 	} else {
-		if s.reqWidth > 0 {
-			width = s.reqWidth
-		} else {
-			width = 80
-		}
+		width = cmp.Or(s.reqWidth, 80)
 		height = width
 	}
 
-	for b := range iter {
+	for b := range <-req {
 		go b.render(width)
 	}
 
-	return s.flush(cw, height)
+	return s.flush(cw, height, <-req)
 }
 
-func (s *pState) flush(cw *cwriter.Writer, height int) error {
-	var wg sync.WaitGroup
-	defer wg.Wait() // waiting for all s.push to complete
-
-	var popCount int
-	var rows []io.Reader
-
-	iter := make(chan *Bar)
-	s.hm.drain(iter, s.dropD)
+func (s *pState) flush(cw *cwriter.Writer, height int, iter <-chan *Bar) error {
+	var total, popCount int
+	rows := make([][]io.Reader, 0, cap(iter))
 
 	for b := range iter {
 		frame := <-b.frameCh
 		if frame.err != nil {
-			close(s.dropD)
 			b.cancel()
+			s.hm.push(b, false)
 			return frame.err // b.frameCh is buffered it's ok to return here
 		}
-		var usedRows int
+		var discarded int
 		for i := len(frame.rows) - 1; i >= 0; i-- {
-			if row := frame.rows[i]; len(rows) < height {
-				rows = append(rows, row)
-				usedRows++
+			if total < height {
+				total++
 			} else {
-				_, _ = io.Copy(io.Discard, row)
+				_, _ = io.Copy(io.Discard, frame.rows[i]) // Found IsInBounds
+				discarded++
 			}
 		}
+		rows = append(rows, frame.rows)
 
 		switch frame.shutdown {
 		case 1:
@@ -406,42 +387,35 @@ func (s *pState) flush(cw *cwriter.Writer, height int) error {
 			if qb, ok := s.queueBars[b]; ok {
 				delete(s.queueBars, b)
 				qb.priority = b.priority
-				wg.Add(1)
-				go s.push(&wg, qb, true)
+				s.hm.push(qb, true)
 			} else if s.popCompleted && !frame.noPop {
 				b.priority = s.popPriority
 				s.popPriority++
-				wg.Add(1)
-				go s.push(&wg, b, false)
+				s.hm.push(b, false)
 			} else if !frame.rmOnComplete {
-				wg.Add(1)
-				go s.push(&wg, b, false)
+				s.hm.push(b, false)
 			}
 		case 2:
 			if s.popCompleted && !frame.noPop {
-				popCount += usedRows
+				popCount += len(frame.rows) - discarded
 				continue
 			}
 			fallthrough
 		default:
-			wg.Add(1)
-			go s.push(&wg, b, false)
+			s.hm.push(b, false)
 		}
 	}
 
 	for i := len(rows) - 1; i >= 0; i-- {
-		_, err := cw.ReadFrom(rows[i])
-		if err != nil {
-			return err
+		for _, r := range rows[i] {
+			_, err := cw.ReadFrom(r)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
-	return cw.Flush(len(rows) - popCount)
-}
-
-func (s *pState) push(wg *sync.WaitGroup, b *Bar, sync bool) {
-	s.hm.push(b, sync)
-	wg.Done()
+	return cw.Flush(total - popCount)
 }
 
 func (s pState) makeBarState(total int64, filler BarFiller, options ...BarOption) *bState {
@@ -453,6 +427,9 @@ func (s pState) makeBarState(total int64, filler BarFiller, options ...BarOption
 		filler:      filler,
 		renderReq:   s.renderReq,
 		autoRefresh: s.autoRefresh,
+		extender: func(_ decor.Statistics, rows ...io.Reader) ([]io.Reader, error) {
+			return rows, nil
+		},
 	}
 
 	if total > 0 {
@@ -462,6 +439,14 @@ func (s pState) makeBarState(total int64, filler BarFiller, options ...BarOption
 	for _, opt := range options {
 		if opt != nil {
 			opt(bs)
+		}
+	}
+
+	for _, group := range bs.decorGroups {
+		for _, d := range group {
+			if d, ok := unwrap(d).(decor.EwmaDecorator); ok {
+				bs.ewmaDecorators = append(bs.ewmaDecorators, d)
+			}
 		}
 	}
 

@@ -1,6 +1,7 @@
 package mpb
 
 import (
+	"cmp"
 	"io"
 	"sync"
 	"time"
@@ -30,6 +31,15 @@ func WithWidth(width int) ContainerOption {
 	}
 }
 
+// WithQueueLen sets buffer size of heap manager channel. Ideally it must be
+// kept at MAX value, where MAX is number of bars to be rendered at the same
+// time. Default queue len is 128.
+func WithQueueLen(len int) ContainerOption {
+	return func(s *pState) {
+		s.hmQueueLen = len
+	}
+}
+
 // WithRefreshRate overrides default 150ms refresh rate.
 func WithRefreshRate(d time.Duration) ContainerOption {
 	return func(s *pState) {
@@ -55,8 +65,8 @@ func WithRenderDelay(ch <-chan struct{}) ContainerOption {
 	}
 }
 
-// WithShutdownNotifier value of type `[]*mpb.Bar` will be send into provided
-// channel upon container shutdown.
+// WithShutdownNotifier value of type `[]*mpb.Bar` will be send to provided channel
+// on shutdown event, i.e. after `(*Progress) Wait()` or `(*Progress) Shutdown()` call.
 func WithShutdownNotifier(ch chan<- interface{}) ContainerOption {
 	return func(s *pState) {
 		s.shutdownNotifier = ch
@@ -67,21 +77,15 @@ func WithShutdownNotifier(ch chan<- interface{}) ContainerOption {
 // is not a terminal then auto refresh is disabled unless WithAutoRefresh
 // option is set.
 func WithOutput(w io.Writer) ContainerOption {
-	if w == nil {
-		w = io.Discard
-	}
 	return func(s *pState) {
-		s.output = w
+		s.output = cmp.Or(w, io.Discard)
 	}
 }
 
 // WithDebugOutput sets debug output.
 func WithDebugOutput(w io.Writer) ContainerOption {
-	if w == nil {
-		w = io.Discard
-	}
 	return func(s *pState) {
-		s.debugOut = w
+		s.debugOut = cmp.Or(w, io.Discard)
 	}
 }
 
