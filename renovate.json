@@ -1,5 +1,8 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "useBaseBranchConfig": "merge",
-  "baseBranches": ["release-rhel9", "release-rhel8"]
+  "baseBranchPatterns": [
+    "release-rhel9",
+    "release-rhel8"
+  ]
 }
