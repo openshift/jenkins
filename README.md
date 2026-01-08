@@ -15,7 +15,7 @@ These images are available via [quay.io](https://quay.io) and are community supp
 * [quay.io/openshift/origin-jenkins-agent-maven](https://quay.io/openshift/origin-jenkins-agent-maven)
 * [quay.io/openshift/origin-jenkins-agent-base](https://quay.io/openshift/origin-jenkins-agent-base)
 
-**NOTE:** The jenkins-agent-maven and jenkins-agent-nodejs image are no longer maintained as of version 4.11 and no longer published as of version 4.14.
+**NOTE:** The jenkins-agent-maven and jenkins-agent-nodejs image are no longer maintained as of version 4.11 and no longer published as of version 4.17.
 
 ### Red Hat OpenShift
 These images are available via the [Red Hat Catalog](https://catalog.redhat.com) for customers with subscriptions.
@@ -26,10 +26,15 @@ These images are intended for OpenShift 4.10 and lower.
 * [openshift4/ose-jenkins-agent-maven](https://catalog.redhat.com/software/containers/openshift4/ose-jenkins-agent-maven/5cdd8fe55a13467289f615e7)
 * [openshift4/ose-jenkins-agent-nodejs-12-rhel8](https://catalog.redhat.com/software/containers/openshift4/ose-jenkins-agent-nodejs-12-rhel8/5f6c39da1fa29796579cdff7)
 
-#### 4.11 and higher
-These images are intended for OpenShift 4.11 and higher.
+#### 4.11 to 4.15
+These images are intended for OpenShift 4.11 and 4.15.
 * [ocp-tools-4/jenkins-rhel8](https://catalog.redhat.com/software/containers/ocp-tools-4/jenkins-rhel8/5fe1f38288e9c2f788526306)
 * [ocp-tools-4/jenkins-agent-base-rhel8](https://catalog.redhat.com/software/containers/ocp-tools-4/jenkins-agent-base-rhel8/6241e3457847116cf8577aea)
+
+#### 4.16 and higher
+These images are intended for OpenShift 4.16 and higher.
+* [ocp-tools-4/jenkins-rhel9](https://catalog.redhat.com/software/containers/ocp-tools-4/jenkins-rhel9/65dc9063b7db2e8b83a5b299)
+* [ocp-tools-4/jenkins-agent-base-rhel9](https://catalog.redhat.com/software/containers/ocp-tools-4/jenkins-agent-base-rhel9/65dc9063b7db2e8b83a5b29e)
 
 **NOTE:** The jenkins-agent-maven and jenkins-agent-nodejs image are no longer maintained or published as of version 4.11.
 
