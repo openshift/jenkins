@@ -9,7 +9,7 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: |
-      event == "pull_request" && target_branch == "release-rhel9" && ( "slave-base/***".pathChanged() || ".tekton/jenkins-agent-base-rhel9-pull-request.yaml".pathChanged() || "slave-base/Dockerfile.rhel9".pathChanged() || "rpms.lock.yaml".pathChanged() || "rpms.in.yaml".pathChanged() || "ubi.repo".pathChanged() || "artifacts.lock.yaml".pathChanged() )
+      event == "pull_request" && target_branch == "release-rhel9" && ( "slave-base/***".pathChanged() || ".tekton/***".pathChanged() || "rpms.lock.yaml".pathChanged() || "rpms.in.yaml".pathChanged() || "ubi.repo".pathChanged() || "artifacts.lock.yaml".pathChanged() )
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: openshift-jenkins-rhel9
