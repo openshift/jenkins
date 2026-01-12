@@ -8,7 +8,7 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "false"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: |
-      event == "push" && target_branch == "release-rhel8" && ( "2/***".pathChanged() || ".tekton/jenkins-rhel8-single-arch-push.yaml".pathChanged() || "2/Dockerfile.rhel8-single-arch".pathChanged() || "rpms.lock.yaml".pathChanged() || "rpms.in.yaml".pathChanged() || "ubi.repo".pathChanged() || "artifacts.lock.yaml".pathChanged() )
+      event == "push" && target_branch == "release-rhel8" && ( "2/***".pathChanged() || ".tekton/***".pathChanged() || "rpms.lock.yaml".pathChanged() || "rpms.in.yaml".pathChanged() || "ubi.repo".pathChanged() || "artifacts.lock.yaml".pathChanged() )
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: openshift-jenkins-rhel8
