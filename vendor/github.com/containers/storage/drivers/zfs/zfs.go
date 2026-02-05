@@ -1,5 +1,4 @@
 //go:build linux || freebsd
-// +build linux freebsd
 
 package zfs
 
@@ -393,12 +392,18 @@ func (d *Driver) Remove(id string) error {
 	name := d.zfsPath(id)
 	dataset := zfs.Dataset{Name: name}
 	err := dataset.Destroy(zfs.DestroyRecursive)
-	if err == nil {
-		d.Lock()
-		delete(d.filesystemsCache, name)
-		d.Unlock()
+	if err != nil {
+		// We must be tolerant in case the image has already been removed,
+		// for example, accidentally by hand.
+		if _, err1 := zfs.GetDataset(name); err1 == nil {
+			return err
+		}
+		logrus.WithField("storage-driver", "zfs").Debugf("Layer %s has already been removed; ignore it and continue to delete the cache", id)
 	}
-	return err
+	d.Lock()
+	delete(d.filesystemsCache, name)
+	d.Unlock()
+	return nil
 }
 
 // Get returns the mountpoint for the given id after creating the target directories if necessary.
@@ -505,4 +510,9 @@ func (d *Driver) ListLayers() ([]string, error) {
 // AdditionalImageStores returns additional image stores supported by the driver
 func (d *Driver) AdditionalImageStores() []string {
 	return nil
+}
+
+// Dedup performs deduplication of the driver's storage.
+func (d *Driver) Dedup(req graphdriver.DedupArgs) (graphdriver.DedupResult, error) {
+	return graphdriver.DedupResult{}, nil
 }
