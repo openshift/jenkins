@@ -6,23 +6,31 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"net"
 	"net/url"
 	"os"
 	"os/user"
-	"path"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 	"time"
 
+	// We are using skeema/knownhosts rather than
+	// golang.org/x/crypto/ssh/knownhosts because the
+	// latter has an issue when the first key returned
+	// by the server doesn't match the one in known_hosts:
+	// https://github.com/golang/go/issues/29286
+	// https://github.com/containers/podman/issues/23575
 	"github.com/containers/common/pkg/config"
+	"github.com/containers/storage/pkg/fileutils"
 	"github.com/containers/storage/pkg/homedir"
 	"github.com/pkg/sftp"
 	"github.com/sirupsen/logrus"
+	"github.com/skeema/knownhosts"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
-	"golang.org/x/crypto/ssh/knownhosts"
 )
 
 func golangConnectionCreate(options ConnectionCreateOptions) error {
@@ -52,32 +60,32 @@ func golangConnectionCreate(options ConnectionCreateOptions) error {
 		dst.URI += uri.Path
 	}
 
-	cfg, err := config.ReadCustomConfig()
-	if err != nil {
-		return err
-	}
-	if cfg.Engine.ServiceDestinations == nil {
-		cfg.Engine.ServiceDestinations = map[string]config.Destination{
-			options.Name: *dst,
-		}
-		cfg.Engine.ActiveService = options.Name
-	} else {
-		cfg.Engine.ServiceDestinations[options.Name] = *dst
-	}
-
-	// Create or update an existing farm with the connection being added
-	if options.Farm != "" {
-		if len(cfg.Farms.List) == 0 {
-			cfg.Farms.Default = options.Farm
-		}
-		if val, ok := cfg.Farms.List[options.Farm]; ok {
-			cfg.Farms.List[options.Farm] = append(val, options.Name)
+	// TODO this really should not live here, it must be in podman where we write the other connections as well.
+	// This duplicates the code for no reason and I have a really hard time to make any sense of why this code
+	// was added in the first place.
+	return config.EditConnectionConfig(func(cfg *config.ConnectionsFile) error {
+		if cfg.Connection.Connections == nil {
+			cfg.Connection.Connections = map[string]config.Destination{
+				options.Name: *dst,
+			}
+			cfg.Connection.Default = options.Name
 		} else {
-			cfg.Farms.List[options.Farm] = []string{options.Name}
+			cfg.Connection.Connections[options.Name] = *dst
 		}
-	}
 
-	return cfg.Write()
+		// Create or update an existing farm with the connection being added
+		if options.Farm != "" {
+			if len(cfg.Farm.List) == 0 {
+				cfg.Farm.Default = options.Farm
+			}
+			if val, ok := cfg.Farm.List[options.Farm]; ok {
+				cfg.Farm.List[options.Farm] = append(val, options.Name)
+			} else {
+				cfg.Farm.List[options.Farm] = []string{options.Name}
+			}
+		}
+		return nil
+	})
 }
 
 func golangConnectionDial(options ConnectionDialOptions) (*ConnectionDialReport, error) {
@@ -98,7 +106,7 @@ func golangConnectionDial(options ConnectionDialOptions) (*ConnectionDialReport,
 	return &ConnectionDialReport{dial}, nil
 }
 
-func golangConnectionExec(options ConnectionExecOptions) (*ConnectionExecReport, error) {
+func golangConnectionExec(options ConnectionExecOptions, input io.Reader) (*ConnectionExecReport, error) {
 	if !strings.HasPrefix(options.Host, "ssh://") {
 		options.Host = "ssh://" + options.Host
 	}
@@ -116,7 +124,7 @@ func golangConnectionExec(options ConnectionExecOptions) (*ConnectionExecReport,
 		return nil, fmt.Errorf("failed to connect: %w", err)
 	}
 
-	out, err := ExecRemoteCommand(dialAdd, strings.Join(options.Args, " "))
+	out, err := ExecRemoteCommandWithInput(dialAdd, strings.Join(options.Args, " "), input)
 	if err != nil {
 		return nil, err
 	}
@@ -188,6 +196,10 @@ func golangConnectionScp(options ConnectionScpOptions) (*ConnectionScpReport, er
 // ExecRemoteCommand takes a ssh client connection and a command to run and executes the
 // command on the specified client. The function returns the Stdout from the client or the Stderr
 func ExecRemoteCommand(dial *ssh.Client, run string) ([]byte, error) {
+	return ExecRemoteCommandWithInput(dial, run, nil)
+}
+
+func ExecRemoteCommandWithInput(dial *ssh.Client, run string, input io.Reader) ([]byte, error) {
 	sess, err := dial.NewSession() // new ssh client session
 	if err != nil {
 		return nil, err
@@ -196,8 +208,11 @@ func ExecRemoteCommand(dial *ssh.Client, run string) ([]byte, error) {
 
 	var buffer bytes.Buffer
 	var bufferErr bytes.Buffer
-	sess.Stdout = &buffer                 // output from client funneled into buffer
-	sess.Stderr = &bufferErr              // err form client funneled into buffer
+	sess.Stdout = &buffer    // output from client funneled into buffer
+	sess.Stderr = &bufferErr // err from client funneled into buffer
+	if input != nil {
+		sess.Stdin = input
+	}
 	if err := sess.Run(run); err != nil { // run the command on the ssh client
 		return nil, fmt.Errorf("%v: %w", bufferErr.String(), err)
 	}
@@ -262,7 +277,7 @@ func ValidateAndConfigure(uri *url.URL, iden string, insecureIsMachineConnection
 			}
 		}
 	}
-	var authMethods []ssh.AuthMethod // now we validate and check for the authorization methods, most notaibly public key authorization
+	var authMethods []ssh.AuthMethod // now we validate and check for the authorization methods, most notably public key authorization
 	if len(signers) > 0 {
 		dedup := make(map[string]ssh.Signer)
 		for _, s := range signers {
@@ -273,10 +288,7 @@ func ValidateAndConfigure(uri *url.URL, iden string, insecureIsMachineConnection
 			dedup[fp] = s
 		}
 
-		var uniq []ssh.Signer
-		for _, s := range dedup {
-			uniq = append(uniq, s)
-		}
+		uniq := slices.Collect(maps.Values(dedup))
 		authMethods = append(authMethods, ssh.PublicKeysCallback(func() ([]ssh.Signer, error) {
 			return uniq, nil
 		}))
@@ -286,7 +298,7 @@ func ValidateAndConfigure(uri *url.URL, iden string, insecureIsMachineConnection
 	}
 	if len(authMethods) == 0 {
 		authMethods = append(authMethods, ssh.PasswordCallback(func() (string, error) {
-			pass, err := ReadPassword(fmt.Sprintf("%s's login password:", uri.User.Username()))
+			pass, err := ReadPassword(uri.User.Username() + "'s login password:")
 			return string(pass), err
 		}))
 	}
@@ -295,46 +307,44 @@ func ValidateAndConfigure(uri *url.URL, iden string, insecureIsMachineConnection
 		return nil, err
 	}
 
+	keyFilePath := filepath.Join(homedir.Get(), ".ssh", "known_hosts")
+	known, err := knownhosts.NewDB(keyFilePath)
+	if err != nil {
+		if !errors.Is(err, os.ErrNotExist) {
+			return nil, err
+		}
+		keyDir := filepath.Dir(keyFilePath)
+		if err := fileutils.Exists(keyDir); errors.Is(err, os.ErrNotExist) {
+			if err := os.Mkdir(keyDir, 0o700); err != nil {
+				return nil, err
+			}
+		}
+		k, err := os.OpenFile(keyFilePath, os.O_RDWR|os.O_CREATE, 0o600)
+		if err != nil {
+			return nil, err
+		}
+		k.Close()
+		known, err = knownhosts.NewDB(keyFilePath)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	var callback ssh.HostKeyCallback
 	if insecureIsMachineConnection {
 		callback = ssh.InsecureIgnoreHostKey()
 	} else {
 		callback = ssh.HostKeyCallback(func(host string, remote net.Addr, pubKey ssh.PublicKey) error {
-			keyFilePath := filepath.Join(homedir.Get(), ".ssh", "known_hosts")
-			known, err := knownhosts.New(keyFilePath)
-			if err != nil {
-				if !errors.Is(err, os.ErrNotExist) {
-					return err
-				}
-				keyDir := path.Dir(keyFilePath)
-				if _, err := os.Stat(keyDir); errors.Is(err, os.ErrNotExist) {
-					if err := os.Mkdir(keyDir, 0o700); err != nil {
-						return err
-					}
-				}
-				k, err := os.OpenFile(keyFilePath, os.O_RDWR|os.O_CREATE, 0o600)
-				if err != nil {
-					return err
-				}
-				k.Close()
-				known, err = knownhosts.New(keyFilePath)
-				if err != nil {
-					return err
-				}
-			}
 			// we need to check if there is an error from reading known hosts for this public key and if there is an error, what is it, and why is it happening?
 			// if it is a key mismatch we want to error since we know the host using another key
 			// however, if it is a general error not because of a known key, we want to add our key to the known_hosts file
-			hErr := known(host, remote, pubKey)
-			var keyErr *knownhosts.KeyError
-			// if keyErr.Want is not empty, we are receiving a different key meaning the host is known but we are using the wrong key
-			as := errors.As(hErr, &keyErr)
+			hErr := known.HostKeyCallback()(host, remote, pubKey)
 			switch {
-			case as && len(keyErr.Want) > 0:
+			case knownhosts.IsHostKeyChanged(hErr):
 				logrus.Warnf("ssh host key mismatch for host %s, got key %s of type %s", host, ssh.FingerprintSHA256(pubKey), pubKey.Type())
-				return keyErr
+				return hErr
 			// if keyErr.Want is empty that just means we do not know this host yet, add it.
-			case as && len(keyErr.Want) == 0:
+			case knownhosts.IsHostUnknown(hErr):
 				// write to known_hosts
 				err := addKnownHostsEntry(host, pubKey)
 				if err != nil {
@@ -352,10 +362,11 @@ func ValidateAndConfigure(uri *url.URL, iden string, insecureIsMachineConnection
 	}
 
 	cfg := &ssh.ClientConfig{
-		User:            uri.User.Username(),
-		Auth:            authMethods,
-		HostKeyCallback: callback,
-		Timeout:         tick,
+		User:              uri.User.Username(),
+		Auth:              authMethods,
+		HostKeyCallback:   callback,
+		Timeout:           tick,
+		HostKeyAlgorithms: known.HostKeyAlgorithms(uri.Host),
 	}
 	return cfg, nil
 }
