@@ -2,7 +2,7 @@ behave
 pyshould
 requests
 kubernetes
-urllib3
+urllib3==2.6.3
 pyfiglet
 clint
 python-jenkins
