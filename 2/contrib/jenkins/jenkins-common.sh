@@ -9,26 +9,25 @@ export AUTH_TOKEN=${KUBE_SA_DIR}/token
 export JENKINS_PASSWORD KUBERNETES_SERVICE_HOST KUBERNETES_SERVICE_PORT
 export ITEM_ROOTDIR="\${ITEM_ROOTDIR}" # Preserve this variable Jenkins has in config.xml
 
-# Takes a password and an optional salt value, outputs the hashed password.
+# Takes a password, outputs the hashed password.
+# Jenkins 2.509+ and LTS 2.516.1 removed jbcrypt; password-encoder.jar now uses Spring Security's
+# BCryptPasswordEncoder, which needs spring-security-crypto and its transitive
+# dependencies (spring-jcl) from the WAR lib at runtime.
+# 
+# ref: https://www.jenkins.io/changelog/2.516.1/
+#      https://www.jenkins.io/changelog/2.509/
 function obfuscate_password {
     local password="$1"
-    local salt="$2"
-    #local acegi_security_path=`find /tmp/war/WEB-INF/lib/ -name acegi-security-*.jar`
-    #local commons_codec_path=`find /tmp/war/WEB-INF/lib/ -name commons-codec-*.jar`
-    local jbcrypt_path=`find /tmp/war/WEB-INF/lib ${JENKINS_HOME}/war/WEB-INF/lib/ -name jbcrypt-*.jar 2> /dev/null | head -1`
-    # source for password-encoder.jar is inside the jar.
-    # acegi-security-1.0.7.jar is inside the jenkins war.
-#    java -classpath "${acegi_security_path}:${commons_codec_path}:/opt/openshift/password-encoder.jar" com.redhat.openshift.PasswordEncoder $password $salt
-     java -classpath "${jbcrypt_path}:/opt/openshift/password-encoder.jar" com.redhat.openshift.PasswordEncoder $password $salt
+    local war_lib=$(find /tmp/war/WEB-INF/lib ${JENKINS_HOME}/war/WEB-INF/lib -maxdepth 0 -type d 2>/dev/null | head -1)
+    java -classpath "${war_lib}/*:/opt/openshift/password-encoder.jar" com.redhat.openshift.PasswordEncoder "$password"
 }
 
 # Returns 0 if password matches 1 otherwise
 function has_password_changed {
     local password="$1"
     local password_hash="$2"
-    local jbcrypt_path=`find /tmp/war/WEB-INF/lib ${JENKINS_HOME}/war/WEB-INF/lib/ -name jbcrypt-*.jar 2> /dev/null | head -1`
-    # source for password-encoder.jar is inside the jar.
-     java -classpath "${jbcrypt_path}:/opt/openshift/password-encoder.jar" com.redhat.openshift.PasswordChecker $password $password_hash
+    local war_lib=$(find /tmp/war/WEB-INF/lib ${JENKINS_HOME}/war/WEB-INF/lib -maxdepth 0 -type d 2>/dev/null | head -1)
+    java -classpath "${war_lib}/*:/opt/openshift/password-encoder.jar" com.redhat.openshift.PasswordChecker "$password" "$password_hash"
 }
 
 
