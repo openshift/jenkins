@@ -18,10 +18,11 @@ if [[ "${INSTALL_JENKINS_VIA_RPMS}" == false ]]; then
         echo "jenkins.war already exists, skipping upstream RPM installation"
     else
         echo "Installing jenkins.war from upstream RPM"
-        curl https://pkg.jenkins.io/redhat-stable-legacy/jenkins.repo | tee /etc/yum.repos.d/jenkins.repo /etc/yum.repos.art/ci/jenkins.repo
+        curl https://pkg.jenkins.io/rpm-stable/jenkins.repo | tee /etc/yum.repos.d/jenkins.repo /etc/yum.repos.art/ci/jenkins.repo
         rpm --import https://pkg.jenkins.io/redhat-stable/jenkins-ci.org.key
         rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
         rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+        rpm --import https://pkg.jenkins.io/rpm-stable/jenkins.io-2026.key
 
         YUM_CACHE=/var/cache/yum/x86_64/7Server/
         if [ -d $YUM_CACHE ]; then
