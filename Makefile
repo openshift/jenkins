@@ -49,3 +49,27 @@ verify:
 .PHONY: build-development-image
 build-development-images:
 	./scripts/build-development-images.sh
+
+# e2e tests for Jenkins on OpenShift
+# defaults to v4.17.0
+# JENKINS_IMAGE ?= registry.redhat.io/ocp-tools-4/jenkins-rhel9:v4.20.0
+JENKINS_IMAGE ?= quay.io/kmemane/jenkins-rhel9-local:latest
+JENKINS_AGENT_BASE_IMAGE ?= registry.redhat.io/ocp-tools-4/jenkins-agent-base-rhel9:v4.20.0
+JENKINS_IMAGE_OLD ?= registry.redhat.io/ocp-tools-4/jenkins-rhel9:v4.18.0-1750848396
+
+# import the images into the openshift namespace ImageStreams
+.PHONY: setup-test-images
+setup-test-images:
+	@JENKINS_IMAGE=$(JENKINS_IMAGE) JENKINS_AGENT_BASE_IMAGE=$(JENKINS_AGENT_BASE_IMAGE) \
+		JENKINS_IMAGE_OLD=$(JENKINS_IMAGE_OLD) \
+		./2/test/e2e/setup-test-images.sh
+
+# run the e2e tests against an OpenShift cluster
+.PHONY: test-e2e
+test-e2e:
+	oc version
+	make setup-test-images || exit 1
+	@echo "Starting Jenkins e2e tests against an OpenShift cluster"
+	
+	@cd 2/test/e2e && JENKINS_IMAGE=$(JENKINS_IMAGE) JENKINS_AGENT_BASE_IMAGE=$(JENKINS_AGENT_BASE_IMAGE) \
+		go test -timeout 30m -v .
