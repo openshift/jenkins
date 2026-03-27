@@ -554,7 +554,7 @@ spec:
         - name: name
           value: apply-tags
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-apply-tags:0.3@sha256:510b6d2a3b188adeb716e49566b57d611ab36bd69a2794b5ddfc11dbf014c2ca
+          value: quay.io/konflux-ci/tekton-catalog/task-apply-tags:0.3@sha256:aa62b41861c09e2e59c69cc6e9a1f740bf0c81e6a1eb03f57f59dfda0f65840e
         - name: kind
           value: task
         resolver: bundles
