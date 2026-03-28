@@ -1,6 +1,6 @@
 module github.com/openshift/jenkins
 
-go 1.25.0
+go 1.25.6
 
 require (
 	github.com/containers/podman/v5 v5.5.2
