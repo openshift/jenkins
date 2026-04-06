@@ -11,3 +11,4 @@ kubeconfig
 __pycache__
 .kube
 .idea
+jenkins-plugin-manager.jar
