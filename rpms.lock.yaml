@@ -158,20 +158,20 @@ arches:
     name: git-core-doc
     evr: 2.47.3-1.el9_6
     sourcerpm: git-2.47.3-1.el9_6.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/g/git-lfs-3.6.1-4.el9_7.aarch64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/g/git-lfs-3.6.1-8.el9_7.aarch64.rpm
     repoid: ubi-9-for-aarch64-appstream-rpms
-    size: 4435206
-    checksum: sha256:d577b61cfcbe1186c32ce0edcf4b0def1341df53109c9ec3e1901d6bb742f04d
+    size: 4447640
+    checksum: sha256:62165cf3e983c4122e520282a919f92097b5efd05c41ca00b41d3e69026cba1c
     name: git-lfs
-    evr: 3.6.1-4.el9_7
-    sourcerpm: git-lfs-3.6.1-4.el9_7.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/g/glibc-locale-source-2.34-231.el9_7.2.aarch64.rpm
+    evr: 3.6.1-8.el9_7
+    sourcerpm: git-lfs-3.6.1-8.el9_7.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/g/glibc-locale-source-2.34-231.el9_7.10.aarch64.rpm
     repoid: ubi-9-for-aarch64-appstream-rpms
-    size: 4362702
-    checksum: sha256:cfaa45566e86cf4778da5c61d87db6a03d0256a7862bc5fbe408e77bf0a8223f
+    size: 4369243
+    checksum: sha256:5d6e699b16b704efdcb8818a26dbe35b1579ad33ddeea6afab5a611c0c40b10f
     name: glibc-locale-source
-    evr: 2.34-231.el9_7.2
-    sourcerpm: glibc-2.34-231.el9_7.2.src.rpm
+    evr: 2.34-231.el9_7.10
+    sourcerpm: glibc-2.34-231.el9_7.10.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/g/gsm-1.0.19-6.el9.aarch64.rpm
     repoid: ubi-9-for-aarch64-appstream-rpms
     size: 37977
@@ -438,13 +438,13 @@ arches:
     name: libsndfile
     evr: 1.0.31-9.el9
     sourcerpm: libsndfile-1.0.31-9.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/l/libsoup-2.72.0-12.el9_7.3.aarch64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/l/libsoup-2.72.0-12.el9_7.5.aarch64.rpm
     repoid: ubi-9-for-aarch64-appstream-rpms
-    size: 406425
-    checksum: sha256:cc52544cc86799bade612f0ddcd5b77c44b179560b03929825bd79928bed06fc
+    size: 413306
+    checksum: sha256:12c74cb293e97e461b88d4431ec6abeb4fc4cb436af1d74b09c229b8e877ab5c
     name: libsoup
-    evr: 2.72.0-12.el9_7.3
-    sourcerpm: libsoup-2.72.0-12.el9_7.3.src.rpm
+    evr: 2.72.0-12.el9_7.5
+    sourcerpm: libsoup-2.72.0-12.el9_7.5.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/l/libstemmer-0-18.585svn.el9.aarch64.rpm
     repoid: ubi-9-for-aarch64-appstream-rpms
     size: 86269
@@ -529,13 +529,13 @@ arches:
     name: libxkbcommon
     evr: 1.0.3-4.el9
     sourcerpm: libxkbcommon-1.0.3-4.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/l/libxslt-1.1.34-13.el9_6.aarch64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/l/libxslt-1.1.34-14.el9_7.1.aarch64.rpm
     repoid: ubi-9-for-aarch64-appstream-rpms
-    size: 248330
-    checksum: sha256:973e5e7144917cb7c9e0552a444159004b330346dc5212d744312304dfdd4610
+    size: 251669
+    checksum: sha256:2b1fc002c4f57960df438791f7dfb5d4defa964f1afc73c3556451bc7f5ea01c
     name: libxslt
-    evr: 1.1.34-13.el9_6
-    sourcerpm: libxslt-1.1.34-13.el9_6.src.rpm
+    evr: 1.1.34-14.el9_7.1
+    sourcerpm: libxslt-1.1.34-14.el9_7.1.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/l/lua-5.4.4-4.el9.aarch64.rpm
     repoid: ubi-9-for-aarch64-appstream-rpms
     size: 195246
@@ -557,48 +557,48 @@ arches:
     name: mkfontscale
     evr: 1.2.1-3.el9
     sourcerpm: mkfontscale-1.2.1-3.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/n/nspr-4.36.0-4.el9_4.aarch64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/n/nspr-4.36.0-8.el9_4.aarch64.rpm
     repoid: ubi-9-for-aarch64-appstream-rpms
-    size: 132948
-    checksum: sha256:17124daa5425a70b9573ff2ac479043d42174f9197f656c549307d31843c75c1
+    size: 133009
+    checksum: sha256:62c1b2f3c3449398c9e26260fd5ffef5b2a98c46021f0500997acf300dd73c8c
     name: nspr
-    evr: 4.36.0-4.el9_4
-    sourcerpm: nss-3.112.0-4.el9_4.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/n/nss-3.112.0-4.el9_4.aarch64.rpm
+    evr: 4.36.0-8.el9_4
+    sourcerpm: nss-3.112.0-8.el9_4.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/n/nss-3.112.0-8.el9_4.aarch64.rpm
     repoid: ubi-9-for-aarch64-appstream-rpms
-    size: 716093
-    checksum: sha256:b604959ea1defcc76f55b2fd7a2299300dec998108b0c1cb80be0efa845e8572
+    size: 716665
+    checksum: sha256:0ef932c6db313eaa521bf06bfb9f4db64fde4c7ebd0d7c1a52d83d47681c3835
     name: nss
-    evr: 3.112.0-4.el9_4
-    sourcerpm: nss-3.112.0-4.el9_4.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/n/nss-softokn-3.112.0-4.el9_4.aarch64.rpm
+    evr: 3.112.0-8.el9_4
+    sourcerpm: nss-3.112.0-8.el9_4.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/n/nss-softokn-3.112.0-8.el9_4.aarch64.rpm
     repoid: ubi-9-for-aarch64-appstream-rpms
-    size: 399692
-    checksum: sha256:35197e3cac43476bf14b17b89c95be12209af7fa193ae3807ec73ed88a0f4d5a
+    size: 401904
+    checksum: sha256:b29a815c51c277a643d6be562b5adada99b176a5ba88ef70846857dd5a7afae3
     name: nss-softokn
-    evr: 3.112.0-4.el9_4
-    sourcerpm: nss-3.112.0-4.el9_4.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/n/nss-softokn-freebl-3.112.0-4.el9_4.aarch64.rpm
+    evr: 3.112.0-8.el9_4
+    sourcerpm: nss-3.112.0-8.el9_4.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/n/nss-softokn-freebl-3.112.0-8.el9_4.aarch64.rpm
     repoid: ubi-9-for-aarch64-appstream-rpms
-    size: 424604
-    checksum: sha256:131a636b10bdb8f94f7918e461ec18d37d81e7f5bf97b307c60c482db4d31034
+    size: 426649
+    checksum: sha256:bf4b311a50db968ea7b6792d4bc65abd76c69e175c1f98c93ab58b15ace50867
     name: nss-softokn-freebl
-    evr: 3.112.0-4.el9_4
-    sourcerpm: nss-3.112.0-4.el9_4.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/n/nss-sysinit-3.112.0-4.el9_4.aarch64.rpm
+    evr: 3.112.0-8.el9_4
+    sourcerpm: nss-3.112.0-8.el9_4.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/n/nss-sysinit-3.112.0-8.el9_4.aarch64.rpm
     repoid: ubi-9-for-aarch64-appstream-rpms
-    size: 18002
-    checksum: sha256:89d455cb36e1b3b059eabc502f94c21161219f0570668068efba70d5df2c0719
+    size: 18107
+    checksum: sha256:94fece74db2641d00a59c645854b095079ceba5229ff865ed7f4c02b668a94f6
     name: nss-sysinit
-    evr: 3.112.0-4.el9_4
-    sourcerpm: nss-3.112.0-4.el9_4.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/n/nss-util-3.112.0-4.el9_4.aarch64.rpm
+    evr: 3.112.0-8.el9_4
+    sourcerpm: nss-3.112.0-8.el9_4.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/n/nss-util-3.112.0-8.el9_4.aarch64.rpm
     repoid: ubi-9-for-aarch64-appstream-rpms
-    size: 88331
-    checksum: sha256:f15db365cf300f60b6ae9e0730c01015bd70d217ea656161daa63f1a75d4ea1e
+    size: 88444
+    checksum: sha256:231995ed0e7855c83a0ce2ff70d435c430b32f347573cc4969734438715b313c
     name: nss-util
-    evr: 3.112.0-4.el9_4
-    sourcerpm: nss-3.112.0-4.el9_4.src.rpm
+    evr: 3.112.0-8.el9_4
+    sourcerpm: nss-3.112.0-8.el9_4.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/o/oniguruma-6.9.6-1.el9.5.aarch64.rpm
     repoid: ubi-9-for-aarch64-appstream-rpms
     size: 222582
@@ -1096,13 +1096,13 @@ arches:
     name: ttmkfdir
     evr: 3.0.9-65.el9
     sourcerpm: ttmkfdir-3.0.9-65.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/t/tzdata-java-2025c-1.el9.noarch.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/t/tzdata-java-2026a-1.el9.noarch.rpm
     repoid: ubi-9-for-aarch64-appstream-rpms
-    size: 228913
-    checksum: sha256:229c0a7e26ad9494bae4ce8bbb809785f258d5d01327b0e98bc6424cbeca0ec6
+    size: 235694
+    checksum: sha256:d9c15585978866d1acf7a47eeec0958a9052ef457559dd7b01870f547ac3b125
     name: tzdata-java
-    evr: 2025c-1.el9
-    sourcerpm: tzdata-2025c-1.el9.src.rpm
+    evr: 2026a-1.el9
+    sourcerpm: tzdata-2026a-1.el9.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/w/webkit2gtk3-jsc-2.50.4-1.el9_7.aarch64.rpm
     repoid: ubi-9-for-aarch64-appstream-rpms
     size: 4488081
@@ -1194,34 +1194,34 @@ arches:
     name: glib-networking
     evr: 2.68.3-3.el9
     sourcerpm: glib-networking-2.68.3-3.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/g/glibc-2.34-231.el9_7.2.aarch64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/g/glibc-2.34-231.el9_7.10.aarch64.rpm
     repoid: ubi-9-for-aarch64-baseos-rpms
-    size: 1807994
-    checksum: sha256:c115c760944430436616c5d2ce532fb14887cde281b469a61072d9779bf59521
+    size: 1816615
+    checksum: sha256:cda08ffeb26cf926087f6aafd98d7c192c9e6f422ea0a33dbccd2c8e71a3feae
     name: glibc
-    evr: 2.34-231.el9_7.2
-    sourcerpm: glibc-2.34-231.el9_7.2.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/g/glibc-common-2.34-231.el9_7.2.aarch64.rpm
+    evr: 2.34-231.el9_7.10
+    sourcerpm: glibc-2.34-231.el9_7.10.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/g/glibc-common-2.34-231.el9_7.10.aarch64.rpm
     repoid: ubi-9-for-aarch64-baseos-rpms
-    size: 303900
-    checksum: sha256:a0b62778fc3b2893de4ca0c75fb7ac5b806f1598e4711c562bd4f05381b2796b
+    size: 310292
+    checksum: sha256:5fba269c9c1713ff7857bc1397e0f629ee6ed76775fcf2c9f3a464891ff0340b
     name: glibc-common
-    evr: 2.34-231.el9_7.2
-    sourcerpm: glibc-2.34-231.el9_7.2.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/g/glibc-langpack-en-2.34-231.el9_7.2.aarch64.rpm
+    evr: 2.34-231.el9_7.10
+    sourcerpm: glibc-2.34-231.el9_7.10.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/g/glibc-langpack-en-2.34-231.el9_7.10.aarch64.rpm
     repoid: ubi-9-for-aarch64-baseos-rpms
-    size: 675705
-    checksum: sha256:24f122dd1e6f0f9ad391d2e74da64adc8f9a8c4bf0056cc168a338dea9b631d0
+    size: 681560
+    checksum: sha256:7aaae41d46c18b4d182f6684641177963ff93d34f9682bbb05ff50611b04240b
     name: glibc-langpack-en
-    evr: 2.34-231.el9_7.2
-    sourcerpm: glibc-2.34-231.el9_7.2.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/g/glibc-minimal-langpack-2.34-231.el9_7.2.aarch64.rpm
+    evr: 2.34-231.el9_7.10
+    sourcerpm: glibc-2.34-231.el9_7.10.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/g/glibc-minimal-langpack-2.34-231.el9_7.10.aarch64.rpm
     repoid: ubi-9-for-aarch64-baseos-rpms
-    size: 22021
-    checksum: sha256:fe9b35d4297f32f924613f00febabe50f92cb442473d246f1015d60ab24d2743
+    size: 28365
+    checksum: sha256:f14adf0f40453c1f504a705f172070cdbc7f64846f3c2f93ac26c361b3a9c77e
     name: glibc-minimal-langpack
-    evr: 2.34-231.el9_7.2
-    sourcerpm: glibc-2.34-231.el9_7.2.src.rpm
+    evr: 2.34-231.el9_7.10
+    sourcerpm: glibc-2.34-231.el9_7.10.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/g/graphite2-1.3.14-9.el9.aarch64.rpm
     repoid: ubi-9-for-aarch64-baseos-rpms
     size: 96898
@@ -1271,13 +1271,13 @@ arches:
     name: libatomic
     evr: 11.5.0-11.el9
     sourcerpm: gcc-11.5.0-11.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/l/libbrotli-1.0.9-7.el9_5.aarch64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/l/libbrotli-1.0.9-9.el9_7.aarch64.rpm
     repoid: ubi-9-for-aarch64-baseos-rpms
-    size: 322936
-    checksum: sha256:d0b95c3894f7cfe2be53d79923c14608f6d18d30b5cdddbd4d4c48e75fcbe74a
+    size: 325179
+    checksum: sha256:f5237abc90191238333c1214da97b5202c8a15c2be3ab401ee10d95343cfdf17
     name: libbrotli
-    evr: 1.0.9-7.el9_5
-    sourcerpm: brotli-1.0.9-7.el9_5.src.rpm
+    evr: 1.0.9-9.el9_7
+    sourcerpm: brotli-1.0.9-9.el9_7.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/l/libcbor-0.7.0-5.el9.aarch64.rpm
     repoid: ubi-9-for-aarch64-baseos-rpms
     size: 59368
@@ -1313,13 +1313,13 @@ arches:
     name: libicu
     evr: 67.1-10.el9_6
     sourcerpm: icu-67.1-10.el9_6.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/l/libpng-1.6.37-12.el9_7.1.aarch64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/l/libpng-1.6.37-12.el9_7.2.aarch64.rpm
     repoid: ubi-9-for-aarch64-baseos-rpms
-    size: 116025
-    checksum: sha256:9919178645dcf43485737340d25dd4c51942468a36a16151c035e9a319aaf20d
+    size: 122776
+    checksum: sha256:fdc3b1562a25f0d4e5d2ce45ea7d31de79fdd7e28043092be081cb19a285b0ee
     name: libpng
-    evr: 2:1.6.37-12.el9_7.1
-    sourcerpm: libpng-1.6.37-12.el9_7.1.src.rpm
+    evr: 2:1.6.37-12.el9_7.2
+    sourcerpm: libpng-1.6.37-12.el9_7.2.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/l/libproxy-0.4.15-35.el9.aarch64.rpm
     repoid: ubi-9-for-aarch64-baseos-rpms
     size: 75974
@@ -1369,20 +1369,20 @@ arches:
     name: ncurses-libs
     evr: 6.2-12.20210508.el9
     sourcerpm: ncurses-6.2-12.20210508.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/o/openssh-8.7p1-47.el9_7.aarch64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/o/openssh-8.7p1-48.el9_7.aarch64.rpm
     repoid: ubi-9-for-aarch64-baseos-rpms
-    size: 457197
-    checksum: sha256:80f3b5be41982ee637ffba3354170b4873c46c47460149c82f9821cd3a1ebf8e
+    size: 464217
+    checksum: sha256:bd9450a83d00d528e56191d05bc11ec94b616c13f8d89f02455c6fd060df8559
     name: openssh
-    evr: 8.7p1-47.el9_7
-    sourcerpm: openssh-8.7p1-47.el9_7.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/o/openssh-clients-8.7p1-47.el9_7.aarch64.rpm
+    evr: 8.7p1-48.el9_7
+    sourcerpm: openssh-8.7p1-48.el9_7.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/o/openssh-clients-8.7p1-48.el9_7.aarch64.rpm
     repoid: ubi-9-for-aarch64-baseos-rpms
-    size: 696884
-    checksum: sha256:5c294f4427bb2f80b699d6f8c6163659413b2821ac6db38cc8fa21c544694503
+    size: 703700
+    checksum: sha256:958e905253df69a927ceca84c0a2fdd75107b5cc3a244ae5ca45becb633765ad
     name: openssh-clients
-    evr: 8.7p1-47.el9_7
-    sourcerpm: openssh-8.7p1-47.el9_7.src.rpm
+    evr: 8.7p1-48.el9_7
+    sourcerpm: openssh-8.7p1-48.el9_7.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/o/openssl-3.5.1-7.el9_7.aarch64.rpm
     repoid: ubi-9-for-aarch64-baseos-rpms
     size: 1541274
@@ -1590,20 +1590,20 @@ arches:
     name: git-core-doc
     evr: 2.47.3-1.el9_6
     sourcerpm: git-2.47.3-1.el9_6.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/g/git-lfs-3.6.1-4.el9_7.ppc64le.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/g/git-lfs-3.6.1-8.el9_7.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-appstream-rpms
-    size: 4468676
-    checksum: sha256:92b163c9f687faa7e1d4dcccf57a0102b70849919b77e996cbf1a0a0ac8a9f97
+    size: 4499294
+    checksum: sha256:a3cd9fd69b0f9a975d6268788e8faef28b80e2836580aaba64fbb5822c9bdc4f
     name: git-lfs
-    evr: 3.6.1-4.el9_7
-    sourcerpm: git-lfs-3.6.1-4.el9_7.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/g/glibc-locale-source-2.34-231.el9_7.2.ppc64le.rpm
+    evr: 3.6.1-8.el9_7
+    sourcerpm: git-lfs-3.6.1-8.el9_7.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/g/glibc-locale-source-2.34-231.el9_7.10.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-appstream-rpms
-    size: 4360011
-    checksum: sha256:23490e027f8ec5caf01bbe3d4477f25738b9cfb570db6b7b7baad0ffd75f45e9
+    size: 4366457
+    checksum: sha256:4438b86ae274864c7cee52265be068ff1c09a189dd3938408fcf5d4eba9c2d0a
     name: glibc-locale-source
-    evr: 2.34-231.el9_7.2
-    sourcerpm: glibc-2.34-231.el9_7.2.src.rpm
+    evr: 2.34-231.el9_7.10
+    sourcerpm: glibc-2.34-231.el9_7.10.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/g/gsm-1.0.19-6.el9.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-appstream-rpms
     size: 39255
@@ -1870,13 +1870,13 @@ arches:
     name: libsndfile
     evr: 1.0.31-9.el9
     sourcerpm: libsndfile-1.0.31-9.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/l/libsoup-2.72.0-12.el9_7.3.ppc64le.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/l/libsoup-2.72.0-12.el9_7.5.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-appstream-rpms
-    size: 434359
-    checksum: sha256:1a9feef3fc765c9dc68456b1a1ea114d012ab70db3490b4c2c1edd1dabf6bae4
+    size: 442084
+    checksum: sha256:7ca8e12e2f96ed296ed137d069068f1cb80f5d49052a393a7855938fe9f43c20
     name: libsoup
-    evr: 2.72.0-12.el9_7.3
-    sourcerpm: libsoup-2.72.0-12.el9_7.3.src.rpm
+    evr: 2.72.0-12.el9_7.5
+    sourcerpm: libsoup-2.72.0-12.el9_7.5.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/l/libstemmer-0-18.585svn.el9.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-appstream-rpms
     size: 89172
@@ -1961,13 +1961,13 @@ arches:
     name: libxkbcommon
     evr: 1.0.3-4.el9
     sourcerpm: libxkbcommon-1.0.3-4.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/l/libxslt-1.1.34-13.el9_6.ppc64le.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/l/libxslt-1.1.34-14.el9_7.1.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-appstream-rpms
-    size: 268687
-    checksum: sha256:59218c6016f5f208dffe832833a193c330fb7853237c8435662fbc00e0327276
+    size: 272058
+    checksum: sha256:c07405af5c0110256e0ec1ab4f9a344155d1d0056ab545df729c4291b8292e09
     name: libxslt
-    evr: 1.1.34-13.el9_6
-    sourcerpm: libxslt-1.1.34-13.el9_6.src.rpm
+    evr: 1.1.34-14.el9_7.1
+    sourcerpm: libxslt-1.1.34-14.el9_7.1.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/l/lua-5.4.4-4.el9.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-appstream-rpms
     size: 207040
@@ -1989,48 +1989,48 @@ arches:
     name: mkfontscale
     evr: 1.2.1-3.el9
     sourcerpm: mkfontscale-1.2.1-3.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/n/nspr-4.36.0-4.el9_4.ppc64le.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/n/nspr-4.36.0-8.el9_4.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-appstream-rpms
-    size: 150220
-    checksum: sha256:6ad5f74f984e17b979be64da32a08550c42a31832c2a5ecc7087b7549348b26f
+    size: 150610
+    checksum: sha256:99a7a001327b95375a1803bcd569cd67f669cc6c825f34047a2aae43de86ac6f
     name: nspr
-    evr: 4.36.0-4.el9_4
-    sourcerpm: nss-3.112.0-4.el9_4.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/n/nss-3.112.0-4.el9_4.ppc64le.rpm
+    evr: 4.36.0-8.el9_4
+    sourcerpm: nss-3.112.0-8.el9_4.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/n/nss-3.112.0-8.el9_4.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-appstream-rpms
-    size: 814623
-    checksum: sha256:bc50567f2da110dd183b6ba5a168032bb221c432060c78f6858de63a261c9edb
+    size: 815124
+    checksum: sha256:b11739b55dee3f18881bf6205039e0d1045038bc0736117f7d0968427e7eb824
     name: nss
-    evr: 3.112.0-4.el9_4
-    sourcerpm: nss-3.112.0-4.el9_4.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/n/nss-softokn-3.112.0-4.el9_4.ppc64le.rpm
+    evr: 3.112.0-8.el9_4
+    sourcerpm: nss-3.112.0-8.el9_4.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/n/nss-softokn-3.112.0-8.el9_4.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-appstream-rpms
-    size: 441512
-    checksum: sha256:caba5d54d0e4208aa8f7a2ecb5520290eb60de185207da3bd86ee70e0ac2365e
+    size: 443304
+    checksum: sha256:cbc4ba3eaf83c5efbab8357835c7f4d99cae0623ee2045b9323c68d3d80f7d31
     name: nss-softokn
-    evr: 3.112.0-4.el9_4
-    sourcerpm: nss-3.112.0-4.el9_4.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/n/nss-softokn-freebl-3.112.0-4.el9_4.ppc64le.rpm
+    evr: 3.112.0-8.el9_4
+    sourcerpm: nss-3.112.0-8.el9_4.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/n/nss-softokn-freebl-3.112.0-8.el9_4.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-appstream-rpms
-    size: 458672
-    checksum: sha256:871d95d48c439e62d60c611bafb75313219a449bf8044e20da715c4c137abd1a
+    size: 461129
+    checksum: sha256:a5c357701fbbdafe6b6c76ead7613bbb088d53a2f8b8255a19130f165aff1f67
     name: nss-softokn-freebl
-    evr: 3.112.0-4.el9_4
-    sourcerpm: nss-3.112.0-4.el9_4.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/n/nss-sysinit-3.112.0-4.el9_4.ppc64le.rpm
+    evr: 3.112.0-8.el9_4
+    sourcerpm: nss-3.112.0-8.el9_4.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/n/nss-sysinit-3.112.0-8.el9_4.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-appstream-rpms
-    size: 18141
-    checksum: sha256:6f1e9e49ef3f5569a5a065f4d5d643a0d37ad8904a948ed28a4a960b3ddaa0fc
+    size: 18333
+    checksum: sha256:b593da50424027dd16ebd290b438d9b6e3e632cb3169ec149d456cd8921dbcde
     name: nss-sysinit
-    evr: 3.112.0-4.el9_4
-    sourcerpm: nss-3.112.0-4.el9_4.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/n/nss-util-3.112.0-4.el9_4.ppc64le.rpm
+    evr: 3.112.0-8.el9_4
+    sourcerpm: nss-3.112.0-8.el9_4.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/n/nss-util-3.112.0-8.el9_4.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-appstream-rpms
-    size: 100927
-    checksum: sha256:955c1018068279390c185971f58a29ba31091779fdd826c113dd688ee34861ec
+    size: 101062
+    checksum: sha256:5f35939db9815f64e2e47c223c6a512a7a6d55f48bb128addab643970c1639f7
     name: nss-util
-    evr: 3.112.0-4.el9_4
-    sourcerpm: nss-3.112.0-4.el9_4.src.rpm
+    evr: 3.112.0-8.el9_4
+    sourcerpm: nss-3.112.0-8.el9_4.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/o/oniguruma-6.9.6-1.el9.5.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-appstream-rpms
     size: 246370
@@ -2528,13 +2528,13 @@ arches:
     name: ttmkfdir
     evr: 3.0.9-65.el9
     sourcerpm: ttmkfdir-3.0.9-65.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/t/tzdata-java-2025c-1.el9.noarch.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/t/tzdata-java-2026a-1.el9.noarch.rpm
     repoid: ubi-9-for-ppc64le-appstream-rpms
-    size: 228913
-    checksum: sha256:229c0a7e26ad9494bae4ce8bbb809785f258d5d01327b0e98bc6424cbeca0ec6
+    size: 235694
+    checksum: sha256:d9c15585978866d1acf7a47eeec0958a9052ef457559dd7b01870f547ac3b125
     name: tzdata-java
-    evr: 2025c-1.el9
-    sourcerpm: tzdata-2025c-1.el9.src.rpm
+    evr: 2026a-1.el9
+    sourcerpm: tzdata-2026a-1.el9.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/w/webkit2gtk3-jsc-2.50.4-1.el9_7.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-appstream-rpms
     size: 4237083
@@ -2626,34 +2626,34 @@ arches:
     name: glib-networking
     evr: 2.68.3-3.el9
     sourcerpm: glib-networking-2.68.3-3.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/baseos/os/Packages/g/glibc-2.34-231.el9_7.2.ppc64le.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/baseos/os/Packages/g/glibc-2.34-231.el9_7.10.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-baseos-rpms
-    size: 2878411
-    checksum: sha256:16d448bd801859e216580d0101d21c583c02169a48a6882fedf89c46f7204865
+    size: 2885586
+    checksum: sha256:e371bfb3702c19ddb1da83593ff09e9752fb907143753efa2a3300d67c5b8fa8
     name: glibc
-    evr: 2.34-231.el9_7.2
-    sourcerpm: glibc-2.34-231.el9_7.2.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/baseos/os/Packages/g/glibc-common-2.34-231.el9_7.2.ppc64le.rpm
+    evr: 2.34-231.el9_7.10
+    sourcerpm: glibc-2.34-231.el9_7.10.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/baseos/os/Packages/g/glibc-common-2.34-231.el9_7.10.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-baseos-rpms
-    size: 330524
-    checksum: sha256:93f64afccca82d1296a468ef21908e71cbd44909035500ebc2e78e12708ad66b
+    size: 337047
+    checksum: sha256:7b437ae52a5f679cc799e6ac25f52e1a7b8dbdcb5e095d1f5eedc697b25560ca
     name: glibc-common
-    evr: 2.34-231.el9_7.2
-    sourcerpm: glibc-2.34-231.el9_7.2.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/baseos/os/Packages/g/glibc-langpack-en-2.34-231.el9_7.2.ppc64le.rpm
+    evr: 2.34-231.el9_7.10
+    sourcerpm: glibc-2.34-231.el9_7.10.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/baseos/os/Packages/g/glibc-langpack-en-2.34-231.el9_7.10.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-baseos-rpms
-    size: 675697
-    checksum: sha256:320aa1dbe756f9a04e5441ae3e85c66b83d93f883a605db4977d5af1fc65ec9c
+    size: 681539
+    checksum: sha256:35fce456c4bda9fadf0722a95ad0894bf7ad1ea3b24216cf94b12a6254d5e30e
     name: glibc-langpack-en
-    evr: 2.34-231.el9_7.2
-    sourcerpm: glibc-2.34-231.el9_7.2.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/baseos/os/Packages/g/glibc-minimal-langpack-2.34-231.el9_7.2.ppc64le.rpm
+    evr: 2.34-231.el9_7.10
+    sourcerpm: glibc-2.34-231.el9_7.10.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/baseos/os/Packages/g/glibc-minimal-langpack-2.34-231.el9_7.10.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-baseos-rpms
-    size: 22053
-    checksum: sha256:9d9cc89bef1fdaff55326ace9563a09f9a344cb24401047ffc3189e8c44e9cb7
+    size: 28381
+    checksum: sha256:125b9a17ebe4940a79899e326ced10db04851101e1cc7899e9d0aecc8407d9fd
     name: glibc-minimal-langpack
-    evr: 2.34-231.el9_7.2
-    sourcerpm: glibc-2.34-231.el9_7.2.src.rpm
+    evr: 2.34-231.el9_7.10
+    sourcerpm: glibc-2.34-231.el9_7.10.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/baseos/os/Packages/g/graphite2-1.3.14-9.el9.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-baseos-rpms
     size: 109394
@@ -2703,13 +2703,13 @@ arches:
     name: libatomic
     evr: 11.5.0-11.el9
     sourcerpm: gcc-11.5.0-11.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/baseos/os/Packages/l/libbrotli-1.0.9-7.el9_5.ppc64le.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/baseos/os/Packages/l/libbrotli-1.0.9-9.el9_7.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-baseos-rpms
-    size: 347425
-    checksum: sha256:7f1571cb99807f3d06d2d1cf9b9c804a7d3e773f1ac6828871aeddcb8900c12b
+    size: 349508
+    checksum: sha256:ff72df4a441c2f8ee8e1bcde8dcbd5bbd89250db9caf8792ff253b7af3e1c51c
     name: libbrotli
-    evr: 1.0.9-7.el9_5
-    sourcerpm: brotli-1.0.9-7.el9_5.src.rpm
+    evr: 1.0.9-9.el9_7
+    sourcerpm: brotli-1.0.9-9.el9_7.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/baseos/os/Packages/l/libcbor-0.7.0-5.el9.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-baseos-rpms
     size: 62130
@@ -2745,13 +2745,13 @@ arches:
     name: libicu
     evr: 67.1-10.el9_6
     sourcerpm: icu-67.1-10.el9_6.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/baseos/os/Packages/l/libpng-1.6.37-12.el9_7.1.ppc64le.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/baseos/os/Packages/l/libpng-1.6.37-12.el9_7.2.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-baseos-rpms
-    size: 138528
-    checksum: sha256:6bfe311c47c91efb9ffb5e92182bfad2f4676ea83f83c28f5f1eddcdcc39821b
+    size: 145235
+    checksum: sha256:db82e5bf347b2c72408d9153827bb903f65a51d6f83d810bd3ea1afe1131a937
     name: libpng
-    evr: 2:1.6.37-12.el9_7.1
-    sourcerpm: libpng-1.6.37-12.el9_7.1.src.rpm
+    evr: 2:1.6.37-12.el9_7.2
+    sourcerpm: libpng-1.6.37-12.el9_7.2.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/baseos/os/Packages/l/libproxy-0.4.15-35.el9.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-baseos-rpms
     size: 82192
@@ -2801,20 +2801,20 @@ arches:
     name: ncurses-libs
     evr: 6.2-12.20210508.el9
     sourcerpm: ncurses-6.2-12.20210508.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/baseos/os/Packages/o/openssh-8.7p1-47.el9_7.ppc64le.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/baseos/os/Packages/o/openssh-8.7p1-48.el9_7.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-baseos-rpms
-    size: 480572
-    checksum: sha256:61f60d1c4e0fd54fbd9fe2cbb3a824af06837c4b925a603421cb84c74cdbe8ce
+    size: 487512
+    checksum: sha256:94bcd7a39cce25a18345ccb091bc2f7f217d1db65ecd560568990709da543eb1
     name: openssh
-    evr: 8.7p1-47.el9_7
-    sourcerpm: openssh-8.7p1-47.el9_7.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/baseos/os/Packages/o/openssh-clients-8.7p1-47.el9_7.ppc64le.rpm
+    evr: 8.7p1-48.el9_7
+    sourcerpm: openssh-8.7p1-48.el9_7.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/baseos/os/Packages/o/openssh-clients-8.7p1-48.el9_7.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-baseos-rpms
-    size: 754554
-    checksum: sha256:f6c7c3a1408c0de2fa4eec2c6f53636cd71f0da730a87ec3e02051fe91e3976c
+    size: 761928
+    checksum: sha256:16edef0f3ba6f6ca005e0dcceeee31f6df4ed3871e2da119fa4c64ae8588ef0d
     name: openssh-clients
-    evr: 8.7p1-47.el9_7
-    sourcerpm: openssh-8.7p1-47.el9_7.src.rpm
+    evr: 8.7p1-48.el9_7
+    sourcerpm: openssh-8.7p1-48.el9_7.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/baseos/os/Packages/o/openssl-3.5.1-7.el9_7.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-baseos-rpms
     size: 1566615
@@ -3043,20 +3043,20 @@ arches:
     name: git-core-doc
     evr: 2.47.3-1.el9_6
     sourcerpm: git-2.47.3-1.el9_6.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/g/git-lfs-3.6.1-4.el9_7.s390x.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/g/git-lfs-3.6.1-8.el9_7.s390x.rpm
     repoid: ubi-9-for-s390x-appstream-rpms
-    size: 4614519
-    checksum: sha256:793f20e1e0aad939db561cce82a7b521e1e99191ebc9f25d074d3738cf781e2a
+    size: 4608897
+    checksum: sha256:6b47f3d29b5a25e2d792d68e097dee58755291d63ec42304ce747b272294cd48
     name: git-lfs
-    evr: 3.6.1-4.el9_7
-    sourcerpm: git-lfs-3.6.1-4.el9_7.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/g/glibc-locale-source-2.34-231.el9_7.2.s390x.rpm
+    evr: 3.6.1-8.el9_7
+    sourcerpm: git-lfs-3.6.1-8.el9_7.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/g/glibc-locale-source-2.34-231.el9_7.10.s390x.rpm
     repoid: ubi-9-for-s390x-appstream-rpms
-    size: 4360033
-    checksum: sha256:a21a248cff9c1a6c66c07ce447e63c8f7cc3b172b864e3adacfd40f54dcc3534
+    size: 4366183
+    checksum: sha256:594d8aeb4034d2e7bb4adffeb0c9766a6d0d60e622ca83605aa128ccae429bb6
     name: glibc-locale-source
-    evr: 2.34-231.el9_7.2
-    sourcerpm: glibc-2.34-231.el9_7.2.src.rpm
+    evr: 2.34-231.el9_7.10
+    sourcerpm: glibc-2.34-231.el9_7.10.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/g/graphite2-1.3.14-9.el9.s390x.rpm
     repoid: ubi-9-for-s390x-appstream-rpms
     size: 96151
@@ -3323,13 +3323,13 @@ arches:
     name: libogg
     evr: 2:1.3.4-6.el9
     sourcerpm: libogg-1.3.4-6.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/l/libpng-1.6.37-12.el9_7.1.s390x.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/l/libpng-1.6.37-12.el9_7.2.s390x.rpm
     repoid: ubi-9-for-s390x-appstream-rpms
-    size: 116513
-    checksum: sha256:22d387293102e16a084cc8c3132280be9a427e873e0548fadf85bf0cae7c0b3e
+    size: 123290
+    checksum: sha256:dde1fee027278ae568355e423e058db44271d84f18bb11255678477d4ef3385b
     name: libpng
-    evr: 2:1.6.37-12.el9_7.1
-    sourcerpm: libpng-1.6.37-12.el9_7.1.src.rpm
+    evr: 2:1.6.37-12.el9_7.2
+    sourcerpm: libpng-1.6.37-12.el9_7.2.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/l/libproxy-webkitgtk4-0.4.15-35.el9.s390x.rpm
     repoid: ubi-9-for-s390x-appstream-rpms
     size: 22139
@@ -3344,13 +3344,13 @@ arches:
     name: libsndfile
     evr: 1.0.31-9.el9
     sourcerpm: libsndfile-1.0.31-9.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/l/libsoup-2.72.0-12.el9_7.3.s390x.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/l/libsoup-2.72.0-12.el9_7.5.s390x.rpm
     repoid: ubi-9-for-s390x-appstream-rpms
-    size: 404953
-    checksum: sha256:3d5d340be76fa15c285de6895b698fd26fb2308bf8b12141c6e924a6def93565
+    size: 411237
+    checksum: sha256:da8cba0e1b9c732608f58fd7028a1f71703f9233d4bc5780ab38b49e367510a0
     name: libsoup
-    evr: 2.72.0-12.el9_7.3
-    sourcerpm: libsoup-2.72.0-12.el9_7.3.src.rpm
+    evr: 2.72.0-12.el9_7.5
+    sourcerpm: libsoup-2.72.0-12.el9_7.5.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/l/libstemmer-0-18.585svn.el9.s390x.rpm
     repoid: ubi-9-for-s390x-appstream-rpms
     size: 81942
@@ -3435,13 +3435,13 @@ arches:
     name: libxkbcommon
     evr: 1.0.3-4.el9
     sourcerpm: libxkbcommon-1.0.3-4.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/l/libxslt-1.1.34-13.el9_6.s390x.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/l/libxslt-1.1.34-14.el9_7.1.s390x.rpm
     repoid: ubi-9-for-s390x-appstream-rpms
-    size: 243361
-    checksum: sha256:619e7668ac0470ad0330307bd083a9c36e59616c55c5173cf1a7898e589b37a3
+    size: 247051
+    checksum: sha256:8b22a204421446c6c45361ee28f5c394da79088a9998676d73c15a81c0225d55
     name: libxslt
-    evr: 1.1.34-13.el9_6
-    sourcerpm: libxslt-1.1.34-13.el9_6.src.rpm
+    evr: 1.1.34-14.el9_7.1
+    sourcerpm: libxslt-1.1.34-14.el9_7.1.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/l/lua-5.4.4-4.el9.s390x.rpm
     repoid: ubi-9-for-s390x-appstream-rpms
     size: 195167
@@ -3463,48 +3463,48 @@ arches:
     name: mkfontscale
     evr: 1.2.1-3.el9
     sourcerpm: mkfontscale-1.2.1-3.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/n/nspr-4.36.0-4.el9_4.s390x.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/n/nspr-4.36.0-8.el9_4.s390x.rpm
     repoid: ubi-9-for-s390x-appstream-rpms
-    size: 135799
-    checksum: sha256:54fbd8f7a41548d165c2b3d6140e3175d3d48f8ee79301d9757cab0a8788d2d2
+    size: 135771
+    checksum: sha256:deff4a55c804bec418ce8f01dca3b0b3e8935643c83adceb2cb18b5293652dd8
     name: nspr
-    evr: 4.36.0-4.el9_4
-    sourcerpm: nss-3.112.0-4.el9_4.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/n/nss-3.112.0-4.el9_4.s390x.rpm
+    evr: 4.36.0-8.el9_4
+    sourcerpm: nss-3.112.0-8.el9_4.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/n/nss-3.112.0-8.el9_4.s390x.rpm
     repoid: ubi-9-for-s390x-appstream-rpms
-    size: 694219
-    checksum: sha256:963396fd7816a9c1b92ef17695046c35a626f556251397aa3351a386c3f6b137
+    size: 695174
+    checksum: sha256:ee749fb762a63a7786c70d18cd1d6e6ca024aa35087fac90a7b44263f2565ccf
     name: nss
-    evr: 3.112.0-4.el9_4
-    sourcerpm: nss-3.112.0-4.el9_4.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/n/nss-softokn-3.112.0-4.el9_4.s390x.rpm
+    evr: 3.112.0-8.el9_4
+    sourcerpm: nss-3.112.0-8.el9_4.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/n/nss-softokn-3.112.0-8.el9_4.s390x.rpm
     repoid: ubi-9-for-s390x-appstream-rpms
-    size: 391378
-    checksum: sha256:1d3639c8fd1a8d9916ebe8c1f68bdd63c0b54d3c1eef9d844a44346659acb594
+    size: 394640
+    checksum: sha256:7773863ca2592520a17fcfc61a3f0001b5b37195c0b97049155e7714a516c094
     name: nss-softokn
-    evr: 3.112.0-4.el9_4
-    sourcerpm: nss-3.112.0-4.el9_4.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/n/nss-softokn-freebl-3.112.0-4.el9_4.s390x.rpm
+    evr: 3.112.0-8.el9_4
+    sourcerpm: nss-3.112.0-8.el9_4.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/n/nss-softokn-freebl-3.112.0-8.el9_4.s390x.rpm
     repoid: ubi-9-for-s390x-appstream-rpms
-    size: 417708
-    checksum: sha256:fc2c460ce088b06dae6f82998754868899c404c80b0cd574b7e935c0f303a5ed
+    size: 419526
+    checksum: sha256:6ed17f2d27a71623739131340e4d951434681af06ca090320a7110573ac00f95
     name: nss-softokn-freebl
-    evr: 3.112.0-4.el9_4
-    sourcerpm: nss-3.112.0-4.el9_4.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/n/nss-sysinit-3.112.0-4.el9_4.s390x.rpm
+    evr: 3.112.0-8.el9_4
+    sourcerpm: nss-3.112.0-8.el9_4.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/n/nss-sysinit-3.112.0-8.el9_4.s390x.rpm
     repoid: ubi-9-for-s390x-appstream-rpms
-    size: 18087
-    checksum: sha256:69f2bb25e414bca1d2eac2786c3a915fc0ff50f8e3dd7dba7bb3fd06d4bd17d3
+    size: 18198
+    checksum: sha256:41935da0c1fd8372386f0d6775f47ab2d6e0faecb8b4c8cc7e0961f7db077757
     name: nss-sysinit
-    evr: 3.112.0-4.el9_4
-    sourcerpm: nss-3.112.0-4.el9_4.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/n/nss-util-3.112.0-4.el9_4.s390x.rpm
+    evr: 3.112.0-8.el9_4
+    sourcerpm: nss-3.112.0-8.el9_4.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/n/nss-util-3.112.0-8.el9_4.s390x.rpm
     repoid: ubi-9-for-s390x-appstream-rpms
-    size: 90586
-    checksum: sha256:3c3d6cca2c14c25144b46fa25e0ab7186db29612cb7117304174bbde18b347b2
+    size: 90500
+    checksum: sha256:9de26758ea9420e1c530e96f18ecf9bc2c30e9dbfc0dd48aafdf32c6cdcf0a9a
     name: nss-util
-    evr: 3.112.0-4.el9_4
-    sourcerpm: nss-3.112.0-4.el9_4.src.rpm
+    evr: 3.112.0-8.el9_4
+    sourcerpm: nss-3.112.0-8.el9_4.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/o/oniguruma-6.9.6-1.el9.5.s390x.rpm
     repoid: ubi-9-for-s390x-appstream-rpms
     size: 225810
@@ -4002,13 +4002,13 @@ arches:
     name: ttmkfdir
     evr: 3.0.9-65.el9
     sourcerpm: ttmkfdir-3.0.9-65.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/t/tzdata-java-2025c-1.el9.noarch.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/t/tzdata-java-2026a-1.el9.noarch.rpm
     repoid: ubi-9-for-s390x-appstream-rpms
-    size: 228913
-    checksum: sha256:229c0a7e26ad9494bae4ce8bbb809785f258d5d01327b0e98bc6424cbeca0ec6
+    size: 235694
+    checksum: sha256:d9c15585978866d1acf7a47eeec0958a9052ef457559dd7b01870f547ac3b125
     name: tzdata-java
-    evr: 2025c-1.el9
-    sourcerpm: tzdata-2025c-1.el9.src.rpm
+    evr: 2026a-1.el9
+    sourcerpm: tzdata-2026a-1.el9.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/w/webkit2gtk3-jsc-2.50.4-1.el9_7.s390x.rpm
     repoid: ubi-9-for-s390x-appstream-rpms
     size: 4275214
@@ -4079,34 +4079,34 @@ arches:
     name: glib-networking
     evr: 2.68.3-3.el9
     sourcerpm: glib-networking-2.68.3-3.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/baseos/os/Packages/g/glibc-2.34-231.el9_7.2.s390x.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/baseos/os/Packages/g/glibc-2.34-231.el9_7.10.s390x.rpm
     repoid: ubi-9-for-s390x-baseos-rpms
-    size: 1785133
-    checksum: sha256:cee5e51b8288a13ae03af22c1b7898de473fcc8eb04792bd3e43c01c4194ad4d
+    size: 1792177
+    checksum: sha256:16bf784842724127ae692801bdcc42db906843f02914178f55944b80ca42c4bf
     name: glibc
-    evr: 2.34-231.el9_7.2
-    sourcerpm: glibc-2.34-231.el9_7.2.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/baseos/os/Packages/g/glibc-common-2.34-231.el9_7.2.s390x.rpm
+    evr: 2.34-231.el9_7.10
+    sourcerpm: glibc-2.34-231.el9_7.10.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/baseos/os/Packages/g/glibc-common-2.34-231.el9_7.10.s390x.rpm
     repoid: ubi-9-for-s390x-baseos-rpms
-    size: 317518
-    checksum: sha256:91c1b15a1db3ca9f168a032b4038c2793415f75ad63065c20800ea9d46477f07
+    size: 323956
+    checksum: sha256:607fa9dbb32ca12910b10db8120a599e11718dc35734cb98e42bc07ca6dfa0fa
     name: glibc-common
-    evr: 2.34-231.el9_7.2
-    sourcerpm: glibc-2.34-231.el9_7.2.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/baseos/os/Packages/g/glibc-langpack-en-2.34-231.el9_7.2.s390x.rpm
+    evr: 2.34-231.el9_7.10
+    sourcerpm: glibc-2.34-231.el9_7.10.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/baseos/os/Packages/g/glibc-langpack-en-2.34-231.el9_7.10.s390x.rpm
     repoid: ubi-9-for-s390x-baseos-rpms
-    size: 626350
-    checksum: sha256:117d2146e09aea8aa59b37c73e8f119068a10e31aed69be358283ab3a7ca82cc
+    size: 632456
+    checksum: sha256:a6efee3ed710d8d320cb265fb9200e09dc1d04063b7e34d9c9d72f79cc4ee8f5
     name: glibc-langpack-en
-    evr: 2.34-231.el9_7.2
-    sourcerpm: glibc-2.34-231.el9_7.2.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/baseos/os/Packages/g/glibc-minimal-langpack-2.34-231.el9_7.2.s390x.rpm
+    evr: 2.34-231.el9_7.10
+    sourcerpm: glibc-2.34-231.el9_7.10.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/baseos/os/Packages/g/glibc-minimal-langpack-2.34-231.el9_7.10.s390x.rpm
     repoid: ubi-9-for-s390x-baseos-rpms
-    size: 22037
-    checksum: sha256:4609f755324f81472e8345081458cfc6644489a6795bbf31ef1f6808f960fe2a
+    size: 28377
+    checksum: sha256:1de4d803dc1791a819dbe4935cb59ae5c7f0964172ede5cd96226ef151fe6ab2
     name: glibc-minimal-langpack
-    evr: 2.34-231.el9_7.2
-    sourcerpm: glibc-2.34-231.el9_7.2.src.rpm
+    evr: 2.34-231.el9_7.10
+    sourcerpm: glibc-2.34-231.el9_7.10.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/baseos/os/Packages/g/groff-base-1.22.4-10.el9.s390x.rpm
     repoid: ubi-9-for-s390x-baseos-rpms
     size: 1100747
@@ -4142,13 +4142,13 @@ arches:
     name: libatomic
     evr: 11.5.0-11.el9
     sourcerpm: gcc-11.5.0-11.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/baseos/os/Packages/l/libbrotli-1.0.9-7.el9_5.s390x.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/baseos/os/Packages/l/libbrotli-1.0.9-9.el9_7.s390x.rpm
     repoid: ubi-9-for-s390x-baseos-rpms
-    size: 326862
-    checksum: sha256:0a0d4dc9c873727fbcf07f39edc0c20dd66e28402f24b5cd62022af1c58a6f51
+    size: 329308
+    checksum: sha256:ea47c24d8670923c31472fac1c2887ee8124b0a142ffb8a3c4953da8bf65c238
     name: libbrotli
-    evr: 1.0.9-7.el9_5
-    sourcerpm: brotli-1.0.9-7.el9_5.src.rpm
+    evr: 1.0.9-9.el9_7
+    sourcerpm: brotli-1.0.9-9.el9_7.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/baseos/os/Packages/l/libcbor-0.7.0-5.el9.s390x.rpm
     repoid: ubi-9-for-s390x-baseos-rpms
     size: 59841
@@ -4233,20 +4233,20 @@ arches:
     name: ncurses-libs
     evr: 6.2-12.20210508.el9
     sourcerpm: ncurses-6.2-12.20210508.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/baseos/os/Packages/o/openssh-8.7p1-47.el9_7.s390x.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/baseos/os/Packages/o/openssh-8.7p1-48.el9_7.s390x.rpm
     repoid: ubi-9-for-s390x-baseos-rpms
-    size: 452850
-    checksum: sha256:304d07af2fd37c108dcbb16cb998211d78b4617bc366d263401daf58a272f07f
+    size: 459811
+    checksum: sha256:f0d5f3b02fbbdf785b310d54755b6994050b2067a632a230d79db33bb7d76633
     name: openssh
-    evr: 8.7p1-47.el9_7
-    sourcerpm: openssh-8.7p1-47.el9_7.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/baseos/os/Packages/o/openssh-clients-8.7p1-47.el9_7.s390x.rpm
+    evr: 8.7p1-48.el9_7
+    sourcerpm: openssh-8.7p1-48.el9_7.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/baseos/os/Packages/o/openssh-clients-8.7p1-48.el9_7.s390x.rpm
     repoid: ubi-9-for-s390x-baseos-rpms
-    size: 681961
-    checksum: sha256:f8a9c90a9516ce6a5cff8b5d8122993fa37bc2539edc4557d63a0384862c95d0
+    size: 689011
+    checksum: sha256:894c0c9fae5b1a5d85b642994dd48bd577821ce394f377abe068c83eda9fa9a2
     name: openssh-clients
-    evr: 8.7p1-47.el9_7
-    sourcerpm: openssh-8.7p1-47.el9_7.src.rpm
+    evr: 8.7p1-48.el9_7
+    sourcerpm: openssh-8.7p1-48.el9_7.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/baseos/os/Packages/o/openssl-3.5.1-7.el9_7.s390x.rpm
     repoid: ubi-9-for-s390x-baseos-rpms
     size: 1548995
@@ -4454,20 +4454,20 @@ arches:
     name: git-core-doc
     evr: 2.47.3-1.el9_6
     sourcerpm: git-2.47.3-1.el9_6.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/g/git-lfs-3.6.1-4.el9_7.x86_64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/g/git-lfs-3.6.1-8.el9_7.x86_64.rpm
     repoid: ubi-9-for-x86_64-appstream-rpms
-    size: 4903422
-    checksum: sha256:9fa047ddae41b79f31642679a80a2c00951d94b015b2370e0a5f2890d28ebcc7
+    size: 4921237
+    checksum: sha256:ced7c78f4b173530b9f0a9db25925b3dd45b9aa82f1762d465b00a25c677c957
     name: git-lfs
-    evr: 3.6.1-4.el9_7
-    sourcerpm: git-lfs-3.6.1-4.el9_7.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/g/glibc-locale-source-2.34-231.el9_7.2.x86_64.rpm
+    evr: 3.6.1-8.el9_7
+    sourcerpm: git-lfs-3.6.1-8.el9_7.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/g/glibc-locale-source-2.34-231.el9_7.10.x86_64.rpm
     repoid: ubi-9-for-x86_64-appstream-rpms
-    size: 4360055
-    checksum: sha256:1ce52d254a96b884b0727fbc123c4bce8d06530f63ddde652197d3c0028075ea
+    size: 4366522
+    checksum: sha256:be3ebcf67328d56ff04f405386123fe18372ea584e22b530e17c06c33c0f4145
     name: glibc-locale-source
-    evr: 2.34-231.el9_7.2
-    sourcerpm: glibc-2.34-231.el9_7.2.src.rpm
+    evr: 2.34-231.el9_7.10
+    sourcerpm: glibc-2.34-231.el9_7.10.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/g/gsm-1.0.19-6.el9.x86_64.rpm
     repoid: ubi-9-for-x86_64-appstream-rpms
     size: 37337
@@ -4734,13 +4734,13 @@ arches:
     name: libsndfile
     evr: 1.0.31-9.el9
     sourcerpm: libsndfile-1.0.31-9.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/l/libsoup-2.72.0-12.el9_7.3.x86_64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/l/libsoup-2.72.0-12.el9_7.5.x86_64.rpm
     repoid: ubi-9-for-x86_64-appstream-rpms
-    size: 413125
-    checksum: sha256:4b42af0860b6ae43f678042e8ff1cc027eabf02d22d32457d249105133101274
+    size: 420847
+    checksum: sha256:77f14bc81e45a61618e836049a968acdd998df82263d9eaa7cd83073267ec02d
     name: libsoup
-    evr: 2.72.0-12.el9_7.3
-    sourcerpm: libsoup-2.72.0-12.el9_7.3.src.rpm
+    evr: 2.72.0-12.el9_7.5
+    sourcerpm: libsoup-2.72.0-12.el9_7.5.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/l/libstemmer-0-18.585svn.el9.x86_64.rpm
     repoid: ubi-9-for-x86_64-appstream-rpms
     size: 87356
@@ -4825,13 +4825,13 @@ arches:
     name: libxkbcommon
     evr: 1.0.3-4.el9
     sourcerpm: libxkbcommon-1.0.3-4.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/l/libxslt-1.1.34-13.el9_6.x86_64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/l/libxslt-1.1.34-14.el9_7.1.x86_64.rpm
     repoid: ubi-9-for-x86_64-appstream-rpms
-    size: 250837
-    checksum: sha256:b22bb9f995e96b2b00711760c57fe4e93b4328815de61c39d53717b6a61f6d8c
+    size: 254259
+    checksum: sha256:d92873a046c78ae6837d8b23deecbfa1d6376b81bf587382e89ed345c1d5bad5
     name: libxslt
-    evr: 1.1.34-13.el9_6
-    sourcerpm: libxslt-1.1.34-13.el9_6.src.rpm
+    evr: 1.1.34-14.el9_7.1
+    sourcerpm: libxslt-1.1.34-14.el9_7.1.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/l/lua-5.4.4-4.el9.x86_64.rpm
     repoid: ubi-9-for-x86_64-appstream-rpms
     size: 197036
@@ -4853,48 +4853,48 @@ arches:
     name: mkfontscale
     evr: 1.2.1-3.el9
     sourcerpm: mkfontscale-1.2.1-3.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/n/nspr-4.36.0-4.el9_4.x86_64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/n/nspr-4.36.0-8.el9_4.x86_64.rpm
     repoid: ubi-9-for-x86_64-appstream-rpms
-    size: 136524
-    checksum: sha256:dd9a598390e8adfebdcec7adbc5aa140d6584ede4d581d5fec328d2e4a5107db
+    size: 136884
+    checksum: sha256:dd84e03ec155228c5a9489f0d2184e3303a24e17107b943bdcde19f22a6a46af
     name: nspr
-    evr: 4.36.0-4.el9_4
-    sourcerpm: nss-3.112.0-4.el9_4.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/n/nss-3.112.0-4.el9_4.x86_64.rpm
+    evr: 4.36.0-8.el9_4
+    sourcerpm: nss-3.112.0-8.el9_4.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/n/nss-3.112.0-8.el9_4.x86_64.rpm
     repoid: ubi-9-for-x86_64-appstream-rpms
-    size: 740527
-    checksum: sha256:6eefe50251cf43934ea5c949a0f23e0da20d81262394e7824328e0f21aabbe88
+    size: 741751
+    checksum: sha256:df2dc36ea504d4fcc7739cbe2c866cfd313a266f4335daecf6dbfc1a203a8cd8
     name: nss
-    evr: 3.112.0-4.el9_4
-    sourcerpm: nss-3.112.0-4.el9_4.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/n/nss-softokn-3.112.0-4.el9_4.x86_64.rpm
+    evr: 3.112.0-8.el9_4
+    sourcerpm: nss-3.112.0-8.el9_4.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/n/nss-softokn-3.112.0-8.el9_4.x86_64.rpm
     repoid: ubi-9-for-x86_64-appstream-rpms
-    size: 409821
-    checksum: sha256:ac09b91c717cf003714b62cb033bea51770c887fdc70426f625a677e50b0813f
+    size: 411899
+    checksum: sha256:301a158bb76422e2127583cd0fa60f19c70713bad412cfa4994f97a6690065b1
     name: nss-softokn
-    evr: 3.112.0-4.el9_4
-    sourcerpm: nss-3.112.0-4.el9_4.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/n/nss-softokn-freebl-3.112.0-4.el9_4.x86_64.rpm
+    evr: 3.112.0-8.el9_4
+    sourcerpm: nss-3.112.0-8.el9_4.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/n/nss-softokn-freebl-3.112.0-8.el9_4.x86_64.rpm
     repoid: ubi-9-for-x86_64-appstream-rpms
-    size: 423244
-    checksum: sha256:1eb3fb60d885f3a1071dcb335e1ee34c156bbc50c797f42772d61412a91db8f5
+    size: 426105
+    checksum: sha256:8912ba4e4057cdb463137fa149610974c824058c56d8cad240dcd2b43f9233e6
     name: nss-softokn-freebl
-    evr: 3.112.0-4.el9_4
-    sourcerpm: nss-3.112.0-4.el9_4.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/n/nss-sysinit-3.112.0-4.el9_4.x86_64.rpm
+    evr: 3.112.0-8.el9_4
+    sourcerpm: nss-3.112.0-8.el9_4.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/n/nss-sysinit-3.112.0-8.el9_4.x86_64.rpm
     repoid: ubi-9-for-x86_64-appstream-rpms
-    size: 18225
-    checksum: sha256:5b5314ce6088f161b2a404b566c6d5016811b6c12e90c7bf70d3fd281168d659
+    size: 18340
+    checksum: sha256:169f7510b31fab5bcbf4ea9e689ea99184f8cf1fbba0b9b6221fb599989f63a6
     name: nss-sysinit
-    evr: 3.112.0-4.el9_4
-    sourcerpm: nss-3.112.0-4.el9_4.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/n/nss-util-3.112.0-4.el9_4.x86_64.rpm
+    evr: 3.112.0-8.el9_4
+    sourcerpm: nss-3.112.0-8.el9_4.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/n/nss-util-3.112.0-8.el9_4.x86_64.rpm
     repoid: ubi-9-for-x86_64-appstream-rpms
-    size: 91543
-    checksum: sha256:3904f1eab4e56789d8d818d0ca4a76c49d1ef5de947ccdabaf64f9d748ad05df
+    size: 91341
+    checksum: sha256:dfe93ee9bc42ba4fafe838db1d0c616b788b833be051841c0a882754f863fadd
     name: nss-util
-    evr: 3.112.0-4.el9_4
-    sourcerpm: nss-3.112.0-4.el9_4.src.rpm
+    evr: 3.112.0-8.el9_4
+    sourcerpm: nss-3.112.0-8.el9_4.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/o/oniguruma-6.9.6-1.el9.5.x86_64.rpm
     repoid: ubi-9-for-x86_64-appstream-rpms
     size: 226331
@@ -5392,13 +5392,13 @@ arches:
     name: ttmkfdir
     evr: 3.0.9-65.el9
     sourcerpm: ttmkfdir-3.0.9-65.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/t/tzdata-java-2025c-1.el9.noarch.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/t/tzdata-java-2026a-1.el9.noarch.rpm
     repoid: ubi-9-for-x86_64-appstream-rpms
-    size: 228913
-    checksum: sha256:229c0a7e26ad9494bae4ce8bbb809785f258d5d01327b0e98bc6424cbeca0ec6
+    size: 235694
+    checksum: sha256:d9c15585978866d1acf7a47eeec0958a9052ef457559dd7b01870f547ac3b125
     name: tzdata-java
-    evr: 2025c-1.el9
-    sourcerpm: tzdata-2025c-1.el9.src.rpm
+    evr: 2026a-1.el9
+    sourcerpm: tzdata-2026a-1.el9.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/w/webkit2gtk3-jsc-2.50.4-1.el9_7.x86_64.rpm
     repoid: ubi-9-for-x86_64-appstream-rpms
     size: 9043928
@@ -5490,34 +5490,34 @@ arches:
     name: glib-networking
     evr: 2.68.3-3.el9
     sourcerpm: glib-networking-2.68.3-3.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/g/glibc-2.34-231.el9_7.2.x86_64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/g/glibc-2.34-231.el9_7.10.x86_64.rpm
     repoid: ubi-9-for-x86_64-baseos-rpms
-    size: 2074021
-    checksum: sha256:d66bcbe73831d22598af6d930ed542e6740671568764894a51f36c1d9d16e96e
+    size: 2079929
+    checksum: sha256:a579dd638fca8d9829b33988592df76199233297eb68a19d7e0e3d13775f8d54
     name: glibc
-    evr: 2.34-231.el9_7.2
-    sourcerpm: glibc-2.34-231.el9_7.2.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/g/glibc-common-2.34-231.el9_7.2.x86_64.rpm
+    evr: 2.34-231.el9_7.10
+    sourcerpm: glibc-2.34-231.el9_7.10.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/g/glibc-common-2.34-231.el9_7.10.x86_64.rpm
     repoid: ubi-9-for-x86_64-baseos-rpms
-    size: 313407
-    checksum: sha256:1c4c2f8e57ae9c9b7e751749de3af85615d936123625d802aaef5a28c068a670
+    size: 319966
+    checksum: sha256:fec3c305983e64fbb6150a61e6591f743542e44908a6c6c7b50e9c39d6ebed1a
     name: glibc-common
-    evr: 2.34-231.el9_7.2
-    sourcerpm: glibc-2.34-231.el9_7.2.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/g/glibc-langpack-en-2.34-231.el9_7.2.x86_64.rpm
+    evr: 2.34-231.el9_7.10
+    sourcerpm: glibc-2.34-231.el9_7.10.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/g/glibc-langpack-en-2.34-231.el9_7.10.x86_64.rpm
     repoid: ubi-9-for-x86_64-baseos-rpms
-    size: 675632
-    checksum: sha256:ea201629802684a4e09563ca2ef138fc02c6a4f9f977fbfe34a6ff12c2305722
+    size: 681408
+    checksum: sha256:222d228a92db3e762cc922440c261d83f48a30206b42a98d344a829493098dae
     name: glibc-langpack-en
-    evr: 2.34-231.el9_7.2
-    sourcerpm: glibc-2.34-231.el9_7.2.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/g/glibc-minimal-langpack-2.34-231.el9_7.2.x86_64.rpm
+    evr: 2.34-231.el9_7.10
+    sourcerpm: glibc-2.34-231.el9_7.10.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/g/glibc-minimal-langpack-2.34-231.el9_7.10.x86_64.rpm
     repoid: ubi-9-for-x86_64-baseos-rpms
-    size: 22065
-    checksum: sha256:7af1a2a9d1c8cff3e267cfb43a09fe3aeac587e6f2bad89d8bbbd04a3ef740c0
+    size: 28397
+    checksum: sha256:ec2bee0afbe9f360b4ac23655b42daaf2c30f4c276d5c82090cb6fe5cbab3e1c
     name: glibc-minimal-langpack
-    evr: 2.34-231.el9_7.2
-    sourcerpm: glibc-2.34-231.el9_7.2.src.rpm
+    evr: 2.34-231.el9_7.10
+    sourcerpm: glibc-2.34-231.el9_7.10.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/g/graphite2-1.3.14-9.el9.x86_64.rpm
     repoid: ubi-9-for-x86_64-baseos-rpms
     size: 100358
@@ -5560,13 +5560,13 @@ arches:
     name: less
     evr: 590-6.el9
     sourcerpm: less-590-6.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/l/libbrotli-1.0.9-7.el9_5.x86_64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/l/libbrotli-1.0.9-9.el9_7.x86_64.rpm
     repoid: ubi-9-for-x86_64-baseos-rpms
-    size: 323932
-    checksum: sha256:bb3175e435723e98cc1a5063eafa82231092eca3bf6276d24505eaeaaa817113
+    size: 326278
+    checksum: sha256:81096e6aed022489306e2fe1d1496b2b689d8f0bf6c70a94b5bddb82356eeda1
     name: libbrotli
-    evr: 1.0.9-7.el9_5
-    sourcerpm: brotli-1.0.9-7.el9_5.src.rpm
+    evr: 1.0.9-9.el9_7
+    sourcerpm: brotli-1.0.9-9.el9_7.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/l/libcbor-0.7.0-5.el9.x86_64.rpm
     repoid: ubi-9-for-x86_64-baseos-rpms
     size: 60575
@@ -5602,13 +5602,13 @@ arches:
     name: libicu
     evr: 67.1-10.el9_6
     sourcerpm: icu-67.1-10.el9_6.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/l/libpng-1.6.37-12.el9_7.1.x86_64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/l/libpng-1.6.37-12.el9_7.2.x86_64.rpm
     repoid: ubi-9-for-x86_64-baseos-rpms
-    size: 117649
-    checksum: sha256:561f20f3e8863ba83d1b67ea6e6f2724b82bd6d1393e0d3bb93f9409f3a0c40d
+    size: 124468
+    checksum: sha256:19b5cf6b3a14137a159ea956c61559fb776a72d251b6c60a4d4959cdd88db3d1
     name: libpng
-    evr: 2:1.6.37-12.el9_7.1
-    sourcerpm: libpng-1.6.37-12.el9_7.1.src.rpm
+    evr: 2:1.6.37-12.el9_7.2
+    sourcerpm: libpng-1.6.37-12.el9_7.2.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/l/libproxy-0.4.15-35.el9.x86_64.rpm
     repoid: ubi-9-for-x86_64-baseos-rpms
     size: 79470
@@ -5658,20 +5658,20 @@ arches:
     name: ncurses-libs
     evr: 6.2-12.20210508.el9
     sourcerpm: ncurses-6.2-12.20210508.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/o/openssh-8.7p1-47.el9_7.x86_64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/o/openssh-8.7p1-48.el9_7.x86_64.rpm
     repoid: ubi-9-for-x86_64-baseos-rpms
-    size: 468180
-    checksum: sha256:9b81451b1f325139829ad9436890b42e23586feb15f4c7b2fa5c526854bf18cf
+    size: 475180
+    checksum: sha256:f9167df3110f931cded7e8500f501d1c0693bfbdc9cf92a77cde95f07a47f3c2
     name: openssh
-    evr: 8.7p1-47.el9_7
-    sourcerpm: openssh-8.7p1-47.el9_7.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/o/openssh-clients-8.7p1-47.el9_7.x86_64.rpm
+    evr: 8.7p1-48.el9_7
+    sourcerpm: openssh-8.7p1-48.el9_7.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/o/openssh-clients-8.7p1-48.el9_7.x86_64.rpm
     repoid: ubi-9-for-x86_64-baseos-rpms
-    size: 729190
-    checksum: sha256:8d6e1934d12df54433fbff8969b48599070da8e556a44606f7cf6227e679adca
+    size: 735877
+    checksum: sha256:32685f9fc5a8b89d35da65d808f79530b49dba570ad2f3a5e26dba29324c9845
     name: openssh-clients
-    evr: 8.7p1-47.el9_7
-    sourcerpm: openssh-8.7p1-47.el9_7.src.rpm
+    evr: 8.7p1-48.el9_7
+    sourcerpm: openssh-8.7p1-48.el9_7.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/o/openssl-3.5.1-7.el9_7.x86_64.rpm
     repoid: ubi-9-for-x86_64-baseos-rpms
     size: 1565197
