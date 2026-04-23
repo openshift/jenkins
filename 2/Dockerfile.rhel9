@@ -10,18 +10,20 @@ RUN GO111MODULE=off go build -o /usr/bin/go-init .
 ##############################################
 # Stage 2 : Build controller with go-init
 ##############################################
+FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.20 as oc-420
 FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.19 as oc-419
 FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.18 as oc-418
 FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.17 as oc-417
 FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.16 as oc-416
 
-FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.20
+FROM registry.redhat.io/openshift4/ose-cli-rhel9:v4.21
 ARG JENKINS_LTS \
     CI_UPSTREAM_COMMIT \
     CI_UPSTREAM_URL \
     OCP_VERSION \
     INSTALL_JENKINS_VIA_RPMS=false
 COPY --from=go-init-builder --chown=root:root /usr/bin/go-init /usr/bin/go-init
+COPY --from=oc-420 --chown=root:root /usr/bin/oc /usr/share/openshift/bin/oc-420/oc
 COPY --from=oc-419 --chown=root:root /usr/bin/oc /usr/share/openshift/bin/oc-419/oc
 COPY --from=oc-418 --chown=root:root /usr/bin/oc /usr/share/openshift/bin/oc-418/oc
 COPY --from=oc-417 --chown=root:root /usr/bin/oc /usr/share/openshift/bin/oc-417/oc
