@@ -10,7 +10,6 @@ metadata:
     pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch
       == "release-rhel8" && ( "slave-base/***".pathChanged() || ".tekton/jenkins-agent-base-rhel8-push.yaml".pathChanged()
       || "slave-base/Dockerfile.rhel8".pathChanged() )
-  creationTimestamp: null
   labels:
     appstudio.openshift.io/application: openshift-jenkins-rhel8
     appstudio.openshift.io/component: jenkins-agent-base-rhel8
