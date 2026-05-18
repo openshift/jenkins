@@ -1,0 +1,133 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: rapidast-integration-test
+spec:
+  params:
+    # this SNAPSHOT should be produced by the build pipeline and contain the containerImage we want to test with rapidast
+    - name: SNAPSHOT
+      type: string
+  tasks:
+    # Create an ephemeral namespace where we will deploy our application.
+    - name: provision-env
+      taskRef:
+        params:
+          - name: name
+            value: eaas-provision-space
+          - name: bundle
+            value: quay.io/konflux-ci/tekton-catalog/task-eaas-provision-space:0.1@sha256:5a571c2a26b5090d18d814bb2b8c4ba7a5ab490c6ec47b2df60e1f27da32726c
+          - name: kind
+            value: task
+        resolver: bundles
+      params:
+        - name: ownerName
+          value: $(context.pipelineRun.name)
+        - name: ownerUid
+          value: $(context.pipelineRun.uid)
+
+    # Deploy the snapshot image into the new environment.
+    - name: deploy-app
+      params:
+        - name: SNAPSHOT
+          value: "$(params.SNAPSHOT)"
+      runAfter:
+      - provision-env
+      taskSpec:
+        params:
+          - name: SNAPSHOT
+            type: string
+        volumes:
+          # A volume which persists for the lifetime of the pipeline and is
+          # shared across steps.
+          - name: scratch
+            emptyDir: {}
+        steps:
+          # Write the kubeconfig to a volume we can use in subsequent steps.
+          - name: get-kubeconfig
+            image: quay.io/konflux-ci/konflux-test:latest
+            env:
+              - name: KUBECONFIG
+                value: /scratch/kubeconfig.yml
+              - name: KUBECONFIG_VALUE
+                valueFrom:
+                  secretKeyRef:
+                    name: "$(tasks.provision-env.results.secretRef)"
+                    key: kubeconfig
+            volumeMounts:
+              - name: scratch
+                mountPath: /scratch
+            script: |
+              #!/bin/bash
+              set -euxo pipefail
+
+              cat <<< "$KUBECONFIG_VALUE" > "$KUBECONFIG"
+              echo "Wrote kubeconfig for new environment to $KUBECONFIG"
+
+          # Deploy an instance of our application using the snapshot image.
+          - name: deploy-app
+            image: quay.io/konflux-ci/konflux-test:latest
+            env:
+              - name: SNAPSHOT
+                value: "$(params.SNAPSHOT)"
+              - name: KUBECONFIG
+                value: /scratch/kubeconfig.yml
+            volumeMounts:
+              - name: scratch
+                mountPath: /scratch
+            script: |
+              #!/bin/bash
+              set -euxo pipefail
+
+              IMAGE=$(echo "$SNAPSHOT" | jq -r '.components[0] | select(.name == "jenkins-rhel9") | .containerImage')
+              echo "Extracted image: $IMAGE"
+
+              oc create deployment jenkins --image=$IMAGE
+              oc create service clusterip jenkins --tcp=8080:8080
+
+              echo "Waiting for deployments to be ready..."
+              oc wait --for=condition=Available=true deployment/jenkins --timeout=180s
+              oc get pods
+              oc logs deployments/jenkins
+
+    # Run the scanner.
+    - name: rapidast-check
+      runAfter:
+      - deploy-app
+      taskRef:
+        resolver: git
+        params:
+          - name: url
+            value: https://github.com/redhatproductsecurity/rapidast
+          - name: revision
+            value: "0119197b4c18791b0947a12a449068f2b718e18c"
+          - name: pathInRepo
+            value: examples/konflux/rapidast-check.yaml
+      params:
+        - name: KUBECONFIG_SECRET
+          value: "$(tasks.provision-env.results.secretRef)"
+        - name: PORT_FORWARD_TARGETS
+          value: "deployment/jenkins 8080:8080"
+        - name: RAPIDAST_CONFIG_VALUE
+          value: |
+            ---
+            config:
+              configVersion: 6
+            
+            application:
+              shortName: "jenkins-dast-scan"
+              url: http://127.0.0.1:8080
+            
+            scanners:
+              zap:
+                authentication:
+                  type: http_header
+                  parameters:
+                    name: "Authorization"
+                    value: "Basic YWRtaW46cGFzc3dvcmQ="
+            
+                spider:
+                  maxDuration: 10
+                  maxDepth: 5
+                passiveScan: {}
+                activeScan:
+                  policy: API-scan-minimal
