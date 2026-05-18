@@ -240,7 +240,7 @@ verify_installed_packages() {
 
 	for e in ${INSTALL_PKGS[@]}; do
 			printf "\t%-50s" "- checking $e ..."
-			if ! yum list installed "${e}" &> /dev/null; then
+			if ! rpm -qa "${e}" &> /dev/null; then
 				printf "FAIL\n"
 				printf "package %s is not installed" "${e}\n" >> $FAILED_LOG_LOCATION
 			else
