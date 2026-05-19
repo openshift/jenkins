@@ -78,7 +78,7 @@ spec:
               #!/bin/bash
               set -euxo pipefail
 
-              IMAGE=$(echo "$SNAPSHOT" | jq -r '.components[0] | select(.name == "jenkins-rhel9") | .containerImage')
+              IMAGE=$(echo "$SNAPSHOT" | jq -r '.components[] | select(.name == "jenkins-rhel9") | .containerImage')
               echo "Extracted image: $IMAGE"
 
               oc create deployment jenkins --image=$IMAGE
