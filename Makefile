@@ -1,6 +1,6 @@
 # The master images follow the normal numbering scheme in which the
 # major version is used as the directory name and incorporated into
-# the image name (jenkins-2-centos7 in this case).  For the slave
+# the image name (jenkins-2-rhel9 in this case).  For the slave
 # images we are not versioning them (they actually pull their
 # jars from the jenkins master, so they don't have a jenkins version,
 # so the only thing we'd version is the maven/nodejs version).
@@ -13,10 +13,12 @@ VERSIONS="2 slave-base"
 BUNDLE_PLUGINS="$(shell pwd)/2/contrib/openshift/bundle-plugins.txt"
 REF=$(shell mktemp -d)
 JENKINS_WAR="$(shell mktemp -d)/jenkins.war"
-ifeq ($(TARGET),rhel8)
+ifeq ($(TARGET),rhel9)
+	OS := rhel9
+else ifeq ($(TARGET),rhel8)
 	OS := rhel8
- else
- 	OS := centos8
+else
+ 	OS := ubi
 endif
 
 .PHONY: build

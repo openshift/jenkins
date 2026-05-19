@@ -26,7 +26,7 @@ var _ = BeforeSuite(func() {
 
 	imageName = os.Getenv("IMAGE_NAME")
 	if imageName == "" {
-		imageName = "openshift/jenkins-slave-base-centos7-candidate"
+		imageName = "openshift/jenkins-slave-base-rhel9-candidate"
 	}
 })
 
