@@ -1,3 +1,4 @@
+---
 apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
@@ -31,7 +32,7 @@ spec:
         - name: SNAPSHOT
           value: "$(params.SNAPSHOT)"
       runAfter:
-      - provision-env
+        - provision-env
       taskSpec:
         params:
           - name: SNAPSHOT
@@ -92,14 +93,14 @@ spec:
     # Run the scanner.
     - name: rapidast-check
       runAfter:
-      - deploy-app
+        - deploy-app
       taskRef:
         resolver: git
         params:
           - name: url
             value: https://github.com/redhatproductsecurity/rapidast
           - name: revision
-            value: "0119197b4c18791b0947a12a449068f2b718e18c"
+            value: "2.13.0"
           - name: pathInRepo
             value: examples/konflux/rapidast-check.yaml
       params:
@@ -112,11 +113,9 @@ spec:
             ---
             config:
               configVersion: 6
-            
             application:
               shortName: "jenkins-dast-scan"
               url: http://127.0.0.1:8080
-            
             scanners:
               zap:
                 authentication:
@@ -124,7 +123,6 @@ spec:
                   parameters:
                     name: "Authorization"
                     value: "Basic YWRtaW46cGFzc3dvcmQ="
-            
                 spider:
                   maxDuration: 10
                   maxDepth: 5
