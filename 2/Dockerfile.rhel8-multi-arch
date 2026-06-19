@@ -39,7 +39,7 @@ ENV JENKINS_VERSION=2 \
     LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
     INSTALL_JENKINS_VIA_RPMS=${INSTALL_JENKINS_VIA_RPMS} \
-    USE_JAVA_VERSION=java-21 \
+    USE_JAVA_VERSION=java-25 \
     BUILD_VERSION=${OCP_VERSION} \
     OS_GIT_MINOR=${OS_GIT_MINOR}
 # openshift/ocp-build-data will change INSTALL_JENKINS_VIA_RPMS to true
@@ -80,16 +80,16 @@ EXPOSE 8080 50000
 # /usr/lib64/jenkins will subsequently get redirected to /usr/lib/jenkins; it is confirmed that the 3.7 jenkins RHEL images
 # do *NOT* have a /usr/lib64/jenkins path
 RUN ln -s /usr/lib/jenkins /usr/lib64/jenkins && \
-    INSTALL_PKGS="dejavu-sans-fonts wget rsync gettext git git-lfs tar zip unzip openssl bzip2 java-21-openjdk java-21-openjdk-devel java-17-openjdk java-17-openjdk-devel jq glibc-locale-source xmlstarlet glibc-langpack-en" && \
+    INSTALL_PKGS="dejavu-sans-fonts wget rsync gettext git git-lfs tar zip unzip openssl bzip2 java-21-openjdk java-21-openjdk-devel java-25-openjdk java-25-openjdk-devel jq glibc-locale-source xmlstarlet glibc-langpack-en" && \
     yum install -y $INSTALL_PKGS && \
     yum update -y && \
     rpm -V  $INSTALL_PKGS && \
     yum clean all  && \
     localedef -f UTF-8 -i en_US en_US.UTF-8 && \
-    alternatives --set java $(alternatives --display java | grep 'family java-21-openjdk' | cut -d ' ' -f 1) && \
-    alternatives --set javac $(alternatives --display javac | grep 'family java-21-openjdk' | cut -d ' ' -f 1) && \
-    alternatives --family $(alternatives --display java | grep 'family java-21-openjdk' | cut -d ' ' -f 4) --install /usr/bin/jar  jar $(alternatives --display java | grep 'family java-21-openjdk' | cut -d' ' -f1 | sed 's,/[^/]*$,/jar,') 1 && \
-    alternatives --set jar $(alternatives --display java | grep 'family java-21-openjdk' | cut -d ' ' -f 4)
+    alternatives --set java $(alternatives --display java | grep 'java-25-openjdk.*priority' | cut -d ' ' -f 1) && \
+    alternatives --set javac $(alternatives --display javac | grep 'java-25-openjdk.*priority' | cut -d ' ' -f 1) && \
+    alternatives --family $(alternatives --display java | grep 'java-25-openjdk.*priority' | cut -d ' ' -f 4) --install /usr/bin/jar  jar $(alternatives --display java | grep 'java-25-openjdk.*priority' | cut -d' ' -f1 | sed 's,/[^/]*$,/jar,') 1 && \
+    alternatives --set jar $(alternatives --display java | grep 'java-25-openjdk.*priority' | cut -d ' ' -f 4)
 
 COPY ./contrib/openshift /opt/openshift
 COPY ./contrib/jenkins /usr/local/bin
