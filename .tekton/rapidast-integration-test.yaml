@@ -100,7 +100,7 @@ spec:
           - name: url
             value: https://github.com/redhatproductsecurity/rapidast
           - name: revision
-            value: "2.13.0"
+            value: "2.14.0"
           - name: pathInRepo
             value: examples/konflux/rapidast-check.yaml
       params:
