@@ -66,10 +66,10 @@ RUN ln -s /usr/lib/jenkins /usr/lib64/jenkins && \
     rpm -V  $INSTALL_PKGS && \
     yum clean all  && \
     localedef -f UTF-8 -i en_US en_US.UTF-8 && \
-    alternatives --set java $(alternatives --display java | grep 'java-25-openjdk.*priority' | cut -d ' ' -f 1) && \
-    alternatives --set javac $(alternatives --display javac | grep 'java-25-openjdk.*priority' | cut -d ' ' -f 1) && \
-    alternatives --family $(alternatives --display java | grep 'java-25-openjdk.*priority' | cut -d ' ' -f 4) --install /usr/bin/jar  jar $(alternatives --display java | grep 'java-25-openjdk.*priority' | cut -d' ' -f1 | sed 's,/[^/]*$,/jar,') 1 && \
-    alternatives --set jar $(alternatives --display java | grep 'java-25-openjdk.*priority' | cut -d ' ' -f 4)
+    alternatives --set java $(alternatives --display java | grep 'java-21-openjdk.*priority' | cut -d ' ' -f 1) && \
+    alternatives --set javac $(alternatives --display javac | grep 'java-21-openjdk.*priority' | cut -d ' ' -f 1) && \
+    alternatives --family $(alternatives --display java | grep 'java-21-openjdk.*priority' | cut -d ' ' -f 4) --install /usr/bin/jar  jar $(alternatives --display java | grep 'java-21-openjdk.*priority' | cut -d' ' -f1 | sed 's,/[^/]*$,/jar,') 1 && \
+    alternatives --set jar $(alternatives --display java | grep 'java-21-openjdk.*priority' | cut -d ' ' -f 4)
 
 COPY ./contrib/openshift /opt/openshift
 COPY ./contrib/jenkins /usr/local/bin
