@@ -42,6 +42,7 @@ spec:
       value: '{"packages": [{"type": "generic"},{"type": "rpm"}]}'
     - name: build-args
       value:
+        - OCP_VERSION=4.20
         - CI_UPSTREAM_COMMIT={{revision}}
         - CI_UPSTREAM_URL={{source_url}}
     - name: build-args-file
