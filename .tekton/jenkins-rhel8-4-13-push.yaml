@@ -39,6 +39,7 @@ spec:
       value: '{"packages": [{"type": "generic"},{"type": "rpm"}]}'
     - name: build-args
       value:
+        - OCP_VERSION=4.13
         - CI_UPSTREAM_COMMIT={{revision}}
         - CI_UPSTREAM_URL={{source_url}}
         - OC_LEGACY_TAG=v4.12
