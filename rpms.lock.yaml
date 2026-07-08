@@ -60,27 +60,6 @@ arches:
     name: glibc-locale-source
     evr: 2.34-272.el9_8
     sourcerpm: glibc-2.34-272.el9_8.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/j/java-17-openjdk-17.0.19.0.10-2.el9.aarch64.rpm
-    repoid: ubi-9-for-aarch64-appstream-rpms
-    size: 469591
-    checksum: sha256:f9726468af45f9c6e420a3fbc4c3aa8950ef2aad732a85318b9b26a0e9de1707
-    name: java-17-openjdk
-    evr: 1:17.0.19.0.10-2.el9
-    sourcerpm: java-17-openjdk-17.0.19.0.10-2.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/j/java-17-openjdk-devel-17.0.19.0.10-2.el9.aarch64.rpm
-    repoid: ubi-9-for-aarch64-appstream-rpms
-    size: 4965342
-    checksum: sha256:8b0a84a716e5de623109e1452c7ee4905c1eeac29a6d0b94f8b5a27c3e5dd720
-    name: java-17-openjdk-devel
-    evr: 1:17.0.19.0.10-2.el9
-    sourcerpm: java-17-openjdk-17.0.19.0.10-2.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/j/java-17-openjdk-headless-17.0.19.0.10-2.el9.aarch64.rpm
-    repoid: ubi-9-for-aarch64-appstream-rpms
-    size: 46654694
-    checksum: sha256:b6e976cf73bab9ebe1b9a1b302242117f2be851b7ccd2f4c760f38527b708ba2
-    name: java-17-openjdk-headless
-    evr: 1:17.0.19.0.10-2.el9
-    sourcerpm: java-17-openjdk-17.0.19.0.10-2.el9.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/j/java-21-openjdk-21.0.11.0.10-2.el9.aarch64.rpm
     repoid: ubi-9-for-aarch64-appstream-rpms
     size: 410640
@@ -102,6 +81,34 @@ arches:
     name: java-21-openjdk-headless
     evr: 1:21.0.11.0.10-2.el9
     sourcerpm: java-21-openjdk-21.0.11.0.10-2.el9.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/j/java-25-openjdk-25.0.3.0.9-1.el9.aarch64.rpm
+    repoid: ubi-9-for-aarch64-appstream-rpms
+    size: 396217
+    checksum: sha256:75f374b9d9077fcbad6043d5da9b67497b0113d8b6cc89fb030db289b8c9a539
+    name: java-25-openjdk
+    evr: 1:25.0.3.0.9-1.el9
+    sourcerpm: java-25-openjdk-25.0.3.0.9-1.el9.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/j/java-25-openjdk-crypto-adapter-25.0.3.0.9-1.el9.aarch64.rpm
+    repoid: ubi-9-for-aarch64-appstream-rpms
+    size: 58183
+    checksum: sha256:a0c43bc257c4edd1af0eebbdfcff3b8e26604d5ccbcc5d2b1299d8572f86e62b
+    name: java-25-openjdk-crypto-adapter
+    evr: 1:25.0.3.0.9-1.el9
+    sourcerpm: java-25-openjdk-25.0.3.0.9-1.el9.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/j/java-25-openjdk-devel-25.0.3.0.9-1.el9.aarch64.rpm
+    repoid: ubi-9-for-aarch64-appstream-rpms
+    size: 6482436
+    checksum: sha256:7ec320963fa444e6c435ea66d6b7e53549090439d6db6f329281a010a632a59d
+    name: java-25-openjdk-devel
+    evr: 1:25.0.3.0.9-1.el9
+    sourcerpm: java-25-openjdk-25.0.3.0.9-1.el9.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/j/java-25-openjdk-headless-25.0.3.0.9-1.el9.aarch64.rpm
+    repoid: ubi-9-for-aarch64-appstream-rpms
+    size: 63111749
+    checksum: sha256:beec8eb3a92ad316d3f42aea1378ff8eb9ce1b0f99bbf813bb0099c66392557c
+    name: java-25-openjdk-headless
+    evr: 1:25.0.3.0.9-1.el9
+    sourcerpm: java-25-openjdk-25.0.3.0.9-1.el9.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/j/javapackages-filesystem-6.4.0-1.el9.noarch.rpm
     repoid: ubi-9-for-aarch64-appstream-rpms
     size: 17320
@@ -1030,27 +1037,6 @@ arches:
     name: glibc-locale-source
     evr: 2.34-272.el9_8
     sourcerpm: glibc-2.34-272.el9_8.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/j/java-17-openjdk-17.0.19.0.10-2.el9.ppc64le.rpm
-    repoid: ubi-9-for-ppc64le-appstream-rpms
-    size: 523994
-    checksum: sha256:92641999676d97f6bdb986cf6647ddbd8382493050ed1fd23f521d03a0d1a807
-    name: java-17-openjdk
-    evr: 1:17.0.19.0.10-2.el9
-    sourcerpm: java-17-openjdk-17.0.19.0.10-2.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/j/java-17-openjdk-devel-17.0.19.0.10-2.el9.ppc64le.rpm
-    repoid: ubi-9-for-ppc64le-appstream-rpms
-    size: 4966925
-    checksum: sha256:be4fb4d0b1dac01f62274b969e5ebab19d3d820228bd50161c4d8e9acbf0fb5e
-    name: java-17-openjdk-devel
-    evr: 1:17.0.19.0.10-2.el9
-    sourcerpm: java-17-openjdk-17.0.19.0.10-2.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/j/java-17-openjdk-headless-17.0.19.0.10-2.el9.ppc64le.rpm
-    repoid: ubi-9-for-ppc64le-appstream-rpms
-    size: 46732932
-    checksum: sha256:7fe8bb3b20f43406304f1000a3794250015a485f1832c95778d2b688c0dfc83c
-    name: java-17-openjdk-headless
-    evr: 1:17.0.19.0.10-2.el9
-    sourcerpm: java-17-openjdk-17.0.19.0.10-2.el9.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/j/java-21-openjdk-21.0.11.0.10-2.el9.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-appstream-rpms
     size: 445153
@@ -1072,6 +1058,34 @@ arches:
     name: java-21-openjdk-headless
     evr: 1:21.0.11.0.10-2.el9
     sourcerpm: java-21-openjdk-21.0.11.0.10-2.el9.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/j/java-25-openjdk-25.0.3.0.9-1.el9.ppc64le.rpm
+    repoid: ubi-9-for-ppc64le-appstream-rpms
+    size: 430546
+    checksum: sha256:4bb8461c4a5443a79af75a76dc96477c87953614e3101965cd27ed4afc7f172d
+    name: java-25-openjdk
+    evr: 1:25.0.3.0.9-1.el9
+    sourcerpm: java-25-openjdk-25.0.3.0.9-1.el9.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/j/java-25-openjdk-crypto-adapter-25.0.3.0.9-1.el9.ppc64le.rpm
+    repoid: ubi-9-for-ppc64le-appstream-rpms
+    size: 58282
+    checksum: sha256:8f2fce7c4829f61561cc330afe3c763cc01edb4d5886c99e732581e2dc4531c6
+    name: java-25-openjdk-crypto-adapter
+    evr: 1:25.0.3.0.9-1.el9
+    sourcerpm: java-25-openjdk-25.0.3.0.9-1.el9.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/j/java-25-openjdk-devel-25.0.3.0.9-1.el9.ppc64le.rpm
+    repoid: ubi-9-for-ppc64le-appstream-rpms
+    size: 6483730
+    checksum: sha256:4089dd34b37be54e92787c3112bd6cac1498e7ac64ae8aa1bb8bc40594d473fa
+    name: java-25-openjdk-devel
+    evr: 1:25.0.3.0.9-1.el9
+    sourcerpm: java-25-openjdk-25.0.3.0.9-1.el9.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/j/java-25-openjdk-headless-25.0.3.0.9-1.el9.ppc64le.rpm
+    repoid: ubi-9-for-ppc64le-appstream-rpms
+    size: 63632661
+    checksum: sha256:416bd7ae28cb55fe2cc027f6b98339c40c70eb8c7927055c868c6c79a5c23877
+    name: java-25-openjdk-headless
+    evr: 1:25.0.3.0.9-1.el9
+    sourcerpm: java-25-openjdk-25.0.3.0.9-1.el9.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/j/javapackages-filesystem-6.4.0-1.el9.noarch.rpm
     repoid: ubi-9-for-ppc64le-appstream-rpms
     size: 17320
@@ -2035,27 +2049,6 @@ arches:
     name: harfbuzz
     evr: 2.7.4-10.el9
     sourcerpm: harfbuzz-2.7.4-10.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/j/java-17-openjdk-17.0.19.0.10-2.el9.s390x.rpm
-    repoid: ubi-9-for-s390x-appstream-rpms
-    size: 386834
-    checksum: sha256:a2ae30a3138affc512a7c5223ddfb090507bc72f84ba65e53835002f40f14685
-    name: java-17-openjdk
-    evr: 1:17.0.19.0.10-2.el9
-    sourcerpm: java-17-openjdk-17.0.19.0.10-2.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/j/java-17-openjdk-devel-17.0.19.0.10-2.el9.s390x.rpm
-    repoid: ubi-9-for-s390x-appstream-rpms
-    size: 4962090
-    checksum: sha256:dfc540ea7e41c0a6f04f56ffa9d2cc483726afd3b99100b76ef24e1d39e4f856
-    name: java-17-openjdk-devel
-    evr: 1:17.0.19.0.10-2.el9
-    sourcerpm: java-17-openjdk-17.0.19.0.10-2.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/j/java-17-openjdk-headless-17.0.19.0.10-2.el9.s390x.rpm
-    repoid: ubi-9-for-s390x-appstream-rpms
-    size: 43481508
-    checksum: sha256:8254fd67f43942b8c16e9e6ea9f73d09a0fb5d9fb9ac43e8010d40abe62cad62
-    name: java-17-openjdk-headless
-    evr: 1:17.0.19.0.10-2.el9
-    sourcerpm: java-17-openjdk-17.0.19.0.10-2.el9.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/j/java-21-openjdk-21.0.11.0.10-2.el9.s390x.rpm
     repoid: ubi-9-for-s390x-appstream-rpms
     size: 342980
@@ -2077,6 +2070,34 @@ arches:
     name: java-21-openjdk-headless
     evr: 1:21.0.11.0.10-2.el9
     sourcerpm: java-21-openjdk-21.0.11.0.10-2.el9.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/j/java-25-openjdk-25.0.3.0.9-1.el9.s390x.rpm
+    repoid: ubi-9-for-s390x-appstream-rpms
+    size: 330034
+    checksum: sha256:861fda9e9ff23a14b30307ea34f1462535cc96da8174bda67d8dae13ef792880
+    name: java-25-openjdk
+    evr: 1:25.0.3.0.9-1.el9
+    sourcerpm: java-25-openjdk-25.0.3.0.9-1.el9.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/j/java-25-openjdk-crypto-adapter-25.0.3.0.9-1.el9.s390x.rpm
+    repoid: ubi-9-for-s390x-appstream-rpms
+    size: 59885
+    checksum: sha256:aa5db5aae55526517f11b1ae278c7948fdbf89b5ba840fa052718661f24c8958
+    name: java-25-openjdk-crypto-adapter
+    evr: 1:25.0.3.0.9-1.el9
+    sourcerpm: java-25-openjdk-25.0.3.0.9-1.el9.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/j/java-25-openjdk-devel-25.0.3.0.9-1.el9.s390x.rpm
+    repoid: ubi-9-for-s390x-appstream-rpms
+    size: 6479388
+    checksum: sha256:b02098098e8d549c67fda0d29b0114dbf3c8b6097cfc6fcaaa0586bb449aef10
+    name: java-25-openjdk-devel
+    evr: 1:25.0.3.0.9-1.el9
+    sourcerpm: java-25-openjdk-25.0.3.0.9-1.el9.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/j/java-25-openjdk-headless-25.0.3.0.9-1.el9.s390x.rpm
+    repoid: ubi-9-for-s390x-appstream-rpms
+    size: 60025867
+    checksum: sha256:49cbba8970964e6ed080b7716f5b16a0836ab274ab8e11b4c5310c814910c49f
+    name: java-25-openjdk-headless
+    evr: 1:25.0.3.0.9-1.el9
+    sourcerpm: java-25-openjdk-25.0.3.0.9-1.el9.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/j/javapackages-filesystem-6.4.0-1.el9.noarch.rpm
     repoid: ubi-9-for-s390x-appstream-rpms
     size: 17320
@@ -2970,27 +2991,6 @@ arches:
     name: glibc-locale-source
     evr: 2.34-272.el9_8
     sourcerpm: glibc-2.34-272.el9_8.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/j/java-17-openjdk-17.0.19.0.10-2.el9.x86_64.rpm
-    repoid: ubi-9-for-x86_64-appstream-rpms
-    size: 473281
-    checksum: sha256:0320afdff6d62ab02b9abc3b0eebf690e767d52c8ab9cd3b2a25cdc2907fd11b
-    name: java-17-openjdk
-    evr: 1:17.0.19.0.10-2.el9
-    sourcerpm: java-17-openjdk-17.0.19.0.10-2.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/j/java-17-openjdk-devel-17.0.19.0.10-2.el9.x86_64.rpm
-    repoid: ubi-9-for-x86_64-appstream-rpms
-    size: 4966796
-    checksum: sha256:85e738234ce0dd8dc89ef089c5c11c9e3279ac7874de25564f3d872e64b5879a
-    name: java-17-openjdk-devel
-    evr: 1:17.0.19.0.10-2.el9
-    sourcerpm: java-17-openjdk-17.0.19.0.10-2.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/j/java-17-openjdk-headless-17.0.19.0.10-2.el9.x86_64.rpm
-    repoid: ubi-9-for-x86_64-appstream-rpms
-    size: 47278394
-    checksum: sha256:bbca281886342702b38912fb5b391d7c27654d633998069d2403ad7ce0710481
-    name: java-17-openjdk-headless
-    evr: 1:17.0.19.0.10-2.el9
-    sourcerpm: java-17-openjdk-17.0.19.0.10-2.el9.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/j/java-21-openjdk-21.0.11.0.10-2.el9.x86_64.rpm
     repoid: ubi-9-for-x86_64-appstream-rpms
     size: 410727
@@ -3012,6 +3012,34 @@ arches:
     name: java-21-openjdk-headless
     evr: 1:21.0.11.0.10-2.el9
     sourcerpm: java-21-openjdk-21.0.11.0.10-2.el9.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/j/java-25-openjdk-25.0.3.0.9-1.el9.x86_64.rpm
+    repoid: ubi-9-for-x86_64-appstream-rpms
+    size: 397464
+    checksum: sha256:167ec10dfb94741181c81abcb16eb6acc25c7cc38603f47b3cc16939c9732080
+    name: java-25-openjdk
+    evr: 1:25.0.3.0.9-1.el9
+    sourcerpm: java-25-openjdk-25.0.3.0.9-1.el9.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/j/java-25-openjdk-crypto-adapter-25.0.3.0.9-1.el9.x86_64.rpm
+    repoid: ubi-9-for-x86_64-appstream-rpms
+    size: 61512
+    checksum: sha256:b093ce2489b15317a0d9be3073829267b53cb1eca2f2efd6865736a664e2cd83
+    name: java-25-openjdk-crypto-adapter
+    evr: 1:25.0.3.0.9-1.el9
+    sourcerpm: java-25-openjdk-25.0.3.0.9-1.el9.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/j/java-25-openjdk-devel-25.0.3.0.9-1.el9.x86_64.rpm
+    repoid: ubi-9-for-x86_64-appstream-rpms
+    size: 6483788
+    checksum: sha256:159a0499611c48db0fd1dc5e6bf0de4e5e2bffd1e2a24ee22ad7168c47702a64
+    name: java-25-openjdk-devel
+    evr: 1:25.0.3.0.9-1.el9
+    sourcerpm: java-25-openjdk-25.0.3.0.9-1.el9.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/j/java-25-openjdk-headless-25.0.3.0.9-1.el9.x86_64.rpm
+    repoid: ubi-9-for-x86_64-appstream-rpms
+    size: 64159985
+    checksum: sha256:67351bbf8ab0231774f33c1bf2b53358558f92e7ca0818ef5f785229b22ea63e
+    name: java-25-openjdk-headless
+    evr: 1:25.0.3.0.9-1.el9
+    sourcerpm: java-25-openjdk-25.0.3.0.9-1.el9.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/j/javapackages-filesystem-6.4.0-1.el9.noarch.rpm
     repoid: ubi-9-for-x86_64-appstream-rpms
     size: 17320
