@@ -62,6 +62,10 @@ spec:
       description: Array of --build-arg values ("arg=value" strings) for buildah
       name: build-args
       type: array
+    - default: []
+      description: Additional key=value labels that should be applied to the image
+      name: LABELS
+      type: array
     - default: ""
       description: Path to a file with build arguments for buildah, see https://www.mankier.com/1/buildah-build#--build-arg-file
       name: build-args-file
@@ -188,6 +192,9 @@ spec:
             - $(params.build-args[*])
         - name: BUILD_ARGS_FILE
           value: $(params.build-args-file)
+        - name: LABELS
+          value:
+            - $(params.LABELS[*])
         - name: PRIVILEGED_NESTED
           value: $(params.privileged-nested)
         - name: SOURCE_URL
