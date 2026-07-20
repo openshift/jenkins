@@ -145,6 +145,23 @@ rpms-lock: build-rpm-lock-image
 		/work/$$(basename $(RPMS_LOCK_IN_FILE)) || { rm -f $(RPMS_LOCK_FILE); exit 1; }
 	@echo "✓ Generated $$(basename $(RPMS_LOCK_FILE))"
 
+.PHONY: rpms-lock-4-13
+rpms-lock-4-13:
+	$(MAKE) rpms-lock \
+		BASE_IMAGE=registry.redhat.io/openshift4/ose-cli:v4.13 \
+		RPMS_LOCK_IN_FILE=$(shell pwd)/rpms-4-13/rpms.in.yaml \
+		RPMS_LOCK_FILE=$(shell pwd)/rpms-4-13/rpms.lock.yaml
+
+.PHONY: rpms-lock-4-15
+rpms-lock-4-15:
+	$(MAKE) rpms-lock \
+		BASE_IMAGE=registry.redhat.io/openshift4/ose-cli:v4.15 \
+		RPMS_LOCK_IN_FILE=$(shell pwd)/rpms-4-15/rpms.in.yaml \
+		RPMS_LOCK_FILE=$(shell pwd)/rpms-4-15/rpms.lock.yaml
+
+.PHONY: rpms-lock-all
+rpms-lock-all: rpms-lock-4-13 rpms-lock-4-15
+
 .PHONY: update-tekton-tasks
 update-tekton-tasks:
 	@echo "Updating Tekton tasks in $(TEKTON_PIPELINE_FILE) file ..."
