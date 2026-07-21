@@ -48,7 +48,7 @@ spec:
       value:
         - "io.openshift.release.version=4.12"
         - "version=4.12"
-        - "cpe=cpe:/a:redhat:openshift:4.12::el8"
+        - "cpe=cpe:/a:redhat:ocp_tools:4.12::el8"
   taskRunTemplate:
     serviceAccountName: build-pipeline-jenkins-agent-base-rhel8-4-12
   workspaces:
