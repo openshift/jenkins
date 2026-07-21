@@ -19,9 +19,9 @@ PULLSECRET ?=
 BASE_IMAGE := registry.redhat.io/openshift4/ose-cli:v4.15
 RPMS_LOCK_REPO_URL := https://github.com/konflux-ci/rpm-lockfile-prototype.git
 RPMS_LOCK_REPO_TMPDIR := $(shell mktemp -d)/rpm-lockfile-prototype
-RPMS_LOCK_IN_FILE := $(shell pwd)/rpms.in.yaml
-RPMS_LOCK_FILE := $(shell pwd)/rpms.lock.yaml
-REPO_FILE := $(shell pwd)/ubi.repo
+RPMS_LOCK_IN_FILE := $(shell pwd)/.konflux/rpms.in.yaml
+RPMS_LOCK_FILE := $(shell pwd)/.konflux/rpms.lock.yaml
+REPO_FILE := $(shell pwd)/.konflux/ubi.repo
 RPMS_LOCK_IMAGE := localhost/rpm-lockfile-prototype:latest
 TEKTON_PIPELINE_FILE := $(shell pwd)/.tekton/build-pipeline.yaml
 
@@ -131,7 +131,7 @@ rpms-lock: build-rpm-lock-image
 		exit 1; \
 	fi
 	@echo "Generating $$(basename $(RPMS_LOCK_FILE)) file with podman ..."
-	@touch $$(basename $(RPMS_LOCK_FILE))
+	@touch $(RPMS_LOCK_FILE)
 	@podman run --rm \
 		--security-opt label=disable \
 		-e REGISTRY_AUTH_FILE=/work/$$(basename $(PULLSECRET)) \
@@ -144,6 +144,23 @@ rpms-lock: build-rpm-lock-image
 		--outfile=/work/$$(basename $(RPMS_LOCK_FILE)) \
 		/work/$$(basename $(RPMS_LOCK_IN_FILE)) || { rm -f $(RPMS_LOCK_FILE); exit 1; }
 	@echo "✓ Generated $$(basename $(RPMS_LOCK_FILE))"
+
+.PHONY: rpms-lock-4-13
+rpms-lock-4-13:
+	$(MAKE) rpms-lock \
+		BASE_IMAGE=registry.redhat.io/openshift4/ose-cli:v4.13 \
+		RPMS_LOCK_IN_FILE=$(shell pwd)/.konflux/rpms-4-13/rpms.in.yaml \
+		RPMS_LOCK_FILE=$(shell pwd)/.konflux/rpms-4-13/rpms.lock.yaml
+
+.PHONY: rpms-lock-4-15
+rpms-lock-4-15:
+	$(MAKE) rpms-lock \
+		BASE_IMAGE=registry.redhat.io/openshift4/ose-cli:v4.15 \
+		RPMS_LOCK_IN_FILE=$(shell pwd)/.konflux/rpms-4-15/rpms.in.yaml \
+		RPMS_LOCK_FILE=$(shell pwd)/.konflux/rpms-4-15/rpms.lock.yaml
+
+.PHONY: rpms-lock-all
+rpms-lock-all: rpms-lock-4-13 rpms-lock-4-15
 
 .PHONY: update-tekton-tasks
 update-tekton-tasks:
