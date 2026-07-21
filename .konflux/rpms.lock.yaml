@@ -1140,10 +1140,10 @@ arches:
     sourcerpm: zip-3.0-23.el8.src.rpm
   source: []
   module_metadata:
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi8/8/aarch64/appstream/os/repodata/48854399d1746c75d4fc0e1cfadd8852cc3a5869712474e04fb394cf8b3a6ab5-modules.yaml.gz
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi8/8/aarch64/appstream/os/repodata/01e2a48f663d7bc0f733015c3004458613f3d37680629163c8b044d6bb47c189-modules.yaml.gz
     repoid: ubi-8-for-aarch64-appstream-rpms
-    size: 57280
-    checksum: sha256:48854399d1746c75d4fc0e1cfadd8852cc3a5869712474e04fb394cf8b3a6ab5
+    size: 56859
+    checksum: sha256:01e2a48f663d7bc0f733015c3004458613f3d37680629163c8b044d6bb47c189
 - arch: ppc64le
   packages:
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi8/8/ppc64le/appstream/os/Packages/a/abattis-cantarell-fonts-0.0.25-6.el8.noarch.rpm
@@ -2282,10 +2282,10 @@ arches:
     sourcerpm: zip-3.0-23.el8.src.rpm
   source: []
   module_metadata:
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi8/8/ppc64le/appstream/os/repodata/c896db1385072e58e91ac4881f74ce1381241000dc5280771b41868a1deddc1f-modules.yaml.gz
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi8/8/ppc64le/appstream/os/repodata/c2a347623dcd5352daa136197914be5b391d6635d256fc23035d6eae0b67d7a5-modules.yaml.gz
     repoid: ubi-8-for-ppc64le-appstream-rpms
-    size: 57862
-    checksum: sha256:c896db1385072e58e91ac4881f74ce1381241000dc5280771b41868a1deddc1f
+    size: 57850
+    checksum: sha256:c2a347623dcd5352daa136197914be5b391d6635d256fc23035d6eae0b67d7a5
 - arch: s390x
   packages:
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi8/8/s390x/appstream/os/Packages/a/abattis-cantarell-fonts-0.0.25-6.el8.noarch.rpm
@@ -3424,10 +3424,10 @@ arches:
     sourcerpm: zip-3.0-23.el8.src.rpm
   source: []
   module_metadata:
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi8/8/s390x/appstream/os/repodata/6ba52a516504530b71864ec791a8713e2e4bdeb2afad8d57f508ffb655e4d35d-modules.yaml.gz
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi8/8/s390x/appstream/os/repodata/a32f12ba8968bebc36ee3b5a91085bae1d88275672a0a9d9b5de281fed786754-modules.yaml.gz
     repoid: ubi-8-for-s390x-appstream-rpms
-    size: 56636
-    checksum: sha256:6ba52a516504530b71864ec791a8713e2e4bdeb2afad8d57f508ffb655e4d35d
+    size: 56778
+    checksum: sha256:a32f12ba8968bebc36ee3b5a91085bae1d88275672a0a9d9b5de281fed786754
 - arch: x86_64
   packages:
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi8/8/x86_64/appstream/os/Packages/a/abattis-cantarell-fonts-0.0.25-6.el8.noarch.rpm
@@ -4566,7 +4566,7 @@ arches:
     sourcerpm: zip-3.0-23.el8.src.rpm
   source: []
   module_metadata:
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi8/8/x86_64/appstream/os/repodata/9dad3097a2727110f86f01a1ff9df431c25ceba53db0cb0cbbbdd5b93d9edf0b-modules.yaml.gz
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi8/8/x86_64/appstream/os/repodata/f45b3ad23aa913c546053e18a56469e32c38ed25c484e72d7cc41a10b06affee-modules.yaml.gz
     repoid: ubi-8-for-x86_64-appstream-rpms
-    size: 58980
-    checksum: sha256:9dad3097a2727110f86f01a1ff9df431c25ceba53db0cb0cbbbdd5b93d9edf0b
+    size: 58516
+    checksum: sha256:f45b3ad23aa913c546053e18a56469e32c38ed25c484e72d7cc41a10b06affee

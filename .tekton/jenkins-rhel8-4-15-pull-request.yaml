@@ -9,7 +9,7 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: |
-      event == "pull_request" && target_branch == "release-rhel8" && ( "2/***".pathChanged() || ".tekton/***".pathChanged() || "rpms-4-15/rpms.lock.yaml".pathChanged() || "rpms-4-15/rpms.in.yaml".pathChanged() || "ubi.repo".pathChanged() || "artifacts.lock.yaml".pathChanged() )
+      event == "pull_request" && target_branch == "release-rhel8" && ( "2/***".pathChanged() || ".tekton/***".pathChanged() || ".konflux/rpms-4-15/rpms.lock.yaml".pathChanged() || ".konflux/rpms-4-15/rpms.in.yaml".pathChanged() || ".konflux/ubi.repo".pathChanged() || ".konflux/artifacts.lock.yaml".pathChanged() )
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: openshift-jenkins-rhel8
@@ -42,14 +42,14 @@ spec:
     - name: hermetic
       value: "true"
     - name: prefetch-input
-      value: '{"packages": [{"type": "generic"},{"type": "rpm", "path": "rpms-4-15"}]}'
+      value: '{"packages": [{"type": "generic", "path": ".konflux"},{"type": "rpm", "path": ".konflux/rpms-4-15"}]}'
     - name: build-args
       value:
         - OCP_VERSION=4.15
         - CI_UPSTREAM_COMMIT={{revision}}
         - CI_UPSTREAM_URL={{source_url}}
     - name: build-args-file
-      value: konflux-build-args.env
+      value: .konflux/konflux-build-args.env
     - name: LABELS
       value:
         - "io.openshift.release.version=4.15"

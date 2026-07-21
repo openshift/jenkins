@@ -1112,7 +1112,7 @@ arches:
     sourcerpm: zip-3.0-23.el8.src.rpm
   source: []
   module_metadata:
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi8/8/x86_64/appstream/os/repodata/9dad3097a2727110f86f01a1ff9df431c25ceba53db0cb0cbbbdd5b93d9edf0b-modules.yaml.gz
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi8/8/x86_64/appstream/os/repodata/f45b3ad23aa913c546053e18a56469e32c38ed25c484e72d7cc41a10b06affee-modules.yaml.gz
     repoid: ubi-8-for-x86_64-appstream-rpms
-    size: 58980
-    checksum: sha256:9dad3097a2727110f86f01a1ff9df431c25ceba53db0cb0cbbbdd5b93d9edf0b
+    size: 58516
+    checksum: sha256:f45b3ad23aa913c546053e18a56469e32c38ed25c484e72d7cc41a10b06affee
