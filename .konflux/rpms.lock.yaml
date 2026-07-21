@@ -46,13 +46,13 @@ arches:
     name: git-core-doc
     evr: 2.52.0-1.el9
     sourcerpm: git-2.52.0-1.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/g/git-lfs-3.7.1-4.el9_8.1.aarch64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/g/git-lfs-3.7.1-4.el9_8.2.aarch64.rpm
     repoid: ubi-9-for-aarch64-appstream-rpms
-    size: 4528408
-    checksum: sha256:046e458a4d9b8781124e65380ffb371435472236d6c06dd382d204d308199d51
+    size: 4529173
+    checksum: sha256:c5347668e520e0194b6702d60a1d2cafac4ad6aaf8bae14dc6130ab56d25e572
     name: git-lfs
-    evr: 3.7.1-4.el9_8.1
-    sourcerpm: git-lfs-3.7.1-4.el9_8.1.src.rpm
+    evr: 3.7.1-4.el9_8.2
+    sourcerpm: git-lfs-3.7.1-4.el9_8.2.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/g/glibc-locale-source-2.34-272.el9_8.aarch64.rpm
     repoid: ubi-9-for-aarch64-appstream-rpms
     size: 4367950
@@ -158,13 +158,13 @@ arches:
     name: libXi
     evr: 1.7.10-8.el9
     sourcerpm: libXi-1.7.10-8.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/l/libXrender-0.9.10-16.el9.aarch64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/l/libXrender-0.9.10-16.el9_8.1.aarch64.rpm
     repoid: ubi-9-for-aarch64-appstream-rpms
-    size: 29483
-    checksum: sha256:06920454ec27e62fd482834d72ef6a6d3b3454ef111e5e7843355ed3d0ae20b5
+    size: 32253
+    checksum: sha256:8f7c951783a8f77aa595eaabc1d651ff5a741821b952776a62dd20afa72ce129
     name: libXrender
-    evr: 0.9.10-16.el9
-    sourcerpm: libXrender-0.9.10-16.el9.src.rpm
+    evr: 0.9.10-16.el9_8.1
+    sourcerpm: libXrender-0.9.10-16.el9_8.1.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/os/Packages/l/libXtst-1.2.3-16.el9.aarch64.rpm
     repoid: ubi-9-for-aarch64-appstream-rpms
     size: 23456
@@ -774,13 +774,13 @@ arches:
     name: crypto-policies-scripts
     evr: 20260224-1.gitea0f072.el9_8
     sourcerpm: crypto-policies-20260224-1.gitea0f072.el9_8.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/c/cups-libs-2.3.3op2-38.el9_8.aarch64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/c/cups-libs-2.3.3op2-39.el9_8.aarch64.rpm
     repoid: ubi-9-for-aarch64-baseos-rpms
-    size: 270934
-    checksum: sha256:e7640acd438993a6b7b132909bf5a47faef66c76eac6745f8848e8ac0c413967
+    size: 270271
+    checksum: sha256:887d49338e7dd7d015aec22a9cf53af9c25653f241d53fe73bf590787ae86672
     name: cups-libs
-    evr: 1:2.3.3op2-38.el9_8
-    sourcerpm: cups-2.3.3op2-38.el9_8.src.rpm
+    evr: 1:2.3.3op2-39.el9_8
+    sourcerpm: cups-2.3.3op2-39.el9_8.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/d/dbus-libs-1.12.20-8.el9.aarch64.rpm
     repoid: ubi-9-for-aarch64-baseos-rpms
     size: 154779
@@ -1023,13 +1023,13 @@ arches:
     name: git-core-doc
     evr: 2.52.0-1.el9
     sourcerpm: git-2.52.0-1.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/g/git-lfs-3.7.1-4.el9_8.1.ppc64le.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/g/git-lfs-3.7.1-4.el9_8.2.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-appstream-rpms
-    size: 4573472
-    checksum: sha256:4d493d1a0783f10e345b6e100e96a87d39242137610b10c18cd5006c7cf7b4d1
+    size: 4569759
+    checksum: sha256:a736acf30d416a2c25da06b9a23dc4310ae524f2406ac35cccd2e22c80acfdce
     name: git-lfs
-    evr: 3.7.1-4.el9_8.1
-    sourcerpm: git-lfs-3.7.1-4.el9_8.1.src.rpm
+    evr: 3.7.1-4.el9_8.2
+    sourcerpm: git-lfs-3.7.1-4.el9_8.2.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/g/glibc-locale-source-2.34-272.el9_8.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-appstream-rpms
     size: 4367813
@@ -1135,13 +1135,13 @@ arches:
     name: libXi
     evr: 1.7.10-8.el9
     sourcerpm: libXi-1.7.10-8.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/l/libXrender-0.9.10-16.el9.ppc64le.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/l/libXrender-0.9.10-16.el9_8.1.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-appstream-rpms
-    size: 32491
-    checksum: sha256:e10822c26806e190764982357cac4c476654469269a1cf2b77856eaa12b4f6f0
+    size: 34767
+    checksum: sha256:7db6ca795e3b47c6f86943602cd6b15dd2ba8c9dc03310698cb1b4490f91ff0c
     name: libXrender
-    evr: 0.9.10-16.el9
-    sourcerpm: libXrender-0.9.10-16.el9.src.rpm
+    evr: 0.9.10-16.el9_8.1
+    sourcerpm: libXrender-0.9.10-16.el9_8.1.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/appstream/os/Packages/l/libXtst-1.2.3-16.el9.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-appstream-rpms
     size: 24956
@@ -1751,13 +1751,13 @@ arches:
     name: crypto-policies-scripts
     evr: 20260224-1.gitea0f072.el9_8
     sourcerpm: crypto-policies-20260224-1.gitea0f072.el9_8.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/baseos/os/Packages/c/cups-libs-2.3.3op2-38.el9_8.ppc64le.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/baseos/os/Packages/c/cups-libs-2.3.3op2-39.el9_8.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-baseos-rpms
-    size: 324452
-    checksum: sha256:9aa0d445d0305672e64a7cf069082281a84c69bf555f53e3f3051f1308c03395
+    size: 324483
+    checksum: sha256:a572107ee7005f5a8feced53282328a95725258bc00aa15bb029aa2e1bbb7de1
     name: cups-libs
-    evr: 1:2.3.3op2-38.el9_8
-    sourcerpm: cups-2.3.3op2-38.el9_8.src.rpm
+    evr: 1:2.3.3op2-39.el9_8
+    sourcerpm: cups-2.3.3op2-39.el9_8.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/ppc64le/baseos/os/Packages/d/dbus-libs-1.12.20-8.el9.ppc64le.rpm
     repoid: ubi-9-for-ppc64le-baseos-rpms
     size: 175753
@@ -2021,13 +2021,13 @@ arches:
     name: git-core-doc
     evr: 2.52.0-1.el9
     sourcerpm: git-2.52.0-1.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/g/git-lfs-3.7.1-4.el9_8.1.s390x.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/g/git-lfs-3.7.1-4.el9_8.2.s390x.rpm
     repoid: ubi-9-for-s390x-appstream-rpms
-    size: 4758964
-    checksum: sha256:c995f662df5482fc90d2ff849aeb158f56a557ca0b4e7053b59deaa43d8284ae
+    size: 4759397
+    checksum: sha256:3ded7b647cc34b8723a763597e4658d1a641bc4ee116838a10ba55d42c9f0b26
     name: git-lfs
-    evr: 3.7.1-4.el9_8.1
-    sourcerpm: git-lfs-3.7.1-4.el9_8.1.src.rpm
+    evr: 3.7.1-4.el9_8.2
+    sourcerpm: git-lfs-3.7.1-4.el9_8.2.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/g/glibc-locale-source-2.34-272.el9_8.s390x.rpm
     repoid: ubi-9-for-s390x-appstream-rpms
     size: 4368044
@@ -2147,13 +2147,13 @@ arches:
     name: libXi
     evr: 1.7.10-8.el9
     sourcerpm: libXi-1.7.10-8.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/l/libXrender-0.9.10-16.el9.s390x.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/l/libXrender-0.9.10-16.el9_8.1.s390x.rpm
     repoid: ubi-9-for-s390x-appstream-rpms
-    size: 29619
-    checksum: sha256:6ecce3138b5dea1ea50349a2ad7f7c8ac8e657d82fd76f8a0f20b826d8f5be0a
+    size: 32224
+    checksum: sha256:6076b03a617eeda1b92f24042b8c90fa2e23b592f7159e0fa8fb0fa79bd17240
     name: libXrender
-    evr: 0.9.10-16.el9
-    sourcerpm: libXrender-0.9.10-16.el9.src.rpm
+    evr: 0.9.10-16.el9_8.1
+    sourcerpm: libXrender-0.9.10-16.el9_8.1.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/appstream/os/Packages/l/libXtst-1.2.3-16.el9.s390x.rpm
     repoid: ubi-9-for-s390x-appstream-rpms
     size: 22995
@@ -2770,13 +2770,13 @@ arches:
     name: crypto-policies-scripts
     evr: 20260224-1.gitea0f072.el9_8
     sourcerpm: crypto-policies-20260224-1.gitea0f072.el9_8.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/baseos/os/Packages/c/cups-libs-2.3.3op2-38.el9_8.s390x.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/baseos/os/Packages/c/cups-libs-2.3.3op2-39.el9_8.s390x.rpm
     repoid: ubi-9-for-s390x-baseos-rpms
-    size: 264137
-    checksum: sha256:fc5dbd8d4d46fb5ba40d5a1c3ad7cc589e35ed1ee775035da55f7b386ab25206
+    size: 264648
+    checksum: sha256:781ce9fa1ee1fe7197cdb243c87e3918c2755800162bbf37902aeafa9d9602b9
     name: cups-libs
-    evr: 1:2.3.3op2-38.el9_8
-    sourcerpm: cups-2.3.3op2-38.el9_8.src.rpm
+    evr: 1:2.3.3op2-39.el9_8
+    sourcerpm: cups-2.3.3op2-39.el9_8.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/s390x/baseos/os/Packages/d/dbus-libs-1.12.20-8.el9.s390x.rpm
     repoid: ubi-9-for-s390x-baseos-rpms
     size: 152874
@@ -2977,13 +2977,13 @@ arches:
     name: git-core-doc
     evr: 2.52.0-1.el9
     sourcerpm: git-2.52.0-1.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/g/git-lfs-3.7.1-4.el9_8.1.x86_64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/g/git-lfs-3.7.1-4.el9_8.2.x86_64.rpm
     repoid: ubi-9-for-x86_64-appstream-rpms
-    size: 5025887
-    checksum: sha256:03e7fe309afb1efb7682dc118ab21c20b014426607b7159d3831f32faefd862c
+    size: 5023104
+    checksum: sha256:b2b3eac45360ea20a81a4a72b2bc19790846fc182e8684a0ae034642fab7677c
     name: git-lfs
-    evr: 3.7.1-4.el9_8.1
-    sourcerpm: git-lfs-3.7.1-4.el9_8.1.src.rpm
+    evr: 3.7.1-4.el9_8.2
+    sourcerpm: git-lfs-3.7.1-4.el9_8.2.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/g/glibc-locale-source-2.34-272.el9_8.x86_64.rpm
     repoid: ubi-9-for-x86_64-appstream-rpms
     size: 4368268
@@ -3089,13 +3089,13 @@ arches:
     name: libXi
     evr: 1.7.10-8.el9
     sourcerpm: libXi-1.7.10-8.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/l/libXrender-0.9.10-16.el9.x86_64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/l/libXrender-0.9.10-16.el9_8.1.x86_64.rpm
     repoid: ubi-9-for-x86_64-appstream-rpms
-    size: 30453
-    checksum: sha256:ab69ef172aaae7535eac07e516a4973d5d7e386e0e693af5f901806f7b527676
+    size: 33128
+    checksum: sha256:84862f0065fc58c4c36656d39cd7f9cc557425c5a937892e7e29889c5decc313
     name: libXrender
-    evr: 0.9.10-16.el9
-    sourcerpm: libXrender-0.9.10-16.el9.src.rpm
+    evr: 0.9.10-16.el9_8.1
+    sourcerpm: libXrender-0.9.10-16.el9_8.1.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os/Packages/l/libXtst-1.2.3-16.el9.x86_64.rpm
     repoid: ubi-9-for-x86_64-appstream-rpms
     size: 23624
@@ -3705,13 +3705,13 @@ arches:
     name: crypto-policies-scripts
     evr: 20260224-1.gitea0f072.el9_8
     sourcerpm: crypto-policies-20260224-1.gitea0f072.el9_8.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/c/cups-libs-2.3.3op2-38.el9_8.x86_64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/c/cups-libs-2.3.3op2-39.el9_8.x86_64.rpm
     repoid: ubi-9-for-x86_64-baseos-rpms
-    size: 272781
-    checksum: sha256:486c05136667592e25432737571d7576aff560a7a4eed75c8291fb560203a13c
+    size: 273029
+    checksum: sha256:c0031cf76552a93f139060c94617206d6084ee353b07ee6ac05669bb6fdcc1d4
     name: cups-libs
-    evr: 1:2.3.3op2-38.el9_8
-    sourcerpm: cups-2.3.3op2-38.el9_8.src.rpm
+    evr: 1:2.3.3op2-39.el9_8
+    sourcerpm: cups-2.3.3op2-39.el9_8.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/d/dbus-libs-1.12.20-8.el9.x86_64.rpm
     repoid: ubi-9-for-x86_64-baseos-rpms
     size: 157201
