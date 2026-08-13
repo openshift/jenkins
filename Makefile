@@ -19,8 +19,6 @@ PULLSECRET ?=
 BASE_IMAGE := registry.redhat.io/openshift4/ose-cli:v4.15
 RPMS_LOCK_REPO_URL := https://github.com/konflux-ci/rpm-lockfile-prototype.git
 RPMS_LOCK_REPO_TMPDIR := $(shell mktemp -d)/rpm-lockfile-prototype
-RPMS_LOCK_IN_FILE := $(shell pwd)/.konflux/rpms.in.yaml
-RPMS_LOCK_FILE := $(shell pwd)/.konflux/rpms.lock.yaml
 REPO_FILE := $(shell pwd)/.konflux/ubi.repo
 RPMS_LOCK_IMAGE := localhost/rpm-lockfile-prototype:latest
 TEKTON_PIPELINE_FILE := $(shell pwd)/.tekton/build-pipeline.yaml
@@ -124,43 +122,49 @@ build-rpm-lock-image:
 	@echo "✓ Built $(RPMS_LOCK_IMAGE) image"
 
 .PHONY: rpms-lock
-rpms-lock: build-rpm-lock-image
+rpms-lock: build-rpm-lock-image rpms-lock-4-13 rpms-lock-4-15
+
+rpms-lock-4-13: build-rpm-lock-image
 	@if [ -z "$(PULLSECRET)" ]; then \
 		echo "Error: PULLSECRET is not set. Please provide a path to the pullsecret file."; \
 		echo "Usage: make rpms-lock PULLSECRET=/path/to/pullsecret"; \
 		exit 1; \
 	fi
-	@echo "Generating $$(basename $(RPMS_LOCK_FILE)) file with podman ..."
-	@touch $(RPMS_LOCK_FILE)
+	@echo "Generating rpms.lock.yaml for ose-cli:v4.13 ..."
+	@touch $(shell pwd)/.konflux/rpms-4-13/rpms.lock.yaml
 	@podman run --rm \
 		--security-opt label=disable \
 		-e REGISTRY_AUTH_FILE=/work/$$(basename $(PULLSECRET)) \
-		-v $(RPMS_LOCK_FILE):/work/$$(basename $(RPMS_LOCK_FILE)):rw \
-		-v $(RPMS_LOCK_IN_FILE):/work/$$(basename $(RPMS_LOCK_IN_FILE)):ro \
+		-v $(shell pwd)/.konflux/rpms-4-13/rpms.lock.yaml:/work/rpms.lock.yaml:rw \
+		-v $(shell pwd)/.konflux/rpms-4-13/rpms.in.yaml:/work/rpms.in.yaml:ro \
 		-v $(REPO_FILE):/work/$$(basename $(REPO_FILE)):ro \
 		-v $(PULLSECRET):/work/$$(basename $(PULLSECRET)):ro \
 		$(RPMS_LOCK_IMAGE) \
-		--image $(BASE_IMAGE) \
-		--outfile=/work/$$(basename $(RPMS_LOCK_FILE)) \
-		/work/$$(basename $(RPMS_LOCK_IN_FILE)) || { rm -f $(RPMS_LOCK_FILE); exit 1; }
-	@echo "✓ Generated $$(basename $(RPMS_LOCK_FILE))"
+		--image registry.redhat.io/openshift4/ose-cli:v4.13 \
+		--outfile=/work/rpms.lock.yaml \
+		/work/rpms.in.yaml || { rm -f $(shell pwd)/.konflux/rpms-4-13/rpms.lock.yaml; exit 1; }
+	@echo "✓ Generated rpms-4-13/rpms.lock.yaml"
 
-.PHONY: rpms-lock-4-13
-rpms-lock-4-13:
-	$(MAKE) rpms-lock \
-		BASE_IMAGE=registry.redhat.io/openshift4/ose-cli:v4.13 \
-		RPMS_LOCK_IN_FILE=$(shell pwd)/.konflux/rpms-4-13/rpms.in.yaml \
-		RPMS_LOCK_FILE=$(shell pwd)/.konflux/rpms-4-13/rpms.lock.yaml
-
-.PHONY: rpms-lock-4-15
-rpms-lock-4-15:
-	$(MAKE) rpms-lock \
-		BASE_IMAGE=registry.redhat.io/openshift4/ose-cli:v4.15 \
-		RPMS_LOCK_IN_FILE=$(shell pwd)/.konflux/rpms-4-15/rpms.in.yaml \
-		RPMS_LOCK_FILE=$(shell pwd)/.konflux/rpms-4-15/rpms.lock.yaml
-
-.PHONY: rpms-lock-all
-rpms-lock-all: rpms-lock-4-13 rpms-lock-4-15
+rpms-lock-4-15: build-rpm-lock-image
+	@if [ -z "$(PULLSECRET)" ]; then \
+		echo "Error: PULLSECRET is not set. Please provide a path to the pullsecret file."; \
+		echo "Usage: make rpms-lock PULLSECRET=/path/to/pullsecret"; \
+		exit 1; \
+	fi
+	@echo "Generating rpms.lock.yaml for ose-cli:v4.15 ..."
+	@touch $(shell pwd)/.konflux/rpms-4-15/rpms.lock.yaml
+	@podman run --rm \
+		--security-opt label=disable \
+		-e REGISTRY_AUTH_FILE=/work/$$(basename $(PULLSECRET)) \
+		-v $(shell pwd)/.konflux/rpms-4-15/rpms.lock.yaml:/work/rpms.lock.yaml:rw \
+		-v $(shell pwd)/.konflux/rpms-4-15/rpms.in.yaml:/work/rpms.in.yaml:ro \
+		-v $(REPO_FILE):/work/$$(basename $(REPO_FILE)):ro \
+		-v $(PULLSECRET):/work/$$(basename $(PULLSECRET)):ro \
+		$(RPMS_LOCK_IMAGE) \
+		--image registry.redhat.io/openshift4/ose-cli:v4.15 \
+		--outfile=/work/rpms.lock.yaml \
+		/work/rpms.in.yaml || { rm -f $(shell pwd)/.konflux/rpms-4-15/rpms.lock.yaml; exit 1; }
+	@echo "✓ Generated rpms-4-15/rpms.lock.yaml"
 
 .PHONY: update-tekton-tasks
 update-tekton-tasks:
