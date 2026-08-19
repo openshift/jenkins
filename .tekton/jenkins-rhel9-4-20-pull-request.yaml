@@ -54,7 +54,7 @@ spec:
       value:
         - "io.openshift.release.version=4.20"
         - "version=4.20"
-        - "cpe=cpe:/a:redhat:openshift:4.20::el9"
+        - "cpe=cpe:/a:redhat:ocp_tools:4.20::el9"
   taskRunTemplate:
     serviceAccountName: build-pipeline-jenkins-rhel9-4-20
   workspaces:
