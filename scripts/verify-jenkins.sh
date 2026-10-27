@@ -221,11 +221,11 @@ check_failed_log() {
 }
 
 verify_installed_packages() {
-	http_status_code=$(curl -s -o "/tmp/Dockerfile.rhel8" -w "%{http_code}\n" "${GITHUB_JENKINS_BASE_URL}/${SHA}/2/Dockerfile.rhel8" 2> /dev/null)
+	http_status_code=$(curl -s -o "/tmp/Dockerfile.rhel9" -w "%{http_code}\n" "${GITHUB_JENKINS_BASE_URL}/${SHA}/2/Dockerfile.rhel9" 2> /dev/null)
 	printf "[VERIFYING] Installed packages ...\n"
 
 	# Download the remote file to a temporary file, verifying the http_status code for the request
-	printf "\t%-50s" "- downloading Dockerfile.rhel8 ... "
+	printf "\t%-50s" "- downloading Dockerfile.rhel9 ... "
 	if [ "$http_status_code" == 200 ]; then
 		printf "PASS\n"
 	else
@@ -233,7 +233,7 @@ verify_installed_packages() {
 		printf "failed to download %s, http status code: %s" "${remote_file_path}" "${http_status_code}" >> $FAILED_LOG_LOCATION
 	fi
 
-	 INSTALL_PKGS=$(grep "INSTALL_PKGS=" /tmp/Dockerfile.rhel8)
+	 INSTALL_PKGS=$(grep "INSTALL_PKGS=" /tmp/Dockerfile.rhel9)
 	 INSTALL_PKGS=${INSTALL_PKGS//INSTALL_PKGS=\"/}
 	 INSTALL_PKGS=${INSTALL_PKGS//\" && \\/}
 	 INSTALL_PKGS=$(echo "${INSTALL_PKGS}" | xargs)

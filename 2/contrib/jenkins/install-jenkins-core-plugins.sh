@@ -18,7 +18,7 @@ if [[ "${INSTALL_JENKINS_VIA_RPMS}" == false ]]; then
         echo "jenkins.war already exists, skipping upstream RPM installation"
     else
         echo "Installing jenkins.war from upstream RPM"
-        curl https://pkg.jenkins.io/rpm-stable/jenkins.repo | tee /etc/yum.repos.d/jenkins.repo /etc/yum.repos.art/ci/jenkins.repo
+        curl https://pkg.jenkins.io/rpm-stable/jenkins.repo -o /etc/yum.repos.d/jenkins.repo
         rpm --import https://pkg.jenkins.io/redhat-stable/jenkins-ci.org.key
         rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
         rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
@@ -30,9 +30,12 @@ if [[ "${INSTALL_JENKINS_VIA_RPMS}" == false ]]; then
     
     /usr/local/bin/install-plugins.sh $PLUGIN_LIST
 else
-    yum install -y --disableplugin=subscription-manager jenkins-2.* jenkins-2-plugins
-    rpm -V jenkins-2.* jenkins-2-plugins
-    yum clean all
+    # Konflux build copies the /usr/lib/jenkins/plugins/*.hpi from the cachi2;
+    # Hence commenting the RPM installation commands
+    # yum install -y --disableplugin=subscription-manager jenkins-2.* jenkins-2-plugins
+    # rpm -V jenkins-2.* jenkins-2-plugins
+    # yum clean all
+
     # Remove the base-plugins.txt file because it's only used for Centos
     # and its presence in the rhel image is confusing.
     rm /opt/openshift/base-plugins.txt
