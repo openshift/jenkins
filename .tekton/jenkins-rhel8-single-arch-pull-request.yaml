@@ -32,6 +32,8 @@ spec:
         - linux/x86_64
     - name: dockerfile
       value: 2/Dockerfile.rhel8-single-arch
+    - name: sast-target-dirs
+      value: "2"
     - name: path-context
       value: "2"
     - name: build-source-image
