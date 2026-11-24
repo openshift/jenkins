@@ -35,6 +35,8 @@ spec:
         - linux/s390x
     - name: dockerfile
       value: 2/Dockerfile.rhel9
+    - name: sast-target-dirs
+      value: "2"
     - name: path-context
       value: "2"
     - name: build-source-image

@@ -32,6 +32,8 @@ spec:
         - linux/s390x
     - name: dockerfile
       value: slave-base/Dockerfile.rhel9
+    - name: sast-target-dirs
+      value: "slave-base"
     - name: path-context
       value: slave-base
     - name: build-source-image
